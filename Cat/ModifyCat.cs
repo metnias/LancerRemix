@@ -44,10 +44,9 @@ namespace LancerRemix.Cat
             var node = list.First;
             while (node.Next != null)
             {
-                if (ModManager.MSC && SlugcatStats.IsSlugcatFromMSC(node.Value))
+                if ((ModManager.MSC && SlugcatStats.IsSlugcatFromMSC(node.Value)) || !HasLancer(node.Value))
                 { node = node.Next; continue; }
-                if (NameLancer.TryGetValue(node.Value, out var lancer))
-                { list.AddAfter(node, lancer); }
+                list.AddAfter(node, GetLancer(node.Value));
                 node = node.Next;
             }
 
@@ -56,7 +55,7 @@ namespace LancerRemix.Cat
 
         public static bool IsLancer(Player self) => IsLancer(self.SlugCatClass);
 
-        public static bool IsLancer(SlugName name) => AllLancer.Contains(name);
+        public static bool IsLancer(SlugName name) => LancerEnums.IsLancer(name);
 
         private static CatSupplement[] subs;
         private static ConditionalWeakTable<AbstractCreature, CatSupplement> ghostSubs;
@@ -101,14 +100,14 @@ namespace LancerRemix.Cat
                 if (!self.playerState.isGhost)
                 {
                     if (GetSub(self.abstractCreature) != null) return;
-                    //subs[self.playerState.playerNumber] = new PlanterCatSupplement(self.abstractCreature);
-                    //decos[self.playerState.playerNumber] = new PlanterCatDecoration(self.abstractCreature);
+                    subs[self.playerState.playerNumber] = new LancerSupplement(self.abstractCreature);
+                    decos[self.playerState.playerNumber] = new LancerDecoration(self.abstractCreature);
                 }
                 else
                 {
                     if (GetSub(self.abstractCreature) != null) return;
-                    //ghostSubs.Add(self.abstractCreature, new PlanterCatSupplement(self.abstractCreature));
-                    //ghostDecos.Add(self.abstractCreature, new PlanterCatDecoration(self.abstractCreature));
+                    ghostSubs.Add(self.abstractCreature, new LancerSupplement(self.abstractCreature));
+                    ghostDecos.Add(self.abstractCreature, new LancerDecoration(self.abstractCreature));
                 }
             }
         }
