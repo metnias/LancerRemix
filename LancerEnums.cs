@@ -5,6 +5,9 @@ using DreamID = DreamsState.DreamID;
 using System.Collections.Generic;
 using SlugName = SlugcatStats.Name;
 using MSCName = MoreSlugcats.MoreSlugcatsEnums.SlugcatStatsName;
+using SlugBase;
+using System.Linq;
+using LancerRemix.Cat;
 
 namespace LancerRemix
 {
@@ -39,17 +42,11 @@ namespace LancerRemix
                 if (slug.Index < 0) continue;
                 if (SlugcatStats.HiddenOrUnplayableSlugcat(slug)) continue;
                 if (ModManager.MSC && SlugcatStats.IsSlugcatFromMSC(slug)) continue;
-                var lancer = CreateLancer(slug);
+                var lancer = LancerGenerator.CreateLancer(slug);
                 AllLancer.Add(lancer);
                 NameLancer.Add(slug, lancer);
                 NameBasis.Add(lancer, slug);
             }
-        }
-
-        private static SlugName CreateLancer(SlugName basis)
-        {
-            // TODO: assign new slugbase character
-            return new SlugName(basis.value + "Lancer", false);
         }
 
         internal static void ClearLancers()

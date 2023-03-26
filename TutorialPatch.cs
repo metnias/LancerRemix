@@ -20,7 +20,7 @@ namespace LancerRemix
         {
             orig.Invoke(map, menu, owner, pos, preset, showPickupInstructions);
             if (!(Custom.rainWorld.processManager.currentMainLoop is RainWorldGame rwg)) return;
-            //if (rwg.StoryCharacter != PlanterEnums.SlugPlanter) return;
+            if (!LancerEnums.IsLancer(rwg.StoryCharacter)) return;
             if (showPickupInstructions)
             {
                 /*

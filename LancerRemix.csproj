@@ -64,6 +64,7 @@
   <ItemGroup>
     <Compile Include="Cat\CatDecoration.cs" />
     <Compile Include="Cat\CatSupplement.cs" />
+    <Compile Include="Cat\LancerGenerator.cs" />
     <Compile Include="Cat\LancerSupplement.cs" />
     <Compile Include="Cat\ModifyCat.cs" />
     <Compile Include="Cat\LancerDecoration.cs" />

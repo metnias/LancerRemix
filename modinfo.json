@@ -1,0 +1,13 @@
+{
+  "id": "topicular.lancer",
+  "name": "Lancer",
+  "version": "1.9.0.0",
+  "hide_version": false,
+  "authors": "topicular & Merang",
+  "description": "Adds Lancer variant for campaigns, which use melee combat.",
+  "target_game_version": "v1.9.0",
+  "requirements": [ "slime-cubed.slugbase" ],
+  "requirements_names": [ "SlugBase" ],
+  "tags": [ "Campaigns", "Game Mechanics" ],
+  "checksum_override_version": false
+}
