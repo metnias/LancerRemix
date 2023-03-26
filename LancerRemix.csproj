@@ -65,6 +65,7 @@
     <Compile Include="Cat\CatDecoration.cs" />
     <Compile Include="Cat\CatSupplement.cs" />
     <Compile Include="Cat\LancerGenerator.cs" />
+    <Compile Include="Cat\MenuModifier.cs" />
     <Compile Include="Cat\LancerSupplement.cs" />
     <Compile Include="Cat\ModifyCat.cs" />
     <Compile Include="Cat\LancerDecoration.cs" />
@@ -72,9 +73,21 @@
     <Compile Include="LancerPlugin.cs" />
     <Compile Include="LancerEnums.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <AdditionalFiles Include="modinfo.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </AdditionalFiles>
     <None Include="SaveManager.cs" />
     <Compile Include="TutorialPatch.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="slugbase\scenes\select - whitelancer\LancerSurv background - 5.png" />
+    <Content Include="slugbase\scenes\select - whitelancer\LancerSurv bkgplants - 3.png" />
+    <Content Include="slugbase\scenes\select - whitelancer\LancerSurv fgplants - 0.png" />
+    <Content Include="slugbase\scenes\select - whitelancer\LancerSurv haze - 4.png" />
+    <Content Include="slugbase\scenes\select - whitelancer\LancerSurv slugcat - 2.png" />
+    <Content Include="slugbase\scenes\select - whitelancer\LancerSurv vines - 1.png" />
+    <Content Include="slugbase\scenes\select - whitelancer\positions.txt" />
+    <Content Include="slugbase\scenes\select - whitelancer\Select - LancerSurv - flat.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
