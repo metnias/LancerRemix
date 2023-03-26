@@ -57,6 +57,7 @@ namespace LancerRemix
             TutorialPatch.SubPatch();
             ModifyCat.SubPatch();
             //SaveManager.SubPatch();
+            MenuModifier.SubPatch();
 
             instance.Logger.LogMessage("The Lancer is Intilaized.");
         }
