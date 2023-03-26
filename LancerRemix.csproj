@@ -62,11 +62,16 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Cat\CatDecoration.cs" />
+    <Compile Include="Cat\CatSupplement.cs" />
+    <Compile Include="Cat\ModifyCat.cs" />
+    <Compile Include="Extras.cs" />
     <Compile Include="LancerPlugin.cs" />
+    <Compile Include="LancerEnums.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SaveManager.cs" />
+    <Compile Include="TutorialPatch.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Cat\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

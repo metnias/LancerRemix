@@ -1,4 +1,5 @@
 ﻿using LancerRemix;
+using LancerRemix.Cat;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -42,6 +43,7 @@ namespace LancerRemix
             LogSource = this.Logger;
 
             On.RainWorld.OnModsInit += Extras.WrapInit(Init);
+            On.RainWorld.PostModsInit += PostInit;
             On.RainWorld.OnModsEnabled += OnModsEnabled;
             On.RainWorld.OnModsDisabled += OnModsDisabled;
         }
@@ -51,7 +53,18 @@ namespace LancerRemix
             if (init) return;
             init = true;
 
+            LancerEnums.RegisterExtEnum();
+            TutorialPatch.SubPatch();
+            ModifyCat.SubPatch();
+
             instance.Logger.LogMessage("The Lancer is Intilaized.");
+        }
+
+        private static void PostInit(On.RainWorld.orig_PostModsInit orig, RainWorld rw)
+        {
+            orig(rw);
+
+            LancerEnums.RegisterLancers();
         }
 
         private static bool lastMSCEnabled;
@@ -59,6 +72,7 @@ namespace LancerRemix
         private static void OnModsEnabled(On.RainWorld.orig_OnModsEnabled orig, RainWorld rw, ModManager.Mod[] newlyEnabledMods)
         {
             orig(rw, newlyEnabledMods);
+            LancerEnums.RegisterLancers();
             if (!lastMSCEnabled && ModManager.MSC)
             {
                 LogSource.LogInfo("Lancer detected MSC newly enabled.");
