@@ -69,7 +69,7 @@
     <Compile Include="LancerPlugin.cs" />
     <Compile Include="LancerEnums.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SaveManager.cs" />
+    <None Include="SaveManager.cs" />
     <Compile Include="TutorialPatch.cs" />
   </ItemGroup>
   <ItemGroup />

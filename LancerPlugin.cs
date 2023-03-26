@@ -56,6 +56,7 @@ namespace LancerRemix
             LancerEnums.RegisterExtEnum();
             TutorialPatch.SubPatch();
             ModifyCat.SubPatch();
+            //SaveManager.SubPatch();
 
             instance.Logger.LogMessage("The Lancer is Intilaized.");
         }

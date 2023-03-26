@@ -41,12 +41,22 @@ namespace LancerRemix.Cat
         private static SlugName[] AppendTimelineOrder(On.SlugcatStats.orig_getSlugcatTimelineOrder orig)
         {
             LinkedList<SlugName> list = new LinkedList<SlugName>(orig());
-            var yellow = list.Find(SlugName.Yellow);
-            list.AddAfter(yellow, SlugPlanter);
+            var node = list.First;
+            while (node.Next != null)
+            {
+                if (ModManager.MSC && SlugcatStats.IsSlugcatFromMSC(node.Value))
+                { node = node.Next; continue; }
+                if (NameLancer.TryGetValue(node.Value, out var lancer))
+                { list.AddAfter(node, lancer); }
+                node = node.Next;
+            }
+
             return list.ToArray();
         }
 
-        public static bool IsLancer(Player self) => LancerEnums.AllLancer.Contains(self.slugcatStats.name);
+        public static bool IsLancer(Player self) => IsLancer(self.SlugCatClass);
+
+        public static bool IsLancer(SlugName name) => AllLancer.Contains(name);
 
         private static CatSupplement[] subs;
         private static ConditionalWeakTable<AbstractCreature, CatSupplement> ghostSubs;
@@ -86,20 +96,19 @@ namespace LancerRemix.Cat
         private static void CtorPatch(On.Player.orig_ctor orig, Player self, AbstractCreature abstractCreature, World world)
         {
             orig(self, abstractCreature, world);
-            Debug.Log($"New Player: {self.slugcatStats.name} == {SlugPlanter}? {IsLancer(self)}");
             if (IsLancer(self))
             {
                 if (!self.playerState.isGhost)
                 {
                     if (GetSub(self.abstractCreature) != null) return;
-                    subs[self.playerState.playerNumber] = new PlanterCatSupplement(self.abstractCreature);
-                    decos[self.playerState.playerNumber] = new PlanterCatDecoration(self.abstractCreature);
+                    //subs[self.playerState.playerNumber] = new PlanterCatSupplement(self.abstractCreature);
+                    //decos[self.playerState.playerNumber] = new PlanterCatDecoration(self.abstractCreature);
                 }
                 else
                 {
                     if (GetSub(self.abstractCreature) != null) return;
-                    ghostSubs.Add(self.abstractCreature, new PlanterCatSupplement(self.abstractCreature));
-                    ghostDecos.Add(self.abstractCreature, new PlanterCatDecoration(self.abstractCreature));
+                    //ghostSubs.Add(self.abstractCreature, new PlanterCatSupplement(self.abstractCreature));
+                    //ghostDecos.Add(self.abstractCreature, new PlanterCatDecoration(self.abstractCreature));
                 }
             }
         }
