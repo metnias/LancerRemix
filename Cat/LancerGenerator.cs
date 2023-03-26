@@ -15,66 +15,49 @@ namespace LancerRemix.Cat
     {
         internal static SlugName CreateLancer(SlugName basis)
         {
-            var data = new Dictionary<string, string>();
-
-            // ID
-            string id = $"{basis.value}Lancer";
-            data.Add("id", id.StringQuote());
+            var builder = new JsonBuilder().
+                Value("id", $"{basis.value}Lancer");
 
             if (ModManager.MSC && SlugcatStats.IsSlugcatFromMSC(basis))
-                GetMSCLancerData(basis, ref data);
-            else if (SlugBaseCharacter.Registry.TryGet(basis, out var character)) PopulateSlugBaseLancerData(character, ref data);
-            else PopulateVanillaLancerData(basis, ref data);
+                GetMSCLancerData(basis, ref builder);
+            else if (SlugBaseCharacter.Registry.TryGet(basis, out var character)) PopulateSlugBaseLancerData(character, ref builder);
+            else PopulateVanillaLancerData(basis, ref builder);
 
-            var pair = SlugBaseCharacter.Registry.Add(JsonAny.Parse(DictToJson(data)).AsObject());
+            var pair = SlugBaseCharacter.Registry.Add(JsonAny.Parse(builder.Build()).AsObject());
             return pair.Key;
         }
 
-        private static string DictToJson(Dictionary<string, string> dict) => "{" +
-                      string.Join(",",
-                                  from kvp in dict
-                                  select $"\"{kvp.Key}\":{kvp.Value}"
-                      ) + "}";
-
-        private static string StringQuote(this string text) => $"\"{text}\"";
-
-        private static string CustomColor(Color[] storyColors)
+        private static void PopulateVanillaLancerData(SlugName basis, ref JsonBuilder builder)
         {
-            StringBuilder sb = new StringBuilder();
-            sb.Append('[');
-            for (int i = 0; i < storyColors.Length; ++i)
+            // name
+            builder.Value("name", SlugcatStats.getSlugcatName(basis));
+            // description
+
+            // features
+            builder.Object("features", features =>
             {
-            }
-            sb.Append(']');
-            return sb.ToString();
+                features.Value("color", "FFFFFF");
+            });
         }
 
-        private static void PopulateVanillaLancerData(SlugName basis, ref Dictionary<string, string> data)
+        private static void PopulateSlugBaseLancerData(SlugBaseCharacter character, ref JsonBuilder builder)
         {
             // name
-            data.Add("name", SlugcatStats.getSlugcatName(basis).StringQuote());
+            builder.Value("name", character.DisplayName);
             // description
+            builder.Value("description", character.Description);
 
             // features
-            var features = new Dictionary<string, string>();
-
-            data.Add("features", DictToJson(features));
+            builder.Object("features", features =>
+            {
+                foreach (var feature in character.Features)
+                {
+                    features.Value(feature.ID, feature.ToString());
+                }
+            });
         }
 
-        private static void PopulateSlugBaseLancerData(SlugBaseCharacter character, ref Dictionary<string, string> data)
-        {
-            // name
-            data.Add("name", character.DisplayName.StringQuote());
-            // description
-            data.Add("description", character.Description.StringQuote());
-
-            // features
-            var features = new Dictionary<string, string>();
-
-            data.Add("features", DictToJson(features));
-        }
-
-        private static void GetMSCLancerData(SlugName basis, ref Dictionary<string, string> data)
+        private static void GetMSCLancerData(SlugName basis, ref JsonBuilder builder)
         {
         }
     }
