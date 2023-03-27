@@ -15,7 +15,7 @@ namespace LancerRemix
     {
         private readonly static Dictionary<SlugName, SlugName> NameLancer = new Dictionary<SlugName, SlugName>();
         private readonly static Dictionary<SlugName, SlugName> NameBasis = new Dictionary<SlugName, SlugName>();
-        private readonly static HashSet<SlugName> AllLancer = new HashSet<SlugName>();
+        internal readonly static HashSet<SlugName> AllLancer = new HashSet<SlugName>();
         private readonly static HashSet<SlugName> AllBasis = new HashSet<SlugName>();
 
         internal static bool IsLancer(SlugName name) => AllLancer.Contains(name);

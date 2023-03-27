@@ -10,6 +10,7 @@ namespace LancerRemix.Menu
     {
         internal static void SubPatch()
         {
+            SelectMenuPatch.MiniPatch();
             /// TODO: add Lancer toggle button in slugcat select menu
             /// clicking that swooshes illust upwards.
         }

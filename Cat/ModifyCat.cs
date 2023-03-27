@@ -39,7 +39,7 @@ namespace LancerRemix.Cat
 
         
 
-        public static bool IsLancer(Player self) => IsLancer(self.SlugCatClass);
+        public static bool IsLancer(AbstractCreature self) => GetSub(self).IsLancer();
 
         public static bool IsLancer(SlugName name) => LancerEnums.IsLancer(name);
 
@@ -80,34 +80,33 @@ namespace LancerRemix.Cat
 
         private static void CtorPatch(On.Player.orig_ctor orig, Player self, AbstractCreature abstractCreature, World world)
         {
-            orig(self, abstractCreature, world);
-            if (IsLancer(self))
+            var name = self.SlugCatClass;
+            if (IsLancer(name))
             {
-                if (!self.playerState.isGhost)
-                {
-                    if (GetSub(self.abstractCreature) != null) return;
-                    subs[self.playerState.playerNumber] = new LancerSupplement(self.abstractCreature);
-                    decos[self.playerState.playerNumber] = new LancerDecoration(self.abstractCreature);
-                }
-                else
-                {
-                    if (GetSub(self.abstractCreature) != null) return;
-                    ghostSubs.Add(self.abstractCreature, new LancerSupplement(self.abstractCreature));
-                    ghostDecos.Add(self.abstractCreature, new LancerDecoration(self.abstractCreature));
-                }
+                self.playerState.slugcatCharacter = GetBasis(name);
+                if (GetSub(self.abstractCreature) != null) return;
+                subs[self.playerState.playerNumber] = new LancerSupplement(self.abstractCreature);
+                decos[self.playerState.playerNumber] = new LancerDecoration(self.abstractCreature);
             }
+            else
+            {
+                if (GetSub(self.abstractCreature) != null) return;
+                subs[self.playerState.playerNumber] = new NonLancerSupplement(self.abstractCreature);
+                decos[self.playerState.playerNumber] = new NonLancerDecoration(self.abstractCreature);
+            }
+            orig(self, abstractCreature, world);
         }
 
         private static void UpdatePatch(On.Player.orig_Update orig, Player self, bool eu)
         {
             orig(self, eu);
-            if (IsLancer(self)) GetSub(self.abstractCreature).Update();
+            GetSub(self.abstractCreature).Update();
         }
 
         private static void DestroyPatch(On.Player.orig_Destroy orig, Player self)
         {
             orig(self);
-            if (IsLancer(self)) GetSub(self.abstractCreature).Destroy();
+            GetSub(self.abstractCreature).Destroy();
         }
 
         #endregion Player
@@ -128,48 +127,48 @@ namespace LancerRemix.Cat
         private static void GrafUpdatePatch(On.PlayerGraphics.orig_Update orig, PlayerGraphics self)
         {
             orig(self);
-            if (IsLancer(self.player)) GetDeco(self.player.abstractCreature).Update();
+            GetDeco(self.player.abstractCreature).Update();
         }
 
         private static void InitSprPatch(On.PlayerGraphics.orig_InitiateSprites orig, PlayerGraphics self,
             RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam)
         {
             orig(self, sLeaser, rCam);
-            if (IsLancer(self.player)) GetDeco(self.player.abstractCreature).InitiateSprites(sLeaser, rCam);
+            GetDeco(self.player.abstractCreature).InitiateSprites(sLeaser, rCam);
         }
 
         private static void SuckedIntoShortCutPatch(On.PlayerGraphics.orig_SuckedIntoShortCut orig,
             PlayerGraphics self, Vector2 shortCutPosition)
         {
             orig(self, shortCutPosition);
-            if (IsLancer(self.player)) GetDeco(self.player.abstractCreature).SuckedIntoShortCut();
+            GetDeco(self.player.abstractCreature).SuckedIntoShortCut();
         }
 
         private static void ResetPatch(On.PlayerGraphics.orig_Reset orig, PlayerGraphics self)
         {
             orig.Invoke(self);
-            if (IsLancer(self.player)) GetDeco(self.player.abstractCreature).Reset();
+            GetDeco(self.player.abstractCreature).Reset();
         }
 
         private static void DrawSprPatch(On.PlayerGraphics.orig_DrawSprites orig, PlayerGraphics self,
             RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
         {
             orig(self, sLeaser, rCam, timeStacker, camPos);
-            if (IsLancer(self.player)) GetDeco(self.player.abstractCreature).DrawSprites(sLeaser, rCam, timeStacker, camPos);
+            GetDeco(self.player.abstractCreature).DrawSprites(sLeaser, rCam, timeStacker, camPos);
         }
 
         private static void AddToCtnrPatch(On.PlayerGraphics.orig_AddToContainer orig, PlayerGraphics self,
             RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, FContainer newContatiner)
         {
             orig(self, sLeaser, rCam, newContatiner);
-            if (IsLancer(self.player)) GetDeco(self.player.abstractCreature).AddToContainer(sLeaser, rCam, newContatiner);
+            GetDeco(self.player.abstractCreature).AddToContainer(sLeaser, rCam, newContatiner);
         }
 
         private static void PalettePatch(On.PlayerGraphics.orig_ApplyPalette orig, PlayerGraphics self,
             RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, RoomPalette palette)
         {
             orig(self, sLeaser, rCam, palette);
-            if (IsLancer(self.player)) GetDeco(self.player.abstractCreature).ApplyPalette(sLeaser, rCam, palette);
+            GetDeco(self.player.abstractCreature).ApplyPalette(sLeaser, rCam, palette);
         }
 
         #endregion Graphics

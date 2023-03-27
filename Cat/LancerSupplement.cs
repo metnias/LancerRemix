@@ -12,5 +12,10 @@ namespace LancerRemix.Cat
         {
             isLancer = true;
         }
+
+        public override void Update()
+        {
+            base.Update();
+        }
     }
 }
