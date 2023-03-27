@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LancerRemix.Cat
+namespace LancerRemix.Menu
 {
     internal static class MenuModifier
     {
@@ -13,5 +13,7 @@ namespace LancerRemix.Cat
             /// TODO: add Lancer toggle button in slugcat select menu
             /// clicking that swooshes illust upwards.
         }
+
+        
     }
 }

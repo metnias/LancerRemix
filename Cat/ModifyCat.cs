@@ -11,7 +11,6 @@ namespace LancerRemix.Cat
     {
         public static void SubPatch()
         {
-            On.SlugcatStats.getSlugcatTimelineOrder += AppendTimelineOrder;
             On.RainWorldGame.ctor += StartGamePatch;
             On.Player.ctor += CtorPatch;
             On.Player.Update += UpdatePatch;
@@ -38,20 +37,7 @@ namespace LancerRemix.Cat
         {
         }
 
-        private static SlugName[] AppendTimelineOrder(On.SlugcatStats.orig_getSlugcatTimelineOrder orig)
-        {
-            LinkedList<SlugName> list = new LinkedList<SlugName>(orig());
-            var node = list.First;
-            while (node.Next != null)
-            {
-                if ((ModManager.MSC && SlugcatStats.IsSlugcatFromMSC(node.Value)) || !HasLancer(node.Value))
-                { node = node.Next; continue; }
-                list.AddAfter(node, GetLancer(node.Value));
-                node = node.Next;
-            }
-
-            return list.ToArray();
-        }
+        
 
         public static bool IsLancer(Player self) => IsLancer(self.SlugCatClass);
 

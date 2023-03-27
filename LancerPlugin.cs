@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using BepInEx.Logging;
 using BepInEx;
+using LancerRemix.Menu;
 
 #region Assembly attributes
 
@@ -58,6 +59,7 @@ namespace LancerRemix
             ModifyCat.SubPatch();
             //SaveManager.SubPatch();
             MenuModifier.SubPatch();
+            LancerGenerator.SubPatch();
 
             instance.Logger.LogMessage("The Lancer is Intilaized.");
         }

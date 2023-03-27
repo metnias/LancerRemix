@@ -13,13 +13,14 @@ namespace LancerRemix
 {
     public static class LancerEnums
     {
-        private static Dictionary<SlugName, SlugName> NameLancer;
-        private static Dictionary<SlugName, SlugName> NameBasis;
-        private static HashSet<SlugName> AllLancer;
+        private readonly static Dictionary<SlugName, SlugName> NameLancer = new Dictionary<SlugName, SlugName>();
+        private readonly static Dictionary<SlugName, SlugName> NameBasis = new Dictionary<SlugName, SlugName>();
+        private readonly static HashSet<SlugName> AllLancer = new HashSet<SlugName>();
+        private readonly static HashSet<SlugName> AllBasis = new HashSet<SlugName>();
 
         internal static bool IsLancer(SlugName name) => AllLancer.Contains(name);
 
-        internal static bool HasLancer(SlugName basis) => NameLancer.ContainsKey(basis);
+        internal static bool HasLancer(SlugName basis) => AllBasis.Contains(basis);
 
         internal static SlugName GetLancer(SlugName basis) => NameLancer[basis];
 
@@ -27,9 +28,6 @@ namespace LancerRemix
 
         internal static void RegisterExtEnum()
         {
-            AllLancer = new HashSet<SlugName>();
-            NameLancer = new Dictionary<SlugName, SlugName>();
-            NameBasis = new Dictionary<SlugName, SlugName>();
         }
 
         internal static void RegisterLancers()
@@ -44,6 +42,7 @@ namespace LancerRemix
                 if (ModManager.MSC && SlugcatStats.IsSlugcatFromMSC(slug)) continue;
                 var lancer = LancerGenerator.CreateLancer(slug);
                 AllLancer.Add(lancer);
+                AllBasis.Add(slug);
                 NameLancer.Add(slug, lancer);
                 NameBasis.Add(lancer, slug);
             }
