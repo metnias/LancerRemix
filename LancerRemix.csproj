@@ -32,16 +32,16 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="BepInEx">
-      <HintPath>..\References\RWDownpour\BepInEx.dll</HintPath>
+      <HintPath>debug\BepInEx.dll</HintPath>
     </Reference>
     <Reference Include="HOOKS-Assembly-CSharp">
-      <HintPath>..\References\RWDownpour\HOOKS-Assembly-CSharp.dll</HintPath>
+      <HintPath>debug\HOOKS-Assembly-CSharp.dll</HintPath>
     </Reference>
     <Reference Include="PUBLIC-Assembly-CSharp">
-      <HintPath>..\References\RWDownpour\PUBLIC-Assembly-CSharp.dll</HintPath>
+      <HintPath>debug\PUBLIC-Assembly-CSharp.dll</HintPath>
     </Reference>
     <Reference Include="SlugBase">
-      <HintPath>..\References\RWDownpour\SlugBase.dll</HintPath>
+      <HintPath>debug\SlugBase.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -52,20 +52,22 @@
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
     <Reference Include="UnityEngine">
-      <HintPath>..\References\RWDownpour\UnityEngine.dll</HintPath>
+      <HintPath>debug\UnityEngine.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
-      <HintPath>..\References\RWDownpour\UnityEngine.CoreModule.dll</HintPath>
+      <HintPath>debug\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.InputLegacyModule">
-      <HintPath>..\References\RWDownpour\UnityEngine.InputLegacyModule.dll</HintPath>
+      <HintPath>debug\UnityEngine.InputLegacyModule.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Cat\CatDecoration.cs" />
     <Compile Include="Cat\CatSupplement.cs" />
+    <Compile Include="Cat\NonLancerSupplement.cs" />
+    <Compile Include="Cat\NonLancerDecoration.cs" />
     <Compile Include="Cat\LancerGenerator.cs" />
-    <Compile Include="Cat\MenuModifier.cs" />
+    <Compile Include="Menu\MenuModifier.cs" />
     <Compile Include="Cat\LancerSupplement.cs" />
     <Compile Include="Cat\ModifyCat.cs" />
     <Compile Include="Cat\LancerDecoration.cs" />
@@ -73,6 +75,7 @@
     <Compile Include="JsonBuilder.cs" />
     <Compile Include="LancerPlugin.cs" />
     <Compile Include="LancerEnums.cs" />
+    <Compile Include="Menu\SelectMenuPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <AdditionalFiles Include="modinfo.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
