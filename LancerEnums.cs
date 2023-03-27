@@ -51,6 +51,8 @@ namespace LancerRemix
 
         internal static void ClearLancers()
         {
+            foreach (var lancer in AllLancer) lancer.Unregister();
+
             NameLancer.Clear();
             NameBasis.Clear();
             AllLancer.Clear();

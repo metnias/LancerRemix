@@ -88,13 +88,14 @@
     <None Include="slugbase\scenes\select - whitelancer\LancerSurv bkgplants - 3.png" />
     <None Include="slugbase\scenes\select - whitelancer\LancerSurv fgplants - 0.png" />
     <None Include="slugbase\scenes\select - whitelancer\LancerSurv haze - 4.png" />
+    <Content Include="illustrations\lancer_off.png" />
+    <Content Include="illustrations\lancer_on.png" />
     <Content Include="scenes\slugcat - lancer\white lancer - 2.png" />
     <None Include="slugbase\scenes\select - whitelancer\LancerSurv vines - 1.png" />
     <None Include="slugbase\scenes\select - whitelancer\positions.txt" />
     <Content Include="scenes\slugcat - lancer\lancer - white - flat.png" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="illustrations\" />
     <Folder Include="text\text_kor\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

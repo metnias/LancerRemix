@@ -45,7 +45,7 @@ namespace LancerRemix.LancerMenu
             }
             // Add Toggle Button
             lancerButton = new SymbolButtonToggle(self, self.pages[0], LANCER_SIGNAL, new Vector2(1016f, 50f), new Vector2(50f, 50f),
-                "ps4_circle_button", "ps4_cross_button", slugcatPageLancer, false); // TODO: add sprites in illustrations
+                "lancer_on", "lancer_off", slugcatPageLancer, false);
             self.pages[0].subObjects.Add(lancerButton);
             self.MutualHorizontalButtonBind(lancerButton, self.nextButton);
 
@@ -138,7 +138,7 @@ namespace LancerRemix.LancerMenu
         private static void PageGrafUpdatePatch(On.Menu.SlugcatSelectMenu.SlugcatPage.orig_GrafUpdate orig, SlugcatPage self, float timeStacker)
         {
             orig(self, timeStacker);
-            float offset = Mathf.Lerp(lastLancerTransition, lancerTransition, timeStacker) * VOFFSET;
+            float offset = Mathf.Lerp(lastLancerTransition, lancerTransition, timeStacker) * VOFFSET + 0.01f;
             if (IsLancerPage(self)) offset -= VOFFSET;
             if (self.markSquare != null && self.markGlow != null)
             {
@@ -177,7 +177,7 @@ namespace LancerRemix.LancerMenu
             if (basis == SlugName.White)
             {
                 ReplaceIllust($"scenes{Path.DirectorySeparatorChar}slugcat - lancer",
-                    "lancer - white - flat", "White Slugcat - 2", "white lancer - 2", new Vector2(503f, 205f));
+                    "lancer - white - flat", "White Slugcat - 2", "white lancer - 2", new Vector2(503f, 178f));
             }
 
             void ReplaceIllust(string sceneFolder, string flatImage, string layerImageOrig, string layerImage, Vector2 layerPos)
