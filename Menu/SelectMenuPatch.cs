@@ -1,11 +1,6 @@
 ﻿using Menu;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static Menu.SlugcatSelectMenu;
 using static LancerRemix.LancerEnums;
+using static Menu.SlugcatSelectMenu;
 using SlugName = SlugcatStats.Name;
 
 namespace LancerRemix.Menu
@@ -20,13 +15,51 @@ namespace LancerRemix.Menu
         private static void SlugcatSelectMenuCtorPatch(On.Menu.SlugcatSelectMenu.orig_ctor orig, SlugcatSelectMenu self, ProcessManager manager)
         {
             orig(self, manager);
+            slugcatPageLancer = false;
+            lancerPages = new SlugcatPage[self.slugcatPages.Count];
             foreach (var lancer in AllLancer)
             {
                 self.saveGameData[lancer] = MineForSaveData(manager, lancer);
+                int order = GetBasisOrder(lancer);
+                if (order < 0) continue;
+                if (self.saveGameData[lancer] != null)
+                {
+                    lancerPages[order] = new LancerPageContinue(self, null, 1 + order, lancer);
+                }
+                else
+                {
+                    lancerPages[order] = new LancerPageNewGame(self, null, 1 + order, lancer);
+                }
+                self.pages.Add(lancerPages[order]);
 
+                UpdateCurrentlySelectedLancer(lancer, order);
+            }
+            // Add Toggle Button
+
+
+            int GetBasisOrder(SlugName lancer)
+            {
+                var basis = GetBasis(lancer);
+                for (int i = 0; i < self.slugcatColorOrder.Count; ++i)
+                    if (self.slugcatColorOrder[i] == basis) return i;
+                return -1;
+            }
+
+            void UpdateCurrentlySelectedLancer(SlugName lancer, int order)
+            {
+                if (self.manager.rainWorld.progression.miscProgressionData.currentlySelectedSinglePlayerSlugcat == lancer)
+                {
+                    slugcatPageLancer = true;
+                    self.slugcatPageIndex = order;
+                }
             }
         }
 
+        private static SlugcatPage[] lancerPages;
+        private static bool slugcatPageLancer;
+
+        private static bool IsLancerPage(SlugcatPage page)
+            => page is LancerPageNewGame || page is LancerPageContinue;
 
     }
 
