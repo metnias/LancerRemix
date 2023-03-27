@@ -69,7 +69,7 @@ namespace LancerRemix.Menu
         private static float lancerTransition = 0f;
         private static float lastLancerTransition = 0f;
 
-        private static bool IsLancerPage(in SlugcatPage page)
+        private static bool IsLancerPage(SlugcatPage page)
             => page is LancerPageNewGame || page is LancerPageContinue;
 
         internal const float VOFFSET = 800f;
@@ -132,7 +132,7 @@ namespace LancerRemix.Menu
                 ReplaceIllust(page.slugcatImage.sceneFolder, "Slugcat - White - Flat", "White Slugcat - 2", "White Slugcat - 2");
             }
 
-            void ReplaceIllust(in string sceneFolder, in string flatImage, in string layerImageOrig, in string layerImage)
+            void ReplaceIllust(string sceneFolder, string flatImage, string layerImageOrig, string layerImage)
             {
                 if (page.slugcatImage.flatMode)
                 {
