@@ -10,6 +10,7 @@ namespace LancerRemix.Cat
     {
         public LancerDecoration(AbstractCreature owner) : base(owner)
         {
+            isLancer = true;
         }
     }
 }

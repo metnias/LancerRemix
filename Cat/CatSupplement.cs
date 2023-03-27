@@ -11,6 +11,10 @@ namespace LancerRemix.Cat
             this.owner = owner;
         }
 
+        public bool IsLancer() => isLancer;
+
+        protected bool isLancer = false;
+
         public readonly AbstractCreature owner;
         public Player player => owner.realizedCreature as Player;
         public static FoodMeter meter;
