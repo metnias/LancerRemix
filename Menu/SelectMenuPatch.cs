@@ -1,8 +1,6 @@
 ﻿using JollyCoop.JollyMenu;
 using Menu;
 using RWCustom;
-using System;
-using System.Linq;
 using UnityEngine;
 using static LancerRemix.LancerEnums;
 using static Menu.SlugcatSelectMenu;
@@ -71,7 +69,7 @@ namespace LancerRemix.Menu
         private static float lancerTransition = 0f;
         private static float lastLancerTransition = 0f;
 
-        private static bool IsLancerPage(SlugcatPage page)
+        private static bool IsLancerPage(in SlugcatPage page)
             => page is LancerPageNewGame || page is LancerPageContinue;
 
         internal const float VOFFSET = 800f;
@@ -126,6 +124,35 @@ namespace LancerRemix.Menu
             }
         }
 
+        private static void LancerPortrait(SlugcatPage page)
+        {
+            var basis = GetBasis(page.slugcatNumber);
+            if (basis == SlugName.White)
+            {
+                ReplaceIllust(page.slugcatImage.sceneFolder, "Slugcat - White - Flat", "White Slugcat - 2", "White Slugcat - 2");
+            }
+
+            void ReplaceIllust(in string sceneFolder, in string flatImage, in string layerImageOrig, in string layerImage)
+            {
+                if (page.slugcatImage.flatMode)
+                {
+                    page.slugcatImage.flatIllustrations[0].RemoveSprites();
+                    page.slugcatImage.flatIllustrations.Clear();
+                    page.slugcatImage.AddIllustration(new MenuIllustration(page.menu, page.slugcatImage, sceneFolder, flatImage, new Vector2(683f, 384f), false, true));
+                }
+                else
+                {
+                    int i = 0;
+                    for (; i < page.slugcatImage.depthIllustrations.Count; ++i)
+                        if (page.slugcatImage.depthIllustrations[i].fileName == layerImageOrig) break;
+                    Vector2 pos = page.slugcatImage.depthIllustrations[i].pos;
+                    page.slugcatImage.depthIllustrations[i].RemoveSprites();
+                    page.slugcatImage.depthIllustrations[i] =
+                        new MenuDepthIllustration(page.menu, page.slugcatImage, sceneFolder, layerImage, pos, 2.7f, MenuDepthIllustration.MenuShader.Basic);
+                }
+            }
+        }
+
 
         internal class LancerPageNewGame : SlugcatPageNewGame
         {
@@ -134,6 +161,7 @@ namespace LancerRemix.Menu
                 basisNumber = slugcatNumber;
                 slugcatNumber = lancerNumber;
 
+                LancerPortrait(this);
                 sceneOffset.y -= VOFFSET;
             }
 
@@ -148,6 +176,7 @@ namespace LancerRemix.Menu
                 basisNumber = slugcatNumber;
                 slugcatNumber = lancerNumber;
 
+                LancerPortrait(this);
                 sceneOffset.y -= VOFFSET;
             }
 
