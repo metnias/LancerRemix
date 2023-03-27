@@ -13,10 +13,10 @@ namespace LancerRemix
 {
     public static class LancerEnums
     {
-        private readonly static Dictionary<SlugName, SlugName> NameLancer = new Dictionary<SlugName, SlugName>();
-        private readonly static Dictionary<SlugName, SlugName> NameBasis = new Dictionary<SlugName, SlugName>();
-        internal readonly static HashSet<SlugName> AllLancer = new HashSet<SlugName>();
-        private readonly static HashSet<SlugName> AllBasis = new HashSet<SlugName>();
+        private static readonly Dictionary<SlugName, SlugName> NameLancer = new Dictionary<SlugName, SlugName>();
+        private static readonly Dictionary<SlugName, SlugName> NameBasis = new Dictionary<SlugName, SlugName>();
+        internal static readonly HashSet<SlugName> AllLancer = new HashSet<SlugName>();
+        private static readonly HashSet<SlugName> AllBasis = new HashSet<SlugName>();
 
         internal static bool IsLancer(SlugName name) => AllLancer.Contains(name);
 
@@ -40,18 +40,21 @@ namespace LancerRemix
                 if (slug.Index < 0) continue;
                 if (SlugcatStats.HiddenOrUnplayableSlugcat(slug)) continue;
                 if (ModManager.MSC && SlugcatStats.IsSlugcatFromMSC(slug)) continue;
-                var lancer = LancerGenerator.CreateLancer(slug);
+                if (!LancerGenerator.CreateLancer(slug, out var lancer)) continue;
                 AllLancer.Add(lancer);
                 AllBasis.Add(slug);
                 NameLancer.Add(slug, lancer);
                 NameBasis.Add(lancer, slug);
+                LancerPlugin.LogSource.LogMessage($"Created {lancer.value}({lancer.Index}) for {slug}({slug.Index})");
             }
         }
 
         internal static void ClearLancers()
         {
             NameLancer.Clear();
+            NameBasis.Clear();
             AllLancer.Clear();
+            AllBasis.Clear();
         }
 
         internal static void UnregisterExtEnum()

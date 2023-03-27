@@ -88,10 +88,10 @@
     <None Include="slugbase\scenes\select - whitelancer\LancerSurv bkgplants - 3.png" />
     <None Include="slugbase\scenes\select - whitelancer\LancerSurv fgplants - 0.png" />
     <None Include="slugbase\scenes\select - whitelancer\LancerSurv haze - 4.png" />
-    <Content Include="scenes\slugcat - lancer\white slugcat - 2.png" />
+    <Content Include="scenes\slugcat - lancer\white lancer - 2.png" />
     <None Include="slugbase\scenes\select - whitelancer\LancerSurv vines - 1.png" />
     <None Include="slugbase\scenes\select - whitelancer\positions.txt" />
-    <Content Include="scenes\slugcat - lancer\slugcat - white - flat.png" />
+    <Content Include="scenes\slugcat - lancer\lancer - white - flat.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="illustrations\" />

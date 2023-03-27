@@ -27,6 +27,8 @@ using LancerRemix.LancerMenu;
 
 namespace LancerRemix
 {
+    [BepInPlugin(PLUGIN_ID, PLUGIN_NAME, PLUGIN_VERSION)]
+    [BepInProcess("RainWorld.exe")]
     public class LancerPlugin : BaseUnityPlugin
     {
         public const string PLUGIN_ID = "com.rainworldgame.topicular.lancer.plugin";

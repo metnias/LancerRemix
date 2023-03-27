@@ -41,9 +41,10 @@ namespace LancerRemix.LancerMenu
                 UpdateCurrentlySelectedLancer(lancer, order);
             }
             // Add Toggle Button
-            lancerButton = new SymbolButtonToggle(self, self.pages[0], LANCER_SIGNAL, new Vector2(1116f, 50f), new Vector2(50f, 50f),
-                "Big_Menu_Arrow", "Kill_Slugcat", slugcatPageLancer, false); // TODO: replace sprites
+            lancerButton = new SymbolButtonToggle(self, self.pages[0], LANCER_SIGNAL, new Vector2(1016f, 50f), new Vector2(50f, 50f),
+                "ps4_circle_button", "ps4_cross_button", slugcatPageLancer, false); // TODO: add sprites in illustrations
             self.pages[0].subObjects.Add(lancerButton);
+            self.MutualHorizontalButtonBind(lancerButton, self.nextButton);
 
             int GetBasisOrder(SlugName lancer)
             {
@@ -79,15 +80,17 @@ namespace LancerRemix.LancerMenu
         {
             orig(self);
             lastLancerTransition = lancerTransition;
-            lancerTransition = Custom.LerpAndTick(lancerTransition, slugcatPageLancer ? 1f : 0f, 0.2f, 0.1f);
+            lancerTransition = Custom.LerpAndTick(lancerTransition, slugcatPageLancer ? 1f : 0f, 0.07f, 0.03f);
         }
 
         private static void SignalPatch(On.Menu.SlugcatSelectMenu.orig_Singal orig, SlugcatSelectMenu self, MenuObject sender, string message)
         {
-            if (message == LANCER_SIGNAL)
+            if (message.StartsWith(LANCER_SIGNAL))
             {
-                slugcatPageLancer = !slugcatPageLancer;
+                slugcatPageLancer = message.EndsWith("_on");
+                //LancerPlugin.LogSource.LogMessage($"slugcatPageLancer: {slugcatPageLancer}");
                 self.PlaySound(SoundID.MENU_Next_Slugcat);
+                self.UpdateStartButtonText();
                 return;
             }
             orig(self, sender, message);
@@ -97,7 +100,7 @@ namespace LancerRemix.LancerMenu
         {
             orig(self, timeStacker);
             float offset = Mathf.Lerp(lastLancerTransition, lancerTransition, timeStacker) * VOFFSET;
-            //if (IsLancerPage(self)) offset -= VOFFSET;
+            if (IsLancerPage(self)) offset -= VOFFSET;
             if (self.markSquare != null && self.markGlow != null)
             {
                 self.markSquare.y += offset;
@@ -109,9 +112,9 @@ namespace LancerRemix.LancerMenu
                 self.glowSpriteA.y += offset;
             }
             foreach (var illust in self.slugcatImage.depthIllustrations)
-                illust.pos.y += offset;
+                illust.sprite.y += offset;
             foreach (var illust in self.slugcatImage.flatIllustrations)
-                illust.pos.y += offset;
+                illust.sprite.y += offset;
             if (self is SlugcatPageNewGame pageNew)
             {
                 float o = pageNew.infoLabel.text.Contains("\n") ? 30f : 0f;
@@ -126,10 +129,15 @@ namespace LancerRemix.LancerMenu
 
         private static void LancerPortrait(SlugcatPage page)
         {
+            foreach (var illust in page.slugcatImage.depthIllustrations)
+                illust.sprite.MoveBehindOtherNode((page.menu as SlugcatSelectMenu).pages[0].Container);
+            foreach (var illust in page.slugcatImage.flatIllustrations)
+                illust.sprite.MoveBehindOtherNode((page.menu as SlugcatSelectMenu).pages[0].Container);
+
             var basis = GetBasis(page.slugcatNumber);
             if (basis == SlugName.White)
             {
-                ReplaceIllust("slugcat - lancer", "Slugcat - White - Flat", "White Slugcat - 2", "White Slugcat - 2");
+                ReplaceIllust("slugcat - lancer", "lancer - white - flat", "White Slugcat - 2", "white lancer - 2");
             }
 
             void ReplaceIllust(string sceneFolder, string flatImage, string layerImageOrig, string layerImage)
@@ -144,24 +152,29 @@ namespace LancerRemix.LancerMenu
                 {
                     int i = 0;
                     for (; i < page.slugcatImage.depthIllustrations.Count; ++i)
-                        if (page.slugcatImage.depthIllustrations[i].fileName == layerImageOrig) break;
-                    Vector2 pos = page.slugcatImage.depthIllustrations[i].pos;
+                        if (string.Compare(page.slugcatImage.depthIllustrations[i].fileName, layerImageOrig, true) == 0) break;
+                    //Vector2 pos = page.slugcatImage.depthIllustrations[i].pos;
                     page.slugcatImage.depthIllustrations[i].RemoveSprites();
+                    page.slugcatImage.depthIllustrations[i] = null;
+                    // LancerPlugin.LogSource.LogMessage($"({i}/{page.slugcatImage.depthIllustrations.Count}) replaced to {layerImage}");
                     page.slugcatImage.depthIllustrations[i] =
-                        new MenuDepthIllustration(page.menu, page.slugcatImage, sceneFolder, layerImage, pos, 2.7f, MenuDepthIllustration.MenuShader.Basic);
+                        new MenuDepthIllustration(page.menu, page.slugcatImage, sceneFolder, layerImage, Vector2.zero, 2.7f, MenuDepthIllustration.MenuShader.Basic);
+                    if (i < page.slugcatImage.depthIllustrations.Count - 1)
+                        page.slugcatImage.depthIllustrations[i].sprite.MoveBehindOtherNode(page.slugcatImage.depthIllustrations[i + 1].sprite);
+                    page.slugcatImage.RefreshPositions();
                 }
             }
         }
 
         internal class LancerPageNewGame : SlugcatPageNewGame
         {
-            public LancerPageNewGame(global::Menu.Menu menu, MenuObject owner, int pageIndex, SlugName lancerNumber) : base(menu, owner, pageIndex, GetBasis(lancerNumber))
+            public LancerPageNewGame(Menu.Menu menu, MenuObject owner, int pageIndex, SlugName lancerNumber) : base(menu, owner, pageIndex, GetBasis(lancerNumber))
             {
                 basisNumber = slugcatNumber;
                 slugcatNumber = lancerNumber;
 
                 LancerPortrait(this);
-                sceneOffset.y -= VOFFSET;
+                //sceneOffset.y -= VOFFSET;
             }
 
             internal SlugName basisNumber;
@@ -169,13 +182,13 @@ namespace LancerRemix.LancerMenu
 
         internal class LancerPageContinue : SlugcatPageContinue
         {
-            public LancerPageContinue(global::Menu.Menu menu, MenuObject owner, int pageIndex, SlugName lancerNumber) : base(menu, owner, pageIndex, GetBasis(lancerNumber))
+            public LancerPageContinue(Menu.Menu menu, MenuObject owner, int pageIndex, SlugName lancerNumber) : base(menu, owner, pageIndex, GetBasis(lancerNumber))
             {
                 basisNumber = slugcatNumber;
                 slugcatNumber = lancerNumber;
 
                 LancerPortrait(this);
-                sceneOffset.y -= VOFFSET;
+                //sceneOffset.y -= VOFFSET;
             }
 
             internal SlugName basisNumber;

@@ -41,12 +41,13 @@ namespace LancerRemix.Cat
             return orig(i);
         }
 
-        internal static SlugName CreateLancer(SlugName basis)
+        internal static bool CreateLancer(SlugName basis, out SlugName lancer)
         {
             string id = $"{basis.value}Lancer";
-            var prebuilt = new SlugName(id, false);
-            if (prebuilt.Index >= 0) return prebuilt;
-            return new SlugName(id, true);
+            lancer = new SlugName(id, false);
+            if (lancer.Index >= 0) return false;
+            lancer = new SlugName(id, true);
+            return true;
 
             //var builder = new JsonBuilder().
             //    Value("id", $"{basis.value}Lancer");
