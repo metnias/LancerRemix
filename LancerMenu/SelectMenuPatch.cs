@@ -6,7 +6,7 @@ using static LancerRemix.LancerEnums;
 using static Menu.SlugcatSelectMenu;
 using SlugName = SlugcatStats.Name;
 
-namespace LancerRemix.Menu
+namespace LancerRemix.LancerMenu
 {
     internal static class SelectMenuPatch
     {
@@ -129,7 +129,7 @@ namespace LancerRemix.Menu
             var basis = GetBasis(page.slugcatNumber);
             if (basis == SlugName.White)
             {
-                ReplaceIllust(page.slugcatImage.sceneFolder, "Slugcat - White - Flat", "White Slugcat - 2", "White Slugcat - 2");
+                ReplaceIllust("slugcat - lancer", "Slugcat - White - Flat", "White Slugcat - 2", "White Slugcat - 2");
             }
 
             void ReplaceIllust(string sceneFolder, string flatImage, string layerImageOrig, string layerImage)
@@ -153,7 +153,6 @@ namespace LancerRemix.Menu
             }
         }
 
-
         internal class LancerPageNewGame : SlugcatPageNewGame
         {
             public LancerPageNewGame(global::Menu.Menu menu, MenuObject owner, int pageIndex, SlugName lancerNumber) : base(menu, owner, pageIndex, GetBasis(lancerNumber))
@@ -166,7 +165,6 @@ namespace LancerRemix.Menu
             }
 
             internal SlugName basisNumber;
-
         }
 
         internal class LancerPageContinue : SlugcatPageContinue
@@ -189,8 +187,6 @@ namespace LancerRemix.Menu
                     return (menu as SlugcatSelectMenu).saveGameData[slugcatNumber];
                 }
             }
-
         }
     }
-
 }

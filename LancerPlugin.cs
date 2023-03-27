@@ -10,7 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using BepInEx.Logging;
 using BepInEx;
-using LancerRemix.Menu;
+using LancerRemix.LancerMenu;
 
 #region Assembly attributes
 

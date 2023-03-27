@@ -67,15 +67,15 @@
     <Compile Include="Cat\NonLancerSupplement.cs" />
     <Compile Include="Cat\NonLancerDecoration.cs" />
     <Compile Include="Cat\LancerGenerator.cs" />
-    <Compile Include="Menu\MenuModifier.cs" />
+    <Compile Include="LancerMenu\MenuModifier.cs" />
     <Compile Include="Cat\LancerSupplement.cs" />
     <Compile Include="Cat\ModifyCat.cs" />
     <Compile Include="Cat\LancerDecoration.cs" />
     <Compile Include="Extras.cs" />
-    <Compile Include="JsonBuilder.cs" />
+    <None Include="JsonBuilder.cs" />
     <Compile Include="LancerPlugin.cs" />
     <Compile Include="LancerEnums.cs" />
-    <Compile Include="Menu\SelectMenuPatch.cs" />
+    <Compile Include="LancerMenu\SelectMenuPatch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <AdditionalFiles Include="modinfo.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -84,14 +84,25 @@
     <Compile Include="TutorialPatch.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="slugbase\scenes\select - whitelancer\LancerSurv background - 5.png" />
-    <Content Include="slugbase\scenes\select - whitelancer\LancerSurv bkgplants - 3.png" />
-    <Content Include="slugbase\scenes\select - whitelancer\LancerSurv fgplants - 0.png" />
-    <Content Include="slugbase\scenes\select - whitelancer\LancerSurv haze - 4.png" />
-    <Content Include="slugbase\scenes\select - whitelancer\LancerSurv slugcat - 2.png" />
-    <Content Include="slugbase\scenes\select - whitelancer\LancerSurv vines - 1.png" />
-    <Content Include="slugbase\scenes\select - whitelancer\positions.txt" />
-    <Content Include="slugbase\scenes\select - whitelancer\Select - LancerSurv - flat.png" />
+    <None Include="slugbase\scenes\select - whitelancer\LancerSurv background - 5.png" />
+    <None Include="slugbase\scenes\select - whitelancer\LancerSurv bkgplants - 3.png" />
+    <None Include="slugbase\scenes\select - whitelancer\LancerSurv fgplants - 0.png" />
+    <None Include="slugbase\scenes\select - whitelancer\LancerSurv haze - 4.png" />
+    <Content Include="scenes\slugcat - lancer\white slugcat - 2.png" />
+    <None Include="slugbase\scenes\select - whitelancer\LancerSurv vines - 1.png" />
+    <None Include="slugbase\scenes\select - whitelancer\positions.txt" />
+    <Content Include="scenes\slugcat - lancer\slugcat - white - flat.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="illustrations\" />
+    <Folder Include="text\text_kor\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>copy /Y "$(TargetPath)" "D:\SteamLibrary\steamapps\common\Rain World\RainWorld_Data\StreamingAssets\mods\lancer\plugins\$(TargetName).dll"
+copy /Y "$(TargetDir)modinfo.json" "D:\SteamLibrary\steamapps\common\Rain World\RainWorld_Data\StreamingAssets\mods\lancer\modinfo.json"
+xcopy "$(ProjectDir)scenes\*.*" "D:\SteamLibrary\steamapps\common\Rain World\RainWorld_Data\StreamingAssets\mods\lancer\scenes" /Y /I /E
+xcopy "$(ProjectDir)illustrations\*.*" "D:\SteamLibrary\steamapps\common\Rain World\RainWorld_Data\StreamingAssets\mods\lancer\illustrations" /Y /I /E
+xcopy "$(ProjectDir)text\*.*" "D:\SteamLibrary\steamapps\common\Rain World\RainWorld_Data\StreamingAssets\mods\lancer\text" /Y /I /E</PostBuildEvent>
+  </PropertyGroup>
 </Project>
