@@ -1,6 +1,7 @@
 ﻿using JollyCoop.JollyMenu;
 using Menu;
 using RWCustom;
+using System.IO;
 using UnityEngine;
 using static LancerRemix.LancerEnums;
 using static Menu.SlugcatSelectMenu;
@@ -14,14 +15,16 @@ namespace LancerRemix.LancerMenu
         {
             On.Menu.SlugcatSelectMenu.ctor += CtorPatch;
             On.Menu.SlugcatSelectMenu.Update += UpdatePatch;
+            On.Menu.SlugcatSelectMenu.UpdateStartButtonText += UpdateLancerStartButtonText;
             On.Menu.SlugcatSelectMenu.Singal += SignalPatch;
             On.Menu.SlugcatSelectMenu.SlugcatPage.GrafUpdate += PageGrafUpdatePatch;
+            On.Menu.SlugcatSelectMenu.SlugcatPageContinue.Update += LancerPageContinue.PageContinueUpdatePatch;
         }
 
         private static void CtorPatch(On.Menu.SlugcatSelectMenu.orig_ctor orig, SlugcatSelectMenu self, ProcessManager manager)
         {
             orig(self, manager);
-            slugcatPageLancer = false;
+            slugcatPageLancer = true; lancerTransition = 1f; lastLancerTransition = 1f; //= false;
             lancerPages = new SlugcatPage[self.slugcatPages.Count];
             foreach (var lancer in AllLancer)
             {
@@ -83,6 +86,42 @@ namespace LancerRemix.LancerMenu
             lancerTransition = Custom.LerpAndTick(lancerTransition, slugcatPageLancer ? 1f : 0f, 0.07f, 0.03f);
         }
 
+        private static void UpdateLancerStartButtonText(On.Menu.SlugcatSelectMenu.orig_UpdateStartButtonText orig, SlugcatSelectMenu self)
+        {
+            self.startButton.GetButtonBehavior.greyedOut = false;
+            if (!slugcatPageLancer) { orig(self); return; }
+            if (!HasLancer(self.slugcatColorOrder[self.slugcatPageIndex])) { self.startButton.GetButtonBehavior.greyedOut = true; return; }
+            self.startButton.fillTime = (self.restartChecked ? 120f : 40f);
+            var lancer = GetLancer(self.slugcatColorOrder[self.slugcatPageIndex]);
+            if (self.saveGameData[lancer] == null)
+            {
+                self.startButton.menuLabel.text = self.Translate("NEW GAME");
+                return;
+            }
+            if (self.restartChecked)
+            {
+                self.startButton.menuLabel.text = self.Translate("DELETE SAVE").Replace(" ", "\r\n");
+                return;
+            }
+            if (GetBasis(lancer) == SlugName.Red && self.saveGameData[lancer].redsDeath)
+            {
+                self.startButton.menuLabel.text = self.Translate("STATISTICS");
+                return;
+            }
+            /*
+            if (ModManager.MSC && this.slugcatPages[this.slugcatPageIndex].slugcatNumber == MoreSlugcatsEnums.SlugcatStatsName.Artificer && this.artificerIsDead)
+            {
+                this.startButton.menuLabel.text = base.Translate("STATISTICS");
+                return;
+            }
+            if (ModManager.MSC && this.slugcatPages[this.slugcatPageIndex].slugcatNumber == MoreSlugcatsEnums.SlugcatStatsName.Saint && this.saintIsDead)
+            {
+                this.startButton.menuLabel.text = base.Translate("STATISTICS");
+                return;
+            } */
+            self.startButton.menuLabel.text = self.Translate("CONTINUE");
+        }
+
         private static void SignalPatch(On.Menu.SlugcatSelectMenu.orig_Singal orig, SlugcatSelectMenu self, MenuObject sender, string message)
         {
             if (message.StartsWith(LANCER_SIGNAL))
@@ -137,10 +176,11 @@ namespace LancerRemix.LancerMenu
             var basis = GetBasis(page.slugcatNumber);
             if (basis == SlugName.White)
             {
-                ReplaceIllust("slugcat - lancer", "lancer - white - flat", "White Slugcat - 2", "white lancer - 2");
+                ReplaceIllust($"scenes{Path.DirectorySeparatorChar}slugcat - lancer",
+                    "lancer - white - flat", "White Slugcat - 2", "white lancer - 2", new Vector2(503f, 205f));
             }
 
-            void ReplaceIllust(string sceneFolder, string flatImage, string layerImageOrig, string layerImage)
+            void ReplaceIllust(string sceneFolder, string flatImage, string layerImageOrig, string layerImage, Vector2 layerPos)
             {
                 if (page.slugcatImage.flatMode)
                 {
@@ -158,10 +198,9 @@ namespace LancerRemix.LancerMenu
                     page.slugcatImage.depthIllustrations[i] = null;
                     // LancerPlugin.LogSource.LogMessage($"({i}/{page.slugcatImage.depthIllustrations.Count}) replaced to {layerImage}");
                     page.slugcatImage.depthIllustrations[i] =
-                        new MenuDepthIllustration(page.menu, page.slugcatImage, sceneFolder, layerImage, Vector2.zero, 2.7f, MenuDepthIllustration.MenuShader.Basic);
+                        new MenuDepthIllustration(page.menu, page.slugcatImage, sceneFolder, layerImage, layerPos, 2.7f, MenuDepthIllustration.MenuShader.Basic);
                     if (i < page.slugcatImage.depthIllustrations.Count - 1)
                         page.slugcatImage.depthIllustrations[i].sprite.MoveBehindOtherNode(page.slugcatImage.depthIllustrations[i + 1].sprite);
-                    page.slugcatImage.RefreshPositions();
                 }
             }
         }
@@ -199,6 +238,15 @@ namespace LancerRemix.LancerMenu
                 {
                     return (menu as SlugcatSelectMenu).saveGameData[slugcatNumber];
                 }
+            }
+
+            internal static void PageContinueUpdatePatch(On.Menu.SlugcatSelectMenu.SlugcatPageContinue.orig_Update orig, SlugcatPageContinue self)
+            {
+                orig(self);
+                float offset = lancerTransition * VOFFSET;
+                if (IsLancerPage(self)) offset -= VOFFSET;
+                self.hud.karmaMeter.pos.y += offset;
+                self.hud.foodMeter.pos.y += offset;
             }
         }
     }
