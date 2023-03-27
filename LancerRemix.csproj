@@ -84,6 +84,7 @@
     <Compile Include="TutorialPatch.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="slugbase\Lancer.zip" />
     <None Include="slugbase\scenes\select - whitelancer\LancerSurv background - 5.png" />
     <None Include="slugbase\scenes\select - whitelancer\LancerSurv bkgplants - 3.png" />
     <None Include="slugbase\scenes\select - whitelancer\LancerSurv fgplants - 0.png" />
