@@ -57,8 +57,7 @@ namespace LancerRemix
             init = true;
 
             LancerEnums.RegisterExtEnum();
-            TutorialPatch.SubPatch();
-            ModifyCat.SubPatch();
+            ModifyCat.Patch();
             //SaveManager.SubPatch();
             MenuModifier.SubPatch();
             LancerGenerator.SubPatch();

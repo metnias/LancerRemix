@@ -1,37 +1,67 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using CatSub.Cat;
 using UnityEngine;
+using SlugName = SlugcatStats.Name;
+using static LancerRemix.LancerEnums;
 
 namespace LancerRemix.Cat
 {
     internal class LancerDecoration : CatDecoration
     {
-        public LancerDecoration(AbstractCreature owner) : base(owner)
+        public LancerDecoration(Player player) : base(player)
         {
-            isLancer = true;
+            lancer = player.SlugCatClass;
+            player.slugcatStats.name = GetBasis(lancer);
+            if (DecoRegistry.TryMakeDeco(player, out CatDecoration deco))
+                basisDeco = deco;
         }
 
-        public override void InitiateSprites(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam)
+        internal readonly SlugName lancer;
+        private readonly CatDecoration basisDeco = null;
+
+        public LancerDecoration() : base() { }
+
+
+        public override void InitiateSprites(On.PlayerGraphics.orig_InitiateSprites orig, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam)
         {
-            base.InitiateSprites(sLeaser, rCam);
+            if (basisDeco != null) basisDeco.InitiateSprites(orig, sLeaser, rCam);
+            else base.InitiateSprites(orig, sLeaser, rCam);
         }
 
-        public override void AddToContainer(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, FContainer newContatiner)
+        public override void AddToContainer(On.PlayerGraphics.orig_AddToContainer orig, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, FContainer newContatiner)
         {
-            base.AddToContainer(sLeaser, rCam, newContatiner);
+            if (basisDeco != null) basisDeco.AddToContainer(orig, sLeaser, rCam, newContatiner);
+            else base.AddToContainer(orig, sLeaser, rCam, newContatiner);
         }
 
-        public override void DrawSprites(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
+        public override void Update(On.PlayerGraphics.orig_Update orig)
         {
-            base.DrawSprites(sLeaser, rCam, timeStacker, camPos);
+            if (basisDeco != null) basisDeco.Update(orig);
+            else base.Update(orig);
         }
 
-        public override void ApplyPalette(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, RoomPalette palette)
+        public override void DrawSprites(On.PlayerGraphics.orig_DrawSprites orig, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
         {
-            base.ApplyPalette(sLeaser, rCam, palette);
+            if (basisDeco != null) basisDeco.DrawSprites(orig, sLeaser, rCam, timeStacker, camPos);
+            else base.DrawSprites(orig, sLeaser, rCam, timeStacker, camPos);
         }
+
+        public override void ApplyPalette(On.PlayerGraphics.orig_ApplyPalette orig, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, RoomPalette palette)
+        {
+            if (basisDeco != null) basisDeco.ApplyPalette(orig, sLeaser, rCam, palette);
+            else base.ApplyPalette(orig, sLeaser, rCam, palette);
+        }
+
+        public override void SuckedIntoShortCut(On.PlayerGraphics.orig_SuckedIntoShortCut orig, Vector2 shortCutPosition)
+        {
+            if (basisDeco != null) basisDeco.SuckedIntoShortCut(orig, shortCutPosition);
+            else base.SuckedIntoShortCut(orig, shortCutPosition);
+        }
+
+        public override void Reset(On.PlayerGraphics.orig_Reset orig)
+        {
+            if (basisDeco != null) basisDeco.Reset(orig);
+            else base.Reset(orig);
+        }
+
     }
 }

@@ -8,6 +8,7 @@ using MSCName = MoreSlugcats.MoreSlugcatsEnums.SlugcatStatsName;
 using SlugBase;
 using System.Linq;
 using LancerRemix.Cat;
+using CatSub.Cat;
 
 namespace LancerRemix
 {
@@ -51,7 +52,13 @@ namespace LancerRemix
 
         internal static void ClearLancers()
         {
-            foreach (var lancer in AllLancer) lancer.Unregister();
+            foreach (var lancer in AllLancer)
+            {
+                if (lancer == null || lancer.Index < 0) continue;
+                SubRegistry.Unregister(lancer);
+                DecoRegistry.Unregister(lancer);
+                lancer.Unregister();
+            }
 
             NameLancer.Clear();
             NameBasis.Clear();
