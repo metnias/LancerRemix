@@ -79,8 +79,6 @@
     <AdditionalFiles Include="modinfo.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </AdditionalFiles>
-    <None Include="SaveManager.cs" />
-    <Compile Include="TutorialPatch.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="slugbase\Lancer.zip" />
