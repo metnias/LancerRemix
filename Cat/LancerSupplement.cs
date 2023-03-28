@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using SlugName = SlugcatStats.Name;
 using static LancerRemix.LancerEnums;
 using CatSub.Story;
+using RWCustom;
+using UnityEngine;
 
 namespace LancerRemix.Cat
 {
@@ -26,6 +28,8 @@ namespace LancerRemix.Cat
 
         public LancerSupplement() : base() { }
 
+        private int parry = 0;
+
         public override void Update(On.Player.orig_Update orig, bool eu)
         {
             if (basisSub != null) basisSub.Update(orig, eu);
@@ -36,6 +40,22 @@ namespace LancerRemix.Cat
         {
             if (basisSub != null) basisSub.Destroy(orig);
             else base.Destroy(orig);
+        }
+
+        public void Grabbed(On.Player.orig_Grabbed orig, Creature.Grasp grasp)
+        {
+            if (parry < 1) goto NoParry;
+            if (!(grasp.grabber is Lizard) && !(grasp.grabber is Vulture) && !(grasp.grabber is BigSpider) && !(grasp.grabber is DropBug)) goto NoParry;
+            // Parry!
+            parry = 0;
+            grasp.grabber.Stun(Mathf.CeilToInt(Mathf.Lerp(80, 40, grasp.grabber.TotalMass / 10f)));
+            
+            // effect
+            self.room.PlaySound(SoundID.Spear_Damage_Creature_But_Fall_Out, grasp.grabber.mainBodyChunk, false, 1.5f, 0.8f);
+            
+
+            return;
+        NoParry: orig(self, grasp);
         }
 
         public override SaveDataTable AppendNewProgSaveData()

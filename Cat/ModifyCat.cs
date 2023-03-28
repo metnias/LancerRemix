@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using CatSub.Cat;
+using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using UnityEngine;
@@ -9,9 +10,10 @@ namespace LancerRemix.Cat
 {
     public static class ModifyCat
     {
-        public static void SubPatch()
+        internal static void Patch()
         {
-            
+            On.Player.Grabbed += GrabbedSub;
+
             if (ModManager.MSC) OnMSCEnablePatch();
         }
 
@@ -23,7 +25,17 @@ namespace LancerRemix.Cat
         {
         }
 
-        
+        private static void GrabbedSub(On.Player.orig_Grabbed orig, Player self, Creature.Grasp grasp)
+        {
+            if (IsLancer(self.SlugCatClass) && SubRegistry.TryGetSub(self.playerState, out CatSupplement sub))
+            {
+                if (sub is LancerSupplement lancerSub) lancerSub.Grabbed(orig, grasp);
+                return;
+            }
+            orig(self, grasp);
+        }
+
+
 
     }
 }
