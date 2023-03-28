@@ -26,9 +26,13 @@ namespace LancerRemix.Cat
         internal readonly SlugName lancer;
         private readonly CatSupplement basisSub = null;
 
-        public LancerSupplement() : base() { }
+        public LancerSupplement() : base()
+        {
+        }
 
         private int parry = 0;
+
+        public override string TargetSubVersion => "1.0.0";
 
         public override void Update(On.Player.orig_Update orig, bool eu)
         {
@@ -49,10 +53,9 @@ namespace LancerRemix.Cat
             // Parry!
             parry = 0;
             grasp.grabber.Stun(Mathf.CeilToInt(Mathf.Lerp(80, 40, grasp.grabber.TotalMass / 10f)));
-            
+
             // effect
             self.room.PlaySound(SoundID.Spear_Damage_Creature_But_Fall_Out, grasp.grabber.mainBodyChunk, false, 1.5f, 0.8f);
-            
 
             return;
         NoParry: orig(self, grasp);
@@ -87,11 +90,9 @@ namespace LancerRemix.Cat
             else misc = base.AppendNewMiscSaveData();
             return misc;
         }
-
     }
 
     internal interface IAmLancer
     {
-
     }
 }
