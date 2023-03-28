@@ -35,7 +35,7 @@
       <HintPath>debug\BepInEx.dll</HintPath>
     </Reference>
     <Reference Include="CatSupplement">
-      <HintPath>debug\CatSupplement.dll</HintPath>
+      <HintPath>..\References\RWDownpour\CatSupplement.dll</HintPath>
     </Reference>
     <Reference Include="HOOKS-Assembly-CSharp">
       <HintPath>debug\HOOKS-Assembly-CSharp.dll</HintPath>

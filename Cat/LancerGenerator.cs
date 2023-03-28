@@ -49,7 +49,8 @@ namespace LancerRemix.Cat
             if (lancer.Index >= 0) return false;
             lancer = new SlugName(id, true);
 
-            CatSupplement.Register(lancer, (player) => new LancerSupplement(player));
+            SubRegistry.Register(lancer, (player) => new LancerSupplement(player));
+            DecoRegistry.Register(lancer, (player) => new LancerDecoration(player));
 
             return true;
 
