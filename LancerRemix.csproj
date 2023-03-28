@@ -34,6 +34,9 @@
     <Reference Include="BepInEx">
       <HintPath>debug\BepInEx.dll</HintPath>
     </Reference>
+    <Reference Include="CatSupplement">
+      <HintPath>debug\CatSupplement.dll</HintPath>
+    </Reference>
     <Reference Include="HOOKS-Assembly-CSharp">
       <HintPath>debug\HOOKS-Assembly-CSharp.dll</HintPath>
     </Reference>
@@ -62,10 +65,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Cat\CatDecoration.cs" />
-    <Compile Include="Cat\CatSupplement.cs" />
-    <Compile Include="Cat\NonLancerSupplement.cs" />
-    <Compile Include="Cat\NonLancerDecoration.cs" />
     <Compile Include="Cat\LancerGenerator.cs" />
     <Compile Include="LancerMenu\MenuModifier.cs" />
     <Compile Include="Cat\LancerSupplement.cs" />
@@ -85,18 +84,13 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="slugbase\Lancer.zip" />
-    <None Include="slugbase\scenes\select - whitelancer\LancerSurv background - 5.png" />
-    <None Include="slugbase\scenes\select - whitelancer\LancerSurv bkgplants - 3.png" />
-    <None Include="slugbase\scenes\select - whitelancer\LancerSurv fgplants - 0.png" />
-    <None Include="slugbase\scenes\select - whitelancer\LancerSurv haze - 4.png" />
     <Content Include="illustrations\lancer_off.png" />
     <Content Include="illustrations\lancer_on.png" />
     <Content Include="scenes\slugcat - lancer\white lancer - 2.png" />
-    <None Include="slugbase\scenes\select - whitelancer\LancerSurv vines - 1.png" />
-    <None Include="slugbase\scenes\select - whitelancer\positions.txt" />
     <Content Include="scenes\slugcat - lancer\lancer - white - flat.png" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="slugbase\scenes\" />
     <Folder Include="text\text_kor\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
