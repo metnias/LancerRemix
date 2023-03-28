@@ -9,6 +9,7 @@ using MSCName = MoreSlugcats.MoreSlugcatsEnums.SlugcatStatsName;
 using static UnityEngine.RectTransform;
 using UnityEngine;
 using static LancerRemix.LancerEnums;
+using CatSub.Cat;
 
 namespace LancerRemix.Cat
 {
@@ -47,6 +48,9 @@ namespace LancerRemix.Cat
             lancer = new SlugName(id, false);
             if (lancer.Index >= 0) return false;
             lancer = new SlugName(id, true);
+
+            CatSupplement.Register(lancer, (player) => new LancerSupplement(player));
+
             return true;
 
             //var builder = new JsonBuilder().
