@@ -34,8 +34,9 @@
     <Reference Include="BepInEx">
       <HintPath>debug\BepInEx.dll</HintPath>
     </Reference>
-    <Reference Include="CatSupplement">
-      <HintPath>debug\CatSupplement.dll</HintPath>
+    <Reference Include="CatSupplement, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\References\RWDownpour\CatSupplement.dll</HintPath>
     </Reference>
     <Reference Include="HOOKS-Assembly-CSharp">
       <HintPath>debug\HOOKS-Assembly-CSharp.dll</HintPath>
@@ -85,6 +86,8 @@
     <None Include="slugbase\Lancer.zip" />
     <Content Include="illustrations\lancer_off.png" />
     <Content Include="illustrations\lancer_on.png" />
+    <Content Include="scenes\slugcat - lancer\yellow lancer - 1.png" />
+    <Content Include="scenes\slugcat - lancer\lancer - yellow - flat.png" />
     <Content Include="scenes\slugcat - lancer\white lancer - 2.png" />
     <Content Include="scenes\slugcat - lancer\lancer - white - flat.png" />
   </ItemGroup>

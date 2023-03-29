@@ -177,7 +177,12 @@ namespace LancerRemix.LancerMenu
             if (basis == SlugName.White)
             {
                 ReplaceIllust($"scenes{Path.DirectorySeparatorChar}slugcat - lancer",
-                    "lancer - white - flat", "White Slugcat - 2", "white lancer - 2", new Vector2(503f, 178f));
+                    "lancer - white - flat", "white slugcat - 2", "white lancer - 2", new Vector2(503f, 178f));
+            }
+            else if (basis == SlugName.Yellow)
+            {
+                ReplaceIllust($"scenes{Path.DirectorySeparatorChar}slugcat - lancer",
+                    "lancer - yellow - flat", "yellow slugcat - 1", "yellow lancer - 1", new Vector2(528f, 211f));
             }
 
             void ReplaceIllust(string sceneFolder, string flatImage, string layerImageOrig, string layerImage, Vector2 layerPos)

@@ -46,8 +46,6 @@ namespace LancerRemix.Cat
             DecoRegistry.Register(lancer, (player) => new LancerDecoration(player));
             StoryRegistry.RegisterTimeline(new StoryRegistry.TimelinePointer(lancer, StoryRegistry.TimelinePointer.Relative.After, basis));
 
-
-
             return true;
 
             //var builder = new JsonBuilder().
@@ -75,11 +73,10 @@ namespace LancerRemix.Cat
             lancer?.Unregister();
         }
 
-        
         private static SlugName RegisterVanillaLancer(SlugName basis)
         {
             // load json
-            return SlugBaseCharacter.Registry.Add(new JsonObject()).Key;
+            return new SlugName(GetLancerName(basis.value), true); //SlugBaseCharacter.Registry.Add(new JsonObject()).Key;
         }
 
         private static SlugName RegisterSlugBaseLancer(SlugName basis)
@@ -118,7 +115,6 @@ namespace LancerRemix.Cat
                }
            });
        }
-
 
        private static void GetMSCLancerData(SlugName basis, ref JsonBuilder builder)
        {
