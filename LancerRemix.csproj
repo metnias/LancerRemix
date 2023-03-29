@@ -35,7 +35,7 @@
       <HintPath>debug\BepInEx.dll</HintPath>
     </Reference>
     <Reference Include="CatSupplement">
-      <HintPath>..\References\RWDownpour\CatSupplement.dll</HintPath>
+      <HintPath>debug\CatSupplement.dll</HintPath>
     </Reference>
     <Reference Include="HOOKS-Assembly-CSharp">
       <HintPath>debug\HOOKS-Assembly-CSharp.dll</HintPath>
@@ -71,6 +71,7 @@
     <Compile Include="Cat\ModifyCat.cs" />
     <Compile Include="Cat\LancerDecoration.cs" />
     <Compile Include="Extras.cs" />
+    <EmbeddedResource Include="Cat\Vanilla\White.json" />
     <None Include="JsonBuilder.cs" />
     <Compile Include="LancerPlugin.cs" />
     <Compile Include="LancerEnums.cs" />
@@ -88,6 +89,7 @@
     <Content Include="scenes\slugcat - lancer\lancer - white - flat.png" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Combat\" />
     <Folder Include="slugbase\scenes\" />
     <Folder Include="text\text_kor\" />
   </ItemGroup>
