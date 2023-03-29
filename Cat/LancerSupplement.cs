@@ -16,21 +16,23 @@ namespace LancerRemix.Cat
     {
         public LancerSupplement(Player player) : base(player)
         {
-            lancer = player.SlugCatClass;
-            player.slugcatStats.name = GetBasis(lancer);
+            lancerName = player.SlugCatClass;
+            player.playerState.slugcatCharacter = GetBasis(lancerName);
             if (SubRegistry.TryMakeSub(player, out CatSupplement sub))
                 basisSub = sub;
-            player.SlugCatClass = lancer; // for lancerdeco
+            player.playerState.slugcatCharacter = lancerName; // for lancerDeco
         }
 
-        internal readonly SlugName lancer;
+        internal readonly SlugName lancerName;
         private readonly CatSupplement basisSub = null;
 
         public LancerSupplement() : base()
         {
         }
 
-        private int parry = 0;
+        private int parry = 0; // throw button: makes you lose spear
+        private int block = 0; // grab button
+        private int OnParry => Math.Max(parry, block);
 
         public override string TargetSubVersion => "1.0.0";
 
@@ -48,15 +50,15 @@ namespace LancerRemix.Cat
 
         public void Grabbed(On.Player.orig_Grabbed orig, Creature.Grasp grasp)
         {
-            if (parry < 1) goto NoParry;
+            if (OnParry < 1) goto NoParry;
             if (!(grasp.grabber is Lizard) && !(grasp.grabber is Vulture) && !(grasp.grabber is BigSpider) && !(grasp.grabber is DropBug)) goto NoParry;
             // Parry!
-            parry = 0;
+            
             grasp.grabber.Stun(Mathf.CeilToInt(Mathf.Lerp(80, 40, grasp.grabber.TotalMass / 10f)));
 
             // effect
             self.room.PlaySound(SoundID.Spear_Damage_Creature_But_Fall_Out, grasp.grabber.mainBodyChunk, false, 1.5f, 0.8f);
-
+            parry = 0; block = 0;
             return;
         NoParry: orig(self, grasp);
         }

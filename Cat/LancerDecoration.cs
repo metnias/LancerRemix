@@ -9,13 +9,14 @@ namespace LancerRemix.Cat
     {
         public LancerDecoration(Player player) : base(player)
         {
-            lancer = player.SlugCatClass;
-            player.slugcatStats.name = GetBasis(lancer);
+            lancerName = player.SlugCatClass;
+            player.playerState.slugcatCharacter = GetBasis(lancerName);
+            player.slugcatStats.name = GetBasis(lancerName);
             if (DecoRegistry.TryMakeDeco(player, out CatDecoration deco))
                 basisDeco = deco;
         }
 
-        internal readonly SlugName lancer;
+        internal readonly SlugName lancerName;
         private readonly CatDecoration basisDeco = null;
 
         public LancerDecoration() : base() { }
