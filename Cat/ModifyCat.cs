@@ -13,6 +13,7 @@ namespace LancerRemix.Cat
         internal static void Patch()
         {
             On.Player.Grabbed += GrabbedSub;
+            // TODO: hook RainWorldGame.StoryCharacter to return basis
 
             if (ModManager.MSC) OnMSCEnablePatch();
         }
@@ -24,6 +25,7 @@ namespace LancerRemix.Cat
         internal static void OnMSCDisablePatch()
         {
         }
+
 
         private static void GrabbedSub(On.Player.orig_Grabbed orig, Player self, Creature.Grasp grasp)
         {

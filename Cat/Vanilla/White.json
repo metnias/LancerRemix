@@ -1,0 +1,18 @@
+{
+  "id": "WhiteLancer",
+  "features": {
+    "color": "9530A1",
+    "custom_colors": [
+      {
+        "name": "Body",
+        "story": "9530A1"
+      },
+      {
+        "name": "Eyes",
+        "story": "FFFFFF"
+      }
+    ],
+    "start_room": "SI_S04",
+    "select_menu_scene": "Slugcat_Scholar"
+  }
+}
