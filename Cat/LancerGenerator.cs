@@ -10,6 +10,7 @@ using static UnityEngine.RectTransform;
 using UnityEngine;
 using static LancerRemix.LancerEnums;
 using CatSub.Cat;
+using CatSub.Story;
 
 namespace LancerRemix.Cat
 {
@@ -17,23 +18,7 @@ namespace LancerRemix.Cat
     {
         internal static void SubPatch()
         {
-            On.SlugcatStats.getSlugcatTimelineOrder += AppendTimelineOrder;
             On.SlugcatStats.HiddenOrUnplayableSlugcat += DisableRegularSelect;
-        }
-
-        private static SlugName[] AppendTimelineOrder(On.SlugcatStats.orig_getSlugcatTimelineOrder orig)
-        {
-            LinkedList<SlugName> list = new LinkedList<SlugName>(orig());
-            var node = list.First;
-            while (node.Next != null)
-            {
-                if ((ModManager.MSC && SlugcatStats.IsSlugcatFromMSC(node.Value)) || !HasLancer(node.Value))
-                { node = node.Next; continue; }
-                list.AddAfter(node, GetLancer(node.Value));
-                node = node.Next;
-            }
-
-            return list.ToArray();
         }
 
         private static bool DisableRegularSelect(On.SlugcatStats.orig_HiddenOrUnplayableSlugcat orig, SlugName i)
@@ -51,6 +36,7 @@ namespace LancerRemix.Cat
 
             SubRegistry.Register(lancer, (player) => new LancerSupplement(player));
             DecoRegistry.Register(lancer, (player) => new LancerDecoration(player));
+            StoryRegistry.RegisterTimeline(new StoryRegistry.TimelinePointer(lancer, StoryRegistry.TimelinePointer.Relative.After, basis));
 
             return true;
 
@@ -64,6 +50,17 @@ namespace LancerRemix.Cat
 
             //var pair = SlugBaseCharacter.Registry.Add(JsonAny.Parse(builder.Build()).AsObject());
             //return pair.Key;
+        }
+
+        internal static void DeleteLancer(SlugName lancer)
+        {
+            SubRegistry.Unregister(lancer);
+            DecoRegistry.Unregister(lancer);
+            StoryRegistry.UnregisterTimeline(lancer);
+            if (SlugBaseCharacter.Registry.TryGet(lancer, out var _))
+                SlugBaseCharacter.Registry.Remove(lancer);
+
+            lancer?.Unregister();
         }
 
         /*

@@ -55,9 +55,7 @@ namespace LancerRemix
             foreach (var lancer in AllLancer)
             {
                 if (lancer == null || lancer.Index < 0) continue;
-                SubRegistry.Unregister(lancer);
-                DecoRegistry.Unregister(lancer);
-                lancer.Unregister();
+                LancerGenerator.DeleteLancer(lancer);
             }
 
             NameLancer.Clear();
