@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using BepInEx.Logging;
 using BepInEx;
 using LancerRemix.LancerMenu;
+using UnityEngine;
 
 #region Assembly attributes
 
@@ -45,7 +46,7 @@ namespace LancerRemix
             instance = this;
             LogSource = this.Logger;
 
-            On.RainWorld.OnModsInit += Extras.WrapInit(Init);
+            On.RainWorld.OnModsInit += WrapInit(Init);
             On.RainWorld.PostModsInit += PostInit;
             On.RainWorld.OnModsEnabled += OnModsEnabled;
             On.RainWorld.OnModsDisabled += OnModsDisabled;
@@ -53,16 +54,31 @@ namespace LancerRemix
 
         private static void Init(RainWorld rw)
         {
-            if (init) return;
-            init = true;
-
             LancerEnums.RegisterExtEnum();
             ModifyCat.Patch();
-            //SaveManager.SubPatch();
             MenuModifier.SubPatch();
             LancerGenerator.SubPatch();
 
-            instance.Logger.LogMessage("The Lancer is Intilaized.");
+            instance.Logger.LogMessage("The Lancer is Intialized.");
+        }
+
+        public static On.RainWorld.hook_OnModsInit WrapInit(Action<RainWorld> loadResources)
+        {
+            return (orig, self) =>
+            {
+                orig(self);
+                if (init) return;
+
+                try
+                {
+                    loadResources(self);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogException(e);
+                }
+                init = true;
+            };
         }
 
         private static void PostInit(On.RainWorld.orig_PostModsInit orig, RainWorld rw)

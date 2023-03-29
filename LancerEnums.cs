@@ -39,8 +39,8 @@ namespace LancerRemix
             {
                 var slug = new SlugName(name, false);
                 if (slug.Index < 0) continue;
-                if (SlugcatStats.HiddenOrUnplayableSlugcat(slug)) continue;
                 if (ModManager.MSC && SlugcatStats.IsSlugcatFromMSC(slug)) continue;
+                if (SlugcatStats.HiddenOrUnplayableSlugcat(slug)) continue;
                 if (!LancerGenerator.CreateLancer(slug, out var lancer)) continue;
                 AllLancer.Add(lancer);
                 AllBasis.Add(slug);

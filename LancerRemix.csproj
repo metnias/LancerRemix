@@ -71,7 +71,6 @@
     <Compile Include="Cat\LancerSupplement.cs" />
     <Compile Include="Cat\ModifyCat.cs" />
     <Compile Include="Cat\LancerDecoration.cs" />
-    <Compile Include="Extras.cs" />
     <EmbeddedResource Include="Cat\Vanilla\White.json" />
     <None Include="JsonBuilder.cs" />
     <Compile Include="LancerPlugin.cs" />
@@ -86,10 +85,14 @@
     <None Include="slugbase\Lancer.zip" />
     <Content Include="illustrations\lancer_off.png" />
     <Content Include="illustrations\lancer_on.png" />
-    <Content Include="scenes\slugcat - lancer\yellow lancer - 1.png" />
-    <Content Include="scenes\slugcat - lancer\lancer - yellow - flat.png" />
-    <Content Include="scenes\slugcat - lancer\white lancer - 2.png" />
-    <Content Include="scenes\slugcat - lancer\lancer - white - flat.png" />
+    <AdditionalFiles Include="scenes\slugcat - lancer\red lancer - 1 - dark.png" />
+    <AdditionalFiles Include="scenes\slugcat - lancer\red lancer - 1.png" />
+    <AdditionalFiles Include="scenes\slugcat - lancer\lancer - red - flat.png" />
+    <AdditionalFiles Include="scenes\slugcat - lancer\lancer - red dark - flat.png" />
+    <AdditionalFiles Include="scenes\slugcat - lancer\yellow lancer - 1.png" />
+    <AdditionalFiles Include="scenes\slugcat - lancer\lancer - yellow - flat.png" />
+    <AdditionalFiles Include="scenes\slugcat - lancer\white lancer - 2.png" />
+    <AdditionalFiles Include="scenes\slugcat - lancer\lancer - white - flat.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Combat\" />

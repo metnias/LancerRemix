@@ -132,6 +132,7 @@ namespace LancerRemix.LancerMenu
                 self.UpdateStartButtonText();
                 return;
             }
+
             orig(self, sender, message);
         }
 
@@ -218,10 +219,15 @@ namespace LancerRemix.LancerMenu
                 slugcatNumber = lancerNumber;
 
                 LancerPortrait(this);
+                VanillaLancerText();
                 //sceneOffset.y -= VOFFSET;
             }
 
             internal SlugName basisNumber;
+
+            private void VanillaLancerText()
+            {
+            }
         }
 
         internal class LancerPageContinue : SlugcatPageContinue

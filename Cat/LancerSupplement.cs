@@ -16,15 +16,7 @@ namespace LancerRemix.Cat
     {
         public LancerSupplement(Player player) : base(player)
         {
-            lancerName = player.SlugCatClass;
-            player.playerState.slugcatCharacter = GetBasis(lancerName);
-            if (SubRegistry.TryMakeSub(player, out CatSupplement sub))
-                basisSub = sub;
-            player.playerState.slugcatCharacter = lancerName; // for lancerDeco
         }
-
-        internal readonly SlugName lancerName;
-        private readonly CatSupplement basisSub = null;
 
         public LancerSupplement() : base()
         {
@@ -34,18 +26,16 @@ namespace LancerRemix.Cat
         private int block = 0; // grab button
         private int OnParry => Math.Max(parry, block);
 
-        public override string TargetSubVersion => "1.0.0";
+        public override string TargetSubVersion => "1.0";
 
         public override void Update(On.Player.orig_Update orig, bool eu)
         {
-            if (basisSub != null) basisSub.Update(orig, eu);
-            else base.Update(orig, eu);
+            base.Update(orig, eu);
         }
 
         public override void Destroy(On.Player.orig_Destroy orig)
         {
-            if (basisSub != null) basisSub.Destroy(orig);
-            else base.Destroy(orig);
+            base.Destroy(orig);
         }
 
         public void Grabbed(On.Player.orig_Grabbed orig, Creature.Grasp grasp)
@@ -53,7 +43,7 @@ namespace LancerRemix.Cat
             if (OnParry < 1) goto NoParry;
             if (!(grasp.grabber is Lizard) && !(grasp.grabber is Vulture) && !(grasp.grabber is BigSpider) && !(grasp.grabber is DropBug)) goto NoParry;
             // Parry!
-            
+
             grasp.grabber.Stun(Mathf.CeilToInt(Mathf.Lerp(80, 40, grasp.grabber.TotalMass / 10f)));
 
             // effect
@@ -61,36 +51,6 @@ namespace LancerRemix.Cat
             parry = 0; block = 0;
             return;
         NoParry: orig(self, grasp);
-        }
-
-        public override SaveDataTable AppendNewProgSaveData()
-        {
-            SaveDataTable prog;
-            if (basisSub != null) prog = basisSub.AppendNewProgSaveData();
-            else prog = base.AppendNewProgSaveData();
-            return prog;
-        }
-
-        public override SaveDataTable AppendNewPersSaveData()
-        {
-            SaveDataTable pers;
-            if (basisSub != null) pers = basisSub.AppendNewPersSaveData();
-            else pers = base.AppendNewPersSaveData();
-            return pers;
-        }
-
-        public override void UpdatePersSaveData(ref SaveDataTable table, DeathPersistentSaveData data, bool saveAsIfPlayerDied, bool saveAsIfPlayerQuit)
-        {
-            if (basisSub != null) basisSub.UpdatePersSaveData(ref table, data, saveAsIfPlayerDied, saveAsIfPlayerQuit);
-            base.UpdatePersSaveData(ref table, data, saveAsIfPlayerDied, saveAsIfPlayerQuit);
-        }
-
-        public override SaveDataTable AppendNewMiscSaveData()
-        {
-            SaveDataTable misc;
-            if (basisSub != null) misc = basisSub.AppendNewMiscSaveData();
-            else misc = base.AppendNewMiscSaveData();
-            return misc;
         }
     }
 
