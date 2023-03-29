@@ -28,13 +28,17 @@ namespace LancerRemix.Cat
         }
 
         private static bool[] isLancer = new bool[4];
+        private static bool isStoryLancer = false;
 
-        public static void SetIsLancer(bool[] players)
+        public static void SetIsLancer(bool story, bool[] players)
         {
+            isStoryLancer = story;
             for (int i = 0; i < 4; ++i) isLancer[i] = players[i];
         }
 
         public static bool IsLancer(PlayerState playerState) => isLancer[playerState.playerNumber];
+
+        public static bool IsStoryLancer => isStoryLancer;
 
         #region Player
 

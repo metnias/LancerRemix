@@ -1,4 +1,5 @@
 ﻿using JollyCoop.JollyMenu;
+using LancerRemix.Cat;
 using Menu;
 using RWCustom;
 using System.IO;
@@ -132,7 +133,13 @@ namespace LancerRemix.LancerMenu
                 self.UpdateStartButtonText();
                 return;
             }
-
+            if (message == "START")
+            {
+                bool[] players = new bool[4];
+                players[0] = slugcatPageLancer; // TODO: get jolly status as well
+                ModifyCat.SetIsLancer(slugcatPageLancer, players);
+                // StartGame(this.slugcatPages[this.slugcatPageIndex].slugcatNumber);
+            }
             orig(self, sender, message);
         }
 
