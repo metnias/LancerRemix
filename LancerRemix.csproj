@@ -82,16 +82,16 @@
     </AdditionalFiles>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="scenes\slugcat - lancer\red lancer - 1 - dark.png" />
+    <Content Include="scenes\slugcat - lancer\red lancer - 1.png" />
+    <Content Include="scenes\slugcat - lancer\yellow lancer - 1.png" />
+    <Content Include="scenes\slugcat - lancer\white lancer - 2.png" />
+    <Content Include="scenes\slugcat - lancer\lancer - red dark - flat.png" />
     <None Include="slugbase\Lancer.zip" />
     <Content Include="illustrations\lancer_off.png" />
     <Content Include="illustrations\lancer_on.png" />
-    <AdditionalFiles Include="scenes\slugcat - lancer\red lancer - 1 - dark.png" />
-    <AdditionalFiles Include="scenes\slugcat - lancer\red lancer - 1.png" />
     <AdditionalFiles Include="scenes\slugcat - lancer\lancer - red - flat.png" />
-    <AdditionalFiles Include="scenes\slugcat - lancer\lancer - red dark - flat.png" />
-    <AdditionalFiles Include="scenes\slugcat - lancer\yellow lancer - 1.png" />
     <AdditionalFiles Include="scenes\slugcat - lancer\lancer - yellow - flat.png" />
-    <AdditionalFiles Include="scenes\slugcat - lancer\white lancer - 2.png" />
     <AdditionalFiles Include="scenes\slugcat - lancer\lancer - white - flat.png" />
   </ItemGroup>
   <ItemGroup>

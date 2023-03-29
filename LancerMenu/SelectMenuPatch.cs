@@ -215,12 +215,12 @@ namespace LancerRemix.LancerMenu
                     int i = 0;
                     for (; i < page.slugcatImage.depthIllustrations.Count; ++i)
                         if (string.Compare(page.slugcatImage.depthIllustrations[i].fileName, layerImageOrig, true) == 0) break;
-                    //Vector2 pos = page.slugcatImage.depthIllustrations[i].pos;
+                    float depth = page.slugcatImage.depthIllustrations[i].depth;
                     page.slugcatImage.depthIllustrations[i].RemoveSprites();
                     page.slugcatImage.depthIllustrations[i] = null;
                     // LancerPlugin.LogSource.LogMessage($"({i}/{page.slugcatImage.depthIllustrations.Count}) replaced to {layerImage}");
                     page.slugcatImage.depthIllustrations[i] =
-                        new MenuDepthIllustration(page.menu, page.slugcatImage, sceneFolder, layerImage, layerPos, 2.7f, MenuDepthIllustration.MenuShader.Basic);
+                        new MenuDepthIllustration(page.menu, page.slugcatImage, sceneFolder, layerImage, layerPos, depth, MenuDepthIllustration.MenuShader.Basic);
                     if (i < page.slugcatImage.depthIllustrations.Count - 1)
                         page.slugcatImage.depthIllustrations[i].sprite.MoveBehindOtherNode(page.slugcatImage.depthIllustrations[i + 1].sprite);
                 }
