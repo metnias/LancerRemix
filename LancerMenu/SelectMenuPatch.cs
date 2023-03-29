@@ -185,6 +185,15 @@ namespace LancerRemix.LancerMenu
                 ReplaceIllust($"scenes{Path.DirectorySeparatorChar}slugcat - lancer",
                     "lancer - yellow - flat", "yellow slugcat - 1", "yellow lancer - 1", new Vector2(528f, 211f));
             }
+            else if (basis == SlugName.Red)
+            {
+                if (page.menu.manager.rainWorld.progression.miscProgressionData.redUnlocked)
+                    ReplaceIllust($"scenes{Path.DirectorySeparatorChar}slugcat - lancer",
+                        "lancer - red - flat", "red slugcat - 1", "red lancer - 1", new Vector2(462f, 225f));
+                else
+                    ReplaceIllust($"scenes{Path.DirectorySeparatorChar}slugcat - lancer",
+                    "lancer - red dark - flat", "red slugcat - 1 - dark", "red lancer - 1 - dark", new Vector2(462f, 225f));
+            }
 
             void ReplaceIllust(string sceneFolder, string flatImage, string layerImageOrig, string layerImage, Vector2 layerPos)
             {
