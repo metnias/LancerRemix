@@ -12,6 +12,8 @@ using static LancerRemix.LancerEnums;
 using CatSub.Cat;
 using CatSub.Story;
 using System.IO;
+using Menu;
+using LancerRemix.LancerMenu;
 
 namespace LancerRemix.Cat
 {
@@ -20,6 +22,7 @@ namespace LancerRemix.Cat
         internal static void Patch()
         {
             On.SlugcatStats.SlugcatUnlocked += LancerUnlocked;
+            On.Menu.MenuScene.UseSlugcatUnlocked += UseLancerUnlocked;
             On.SlugcatStats.HiddenOrUnplayableSlugcat += DisableRegularSelect;
         }
 
@@ -27,11 +30,17 @@ namespace LancerRemix.Cat
         {
             if (IsLancer(i))
             {
-                var basis = GetBasis(i);
-                if (SlugcatStats.IsSlugcatFromMSC(basis)) return false; // TBA
-                return orig(basis, rainWorld);
+                i = GetBasis(i);
+                if (SlugcatStats.IsSlugcatFromMSC(i)) return false; // TBA
             }
             return orig(i, rainWorld);
+        }
+
+        private static bool UseLancerUnlocked(On.Menu.MenuScene.orig_UseSlugcatUnlocked orig, MenuScene self, SlugName slugcat)
+        {
+            if (self.owner is SelectMenuPatch.LancerPageNewGame || self.owner is SelectMenuPatch.LancerPageContinue)
+                return ((self.owner as SlugcatSelectMenu.SlugcatPage).menu as SlugcatSelectMenu).SlugcatUnlocked(GetLancer(slugcat));
+            return orig(self, slugcat);
         }
 
         private static bool DisableRegularSelect(On.SlugcatStats.orig_HiddenOrUnplayableSlugcat orig, SlugName i)

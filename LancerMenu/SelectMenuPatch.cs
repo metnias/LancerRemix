@@ -16,6 +16,7 @@ namespace LancerRemix.LancerMenu
         internal static void MiniPatch()
         {
             On.Menu.SlugcatSelectMenu.ctor += CtorPatch;
+            On.Menu.SlugcatSelectMenu.colorFromIndex += LancerFromIndex;
             On.Menu.SlugcatSelectMenu.Update += UpdatePatch;
             On.Menu.SlugcatSelectMenu.UpdateStartButtonText += UpdateLancerStartButtonText;
             On.Menu.SlugcatSelectMenu.Singal += SignalPatch;
@@ -87,6 +88,14 @@ namespace LancerRemix.LancerMenu
             orig(self);
             lastLancerTransition = lancerTransition;
             lancerTransition = Custom.LerpAndTick(lancerTransition, slugcatPageLancer ? 1f : 0f, 0.07f, 0.03f);
+            self.startButton.GetButtonBehavior.greyedOut |= lancerTransition > 0.1f && lancerTransition < 0.9f;
+        }
+
+        private static SlugName LancerFromIndex(On.Menu.SlugcatSelectMenu.orig_colorFromIndex orig, SlugcatSelectMenu self, int index)
+        {
+            var res = orig(self, index);
+            if (slugcatPageLancer && HasLancer(res)) res = GetLancer(res);
+            return res;
         }
 
         private static void UpdateLancerStartButtonText(On.Menu.SlugcatSelectMenu.orig_UpdateStartButtonText orig, SlugcatSelectMenu self)
@@ -187,46 +196,46 @@ namespace LancerRemix.LancerMenu
             var basis = GetBasis(page.slugcatNumber);
             if (basis == SlugName.White)
             {
-                ReplaceIllust($"scenes{Path.DirectorySeparatorChar}slugcat - lancer",
+                ReplaceIllust(page.slugcatImage, $"scenes{Path.DirectorySeparatorChar}slugcat - lancer",
                     "lancer - white - flat", "white slugcat - 2", "white lancer - 2", new Vector2(503f, 178f));
             }
             else if (basis == SlugName.Yellow)
             {
-                ReplaceIllust($"scenes{Path.DirectorySeparatorChar}slugcat - lancer",
+                ReplaceIllust(page.slugcatImage, $"scenes{Path.DirectorySeparatorChar}slugcat - lancer",
                     "lancer - yellow - flat", "yellow slugcat - 1", "yellow lancer - 1", new Vector2(528f, 211f));
             }
             else if (basis == SlugName.Red)
             {
                 if (page.menu.manager.rainWorld.progression.miscProgressionData.redUnlocked)
-                    ReplaceIllust($"scenes{Path.DirectorySeparatorChar}slugcat - lancer",
+                    ReplaceIllust(page.slugcatImage, $"scenes{Path.DirectorySeparatorChar}slugcat - lancer",
                         "lancer - red - flat", "red slugcat - 1", "red lancer - 1", new Vector2(462f, 225f));
                 else
-                    ReplaceIllust($"scenes{Path.DirectorySeparatorChar}slugcat - lancer",
+                    ReplaceIllust(page.slugcatImage, $"scenes{Path.DirectorySeparatorChar}slugcat - lancer",
                     "lancer - red dark - flat", "red slugcat - 1 - dark", "red lancer - 1 - dark", new Vector2(462f, 225f));
             }
+        }
 
-            void ReplaceIllust(string sceneFolder, string flatImage, string layerImageOrig, string layerImage, Vector2 layerPos)
+        internal static void ReplaceIllust(MenuScene scene, string sceneFolder, string flatImage, string layerImageOrig, string layerImage, Vector2 layerPos)
+        {
+            if (scene.flatMode)
             {
-                if (page.slugcatImage.flatMode)
-                {
-                    page.slugcatImage.flatIllustrations[0].RemoveSprites();
-                    page.slugcatImage.flatIllustrations.Clear();
-                    page.slugcatImage.AddIllustration(new MenuIllustration(page.menu, page.slugcatImage, sceneFolder, flatImage, new Vector2(683f, 384f), false, true));
-                }
-                else
-                {
-                    int i = 0;
-                    for (; i < page.slugcatImage.depthIllustrations.Count; ++i)
-                        if (string.Compare(page.slugcatImage.depthIllustrations[i].fileName, layerImageOrig, true) == 0) break;
-                    float depth = page.slugcatImage.depthIllustrations[i].depth;
-                    page.slugcatImage.depthIllustrations[i].RemoveSprites();
-                    page.slugcatImage.depthIllustrations[i] = null;
-                    // LancerPlugin.LogSource.LogMessage($"({i}/{page.slugcatImage.depthIllustrations.Count}) replaced to {layerImage}");
-                    page.slugcatImage.depthIllustrations[i] =
-                        new MenuDepthIllustration(page.menu, page.slugcatImage, sceneFolder, layerImage, layerPos, depth, MenuDepthIllustration.MenuShader.Basic);
-                    if (i < page.slugcatImage.depthIllustrations.Count - 1)
-                        page.slugcatImage.depthIllustrations[i].sprite.MoveBehindOtherNode(page.slugcatImage.depthIllustrations[i + 1].sprite);
-                }
+                scene.flatIllustrations[0].RemoveSprites();
+                scene.flatIllustrations.Clear();
+                scene.AddIllustration(new MenuIllustration(scene.page.menu, scene, sceneFolder, flatImage, new Vector2(683f, 384f), false, true));
+            }
+            else
+            {
+                int i = 0;
+                for (; i < scene.depthIllustrations.Count; ++i)
+                    if (string.Compare(scene.depthIllustrations[i].fileName, layerImageOrig, true) == 0) break;
+                float depth = scene.depthIllustrations[i].depth;
+                scene.depthIllustrations[i].RemoveSprites();
+                scene.depthIllustrations[i] = null;
+                // LancerPlugin.LogSource.LogMessage($"({i}/{scene.depthIllustrations.Count}) replaced to {layerImage}");
+                scene.depthIllustrations[i] =
+                    new MenuDepthIllustration(scene.page.menu, scene, sceneFolder, layerImage, layerPos, depth, MenuDepthIllustration.MenuShader.Basic);
+                if (i < scene.depthIllustrations.Count - 1)
+                    scene.depthIllustrations[i].sprite.MoveBehindOtherNode(scene.depthIllustrations[i + 1].sprite);
             }
         }
 
@@ -256,7 +265,7 @@ namespace LancerRemix.LancerMenu
                 {
                     info = menu.Translate("Feeble but cautious cub. Stranded in a harsh world and surrounded by<LINE>its creatures, your journey will be a significantly more challenging one.");
                 }
-                if ((menu as SlugcatSelectMenu).SlugcatUnlocked(slugcatNumber))
+                if (!(menu as SlugcatSelectMenu).SlugcatUnlocked(slugcatNumber))
                 {
                     if (ModManager.MSC && SlugcatStats.IsSlugcatFromMSC(basisNumber))
                     {

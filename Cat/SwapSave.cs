@@ -33,7 +33,7 @@ namespace LancerRemix.Cat
             return orig(self, saveStateNumber);
         }
 
-        private static void ContinueStartedLancer(On.Menu.SlugcatSelectMenu.orig_ContinueStartedGame orig, SlugcatSelectMenu self, SlugcatStats.Name storyGameCharacter)
+        private static void ContinueStartedLancer(On.Menu.SlugcatSelectMenu.orig_ContinueStartedGame orig, SlugcatSelectMenu self, SlugName storyGameCharacter)
         {
             if (IsStoryLancer)
             {
