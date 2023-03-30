@@ -1,10 +1,10 @@
 ﻿using CatSub.Cat;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 using static LancerRemix.LancerEnums;
 using SlugName = SlugcatStats.Name;
+using MonoMod.RuntimeDetour;
+using System.Reflection;
 
 namespace LancerRemix.Cat
 {
@@ -16,7 +16,6 @@ namespace LancerRemix.Cat
             On.Player.Update += PlayerUpdate;
             On.Player.Destroy += PlayerDestroy;
             On.Player.Grabbed += PlayerGrabbed;
-            // TODO: hook RainWorldGame.StoryCharacter to return basis
 
             On.PlayerGraphics.InitiateSprites += GrafInitSprite;
             On.PlayerGraphics.AddToContainer += GrafAddToContainer;
@@ -25,6 +24,12 @@ namespace LancerRemix.Cat
             On.PlayerGraphics.ApplyPalette += GrafApplyPalette;
             On.PlayerGraphics.SuckedIntoShortCut += GrafSuckedIntoShortCut;
             On.PlayerGraphics.Reset += GrafReset;
+
+            var characterForColor = new Hook(
+                typeof(PlayerGraphics).GetProperty(nameof(PlayerGraphics.CharacterForColor), BindingFlags.Instance | BindingFlags.Public).GetGetMethod(),
+                typeof(ModifyCat).GetMethod(nameof(ModifyCat.LancerForColor), BindingFlags.Static | BindingFlags.NonPublic)
+            );
+            On.PlayerGraphics.DefaultSlugcatColor += DefaultLancerColor;
 
             SwapSave.SubPatch();
 
@@ -49,6 +54,11 @@ namespace LancerRemix.Cat
         }
 
         public static bool IsLancer(PlayerState playerState) => isLancer[playerState.playerNumber];
+
+        public static bool IsLancer(Player player) => IsLancer(player.playerState);
+
+        public static bool IsLancer(PlayerGraphics playerGraphics) => IsLancer(playerGraphics.player.playerState);
+
 
         #region Player
 
@@ -175,6 +185,30 @@ namespace LancerRemix.Cat
             orig(self);
         }
 
+        private delegate SlugName orig_CharacterForColor(PlayerGraphics self);
+
+        private static SlugName LancerForColor(orig_CharacterForColor orig, PlayerGraphics self)
+        {
+            var res = orig(self);
+            if (IsLancer(self))
+                if (HasLancer(res)) res = GetLancer(res);
+            return res;
+        }
+
+        private static Color DefaultLancerColor(On.PlayerGraphics.orig_DefaultSlugcatColor orig, SlugName i)
+        {
+            if (LancerEnums.IsLancer(i))
+            {
+                var basis = GetBasis(i);
+                if (basis == SlugName.White) return new Color(0.8f, 1.0f, 0.5f);
+                if (basis == SlugName.Yellow) return new Color(1.0f, 0.9f, 0.4f);
+                if (basis == SlugName.Red) return new Color(0.3f, 0.5f, 1.0f);
+                if (basis == SlugName.Night) return new Color(0.8f, 0.1f, 0.3f);
+
+                return orig(basis);
+            }
+            return orig(i);
+        }
 
         #endregion PlayerGraphics
     }
