@@ -1,19 +1,21 @@
 ﻿using CatSub.Cat;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SlugName = SlugcatStats.Name;
-using static LancerRemix.LancerEnums;
-using CatSub.Story;
-using RWCustom;
 using UnityEngine;
 
 namespace LancerRemix.Cat
 {
     internal class LancerSupplement : CatSupplement, IAmLancer
     {
+        /// <summary>
+        /// Slide throw backward: backflip upwards
+        /// forward: hard hit & stun, but loses spear
+        /// pulling spear from wall/creatures takes time
+        /// 
+        /// parry: grab / throw. throw parry will fling your spear. (12 ticks for now)
+        /// grab parry will flip lizards
+        /// 
+        /// normal stab: will never stun
+        /// </summary>
         public LancerSupplement(Player player) : base(player)
         {
         }
@@ -32,6 +34,8 @@ namespace LancerRemix.Cat
         public override void Update(On.Player.orig_Update orig, bool eu)
         {
             base.Update(null, eu);
+            if (parry > 0) --parry;
+            if (block > 0) --block;
         }
 
         public override void Destroy(On.Player.orig_Destroy orig)
