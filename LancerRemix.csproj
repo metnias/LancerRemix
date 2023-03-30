@@ -41,6 +41,18 @@
     <Reference Include="HOOKS-Assembly-CSharp">
       <HintPath>debug\HOOKS-Assembly-CSharp.dll</HintPath>
     </Reference>
+    <Reference Include="Mono.Cecil">
+      <HintPath>debug\Mono.Cecil.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoMod">
+      <HintPath>debug\MonoMod.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoMod.RuntimeDetour">
+      <HintPath>debug\MonoMod.RuntimeDetour.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoMod.Utils">
+      <HintPath>debug\MonoMod.Utils.dll</HintPath>
+    </Reference>
     <Reference Include="PUBLIC-Assembly-CSharp">
       <HintPath>debug\PUBLIC-Assembly-CSharp.dll</HintPath>
     </Reference>
@@ -67,6 +79,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Cat\LancerGenerator.cs" />
+    <Compile Include="Cat\SwapSave.cs" />
     <Compile Include="LancerMenu\MenuModifier.cs" />
     <Compile Include="Cat\LancerSupplement.cs" />
     <Compile Include="Cat\ModifyCat.cs" />
@@ -87,6 +100,7 @@
     <Content Include="scenes\slugcat - lancer\yellow lancer - 1.png" />
     <Content Include="scenes\slugcat - lancer\white lancer - 2.png" />
     <Content Include="scenes\slugcat - lancer\lancer - red dark - flat.png" />
+    <AdditionalFiles Include="text\text_kor\strings.txt" />
     <None Include="slugbase\Lancer.zip" />
     <Content Include="illustrations\lancer_off.png" />
     <Content Include="illustrations\lancer_on.png" />
@@ -97,7 +111,6 @@
   <ItemGroup>
     <Folder Include="Combat\" />
     <Folder Include="slugbase\scenes\" />
-    <Folder Include="text\text_kor\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
