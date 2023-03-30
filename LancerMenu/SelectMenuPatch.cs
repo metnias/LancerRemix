@@ -17,6 +17,8 @@ namespace LancerRemix.LancerMenu
         {
             On.Menu.SlugcatSelectMenu.ctor += CtorPatch;
             On.Menu.SlugcatSelectMenu.colorFromIndex += LancerFromIndex;
+            On.Menu.SlugcatSelectMenu.indexFromColor += IndexFromLancer;
+            On.Menu.SlugcatSelectMenu.SetChecked += SetLancerChecked;
             On.Menu.SlugcatSelectMenu.Update += UpdatePatch;
             On.Menu.SlugcatSelectMenu.UpdateStartButtonText += UpdateLancerStartButtonText;
             On.Menu.SlugcatSelectMenu.Singal += SignalPatch;
@@ -96,6 +98,39 @@ namespace LancerRemix.LancerMenu
             var res = orig(self, index);
             if (slugcatPageLancer && HasLancer(res)) res = GetLancer(res);
             return res;
+        }
+
+        private static int IndexFromLancer(On.Menu.SlugcatSelectMenu.orig_indexFromColor orig, SlugcatSelectMenu self, SlugName color)
+        {
+            if (IsLancer(color)) color = GetBasis(color);
+            return orig(self, color);
+        }
+
+        private static void SetLancerChecked(On.Menu.SlugcatSelectMenu.orig_SetChecked orig, SlugcatSelectMenu self, CheckBox box, bool c)
+        {
+            if (slugcatPageLancer)
+            {
+                var basis = self.slugcatColorOrder[self.slugcatPageIndex];
+                if (!HasLancer(basis)) goto NoLancer;
+                var lancer = GetLancer(basis);
+                if (!(box.IDString == "COLORS"))
+                {
+                    self.restartChecked = c;
+                    self.UpdateStartButtonText();
+                    return;
+                }
+                self.colorChecked = c;
+                if (self.colorChecked && !self.CheckJollyCoopAvailable(self.colorFromIndex(self.slugcatPageIndex)))
+                {
+                    self.AddColorButtons();
+                    self.manager.rainWorld.progression.miscProgressionData.colorsEnabled[lancer.value] = true;
+                    return;
+                }
+                self.RemoveColorButtons();
+                self.manager.rainWorld.progression.miscProgressionData.colorsEnabled[lancer.value] = false;
+                return;
+            }
+        NoLancer: orig(self, box, c);
         }
 
         private static void UpdateLancerStartButtonText(On.Menu.SlugcatSelectMenu.orig_UpdateStartButtonText orig, SlugcatSelectMenu self)

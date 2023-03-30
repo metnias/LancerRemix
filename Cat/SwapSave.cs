@@ -19,7 +19,6 @@ namespace LancerRemix.Cat
 
             On.PlayerProgression.SaveToDisk += SaveToLancer;
             //On.SaveState.SaveToString += SaveStateToLancer;
-            On.PlayerProgression.GetOrInitiateSaveState += GetOrInitiateLancerState;
             On.PlayerProgression.LoadGameState += LoadLancerStateInstead;
             //IL.PlayerProgression.LoadGameState += LoadLancerState;
         }
@@ -91,16 +90,6 @@ namespace LancerRemix.Cat
                 data.ReplaceFirst(self.saveStateNumber.value, lancer.value);
             }
             return data;
-        }
-
-        private static SaveState GetOrInitiateLancerState(On.PlayerProgression.orig_GetOrInitiateSaveState orig, PlayerProgression self,
-            SlugName saveStateNumber, RainWorldGame game, ProcessManager.MenuSetup setup, bool saveAsDeathOrQuit)
-        {
-            if (self.currentSaveState != null)
-            {
-                LancerPlugin.LogSource.LogInfo($"{self.currentSaveState.saveStateNumber} == {saveStateNumber}");
-            }
-            return orig(self, saveStateNumber, game, setup, saveAsDeathOrQuit);
         }
 
         private static SaveState LoadLancerStateInstead(On.PlayerProgression.orig_LoadGameState orig, PlayerProgression self,
