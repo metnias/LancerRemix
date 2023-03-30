@@ -86,7 +86,13 @@ namespace LancerRemix
             try
             {
                 if (self.currentMainLoop?.ID == ProcessManager.ProcessID.MainMenu)
+                {
                     LancerEnums.RegisterLancers();
+                }
+                else if (ID == ProcessManager.ProcessID.SlugcatSelect)
+                {
+                    ModifyCat.SetIsLancer(false, new bool[4]);
+                }
             }
             catch (Exception e) { Debug.LogException(e); }
             orig(self, ID);

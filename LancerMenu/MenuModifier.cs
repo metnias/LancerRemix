@@ -10,10 +10,10 @@ namespace LancerRemix.LancerMenu
     {
         internal static void Patch()
         {
-            SelectMenuPatch.MiniPatch();
+            SelectMenuPatch.SubPatch();
             /// TODO: add Lancer toggle button in slugcat select menu
             /// clicking that swooshes illust upwards.
-            /// 
+            ///
             /// or just save which players should be lancer
             /// and attach supplements to them separately
             /// lancer supplements will pass null for orig to prevent double updates

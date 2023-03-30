@@ -1,9 +1,11 @@
 ﻿using JollyCoop.JollyMenu;
 using LancerRemix.Cat;
 using Menu;
+using MonoMod.RuntimeDetour;
 using RWCustom;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using UnityEngine;
 using static LancerRemix.LancerEnums;
 using static Menu.SlugcatSelectMenu;
@@ -13,7 +15,7 @@ namespace LancerRemix.LancerMenu
 {
     internal static class SelectMenuPatch
     {
-        internal static void MiniPatch()
+        internal static void SubPatch()
         {
             On.Menu.SlugcatSelectMenu.ctor += CtorPatch;
             On.Menu.SlugcatSelectMenu.colorFromIndex += LancerFromIndex;
@@ -21,9 +23,12 @@ namespace LancerRemix.LancerMenu
             On.Menu.SlugcatSelectMenu.SetChecked += SetLancerChecked;
             On.Menu.SlugcatSelectMenu.Update += UpdatePatch;
             On.Menu.SlugcatSelectMenu.UpdateStartButtonText += UpdateLancerStartButtonText;
+            On.Menu.SlugcatSelectMenu.UpdateSelectedSlugcatInMiscProg += UpdateSelectedLancerInMiscProg;
             On.Menu.SlugcatSelectMenu.Singal += SignalPatch;
             On.Menu.SlugcatSelectMenu.SlugcatPage.GrafUpdate += PageGrafUpdatePatch;
             On.Menu.SlugcatSelectMenu.SlugcatPageContinue.Update += LancerPageContinue.PageContinueUpdatePatch;
+
+            LancerPageContinue.SubPatch();
         }
 
         private static void CtorPatch(On.Menu.SlugcatSelectMenu.orig_ctor orig, SlugcatSelectMenu self, ProcessManager manager)
@@ -35,9 +40,9 @@ namespace LancerRemix.LancerMenu
             lancerPages = new SlugcatPage[self.slugcatPages.Count];
             foreach (var lancer in AllLancer)
             {
-                self.saveGameData[lancer] = MineForSaveData(manager, lancer);
                 int order = GetBasisOrder(lancer);
                 if (order < 0) continue;
+                self.saveGameData[lancer] = MineForSaveData(manager, lancer);
                 if (self.saveGameData[lancer] != null)
                     lancerPages[order] = new LancerPageContinue(self, null, 1 + order, lancer);
                 else
@@ -53,6 +58,7 @@ namespace LancerRemix.LancerMenu
             self.MutualHorizontalButtonBind(lancerButton, self.nextButton);
             _lancerInit = true;
             self.UpdateStartButtonText();
+            self.UpdateSelectedSlugcatInMiscProg();
 
             int GetBasisOrder(SlugName lancer)
             {
@@ -168,6 +174,12 @@ namespace LancerRemix.LancerMenu
                 return;
             } */
             self.startButton.menuLabel.text = self.Translate("CONTINUE");
+        }
+
+        private static void UpdateSelectedLancerInMiscProg(On.Menu.SlugcatSelectMenu.orig_UpdateSelectedSlugcatInMiscProg orig, SlugcatSelectMenu self)
+        {
+            if (!_lancerInit) return;
+            orig(self);
         }
 
         private static void SignalPatch(On.Menu.SlugcatSelectMenu.orig_Singal orig, SlugcatSelectMenu self, MenuObject sender, string message)
@@ -335,12 +347,25 @@ namespace LancerRemix.LancerMenu
 
             internal SlugName basisNumber;
 
-            public new SaveGameData saveGameData
+            private delegate SaveGameData orig_saveGameData(SlugcatPageContinue self);
+
+            private static SaveGameData LancerGameData(orig_saveGameData orig, SlugcatPageContinue self)
             {
-                get
+                if (self is LancerPageContinue)
                 {
-                    return (menu as SlugcatSelectMenu).saveGameData[slugcatNumber];
+                    var lancerNumber = self.slugcatNumber;
+                    if (HasLancer(lancerNumber)) lancerNumber = GetLancer(lancerNumber);
+                    return (self.menu as SlugcatSelectMenu).saveGameData[lancerNumber];
                 }
+                return orig(self);
+            }
+
+            internal static void SubPatch()
+            {
+                var saveGameData = new Hook(
+                    typeof(SlugcatPageContinue).GetProperty(nameof(SlugcatPageContinue.saveGameData), BindingFlags.Instance | BindingFlags.Public).GetGetMethod(),
+                    typeof(LancerPageContinue).GetMethod(nameof(LancerPageContinue.LancerGameData), BindingFlags.Static | BindingFlags.NonPublic)
+                );
             }
 
             internal static void PageContinueUpdatePatch(On.Menu.SlugcatSelectMenu.SlugcatPageContinue.orig_Update orig, SlugcatPageContinue self)

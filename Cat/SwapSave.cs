@@ -81,17 +81,6 @@ namespace LancerRemix.Cat
             return orig(self, saveCurrentState, saveMaps, saveMiscProg);
         }
 
-        private static string SaveStateToLancer(On.SaveState.orig_SaveToString orig, SaveState self)
-        {
-            var data = orig(self);
-            if (IsStoryLancer)
-            {
-                var lancer = GetLancer(self.saveStateNumber);
-                data.ReplaceFirst(self.saveStateNumber.value, lancer.value);
-            }
-            return data;
-        }
-
         private static SaveState LoadLancerStateInstead(On.PlayerProgression.orig_LoadGameState orig, PlayerProgression self,
             string saveFilePath, RainWorldGame game, bool saveAsDeathOrQuit)
         {
