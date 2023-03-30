@@ -17,7 +17,7 @@ namespace LancerRemix.Cat
             On.Menu.SlugcatSelectMenu.ContinueStartedGame += ContinueStartedLancer;
             On.PlayerProgression.WipeSaveState += WipeSaveLancer;
 
-            On.SaveState.SaveToString += SaveLancerToString;
+            On.SaveState.SaveToString += SaveStateToLancer;
             On.PlayerProgression.LoadGameState += LoadLancerStateInstead;
             //IL.PlayerProgression.LoadGameState += LoadLancerState;
         }
@@ -66,7 +66,7 @@ namespace LancerRemix.Cat
             return text;
         }
 
-        private static string SaveLancerToString(On.SaveState.orig_SaveToString orig, SaveState self)
+        private static string SaveStateToLancer(On.SaveState.orig_SaveToString orig, SaveState self)
         {
             var data = orig(self);
             if (IsStoryLancer)
