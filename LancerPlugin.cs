@@ -47,7 +47,7 @@ namespace LancerRemix
             LogSource = this.Logger;
 
             On.RainWorld.OnModsInit += WrapInit(Init);
-            On.RainWorld.PostModsInit += PostInit;
+            On.ProcessManager.PreSwitchMainProcess += RegisterLancersAfterMainMenu;
             On.RainWorld.OnModsEnabled += OnModsEnabled;
             On.RainWorld.OnModsDisabled += OnModsDisabled;
         }
@@ -81,11 +81,15 @@ namespace LancerRemix
             };
         }
 
-        private static void PostInit(On.RainWorld.orig_PostModsInit orig, RainWorld rw)
+        private static void RegisterLancersAfterMainMenu(On.ProcessManager.orig_PreSwitchMainProcess orig, ProcessManager self, ProcessManager.ProcessID ID)
         {
-            orig(rw);
-
-            LancerEnums.RegisterLancers();
+            try
+            {
+                if (self.currentMainLoop?.ID == ProcessManager.ProcessID.MainMenu)
+                    LancerEnums.RegisterLancers();
+            }
+            catch (Exception e) { Debug.LogException(e); }
+            orig(self, ID);
         }
 
         private static bool lastMSCEnabled;
@@ -96,7 +100,7 @@ namespace LancerRemix
             LancerEnums.RegisterLancers();
             if (!lastMSCEnabled && ModManager.MSC)
             {
-                LogSource.LogInfo("Lancer detected MSC newly enabled.");
+                //LogSource.LogInfo("Lancer detected MSC newly enabled.");
                 //ModifyCat.OnMSCEnablePatch();
                 //AltEndingHandler.OnMSCEnablePatch();
                 lastMSCEnabled = ModManager.MSC;
@@ -108,7 +112,7 @@ namespace LancerRemix
             orig(rw, newlyDisabledMods);
             if (lastMSCEnabled && !ModManager.MSC)
             {
-                LogSource.LogInfo("Lancer detected MSC newly disabled.");
+                //LogSource.LogInfo("Lancer detected MSC newly disabled.");
                 //ModifyCat.OnMSCDisablePatch();
                 //AltEndingHandler.OnMSCDisablePatch();
                 lastMSCEnabled = ModManager.MSC;

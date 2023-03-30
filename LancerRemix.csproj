@@ -42,16 +42,16 @@
       <HintPath>debug\HOOKS-Assembly-CSharp.dll</HintPath>
     </Reference>
     <Reference Include="Mono.Cecil">
-      <HintPath>debug\Mono.Cecil.dll</HintPath>
+      <HintPath>..\References\RWDownpour\Mono.Cecil.dll</HintPath>
     </Reference>
     <Reference Include="MonoMod">
-      <HintPath>debug\MonoMod.dll</HintPath>
+      <HintPath>..\References\RWDownpour\MonoMod.dll</HintPath>
     </Reference>
     <Reference Include="MonoMod.RuntimeDetour">
-      <HintPath>debug\MonoMod.RuntimeDetour.dll</HintPath>
+      <HintPath>..\References\RWDownpour\MonoMod.RuntimeDetour.dll</HintPath>
     </Reference>
     <Reference Include="MonoMod.Utils">
-      <HintPath>debug\MonoMod.Utils.dll</HintPath>
+      <HintPath>..\References\RWDownpour\MonoMod.Utils.dll</HintPath>
     </Reference>
     <Reference Include="PUBLIC-Assembly-CSharp">
       <HintPath>debug\PUBLIC-Assembly-CSharp.dll</HintPath>

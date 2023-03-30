@@ -18,6 +18,7 @@ namespace LancerRemix.Cat
             On.PlayerProgression.WipeSaveState += WipeSaveLancer;
 
             On.SaveState.SaveToString += SaveStateToLancer;
+            On.PlayerProgression.GetOrInitiateSaveState += GetOrInitiateLancerState;
             On.PlayerProgression.LoadGameState += LoadLancerStateInstead;
             //IL.PlayerProgression.LoadGameState += LoadLancerState;
         }
@@ -28,7 +29,7 @@ namespace LancerRemix.Cat
 
         private static bool IsThereASavedLancer(On.PlayerProgression.orig_IsThereASavedGame orig, PlayerProgression self, SlugName saveStateNumber)
         {
-            if (IsStoryLancer) saveStateNumber = GetLancer(saveStateNumber);
+            if (IsStoryLancer && HasLancer(saveStateNumber)) saveStateNumber = GetLancer(saveStateNumber);
             return orig(self, saveStateNumber);
         }
 
@@ -51,7 +52,7 @@ namespace LancerRemix.Cat
 
         private static void WipeSaveLancer(On.PlayerProgression.orig_WipeSaveState orig, PlayerProgression self, SlugName saveStateNumber)
         {
-            if (IsStoryLancer) saveStateNumber = GetLancer(saveStateNumber);
+            if (IsStoryLancer && HasLancer(saveStateNumber)) saveStateNumber = GetLancer(saveStateNumber);
             orig(self, saveStateNumber);
         }
 
@@ -75,6 +76,16 @@ namespace LancerRemix.Cat
                 data.ReplaceFirst(self.saveStateNumber.value, lancer.value);
             }
             return data;
+        }
+
+        private static SaveState GetOrInitiateLancerState(On.PlayerProgression.orig_GetOrInitiateSaveState orig, PlayerProgression self,
+            SlugName saveStateNumber, RainWorldGame game, ProcessManager.MenuSetup setup, bool saveAsDeathOrQuit)
+        {
+            if (self.currentSaveState != null)
+            {
+                LancerPlugin.LogSource.LogInfo($"{self.currentSaveState.saveStateNumber} == {saveStateNumber}");
+            }
+            return orig(self, saveStateNumber, game, setup, saveAsDeathOrQuit);
         }
 
         private static SaveState LoadLancerStateInstead(On.PlayerProgression.orig_LoadGameState orig, PlayerProgression self,
@@ -118,8 +129,8 @@ namespace LancerRemix.Cat
             var cursor = new ILCursor(il);
             LancerPlugin.LogSource.LogInfo("LoadLancerState Patch");
 
-
             #region AddLblContinue
+
             if (!cursor.TryGotoNext(MoveType.Before,
                 x => x.MatchLdloc(1),
                 x => x.MatchLdcI4(1),
@@ -129,9 +140,11 @@ namespace LancerRemix.Cat
             cursor.Emit(OpCodes.Nop);
             var lblContinue = cursor.DefineLabel();
             lblContinue.Target = cursor.Prev;
+
             #endregion AddLblContinue
 
             #region AddLblOkay
+
             if (!cursor.TryGotoPrev(MoveType.Before,
                 x => x.MatchLdarg(0),
                 x => x.MatchLdfld(typeof(PlayerProgression).GetField(nameof(PlayerProgression.currentSaveState))),
@@ -141,9 +154,11 @@ namespace LancerRemix.Cat
             cursor.Emit(OpCodes.Nop);
             var lblOkay = cursor.DefineLabel();
             lblOkay.Target = cursor.Prev;
+
             #endregion AddLblOkay
 
             #region AddLblNoLancer
+
             if (!cursor.TryGotoPrev(MoveType.Before,
                 x => x.MatchLdloc(3),
                 x => x.MatchLdcI4(1),
@@ -157,6 +172,7 @@ namespace LancerRemix.Cat
             lblNoLancer.Target = cursor.Prev;
             cursor.GotoLabel(lblNoLancer, MoveType.Before);
             DebugLogCursor();
+
             #endregion AddLblNoLancer
 
             cursor.EmitDelegate<Func<bool>>(
@@ -188,6 +204,5 @@ namespace LancerRemix.Cat
         */
 
         #endregion SaveState
-
     }
 }

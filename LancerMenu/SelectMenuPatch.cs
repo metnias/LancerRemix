@@ -25,8 +25,10 @@ namespace LancerRemix.LancerMenu
 
         private static void CtorPatch(On.Menu.SlugcatSelectMenu.orig_ctor orig, SlugcatSelectMenu self, ProcessManager manager)
         {
+            _lancerInit = false;
+            ModifyCat.SetIsLancer(false, new bool[4]);
             orig(self, manager);
-            slugcatPageLancer = false;
+            slugcatPageLancer = false; lancerTransition = 0f; lastLancerTransition = 0f;
             lancerPages = new SlugcatPage[self.slugcatPages.Count];
             foreach (var lancer in AllLancer)
             {
@@ -34,13 +36,9 @@ namespace LancerRemix.LancerMenu
                 int order = GetBasisOrder(lancer);
                 if (order < 0) continue;
                 if (self.saveGameData[lancer] != null)
-                {
                     lancerPages[order] = new LancerPageContinue(self, null, 1 + order, lancer);
-                }
                 else
-                {
                     lancerPages[order] = new LancerPageNewGame(self, null, 1 + order, lancer);
-                }
                 self.pages.Add(lancerPages[order]);
 
                 UpdateCurrentlySelectedLancer(lancer, order);
@@ -50,6 +48,8 @@ namespace LancerRemix.LancerMenu
                 "lancer_on", "lancer_off", slugcatPageLancer, false);
             self.pages[0].subObjects.Add(lancerButton);
             self.MutualHorizontalButtonBind(lancerButton, self.nextButton);
+            _lancerInit = true;
+            self.UpdateStartButtonText();
 
             int GetBasisOrder(SlugName lancer)
             {
@@ -71,6 +71,7 @@ namespace LancerRemix.LancerMenu
 
         private static SlugcatPage[] lancerPages;
         private static bool slugcatPageLancer;
+        private static bool _lancerInit = false;
         private static SymbolButtonToggle lancerButton;
         private static float lancerTransition = 0f;
         private static float lastLancerTransition = 0f;
@@ -91,8 +92,11 @@ namespace LancerRemix.LancerMenu
         private static void UpdateLancerStartButtonText(On.Menu.SlugcatSelectMenu.orig_UpdateStartButtonText orig, SlugcatSelectMenu self)
         {
             if (!slugcatPageLancer) { orig(self); return; }
+            if (!_lancerInit) return; // to prevent breaking
+            var lancer = self.slugcatColorOrder[self.slugcatPageIndex];
+            if (!HasLancer(lancer)) return;
+            lancer = GetLancer(lancer);
             self.startButton.fillTime = (self.restartChecked ? 120f : 40f);
-            var lancer = GetLancer(self.slugcatColorOrder[self.slugcatPageIndex]);
             if (self.saveGameData[lancer] == null)
             {
                 self.startButton.menuLabel.text = self.Translate("NEW GAME");
