@@ -19,7 +19,19 @@ namespace LancerRemix.Cat
     {
         internal static void Patch()
         {
+            On.SlugcatStats.SlugcatUnlocked += LancerUnlocked;
             On.SlugcatStats.HiddenOrUnplayableSlugcat += DisableRegularSelect;
+        }
+
+        private static bool LancerUnlocked(On.SlugcatStats.orig_SlugcatUnlocked orig, SlugName i, RainWorld rainWorld)
+        {
+            if (IsLancer(i))
+            {
+                var basis = GetBasis(i);
+                if (SlugcatStats.IsSlugcatFromMSC(basis)) return false; // TBA
+                return orig(basis, rainWorld);
+            }
+            return orig(i, rainWorld);
         }
 
         private static bool DisableRegularSelect(On.SlugcatStats.orig_HiddenOrUnplayableSlugcat orig, SlugName i)

@@ -26,6 +26,8 @@ namespace LancerRemix.Cat
             On.PlayerGraphics.SuckedIntoShortCut += GrafSuckedIntoShortCut;
             On.PlayerGraphics.Reset += GrafReset;
 
+            SwapSave.SubPatch();
+
             if (ModManager.MSC) OnMSCEnablePatch();
         }
 

@@ -3,6 +3,7 @@ using LancerRemix.Cat;
 using Menu;
 using RWCustom;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 using static LancerRemix.LancerEnums;
 using static Menu.SlugcatSelectMenu;
@@ -25,7 +26,7 @@ namespace LancerRemix.LancerMenu
         private static void CtorPatch(On.Menu.SlugcatSelectMenu.orig_ctor orig, SlugcatSelectMenu self, ProcessManager manager)
         {
             orig(self, manager);
-            slugcatPageLancer = true; lancerTransition = 1f; lastLancerTransition = 1f; //= false;
+            slugcatPageLancer = false;
             lancerPages = new SlugcatPage[self.slugcatPages.Count];
             foreach (var lancer in AllLancer)
             {
@@ -243,6 +244,35 @@ namespace LancerRemix.LancerMenu
 
             private void VanillaLancerText()
             {
+                string diff = difficultyLabel.text;
+                string info = infoLabel.text;
+                int lineCount = Enumerable.Count(info, (char f) => f == '\n');
+                if (lineCount > 1) // revert offset to recalculate
+                { imagePos.y -= 30f; sceneOffset.y -= 30f; }
+
+                if (basisNumber == SlugName.Yellow)
+                {
+                    info = menu.Translate("Feeble but cautious cub. Stranded in a harsh world and surrounded by its<LINE>unempathetic creatures, your journey will be a significantly more challenging one.");
+                }
+                if ((menu as SlugcatSelectMenu).SlugcatUnlocked(slugcatNumber))
+                {
+                    if (ModManager.MSC && SlugcatStats.IsSlugcatFromMSC(basisNumber))
+                    {
+                        diff = "???";
+                        info = menu.Translate("To be announced...");
+                    }
+                }
+                info = Custom.ReplaceLineDelimeters(info);
+                lineCount = Enumerable.Count(info, (char f) => f == '\n');
+                float yOffset = lineCount > 1 ? 30f : 0f;
+
+                difficultyLabel.text = diff;
+                infoLabel.text = info;
+
+                difficultyLabel.pos.y = imagePos.y - 249f + yOffset;
+                infoLabel.pos.y = imagePos.y - 249f - 60f + yOffset / 2f;
+                if (lineCount > 1)
+                { imagePos.y += 30f; sceneOffset.y += 30f; }
             }
         }
 
