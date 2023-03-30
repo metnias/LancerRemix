@@ -2,6 +2,8 @@
 using UnityEngine;
 using SlugName = SlugcatStats.Name;
 using static LancerRemix.LancerEnums;
+using RWCustom;
+using System.Collections.Generic;
 
 namespace LancerRemix.Cat
 {
@@ -49,5 +51,29 @@ namespace LancerRemix.Cat
         {
             base.Reset(null);
         }
+
+
+        public static Color DefaultHornColor(SlugName basis)
+        {
+            if (defaultHornColors.TryGetValue(basis, out var res)) return res;
+
+            var c = PlayerGraphics.DefaultSlugcatColor(basis);
+            var hsl = Custom.RGB2HSL(c);
+            hsl.x = (hsl.x + 0.5f) % 1f;
+            hsl.z = Mathf.Lerp(hsl.z, 0.2f, 0.3f);
+            defaultHornColors.Add(basis, Custom.HSL2RGB(hsl.x, hsl.y, hsl.z));
+
+            return defaultHornColors[basis];
+        }
+
+        private static readonly Dictionary<SlugName, Color> defaultHornColors
+            = new Dictionary<SlugName, Color>()
+            {
+                { SlugName.White, new Color(0.1f, 0.3f, 0.0f) },
+                {SlugName.Yellow, new Color(0.5f, 0.1f, 0.0f) },
+                {SlugName.Red, new Color(0.0f, 0.1f, 0.5f) },
+                {SlugName.Night, new Color(0.1f, 0.5f, 0.3f) }
+            };
+
     }
 }

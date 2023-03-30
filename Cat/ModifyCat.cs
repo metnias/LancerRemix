@@ -1,10 +1,11 @@
 ﻿using CatSub.Cat;
+using MonoMod.RuntimeDetour;
+using System.Collections.Generic;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 using static LancerRemix.LancerEnums;
 using SlugName = SlugcatStats.Name;
-using MonoMod.RuntimeDetour;
-using System.Reflection;
 
 namespace LancerRemix.Cat
 {
@@ -86,6 +87,8 @@ namespace LancerRemix.Cat
 
         #endregion SubRegistry
 
+        #region CatSub
+
         private static void PlayerCtor(On.Player.orig_ctor orig, Player self, AbstractCreature abstractCreature, World world)
         {
             orig(self, abstractCreature, world);
@@ -107,6 +110,8 @@ namespace LancerRemix.Cat
             if (IsLancer(self.playerState))
                 GetSub<LancerSupplement>(self)?.Destroy(null);
         }
+
+        #endregion CatSub
 
         private static void PlayerGrabbed(On.Player.orig_Grabbed orig, Player self, Creature.Grasp grasp)
         {
@@ -139,6 +144,8 @@ namespace LancerRemix.Cat
            => GetDeco<T>(playerGraphics.player.playerState);
 
         #endregion DecoRegistry
+
+        #region CatDeco
 
         private static void GrafInitSprite(On.PlayerGraphics.orig_InitiateSprites orig, PlayerGraphics self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam)
         {
@@ -189,6 +196,10 @@ namespace LancerRemix.Cat
                 GetDeco<LancerDecoration>(self)?.Reset(null);
         }
 
+        #endregion CatDeco
+
+        #region Properties
+
         private delegate SlugName orig_CharacterForColor(PlayerGraphics self);
 
         private static SlugName LancerForColor(orig_CharacterForColor orig, PlayerGraphics self)
@@ -207,20 +218,28 @@ namespace LancerRemix.Cat
             return orig(self);
         }
 
+        #endregion Properties
+
         private static Color DefaultLancerColor(On.PlayerGraphics.orig_DefaultSlugcatColor orig, SlugName i)
         {
             if (LancerEnums.IsLancer(i))
             {
                 var basis = GetBasis(i);
-                if (basis == SlugName.White) return new Color(0.8f, 1.0f, 0.5f);
-                if (basis == SlugName.Yellow) return new Color(1.0f, 0.9f, 0.4f);
-                if (basis == SlugName.Red) return new Color(0.3f, 0.5f, 1.0f);
-                if (basis == SlugName.Night) return new Color(0.8f, 0.1f, 0.3f);
+                if (defaultLancerBodyColors.TryGetValue(basis, out var res)) return res;
 
                 return orig(basis);
             }
             return orig(i);
         }
+
+        private static readonly Dictionary<SlugName, Color> defaultLancerBodyColors
+            = new Dictionary<SlugName, Color>()
+            {
+                {SlugName.White, new Color(0.8f, 1.0f, 0.5f) },
+                {SlugName.Yellow, new Color(1.0f, 0.9f, 0.4f)},
+                {SlugName.Red, new Color(0.3f, 0.5f, 1.0f)},
+                {SlugName.Night, new Color(0.8f, 0.1f, 0.3f) }
+            };
 
         #endregion PlayerGraphics
     }

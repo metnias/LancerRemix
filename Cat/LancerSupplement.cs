@@ -28,6 +28,7 @@ namespace LancerRemix.Cat
 
         public override string TargetSubVersion => "1.0";
 
+
         public override void Update(On.Player.orig_Update orig, bool eu)
         {
             base.Update(null, eu);
