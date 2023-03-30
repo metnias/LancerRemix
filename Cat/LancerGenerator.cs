@@ -12,14 +12,35 @@ using static LancerRemix.LancerEnums;
 using CatSub.Cat;
 using CatSub.Story;
 using System.IO;
+using Menu;
+using LancerRemix.LancerMenu;
 
 namespace LancerRemix.Cat
 {
     internal static class LancerGenerator
     {
-        internal static void SubPatch()
+        internal static void Patch()
         {
+            On.SlugcatStats.SlugcatUnlocked += LancerUnlocked;
+            On.Menu.MenuScene.UseSlugcatUnlocked += UseLancerUnlocked;
             On.SlugcatStats.HiddenOrUnplayableSlugcat += DisableRegularSelect;
+        }
+
+        private static bool LancerUnlocked(On.SlugcatStats.orig_SlugcatUnlocked orig, SlugName i, RainWorld rainWorld)
+        {
+            if (IsLancer(i))
+            {
+                i = GetBasis(i);
+                if (SlugcatStats.IsSlugcatFromMSC(i)) return false; // TBA
+            }
+            return orig(i, rainWorld);
+        }
+
+        private static bool UseLancerUnlocked(On.Menu.MenuScene.orig_UseSlugcatUnlocked orig, MenuScene self, SlugName slugcat)
+        {
+            if (self.owner is SelectMenuPatch.LancerPageNewGame || self.owner is SelectMenuPatch.LancerPageContinue)
+                return ((self.owner as SlugcatSelectMenu.SlugcatPage).menu as SlugcatSelectMenu).SlugcatUnlocked(GetLancer(slugcat));
+            return orig(self, slugcat);
         }
 
         private static bool DisableRegularSelect(On.SlugcatStats.orig_HiddenOrUnplayableSlugcat orig, SlugName i)
@@ -36,14 +57,14 @@ namespace LancerRemix.Cat
 
             if (basis == SlugName.White || basis == SlugName.Yellow || basis == SlugName.Red || basis == SlugName.Night)
                 lancer = RegisterVanillaLancer(basis);
-            else if (SlugBaseCharacter.TryGet(basis, out var _))
-            {
+            else if (SlugcatStats.IsSlugcatFromMSC(basis))
+                lancer = RegisterMSCLancer(basis);
+            if (SlugBaseCharacter.TryGet(basis, out var _))
                 lancer = RegisterSlugBaseLancer(basis);
-                if (lancer == null) return false; // Json file doesn't exist
-            }
+            if (lancer == null || lancer.Index < 0) return false; // something went wrong
 
-            SubRegistry.Register(lancer, (player) => new LancerSupplement(player));
-            DecoRegistry.Register(lancer, (player) => new LancerDecoration(player));
+            // SubRegistry.Register(lancer, (player) => new LancerSupplement(player));
+            // DecoRegistry.Register(lancer, (player) => new LancerDecoration(player));
             StoryRegistry.RegisterTimeline(new StoryRegistry.TimelinePointer(lancer, StoryRegistry.TimelinePointer.Relative.After, basis));
 
             return true;
@@ -75,12 +96,19 @@ namespace LancerRemix.Cat
 
         private static SlugName RegisterVanillaLancer(SlugName basis)
         {
-            // load json
-            return new SlugName(GetLancerName(basis.value), true); //SlugBaseCharacter.Registry.Add(new JsonObject()).Key;
+            return new SlugName(GetLancerName(basis.value), true);
+        }
+
+        private static SlugName RegisterMSCLancer(SlugName basis)
+        {
+            return new SlugName(GetLancerName(basis.value), true);
         }
 
         private static SlugName RegisterSlugBaseLancer(SlugName basis)
         {
+            return new SlugName(GetLancerName(basis.value), true);
+
+            /*
             if (!SlugBaseCharacter.Registry.TryGetPath(basis, out string path))
                 return null;
             string data = File.ReadAllText(path);
@@ -96,29 +124,7 @@ namespace LancerRemix.Cat
                 if (index >= 0) return $"{text.Substring(0, index)}{lancerName}{text.Substring(index + basisName.Length)}";
                 return text;
             }
+            */
         }
-
-        /*
-       private static void PopulateSlugBaseLancerData(SlugBaseCharacter character, ref JsonBuilder builder)
-       {
-           // name
-           builder.Value("name", character.DisplayName);
-           // description
-           builder.Value("description", character.Description);
-
-           // features
-           builder.Object("features", features =>
-           {
-               foreach (var feature in character.Features)
-               {
-                   features.Value(feature.ID, feature.ToString());
-               }
-           });
-       }
-
-       private static void GetMSCLancerData(SlugName basis, ref JsonBuilder builder)
-       {
-       }
-       */
     }
 }

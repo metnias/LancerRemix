@@ -1,7 +1,11 @@
 ﻿using JollyCoop.JollyMenu;
+using LancerRemix.Cat;
 using Menu;
+using MonoMod.RuntimeDetour;
 using RWCustom;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 using UnityEngine;
 using static LancerRemix.LancerEnums;
 using static Menu.SlugcatSelectMenu;
@@ -11,34 +15,38 @@ namespace LancerRemix.LancerMenu
 {
     internal static class SelectMenuPatch
     {
-        internal static void MiniPatch()
+        internal static void SubPatch()
         {
             On.Menu.SlugcatSelectMenu.ctor += CtorPatch;
+            On.Menu.SlugcatSelectMenu.colorFromIndex += LancerFromIndex;
+            On.Menu.SlugcatSelectMenu.indexFromColor += IndexFromLancer;
+            On.Menu.SlugcatSelectMenu.SetChecked += SetLancerChecked;
             On.Menu.SlugcatSelectMenu.Update += UpdatePatch;
             On.Menu.SlugcatSelectMenu.UpdateStartButtonText += UpdateLancerStartButtonText;
+            On.Menu.SlugcatSelectMenu.UpdateSelectedSlugcatInMiscProg += UpdateSelectedLancerInMiscProg;
             On.Menu.SlugcatSelectMenu.Singal += SignalPatch;
             On.Menu.SlugcatSelectMenu.SlugcatPage.GrafUpdate += PageGrafUpdatePatch;
             On.Menu.SlugcatSelectMenu.SlugcatPageContinue.Update += LancerPageContinue.PageContinueUpdatePatch;
+
+            LancerPageContinue.SubPatch();
         }
 
         private static void CtorPatch(On.Menu.SlugcatSelectMenu.orig_ctor orig, SlugcatSelectMenu self, ProcessManager manager)
         {
+            _lancerInit = false;
+            ModifyCat.SetIsLancer(false, new bool[4]);
             orig(self, manager);
-            slugcatPageLancer = true; lancerTransition = 1f; lastLancerTransition = 1f; //= false;
+            slugcatPageLancer = false; lancerTransition = 0f; lastLancerTransition = 0f;
             lancerPages = new SlugcatPage[self.slugcatPages.Count];
             foreach (var lancer in AllLancer)
             {
-                self.saveGameData[lancer] = MineForSaveData(manager, lancer);
                 int order = GetBasisOrder(lancer);
                 if (order < 0) continue;
+                self.saveGameData[lancer] = MineForSaveData(manager, lancer);
                 if (self.saveGameData[lancer] != null)
-                {
                     lancerPages[order] = new LancerPageContinue(self, null, 1 + order, lancer);
-                }
                 else
-                {
                     lancerPages[order] = new LancerPageNewGame(self, null, 1 + order, lancer);
-                }
                 self.pages.Add(lancerPages[order]);
 
                 UpdateCurrentlySelectedLancer(lancer, order);
@@ -48,6 +56,9 @@ namespace LancerRemix.LancerMenu
                 "lancer_on", "lancer_off", slugcatPageLancer, false);
             self.pages[0].subObjects.Add(lancerButton);
             self.MutualHorizontalButtonBind(lancerButton, self.nextButton);
+            _lancerInit = true;
+            self.UpdateStartButtonText();
+            self.UpdateSelectedSlugcatInMiscProg();
 
             int GetBasisOrder(SlugName lancer)
             {
@@ -69,6 +80,7 @@ namespace LancerRemix.LancerMenu
 
         private static SlugcatPage[] lancerPages;
         private static bool slugcatPageLancer;
+        private static bool _lancerInit = false;
         private static SymbolButtonToggle lancerButton;
         private static float lancerTransition = 0f;
         private static float lastLancerTransition = 0f;
@@ -84,15 +96,57 @@ namespace LancerRemix.LancerMenu
             orig(self);
             lastLancerTransition = lancerTransition;
             lancerTransition = Custom.LerpAndTick(lancerTransition, slugcatPageLancer ? 1f : 0f, 0.07f, 0.03f);
+            self.startButton.GetButtonBehavior.greyedOut |= lancerTransition > 0.1f && lancerTransition < 0.9f;
+        }
+
+        private static SlugName LancerFromIndex(On.Menu.SlugcatSelectMenu.orig_colorFromIndex orig, SlugcatSelectMenu self, int index)
+        {
+            var res = orig(self, index);
+            if (slugcatPageLancer && HasLancer(res)) res = GetLancer(res);
+            return res;
+        }
+
+        private static int IndexFromLancer(On.Menu.SlugcatSelectMenu.orig_indexFromColor orig, SlugcatSelectMenu self, SlugName color)
+        {
+            if (IsLancer(color)) color = GetBasis(color);
+            return orig(self, color);
+        }
+
+        private static void SetLancerChecked(On.Menu.SlugcatSelectMenu.orig_SetChecked orig, SlugcatSelectMenu self, CheckBox box, bool c)
+        {
+            if (slugcatPageLancer)
+            {
+                var basis = self.slugcatColorOrder[self.slugcatPageIndex];
+                if (!HasLancer(basis)) goto NoLancer;
+                var lancer = GetLancer(basis);
+                if (!(box.IDString == "COLORS"))
+                {
+                    self.restartChecked = c;
+                    self.UpdateStartButtonText();
+                    return;
+                }
+                self.colorChecked = c;
+                if (self.colorChecked && !self.CheckJollyCoopAvailable(self.colorFromIndex(self.slugcatPageIndex)))
+                {
+                    self.AddColorButtons();
+                    self.manager.rainWorld.progression.miscProgressionData.colorsEnabled[lancer.value] = true;
+                    return;
+                }
+                self.RemoveColorButtons();
+                self.manager.rainWorld.progression.miscProgressionData.colorsEnabled[lancer.value] = false;
+                return;
+            }
+        NoLancer: orig(self, box, c);
         }
 
         private static void UpdateLancerStartButtonText(On.Menu.SlugcatSelectMenu.orig_UpdateStartButtonText orig, SlugcatSelectMenu self)
         {
-            self.startButton.GetButtonBehavior.greyedOut = false;
             if (!slugcatPageLancer) { orig(self); return; }
-            if (!HasLancer(self.slugcatColorOrder[self.slugcatPageIndex])) { self.startButton.GetButtonBehavior.greyedOut = true; return; }
+            if (!_lancerInit) return; // to prevent breaking
+            var lancer = self.slugcatColorOrder[self.slugcatPageIndex];
+            if (!HasLancer(lancer)) return;
+            lancer = GetLancer(lancer);
             self.startButton.fillTime = (self.restartChecked ? 120f : 40f);
-            var lancer = GetLancer(self.slugcatColorOrder[self.slugcatPageIndex]);
             if (self.saveGameData[lancer] == null)
             {
                 self.startButton.menuLabel.text = self.Translate("NEW GAME");
@@ -122,6 +176,12 @@ namespace LancerRemix.LancerMenu
             self.startButton.menuLabel.text = self.Translate("CONTINUE");
         }
 
+        private static void UpdateSelectedLancerInMiscProg(On.Menu.SlugcatSelectMenu.orig_UpdateSelectedSlugcatInMiscProg orig, SlugcatSelectMenu self)
+        {
+            if (!_lancerInit) return;
+            orig(self);
+        }
+
         private static void SignalPatch(On.Menu.SlugcatSelectMenu.orig_Singal orig, SlugcatSelectMenu self, MenuObject sender, string message)
         {
             if (message.StartsWith(LANCER_SIGNAL))
@@ -131,6 +191,13 @@ namespace LancerRemix.LancerMenu
                 self.PlaySound(SoundID.MENU_Next_Slugcat);
                 self.UpdateStartButtonText();
                 return;
+            }
+            if (message == "START")
+            {
+                bool[] players = new bool[4];
+                players[0] = slugcatPageLancer; // TODO: get jolly status as well
+                ModifyCat.SetIsLancer(slugcatPageLancer, players);
+                // StartGame(this.slugcatPages[this.slugcatPageIndex].slugcatNumber);
             }
             orig(self, sender, message);
         }
@@ -176,37 +243,46 @@ namespace LancerRemix.LancerMenu
             var basis = GetBasis(page.slugcatNumber);
             if (basis == SlugName.White)
             {
-                ReplaceIllust($"scenes{Path.DirectorySeparatorChar}slugcat - lancer",
+                ReplaceIllust(page.slugcatImage, $"scenes{Path.DirectorySeparatorChar}slugcat - lancer",
                     "lancer - white - flat", "white slugcat - 2", "white lancer - 2", new Vector2(503f, 178f));
             }
             else if (basis == SlugName.Yellow)
             {
-                ReplaceIllust($"scenes{Path.DirectorySeparatorChar}slugcat - lancer",
+                ReplaceIllust(page.slugcatImage, $"scenes{Path.DirectorySeparatorChar}slugcat - lancer",
                     "lancer - yellow - flat", "yellow slugcat - 1", "yellow lancer - 1", new Vector2(528f, 211f));
             }
-
-            void ReplaceIllust(string sceneFolder, string flatImage, string layerImageOrig, string layerImage, Vector2 layerPos)
+            else if (basis == SlugName.Red)
             {
-                if (page.slugcatImage.flatMode)
-                {
-                    page.slugcatImage.flatIllustrations[0].RemoveSprites();
-                    page.slugcatImage.flatIllustrations.Clear();
-                    page.slugcatImage.AddIllustration(new MenuIllustration(page.menu, page.slugcatImage, sceneFolder, flatImage, new Vector2(683f, 384f), false, true));
-                }
+                if (page.menu.manager.rainWorld.progression.miscProgressionData.redUnlocked)
+                    ReplaceIllust(page.slugcatImage, $"scenes{Path.DirectorySeparatorChar}slugcat - lancer",
+                        "lancer - red - flat", "red slugcat - 1", "red lancer - 1", new Vector2(462f, 225f));
                 else
-                {
-                    int i = 0;
-                    for (; i < page.slugcatImage.depthIllustrations.Count; ++i)
-                        if (string.Compare(page.slugcatImage.depthIllustrations[i].fileName, layerImageOrig, true) == 0) break;
-                    //Vector2 pos = page.slugcatImage.depthIllustrations[i].pos;
-                    page.slugcatImage.depthIllustrations[i].RemoveSprites();
-                    page.slugcatImage.depthIllustrations[i] = null;
-                    // LancerPlugin.LogSource.LogMessage($"({i}/{page.slugcatImage.depthIllustrations.Count}) replaced to {layerImage}");
-                    page.slugcatImage.depthIllustrations[i] =
-                        new MenuDepthIllustration(page.menu, page.slugcatImage, sceneFolder, layerImage, layerPos, 2.7f, MenuDepthIllustration.MenuShader.Basic);
-                    if (i < page.slugcatImage.depthIllustrations.Count - 1)
-                        page.slugcatImage.depthIllustrations[i].sprite.MoveBehindOtherNode(page.slugcatImage.depthIllustrations[i + 1].sprite);
-                }
+                    ReplaceIllust(page.slugcatImage, $"scenes{Path.DirectorySeparatorChar}slugcat - lancer",
+                    "lancer - red dark - flat", "red slugcat - 1 - dark", "red lancer - 1 - dark", new Vector2(462f, 225f));
+            }
+        }
+
+        internal static void ReplaceIllust(MenuScene scene, string sceneFolder, string flatImage, string layerImageOrig, string layerImage, Vector2 layerPos)
+        {
+            if (scene.flatMode)
+            {
+                scene.flatIllustrations[0].RemoveSprites();
+                scene.flatIllustrations.Clear();
+                scene.AddIllustration(new MenuIllustration(scene.page.menu, scene, sceneFolder, flatImage, new Vector2(683f, 384f), false, true));
+            }
+            else
+            {
+                int i = 0;
+                for (; i < scene.depthIllustrations.Count; ++i)
+                    if (string.Compare(scene.depthIllustrations[i].fileName, layerImageOrig, true) == 0) break;
+                float depth = scene.depthIllustrations[i].depth;
+                scene.depthIllustrations[i].RemoveSprites();
+                scene.depthIllustrations[i] = null;
+                // LancerPlugin.LogSource.LogMessage($"({i}/{scene.depthIllustrations.Count}) replaced to {layerImage}");
+                scene.depthIllustrations[i] =
+                    new MenuDepthIllustration(scene.page.menu, scene, sceneFolder, layerImage, layerPos, depth, MenuDepthIllustration.MenuShader.Basic);
+                if (i < scene.depthIllustrations.Count - 1)
+                    scene.depthIllustrations[i].sprite.MoveBehindOtherNode(scene.depthIllustrations[i + 1].sprite);
             }
         }
 
@@ -218,10 +294,44 @@ namespace LancerRemix.LancerMenu
                 slugcatNumber = lancerNumber;
 
                 LancerPortrait(this);
+                VanillaLancerText();
                 //sceneOffset.y -= VOFFSET;
             }
 
             internal SlugName basisNumber;
+
+            private void VanillaLancerText()
+            {
+                string diff = difficultyLabel.text;
+                string info = infoLabel.text;
+                int lineCount = Enumerable.Count(info, (char f) => f == '\n');
+                if (lineCount > 1) // revert offset to recalculate
+                { imagePos.y -= 30f; sceneOffset.y -= 30f; }
+
+                if (basisNumber == SlugName.Yellow)
+                {
+                    info = menu.Translate("Feeble but cautious cub. Stranded in a harsh world and surrounded by<LINE>its creatures, your journey will be a significantly more challenging one.");
+                }
+                if (!(menu as SlugcatSelectMenu).SlugcatUnlocked(slugcatNumber))
+                {
+                    if (ModManager.MSC && SlugcatStats.IsSlugcatFromMSC(basisNumber))
+                    {
+                        diff = "???";
+                        info = menu.Translate("To be released...");
+                    }
+                }
+                info = Custom.ReplaceLineDelimeters(info);
+                lineCount = Enumerable.Count(info, (char f) => f == '\n');
+                float yOffset = lineCount > 1 ? 30f : 0f;
+
+                difficultyLabel.text = diff;
+                infoLabel.text = info;
+
+                difficultyLabel.pos.y = imagePos.y - 249f + yOffset;
+                infoLabel.pos.y = imagePos.y - 249f - 60f + yOffset / 2f;
+                if (lineCount > 1)
+                { imagePos.y += 30f; sceneOffset.y += 30f; }
+            }
         }
 
         internal class LancerPageContinue : SlugcatPageContinue
@@ -237,12 +347,25 @@ namespace LancerRemix.LancerMenu
 
             internal SlugName basisNumber;
 
-            public new SaveGameData saveGameData
+            private delegate SaveGameData orig_saveGameData(SlugcatPageContinue self);
+
+            private static SaveGameData LancerGameData(orig_saveGameData orig, SlugcatPageContinue self)
             {
-                get
+                if (self is LancerPageContinue)
                 {
-                    return (menu as SlugcatSelectMenu).saveGameData[slugcatNumber];
+                    var lancerNumber = self.slugcatNumber;
+                    if (HasLancer(lancerNumber)) lancerNumber = GetLancer(lancerNumber);
+                    return (self.menu as SlugcatSelectMenu).saveGameData[lancerNumber];
                 }
+                return orig(self);
+            }
+
+            internal static void SubPatch()
+            {
+                var saveGameData = new Hook(
+                    typeof(SlugcatPageContinue).GetProperty(nameof(SlugcatPageContinue.saveGameData), BindingFlags.Instance | BindingFlags.Public).GetGetMethod(),
+                    typeof(LancerPageContinue).GetMethod(nameof(LancerPageContinue.LancerGameData), BindingFlags.Static | BindingFlags.NonPublic)
+                );
             }
 
             internal static void PageContinueUpdatePatch(On.Menu.SlugcatSelectMenu.SlugcatPageContinue.orig_Update orig, SlugcatPageContinue self)

@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using BepInEx.Logging;
 using BepInEx;
 using LancerRemix.LancerMenu;
+using UnityEngine;
 
 #region Assembly attributes
 
@@ -45,31 +46,56 @@ namespace LancerRemix
             instance = this;
             LogSource = this.Logger;
 
-            On.RainWorld.OnModsInit += Extras.WrapInit(Init);
-            On.RainWorld.PostModsInit += PostInit;
+            On.RainWorld.OnModsInit += WrapInit(Init);
+            On.ProcessManager.PreSwitchMainProcess += RegisterLancersAfterMainMenu;
             On.RainWorld.OnModsEnabled += OnModsEnabled;
             On.RainWorld.OnModsDisabled += OnModsDisabled;
         }
 
         private static void Init(RainWorld rw)
         {
-            if (init) return;
-            init = true;
-
             LancerEnums.RegisterExtEnum();
             ModifyCat.Patch();
-            //SaveManager.SubPatch();
-            MenuModifier.SubPatch();
-            LancerGenerator.SubPatch();
+            MenuModifier.Patch();
+            LancerGenerator.Patch();
 
-            instance.Logger.LogMessage("The Lancer is Intilaized.");
+            instance.Logger.LogMessage("The Lancer is Intialized.");
         }
 
-        private static void PostInit(On.RainWorld.orig_PostModsInit orig, RainWorld rw)
+        public static On.RainWorld.hook_OnModsInit WrapInit(Action<RainWorld> loadResources)
         {
-            orig(rw);
+            return (orig, self) =>
+            {
+                orig(self);
+                if (init) return;
 
-            LancerEnums.RegisterLancers();
+                try
+                {
+                    loadResources(self);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogException(e);
+                }
+                init = true;
+            };
+        }
+
+        private static void RegisterLancersAfterMainMenu(On.ProcessManager.orig_PreSwitchMainProcess orig, ProcessManager self, ProcessManager.ProcessID ID)
+        {
+            try
+            {
+                if (self.currentMainLoop?.ID == ProcessManager.ProcessID.MainMenu)
+                {
+                    LancerEnums.RegisterLancers();
+                }
+                else if (ID == ProcessManager.ProcessID.SlugcatSelect)
+                {
+                    ModifyCat.SetIsLancer(false, new bool[4]);
+                }
+            }
+            catch (Exception e) { Debug.LogException(e); }
+            orig(self, ID);
         }
 
         private static bool lastMSCEnabled;
@@ -80,7 +106,7 @@ namespace LancerRemix
             LancerEnums.RegisterLancers();
             if (!lastMSCEnabled && ModManager.MSC)
             {
-                LogSource.LogInfo("Lancer detected MSC newly enabled.");
+                //LogSource.LogInfo("Lancer detected MSC newly enabled.");
                 //ModifyCat.OnMSCEnablePatch();
                 //AltEndingHandler.OnMSCEnablePatch();
                 lastMSCEnabled = ModManager.MSC;
@@ -92,7 +118,7 @@ namespace LancerRemix
             orig(rw, newlyDisabledMods);
             if (lastMSCEnabled && !ModManager.MSC)
             {
-                LogSource.LogInfo("Lancer detected MSC newly disabled.");
+                //LogSource.LogInfo("Lancer detected MSC newly disabled.");
                 //ModifyCat.OnMSCDisablePatch();
                 //AltEndingHandler.OnMSCDisablePatch();
                 lastMSCEnabled = ModManager.MSC;

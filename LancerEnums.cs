@@ -33,14 +33,16 @@ namespace LancerRemix
 
         internal static void RegisterLancers()
         {
+            if (CheckModState()) return;
             ClearLancers();
             var slugs = ExtEnumBase.GetNames(typeof(SlugName));
             foreach (var name in slugs)
             {
                 var slug = new SlugName(name, false);
                 if (slug.Index < 0) continue;
-                if (SlugcatStats.HiddenOrUnplayableSlugcat(slug)) continue;
-                if (ModManager.MSC && SlugcatStats.IsSlugcatFromMSC(slug)) continue;
+                // if (ModManager.MSC && SlugcatStats.IsSlugcatFromMSC(slug)) continue;
+                if (SlugcatStats.HiddenOrUnplayableSlugcat(slug))
+                    if (!ModManager.MSC || slug != MSCName.Sofanthiel) continue;
                 if (!LancerGenerator.CreateLancer(slug, out var lancer)) continue;
                 AllLancer.Add(lancer);
                 AllBasis.Add(slug);
@@ -62,6 +64,29 @@ namespace LancerRemix
             NameBasis.Clear();
             AllLancer.Clear();
             AllBasis.Clear();
+        }
+
+        private static HashSet<string> enabledMods = new HashSet<string>();
+
+        private static bool CheckModState()
+        {
+            var curMods = new HashSet<string>();
+            if (ModManager.MMF) curMods.Add(MoreSlugcats.MMF.MOD_ID);
+            if (ModManager.MSC) curMods.Add(MoreSlugcats.MoreSlugcats.MOD_ID);
+            if (ModManager.Expedition) curMods.Add(Expedition.Expedition.MOD_ID);
+            if (ModManager.JollyCoop) curMods.Add(JollyCoop.JollyCoop.MOD_ID);
+            foreach (var mod in ModManager.ActiveMods) curMods.Add(mod.id);
+
+            if (CheckEquals()) return true;
+            enabledMods = curMods;
+            return false;
+
+            bool CheckEquals()
+            {
+                if (curMods.Count != enabledMods.Count) return false;
+                foreach (var mod in enabledMods) if (!curMods.Contains(mod)) return false;
+                return true;
+            }
         }
 
         internal static void UnregisterExtEnum()
