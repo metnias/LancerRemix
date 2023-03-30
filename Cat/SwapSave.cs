@@ -17,7 +17,8 @@ namespace LancerRemix.Cat
             On.Menu.SlugcatSelectMenu.ContinueStartedGame += ContinueStartedLancer;
             On.PlayerProgression.WipeSaveState += WipeSaveLancer;
 
-            On.SaveState.SaveToString += SaveStateToLancer;
+            On.PlayerProgression.SaveToDisk += SaveToLancer;
+            //On.SaveState.SaveToString += SaveStateToLancer;
             On.PlayerProgression.GetOrInitiateSaveState += GetOrInitiateLancerState;
             On.PlayerProgression.LoadGameState += LoadLancerStateInstead;
             //IL.PlayerProgression.LoadGameState += LoadLancerState;
@@ -65,6 +66,20 @@ namespace LancerRemix.Cat
             int index = text.IndexOf(orig);
             if (index >= 0) return $"{text.Substring(0, index)}{patch}{text.Substring(index + orig.Length)}";
             return text;
+        }
+
+        private static bool SaveToLancer(On.PlayerProgression.orig_SaveToDisk orig, PlayerProgression self,
+            bool saveCurrentState, bool saveMaps, bool saveMiscProg)
+        {
+            if (IsStoryLancer && self.currentSaveState != null)
+            {
+                var basis = self.currentSaveState.saveStateNumber;
+                self.currentSaveState.saveStateNumber = GetLancer(basis);
+                var res = orig(self, saveCurrentState, saveMaps, saveMiscProg);
+                self.currentSaveState.saveStateNumber = basis;
+                return res;
+            }
+            return orig(self, saveCurrentState, saveMaps, saveMiscProg);
         }
 
         private static string SaveStateToLancer(On.SaveState.orig_SaveToString orig, SaveState self)
