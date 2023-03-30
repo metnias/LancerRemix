@@ -1,0 +1,5 @@
+﻿0topicular.lancer-name|랜서
+topicular.lancer-description|캠페인에 근접 전투하는 랜서 버전을 추가합니다.
+
+Feeble but cautious cub. Stranded in a harsh world and surrounded by<LINE>its creatures, your journey will be a significantly more challenging one.|연약하지만 조심스러운 아이. 혹독한 세계에 고립되어<LINE>그 생물들에게 둘러싸인, 당신의 여정은 훨씬 더 도전다울 것이다.
+To be released...|출시 예정...

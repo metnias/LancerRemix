@@ -90,9 +90,7 @@ namespace LancerRemix.LancerMenu
 
         private static void UpdateLancerStartButtonText(On.Menu.SlugcatSelectMenu.orig_UpdateStartButtonText orig, SlugcatSelectMenu self)
         {
-            self.startButton.GetButtonBehavior.greyedOut = false;
             if (!slugcatPageLancer) { orig(self); return; }
-            if (!HasLancer(self.slugcatColorOrder[self.slugcatPageIndex])) { self.startButton.GetButtonBehavior.greyedOut = true; return; }
             self.startButton.fillTime = (self.restartChecked ? 120f : 40f);
             var lancer = GetLancer(self.slugcatColorOrder[self.slugcatPageIndex]);
             if (self.saveGameData[lancer] == null)
@@ -252,14 +250,14 @@ namespace LancerRemix.LancerMenu
 
                 if (basisNumber == SlugName.Yellow)
                 {
-                    info = menu.Translate("Feeble but cautious cub. Stranded in a harsh world and surrounded by its<LINE>unempathetic creatures, your journey will be a significantly more challenging one.");
+                    info = menu.Translate("Feeble but cautious cub. Stranded in a harsh world and surrounded by<LINE>its creatures, your journey will be a significantly more challenging one.");
                 }
                 if ((menu as SlugcatSelectMenu).SlugcatUnlocked(slugcatNumber))
                 {
                     if (ModManager.MSC && SlugcatStats.IsSlugcatFromMSC(basisNumber))
                     {
                         diff = "???";
-                        info = menu.Translate("To be announced...");
+                        info = menu.Translate("To be released...");
                     }
                 }
                 info = Custom.ReplaceLineDelimeters(info);
