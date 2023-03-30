@@ -29,6 +29,10 @@ namespace LancerRemix.Cat
                 typeof(PlayerGraphics).GetProperty(nameof(PlayerGraphics.CharacterForColor), BindingFlags.Instance | BindingFlags.Public).GetGetMethod(),
                 typeof(ModifyCat).GetMethod(nameof(ModifyCat.LancerForColor), BindingFlags.Static | BindingFlags.NonPublic)
             );
+            var renderAsPup = new Hook(
+                typeof(PlayerGraphics).GetProperty(nameof(PlayerGraphics.RenderAsPup), BindingFlags.Instance | BindingFlags.Public).GetGetMethod(),
+                typeof(ModifyCat).GetMethod(nameof(ModifyCat.RenderAsLancer), BindingFlags.Static | BindingFlags.NonPublic)
+            );
             On.PlayerGraphics.DefaultSlugcatColor += DefaultLancerColor;
 
             SwapSave.SubPatch();
@@ -193,6 +197,14 @@ namespace LancerRemix.Cat
             if (IsLancer(self))
                 if (HasLancer(res)) res = GetLancer(res);
             return res;
+        }
+
+        private delegate bool orig_RenderAsPup(PlayerGraphics self);
+
+        private static bool RenderAsLancer(orig_RenderAsPup orig, PlayerGraphics self)
+        {
+            if (IsLancer(self)) return true;
+            return orig(self);
         }
 
         private static Color DefaultLancerColor(On.PlayerGraphics.orig_DefaultSlugcatColor orig, SlugName i)
