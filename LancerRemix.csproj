@@ -36,7 +36,7 @@
     </Reference>
     <Reference Include="CatSupplement, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\References\RWDownpour\CatSupplement.dll</HintPath>
+      <HintPath>debug\CatSupplement.dll</HintPath>
     </Reference>
     <Reference Include="HOOKS-Assembly-CSharp">
       <HintPath>debug\HOOKS-Assembly-CSharp.dll</HintPath>

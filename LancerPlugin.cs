@@ -56,8 +56,8 @@ namespace LancerRemix
         {
             LancerEnums.RegisterExtEnum();
             ModifyCat.Patch();
-            MenuModifier.SubPatch();
-            LancerGenerator.SubPatch();
+            MenuModifier.Patch();
+            LancerGenerator.Patch();
 
             instance.Logger.LogMessage("The Lancer is Intialized.");
         }

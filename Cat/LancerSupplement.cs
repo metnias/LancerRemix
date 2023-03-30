@@ -30,15 +30,15 @@ namespace LancerRemix.Cat
 
         public override void Update(On.Player.orig_Update orig, bool eu)
         {
-            base.Update(orig, eu);
+            base.Update(null, eu);
         }
 
         public override void Destroy(On.Player.orig_Destroy orig)
         {
-            base.Destroy(orig);
+            base.Destroy(null);
         }
 
-        public void Grabbed(On.Player.orig_Grabbed orig, Creature.Grasp grasp)
+        public virtual void Grabbed(On.Player.orig_Grabbed orig, Creature.Grasp grasp)
         {
             if (OnParry < 1) goto NoParry;
             if (!(grasp.grabber is Lizard) && !(grasp.grabber is Vulture) && !(grasp.grabber is BigSpider) && !(grasp.grabber is DropBug)) goto NoParry;

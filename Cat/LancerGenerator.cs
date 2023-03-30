@@ -17,7 +17,7 @@ namespace LancerRemix.Cat
 {
     internal static class LancerGenerator
     {
-        internal static void SubPatch()
+        internal static void Patch()
         {
             On.SlugcatStats.HiddenOrUnplayableSlugcat += DisableRegularSelect;
         }
@@ -39,10 +39,8 @@ namespace LancerRemix.Cat
             else if (SlugcatStats.IsSlugcatFromMSC(basis))
                 lancer = RegisterMSCLancer(basis);
             if (SlugBaseCharacter.TryGet(basis, out var _))
-            {
                 lancer = RegisterSlugBaseLancer(basis);
-                if (lancer == null) return false; // Json file doesn't exist
-            }
+            if (lancer == null || lancer.Index < 0) return false; // something went wrong
 
             // SubRegistry.Register(lancer, (player) => new LancerSupplement(player));
             // DecoRegistry.Register(lancer, (player) => new LancerDecoration(player));
@@ -87,6 +85,9 @@ namespace LancerRemix.Cat
 
         private static SlugName RegisterSlugBaseLancer(SlugName basis)
         {
+            return new SlugName(GetLancerName(basis.value), true);
+
+            /*
             if (!SlugBaseCharacter.Registry.TryGetPath(basis, out string path))
                 return null;
             string data = File.ReadAllText(path);
@@ -102,6 +103,7 @@ namespace LancerRemix.Cat
                 if (index >= 0) return $"{text.Substring(0, index)}{lancerName}{text.Substring(index + basisName.Length)}";
                 return text;
             }
+            */
         }
     }
 }

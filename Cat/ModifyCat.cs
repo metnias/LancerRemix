@@ -16,6 +16,8 @@ namespace LancerRemix.Cat
             On.Player.Grabbed += GrabbedSub;
             // TODO: hook RainWorldGame.StoryCharacter to return basis
 
+            On.PlayerGraphics.InitiateSprites += InitSprite;
+
             if (ModManager.MSC) OnMSCEnablePatch();
         }
 
@@ -27,48 +29,78 @@ namespace LancerRemix.Cat
         {
         }
 
-        private static bool[] isLancer = new bool[4];
-        private static bool isStoryLancer = false;
+        private static readonly bool[] isLancer = new bool[4];
+        public static bool IsStoryLancer { get; private set; } = false;
 
         public static void SetIsLancer(bool story, bool[] players)
         {
-            isStoryLancer = story;
+            IsStoryLancer = story;
             for (int i = 0; i < 4; ++i) isLancer[i] = players[i];
         }
 
         public static bool IsLancer(PlayerState playerState) => isLancer[playerState.playerNumber];
-
-        public static bool IsStoryLancer => isStoryLancer;
 
         #region Player
 
         private static readonly ConditionalWeakTable<PlayerState, CatSupplement> catSubs
             = new ConditionalWeakTable<PlayerState, CatSupplement>();
 
-        private static T GetSub<T>(PlayerState playerState) where T : CatSupplement
+        public static T GetSub<T>(PlayerState playerState) where T : CatSupplement
         {
             if (catSubs.TryGetValue(playerState, out var sub))
                 if (sub is T) return sub as T;
-            return default;
+            return null;
         }
+
+        public static T GetSub<T>(Player player) where T : CatSupplement
+            => GetSub<T>(player.playerState);
+
+        public static T GetSub<T>(PlayerGraphics playerGraphics) where T : CatSupplement
+           => GetSub<T>(playerGraphics.player.playerState);
+
 
         private static void PlayerCtor(On.Player.orig_ctor orig, Player self, AbstractCreature abstractCreature, World world)
         {
             orig(self, abstractCreature, world);
             if (!IsLancer(self.playerState)) return;
             catSubs.Add(self.playerState, new LancerSupplement(self));
+            catDecos.Add(self.playerState, new LancerDecoration(self));
         }
 
         private static void GrabbedSub(On.Player.orig_Grabbed orig, Player self, Creature.Grasp grasp)
         {
             if (IsLancer(self.playerState))
-            {
-                GetSub<LancerSupplement>(self.playerState).Grabbed(orig, grasp);
-                return;
-            }
+                GetSub<LancerSupplement>(self)?.Grabbed(orig, grasp);
             orig(self, grasp);
         }
 
         #endregion Player
+
+        #region PlayerGraphics
+
+        private static readonly ConditionalWeakTable<PlayerState, CatDecoration> catDecos
+           = new ConditionalWeakTable<PlayerState, CatDecoration>();
+
+        public static T GetDeco<T>(PlayerState playerState) where T : CatDecoration
+        {
+            if (catDecos.TryGetValue(playerState, out var deco))
+                if (deco is T) return deco as T;
+            return null;
+        }
+
+        public static T GetDeco<T>(Player player) where T : CatDecoration
+            => GetDeco<T>(player.playerState);
+
+        public static T GetDeco<T>(PlayerGraphics playerGraphics) where T : CatDecoration
+           => GetDeco<T>(playerGraphics.player.playerState);
+
+        private static void InitSprite(On.PlayerGraphics.orig_InitiateSprites orig, PlayerGraphics self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam)
+        {
+            if (IsLancer(self.player.playerState))
+                GetDeco<LancerDecoration>(self)?.InitiateSprites(null, sLeaser, rCam);
+            orig(self, sLeaser, rCam);
+        }
+
+        #endregion PlayerGraphics
     }
 }
