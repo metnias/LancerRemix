@@ -50,6 +50,8 @@ namespace LancerRemix
                 NameBasis.Add(lancer, slug);
                 LancerPlugin.LogSource.LogMessage($"Created {lancer.value}({lancer.Index}) for {slug}({slug.Index})");
             }
+            slugNameVersion = ExtEnumBase.GetExtEnumType(typeof(SlugName)).version;
+            LancerPlugin.CheckedAnyModChanged();
         }
 
         internal static void ClearLancers()
@@ -67,11 +69,12 @@ namespace LancerRemix
         }
 
         // private static HashSet<string> enabledMods = new HashSet<string>();
+        private static int slugNameVersion = -1;
 
         private static bool CheckModState()
         {
+            if (slugNameVersion != ExtEnumBase.GetExtEnumType(typeof(SlugName)).version) return false;
             if (!LancerPlugin.AnyModChanged) return true; // skip checking
-            LancerPlugin.CheckedAnyModChanged();
             return false;
 
             /*

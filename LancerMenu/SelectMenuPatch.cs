@@ -180,6 +180,9 @@ namespace LancerRemix.LancerMenu
         {
             if (!_lancerInit) return;
             orig(self);
+            if (!slugcatPageLancer) return;
+            self.manager.rainWorld.progression.miscProgressionData.currentlySelectedSinglePlayerSlugcat =
+                lancerPages[self.slugcatPageIndex]?.slugcatNumber;
         }
 
         private static void SignalPatch(On.Menu.SlugcatSelectMenu.orig_Singal orig, SlugcatSelectMenu self, MenuObject sender, string message)
