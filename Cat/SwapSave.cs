@@ -1,7 +1,4 @@
 ﻿using Menu;
-using Mono.Cecil.Cil;
-using MonoMod.Cil;
-using System;
 using System.IO;
 using System.Text.RegularExpressions;
 using static LancerRemix.LancerEnums;
