@@ -235,10 +235,13 @@ namespace LancerRemix.LancerMenu
 
         private static void LancerPortrait(SlugcatPage page)
         {
+            var relImage = (page.menu as SlugcatSelectMenu).slugcatPages[0].slugcatImage;
+            var relSprite = relImage.flatIllustrations.Count > 0 ? relImage.flatIllustrations[0].sprite
+                : relImage.depthIllustrations[0].sprite;
             foreach (var illust in page.slugcatImage.depthIllustrations)
-                illust.sprite.MoveBehindOtherNode((page.menu as SlugcatSelectMenu).pages[0].Container);
+                illust.sprite.MoveBehindOtherNode(relSprite);
             foreach (var illust in page.slugcatImage.flatIllustrations)
-                illust.sprite.MoveBehindOtherNode((page.menu as SlugcatSelectMenu).pages[0].Container);
+                illust.sprite.MoveBehindOtherNode(relSprite);
 
             var basis = GetBasis(page.slugcatNumber);
             if (basis == SlugName.White)
