@@ -83,27 +83,31 @@ namespace LancerRemix
 
         private static void RegisterLancersAfterMainMenu(On.ProcessManager.orig_PreSwitchMainProcess orig, ProcessManager self, ProcessManager.ProcessID ID)
         {
-            try
+            if (self.currentMainLoop?.ID == ProcessManager.ProcessID.MainMenu)
             {
-                if (self.currentMainLoop?.ID == ProcessManager.ProcessID.MainMenu)
+                try
                 {
                     LancerEnums.RegisterLancers();
                 }
-                else if (ID == ProcessManager.ProcessID.SlugcatSelect)
-                {
-                    ModifyCat.SetIsLancer(false, new bool[4]);
-                }
+                catch (Exception e) { Debug.LogException(e); }
             }
-            catch (Exception e) { Debug.LogException(e); }
+            else if (ID == ProcessManager.ProcessID.SlugcatSelect)
+            {
+                ModifyCat.SetIsLancer(false, new bool[4]);
+            }
             orig(self, ID);
         }
 
         private static bool lastMSCEnabled;
 
+        internal static bool AnyModChanged { get; private set; } = true;
+
+        internal static bool CheckedAnyModChanged() => AnyModChanged = false;
+
         private static void OnModsEnabled(On.RainWorld.orig_OnModsEnabled orig, RainWorld rw, ModManager.Mod[] newlyEnabledMods)
         {
             orig(rw, newlyEnabledMods);
-            LancerEnums.RegisterLancers();
+            if (newlyEnabledMods.Length > 0) AnyModChanged = true;
             if (!lastMSCEnabled && ModManager.MSC)
             {
                 //LogSource.LogInfo("Lancer detected MSC newly enabled.");
@@ -116,6 +120,7 @@ namespace LancerRemix
         private static void OnModsDisabled(On.RainWorld.orig_OnModsDisabled orig, RainWorld rw, ModManager.Mod[] newlyDisabledMods)
         {
             orig(rw, newlyDisabledMods);
+            if (newlyDisabledMods.Length > 0) AnyModChanged = true;
             if (lastMSCEnabled && !ModManager.MSC)
             {
                 //LogSource.LogInfo("Lancer detected MSC newly disabled.");

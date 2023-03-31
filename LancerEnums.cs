@@ -66,27 +66,37 @@ namespace LancerRemix
             AllBasis.Clear();
         }
 
-        private static HashSet<string> enabledMods = new HashSet<string>();
+        // private static HashSet<string> enabledMods = new HashSet<string>();
 
         private static bool CheckModState()
         {
-            var curMods = new HashSet<string>();
-            if (ModManager.MMF) curMods.Add(MoreSlugcats.MMF.MOD_ID);
-            if (ModManager.MSC) curMods.Add(MoreSlugcats.MoreSlugcats.MOD_ID);
-            if (ModManager.Expedition) curMods.Add(Expedition.Expedition.MOD_ID);
-            if (ModManager.JollyCoop) curMods.Add(JollyCoop.JollyCoop.MOD_ID);
-            foreach (var mod in ModManager.ActiveMods) curMods.Add(mod.id);
+            if (!LancerPlugin.AnyModChanged) return true; // skip checking
+            LancerPlugin.CheckedAnyModChanged();
+            return false;
 
-            if (CheckEquals()) return true;
+            /*
+            var curMods = GetCurrentMods();
+            if (CheckModsEquals()) return true;
             enabledMods = curMods;
             return false;
 
-            bool CheckEquals()
+            HashSet<string> GetCurrentMods()
+            {
+                var mods = new HashSet<string>();
+                if (ModManager.MMF) mods.Add(MoreSlugcats.MMF.MOD_ID);
+                if (ModManager.MSC) mods.Add(MoreSlugcats.MoreSlugcats.MOD_ID);
+                if (ModManager.Expedition) mods.Add(Expedition.Expedition.MOD_ID);
+                if (ModManager.JollyCoop) mods.Add(JollyCoop.JollyCoop.MOD_ID);
+                foreach (var mod in ModManager.ActiveMods) mods.Add(mod.id);
+                return mods;
+            }
+            bool CheckModsEquals()
             {
                 if (curMods.Count != enabledMods.Count) return false;
                 foreach (var mod in enabledMods) if (!curMods.Contains(mod)) return false;
                 return true;
             }
+            */
         }
 
         internal static void UnregisterExtEnum()
