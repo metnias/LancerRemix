@@ -18,6 +18,11 @@ namespace LancerRemix.Cat
             On.Player.Destroy += PlayerDestroy;
             On.Player.Grabbed += PlayerGrabbed;
             On.Player.ShortCutColor += LancerShortCutColor;
+            On.Player.DeathByBiteMultiplier += LancerDeathByBiteMultiplier;
+            On.Player.ThrowObject += PlayerThrowObject;
+            On.Player.Stun += PlayerStun;
+            On.Player.Die += PlayerDie;
+            On.Player.MovementUpdate += LancerMovementUpdate;
 
             On.PlayerGraphics.InitiateSprites += GrafInitSprite;
             On.PlayerGraphics.AddToContainer += GrafAddToContainer;
@@ -129,6 +134,43 @@ namespace LancerRemix.Cat
             var lancer = self.playerState.slugcatCharacter;
             if (HasLancer(lancer)) lancer = GetLancer(lancer);
             return PlayerGraphics.SlugcatColor(lancer);
+        }
+
+        private static float LancerDeathByBiteMultiplier(On.Player.orig_DeathByBiteMultiplier orig, Player self)
+        {
+            if (IsLancer(self))
+            {
+                if (self.room?.game.IsStorySession == true)
+                    return 0.2f + self.room.game.GetStorySession.difficulty / 4f;
+                return 0.3f;
+            }
+            return orig(self);
+        }
+
+        private static void PlayerThrowObject(On.Player.orig_ThrowObject orig, Player self, int grasp, bool eu)
+        {
+            if (IsLancer(self))
+            { GetSub<LancerSupplement>(self)?.ThrowObject(orig, grasp, eu); return; }
+            orig(self, grasp, eu);
+        }
+
+        private static void PlayerStun(On.Player.orig_Stun orig, Player self, int st)
+        {
+            orig(self, st);
+            if (IsLancer(self)) GetSub<LancerSupplement>(self)?.StunOrDie();
+        }
+
+        private static void PlayerDie(On.Player.orig_Die orig, Player self)
+        {
+            orig(self);
+            if (IsLancer(self)) GetSub<LancerSupplement>(self)?.StunOrDie();
+        }
+
+        private static void LancerMovementUpdate(On.Player.orig_MovementUpdate orig, Player self, bool eu)
+        {
+            if (IsLancer(self))
+            { GetSub<LancerSupplement>(self)?.MovementUpdate(orig, eu); return; }
+            orig(self, eu);
         }
 
         #endregion Player
