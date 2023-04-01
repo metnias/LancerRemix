@@ -21,9 +21,10 @@ namespace LancerRemix.Cat
     {
         internal static void Patch()
         {
+            On.SlugcatStats.ctor += LancerStats;
             On.SlugcatStats.SlugcatUnlocked += LancerUnlocked;
             On.Menu.MenuScene.UseSlugcatUnlocked += UseLancerUnlocked;
-            On.SlugcatStats.HiddenOrUnplayableSlugcat += DisableRegularSelect;
+            On.SlugcatStats.HiddenOrUnplayableSlugcat += DisableLancerRegularSelect;
         }
 
         private static bool LancerUnlocked(On.SlugcatStats.orig_SlugcatUnlocked orig, SlugName i, RainWorld rainWorld)
@@ -43,10 +44,28 @@ namespace LancerRemix.Cat
             return orig(self, slugcat);
         }
 
-        private static bool DisableRegularSelect(On.SlugcatStats.orig_HiddenOrUnplayableSlugcat orig, SlugName i)
+        private static bool DisableLancerRegularSelect(On.SlugcatStats.orig_HiddenOrUnplayableSlugcat orig, SlugName i)
         {
             if (IsLancer(i)) return true;
             return orig(i);
+        }
+
+        private static void LancerStats(On.SlugcatStats.orig_ctor orig, SlugcatStats self, SlugName slugcat, bool malnourished)
+        {
+            if (!IsLancer(slugcat)) { orig(self, slugcat, malnourished); return; }
+            var basis = GetBasis(slugcat);
+            orig(self, basis, malnourished);
+            if (!lancerModifiers.TryGetValue(basis, out var mod)) return;
+
+            self.lungsFac *= mod.lungsFac;
+            self.poleClimbSpeedFac *= mod.poleClimbSpeedFac;
+            self.corridorClimbSpeedFac *= mod.corridorClimbSpeedFac;
+            self.runspeedFac *= mod.runspeedFac;
+            self.bodyWeightFac *= mod.bodyWeightFac;
+            self.loudnessFac *= mod.loudnessFac;
+
+            self.generalVisibilityBonus += mod.generalVisibilityBonus;
+            self.visualStealthInSneakMode += mod.visualStealthInSneakMode;
         }
 
         internal static bool CreateLancer(SlugName basis, out SlugName lancer)
@@ -62,9 +81,6 @@ namespace LancerRemix.Cat
             if (SlugBaseCharacter.TryGet(basis, out var _))
                 lancer = RegisterSlugBaseLancer(basis);
             if (lancer == null || lancer.Index < 0) return false; // something went wrong
-
-            // SubRegistry.Register(lancer, (player) => new LancerSupplement(player));
-            // DecoRegistry.Register(lancer, (player) => new LancerDecoration(player));
 
             return true;
 
@@ -84,11 +100,10 @@ namespace LancerRemix.Cat
 
         internal static void DeleteLancer(SlugName lancer)
         {
-            SubRegistry.Unregister(lancer);
-            DecoRegistry.Unregister(lancer);
             StoryRegistry.UnregisterTimeline(lancer);
             if (SlugBaseCharacter.Registry.TryGet(lancer, out var _))
                 SlugBaseCharacter.Registry.Remove(lancer);
+            lancerModifiers.Remove(GetBasis(lancer));
 
             lancer?.Unregister();
         }
@@ -100,6 +115,20 @@ namespace LancerRemix.Cat
                 StoryRegistry.RegisterTimeline(new StoryRegistry.TimelinePointer(lancer, StoryRegistry.TimelinePointer.Relative.Before, SlugName.Red));
             else
                 StoryRegistry.RegisterTimeline(new StoryRegistry.TimelinePointer(lancer, StoryRegistry.TimelinePointer.Relative.After, basis));
+            var modifier = new StatModifier
+            {
+                lungsFac = 1.1f,
+                poleClimbSpeedFac = 1.1f,
+                corridorClimbSpeedFac = 1.05f,
+                runspeedFac = 1.2f,
+                bodyWeightFac = 0.8f,
+                loudnessFac = 0.8f,
+
+                generalVisibilityBonus = -0.1f,
+                visualStealthInSneakMode = 0.2f
+            };
+            lancerModifiers.Add(basis, modifier);
+
             return lancer;
         }
 
@@ -107,6 +136,19 @@ namespace LancerRemix.Cat
         {
             var lancer = new SlugName(GetLancerName(basis.value), true);
             StoryRegistry.RegisterTimeline(new StoryRegistry.TimelinePointer(lancer, StoryRegistry.TimelinePointer.Relative.After, basis));
+            var modifier = new StatModifier
+            {
+                lungsFac = 1.1f,
+                poleClimbSpeedFac = 1.1f,
+                corridorClimbSpeedFac = 1.05f,
+                runspeedFac = 1.2f,
+                bodyWeightFac = 0.8f,
+                loudnessFac = 0.8f,
+
+                generalVisibilityBonus = -0.1f,
+                visualStealthInSneakMode = 0.2f
+            };
+            lancerModifiers.Add(basis, modifier);
             return lancer;
         }
 
@@ -114,6 +156,19 @@ namespace LancerRemix.Cat
         {
             var lancer = new SlugName(GetLancerName(basis.value), true);
             StoryRegistry.RegisterTimeline(new StoryRegistry.TimelinePointer(lancer, StoryRegistry.TimelinePointer.Relative.After, basis));
+            var modifier = new StatModifier
+            {
+                lungsFac = 1.1f,
+                poleClimbSpeedFac = 1.1f,
+                corridorClimbSpeedFac = 1.05f,
+                runspeedFac = 1.2f,
+                bodyWeightFac = 0.8f,
+                loudnessFac = 0.8f,
+
+                generalVisibilityBonus = -0.1f,
+                visualStealthInSneakMode = 0.2f
+            };
+            lancerModifiers.Add(basis, modifier);
             return lancer;
 
             /*
@@ -141,6 +196,27 @@ namespace LancerRemix.Cat
             if (IsLancer(basis)) basis = GetBasis(basis);
             if (basis == SlugName.Yellow) basis = SlugName.Red;
             return basis;
+        }
+
+        private static readonly Dictionary<SlugName, StatModifier> lancerModifiers
+            = new Dictionary<SlugName, StatModifier>();
+
+        private struct StatModifier
+        {
+            // multipliers
+            public float lungsFac;
+
+            public float poleClimbSpeedFac;
+            public float corridorClimbSpeedFac;
+            public float runspeedFac;
+            public float bodyWeightFac;
+            public float loudnessFac;
+
+            // adders
+            public float generalVisibilityBonus;
+
+            public float visualStealthInSneakMode;
+            // public int throwingSkill;
         }
     }
 }
