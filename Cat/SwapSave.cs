@@ -8,7 +8,6 @@ namespace LancerRemix.Cat
 {
     internal static class SwapSave
     {
-        // To fix: passage to use lancer map progress
         internal static void SubPatch()
         {
             On.PlayerProgression.IsThereASavedGame += IsThereASavedLancer;
@@ -19,6 +18,8 @@ namespace LancerRemix.Cat
             //On.SaveState.SaveToString += SaveStateToLancer;
             On.PlayerProgression.LoadGameState += LoadLancerStateInstead;
             //IL.PlayerProgression.LoadGameState += LoadLancerState;
+
+            On.Region.ctor += LancerGetBasisRegion;
         }
 
         private static bool IsStoryLancer => ModifyCat.IsStoryLancer;
@@ -195,5 +196,24 @@ namespace LancerRemix.Cat
         */
 
         #endregion SaveState
+
+        #region Region
+
+        private static void LancerGetBasisRegion(On.Region.orig_ctor orig, Region self, string name, int firstRoomIndex, int regionNumber, SlugName storyIndex)
+        {
+            if (IsLancer(storyIndex))
+            {
+                var basis = GetBasis(storyIndex);
+                if (basis == SlugName.Yellow) basis = SlugName.Red;
+                storyIndex = basis;
+            }
+            else if (IsStoryLancer)
+            {
+                if (storyIndex == SlugName.Yellow) storyIndex = SlugName.Red;
+            }
+            orig(self, name, firstRoomIndex, regionNumber, storyIndex);
+        }
+
+        #endregion Region
     }
 }

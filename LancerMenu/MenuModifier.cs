@@ -5,6 +5,9 @@ using UnityEngine;
 using SlugName = SlugcatStats.Name;
 using static LancerRemix.LancerEnums;
 using MenueSceneID = Menu.MenuScene.SceneID;
+using MonoMod.Cil;
+using Mono.Cecil.Cil;
+using System;
 
 namespace LancerRemix.LancerMenu
 {
@@ -13,14 +16,10 @@ namespace LancerRemix.LancerMenu
         internal static void Patch()
         {
             On.Menu.MenuScene.ctor += LancerSceneSwap;
+            IL.Menu.FastTravelScreen.ctor += LancerTravelScreen;
 
             SelectMenuPatch.SubPatch();
-            /// TODO: add Lancer toggle button in slugcat select menu
-            /// clicking that swooshes illust upwards.
-            ///
-            /// or just save which players should be lancer
-            /// and attach supplements to them separately
-            /// lancer supplements will pass null for orig to prevent double updates
+            /// To fix: passage to use lancer map progress
         }
 
         private static bool IsStoryLancer => ModifyCat.IsStoryLancer;
@@ -64,6 +63,59 @@ namespace LancerRemix.LancerMenu
             {
                 LancerSleepScene(self);
             }
+        }
+
+        private static void LancerTravelScreen(ILContext il)
+        {
+            var cursor = new ILCursor(il);
+            LancerPlugin.LogSource.LogInfo("LancerTravelScreen Patch");
+
+            if (!cursor.TryGotoNext(MoveType.After,
+                z => z.MatchLdcI4(-1),
+                z => z.MatchStloc(1))) return;
+
+            DebugLogCursor();
+            // if !IsStoryLancer => skip ahead
+
+            #region SkipNoLancer
+
+            cursor.Emit(OpCodes.Nop);
+            var lblNoLancer = cursor.DefineLabel();
+            lblNoLancer.Target = cursor.Prev;
+            cursor.GotoLabel(lblNoLancer, MoveType.Before);
+
+            cursor.EmitDelegate<Func<bool>>(() =>
+            {
+                return IsStoryLancer;
+            }
+                );
+            cursor.Emit(OpCodes.Brfalse, lblNoLancer);
+
+            #endregion SkipNoLancer
+
+            // num = GetLancer(menu.manager.rainWorld.progression.PlayingAsSlugcat).Index
+
+            #region SetNumToLancer
+
+            cursor.Emit(OpCodes.Ldarg_0);
+            cursor.EmitDelegate<Func<FastTravelScreen, int>>(
+                (self) =>
+                {
+                    var lancer = self.manager.rainWorld.progression.PlayingAsSlugcat;
+                    if (HasLancer(lancer)) lancer = GetLancer(lancer);
+                    LancerPlugin.LogSource.LogInfo($"Switched FastTravelScreen for {lancer.value}({lancer.Index}) (basis: {self.manager.rainWorld.progression.PlayingAsSlugcat})");
+                    LancerPlugin.LogSource.LogInfo($"shelters: {self.playerShelters[lancer.Index]}");
+                    return lancer.Index;
+                }
+                );
+            cursor.Emit(OpCodes.Stloc, 1);
+
+            #endregion SetNumToLancer
+
+            LancerPlugin.LogSource.LogInfo("LancerTravelScreen Patch Done");
+
+            void DebugLogCursor() =>
+                LancerPlugin.LogSource.LogInfo($"{cursor.Prev.OpCode.Name} > Cursor < {cursor.Next.OpCode.Name}");
         }
     }
 }

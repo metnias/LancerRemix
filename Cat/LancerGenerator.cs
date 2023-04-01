@@ -96,7 +96,8 @@ namespace LancerRemix.Cat
 
         private static SlugName RegisterVanillaLancer(SlugName basis)
         {
-            return new SlugName(GetLancerName(basis.value), true);
+            var lancer = new SlugName(GetLancerName(basis.value), true);
+            return lancer;
         }
 
         private static SlugName RegisterMSCLancer(SlugName basis)
