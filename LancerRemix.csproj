@@ -80,6 +80,7 @@
   <ItemGroup>
     <Compile Include="Cat\LancerGenerator.cs" />
     <Compile Include="Cat\SwapSave.cs" />
+    <Compile Include="Combat\CreaturePatch.cs" />
     <Compile Include="LancerMenu\MenuModifier.cs" />
     <Compile Include="Cat\LancerSupplement.cs" />
     <Compile Include="Cat\ModifyCat.cs" />
@@ -112,7 +113,6 @@
     <AdditionalFiles Include="scenes\slugcat - lancer\lancer - white - flat.png" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Combat\" />
     <Folder Include="slugbase\scenes\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

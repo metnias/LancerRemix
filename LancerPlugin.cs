@@ -12,6 +12,7 @@ using BepInEx.Logging;
 using BepInEx;
 using LancerRemix.LancerMenu;
 using UnityEngine;
+using LancerRemix.Combat;
 
 #region Assembly attributes
 
@@ -58,6 +59,7 @@ namespace LancerRemix
             ModifyCat.Patch();
             MenuModifier.Patch();
             LancerGenerator.Patch();
+            CreaturePatch.Patch();
 
             instance.Logger.LogMessage("The Lancer is Intialized.");
         }
