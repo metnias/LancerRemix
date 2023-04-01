@@ -26,17 +26,16 @@ namespace LancerRemix.Cat
             On.PlayerGraphics.ApplyPalette += GrafApplyPalette;
             On.PlayerGraphics.SuckedIntoShortCut += GrafSuckedIntoShortCut;
             On.PlayerGraphics.Reset += GrafReset;
-            On.PlayerGraphics.ctor += GrafCtor;
             On.PlayerGraphics.ColoredBodyPartList += ColoredLancerPartList;
 
             var characterForColor = new Hook(
                 typeof(PlayerGraphics).GetProperty(nameof(PlayerGraphics.CharacterForColor), BindingFlags.Instance | BindingFlags.Public).GetGetMethod(),
                 typeof(ModifyCat).GetMethod(nameof(ModifyCat.LancerForColor), BindingFlags.Static | BindingFlags.NonPublic)
             );
-            var renderAsPup = new Hook(
+            /*var renderAsPup = new Hook(
                 typeof(PlayerGraphics).GetProperty(nameof(PlayerGraphics.RenderAsPup), BindingFlags.Instance | BindingFlags.Public).GetGetMethod(),
                 typeof(ModifyCat).GetMethod(nameof(ModifyCat.RenderAsLancer), BindingFlags.Static | BindingFlags.NonPublic)
-            );
+            );*/
             On.PlayerGraphics.DefaultSlugcatColor += DefaultLancerColor;
 
             SwapSave.SubPatch();
@@ -209,12 +208,6 @@ namespace LancerRemix.Cat
 
         #endregion CatDeco
 
-        private static void GrafCtor(On.PlayerGraphics.orig_ctor orig, PlayerGraphics self, PhysicalObject ow)
-        {
-            orig(self, ow);
-            if (IsLancer(self)) GetDeco<LancerDecoration>(self)?.Ctor(self);
-        }
-
         #region Properties
 
         private delegate SlugName orig_CharacterForColor(PlayerGraphics self);
@@ -227,6 +220,7 @@ namespace LancerRemix.Cat
             return res;
         }
 
+        /*
         private delegate bool orig_RenderAsPup(PlayerGraphics self);
 
         private static bool RenderAsLancer(orig_RenderAsPup orig, PlayerGraphics self)
@@ -234,6 +228,7 @@ namespace LancerRemix.Cat
             if (IsLancer(self)) return true;
             return orig(self);
         }
+        */
 
         #endregion Properties
 

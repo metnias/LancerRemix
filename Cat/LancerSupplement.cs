@@ -10,14 +10,15 @@ namespace LancerRemix.Cat
         /// Slide throw backward: backflip upwards
         /// forward: hard hit & stun, but loses spear
         /// pulling spear from wall/creatures takes time
-        /// 
+        ///
         /// parry: grab / throw. throw parry will fling your spear. (12 ticks for now)
         /// grab parry will flip lizards
-        /// 
+        ///
         /// normal stab: will never stun
         /// </summary>
         public LancerSupplement(Player player) : base(player)
         {
+            player.playerState.isPup = true;
         }
 
         public LancerSupplement() : base()
@@ -29,7 +30,6 @@ namespace LancerRemix.Cat
         private int OnParry => Math.Max(parry, block);
 
         public override string TargetSubVersion => "1.0";
-
 
         public override void Update(On.Player.orig_Update orig, bool eu)
         {
