@@ -65,7 +65,6 @@ namespace LancerRemix.Cat
 
             // SubRegistry.Register(lancer, (player) => new LancerSupplement(player));
             // DecoRegistry.Register(lancer, (player) => new LancerDecoration(player));
-            StoryRegistry.RegisterTimeline(new StoryRegistry.TimelinePointer(lancer, StoryRegistry.TimelinePointer.Relative.After, basis));
 
             return true;
 
@@ -97,17 +96,25 @@ namespace LancerRemix.Cat
         private static SlugName RegisterVanillaLancer(SlugName basis)
         {
             var lancer = new SlugName(GetLancerName(basis.value), true);
+            if (basis == SlugName.Yellow)
+                StoryRegistry.RegisterTimeline(new StoryRegistry.TimelinePointer(lancer, StoryRegistry.TimelinePointer.Relative.Before, SlugName.Red));
+            else
+                StoryRegistry.RegisterTimeline(new StoryRegistry.TimelinePointer(lancer, StoryRegistry.TimelinePointer.Relative.After, basis));
             return lancer;
         }
 
         private static SlugName RegisterMSCLancer(SlugName basis)
         {
-            return new SlugName(GetLancerName(basis.value), true);
+            var lancer = new SlugName(GetLancerName(basis.value), true);
+            StoryRegistry.RegisterTimeline(new StoryRegistry.TimelinePointer(lancer, StoryRegistry.TimelinePointer.Relative.After, basis));
+            return lancer;
         }
 
         private static SlugName RegisterSlugBaseLancer(SlugName basis)
         {
-            return new SlugName(GetLancerName(basis.value), true);
+            var lancer = new SlugName(GetLancerName(basis.value), true);
+            StoryRegistry.RegisterTimeline(new StoryRegistry.TimelinePointer(lancer, StoryRegistry.TimelinePointer.Relative.After, basis));
+            return lancer;
 
             /*
             if (!SlugBaseCharacter.Registry.TryGetPath(basis, out string path))
@@ -126,6 +133,14 @@ namespace LancerRemix.Cat
                 return text;
             }
             */
+        }
+
+        internal static SlugName GetStoryBasisForLancer(SlugName lancer)
+        {
+            var basis = lancer;
+            if (IsLancer(basis)) basis = GetBasis(basis);
+            if (basis == SlugName.Yellow) basis = SlugName.Red;
+            return basis;
         }
     }
 }

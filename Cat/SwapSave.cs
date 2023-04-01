@@ -20,6 +20,8 @@ namespace LancerRemix.Cat
             //IL.PlayerProgression.LoadGameState += LoadLancerState;
 
             On.Region.ctor += LancerGetBasisRegion;
+            On.Region.LoadAllRegions += LoadAllLancerRegion;
+            On.PlayerProgression.MiscProgressionData.updateConditionalShelters += UpdateConditionalLancerShelters;
         }
 
         private static bool IsStoryLancer => ModifyCat.IsStoryLancer;
@@ -72,7 +74,8 @@ namespace LancerRemix.Cat
             if (IsStoryLancer && self.currentSaveState != null)
             {
                 var basis = self.currentSaveState.saveStateNumber;
-                self.currentSaveState.saveStateNumber = GetLancer(basis);
+                if (HasLancer(basis))
+                    self.currentSaveState.saveStateNumber = GetLancer(basis);
                 var res = orig(self, saveCurrentState, saveMaps, saveMiscProg);
                 self.currentSaveState.saveStateNumber = basis;
                 return res;
@@ -85,7 +88,8 @@ namespace LancerRemix.Cat
         {
             if (!IsStoryLancer) return orig(self, saveFilePath, game, saveAsDeathOrQuit);
             string[] rawData = GetRawData();
-            var lancer = GetLancer(self.currentSaveState.saveStateNumber);
+            var lancer = self.currentSaveState.saveStateNumber;
+            if (HasLancer(lancer)) lancer = GetLancer(lancer);
             for (int i = 0; i < rawData.Length; i++)
             {
                 string[] rawStates = Regex.Split(rawData[i], "<progDivB>");
@@ -199,19 +203,31 @@ namespace LancerRemix.Cat
 
         #region Region
 
+        private static SlugName GetStoryBasisForLancer(SlugName lancer)
+        {
+            if (IsLancer(lancer) || IsStoryLancer)
+                lancer = GetStoryBasisForLancer(lancer);
+            return LancerGenerator.GetStoryBasisForLancer(lancer);
+        }
+
         private static void LancerGetBasisRegion(On.Region.orig_ctor orig, Region self, string name, int firstRoomIndex, int regionNumber, SlugName storyIndex)
         {
-            if (IsLancer(storyIndex))
-            {
-                var basis = GetBasis(storyIndex);
-                if (basis == SlugName.Yellow) basis = SlugName.Red;
-                storyIndex = basis;
-            }
-            else if (IsStoryLancer)
-            {
-                if (storyIndex == SlugName.Yellow) storyIndex = SlugName.Red;
-            }
+            storyIndex = GetStoryBasisForLancer(storyIndex);
             orig(self, name, firstRoomIndex, regionNumber, storyIndex);
+        }
+
+        private static Region[] LoadAllLancerRegion(On.Region.orig_LoadAllRegions orig, SlugName storyIndex)
+        {
+            storyIndex = GetStoryBasisForLancer(storyIndex);
+            return orig(storyIndex);
+        }
+
+        private static void UpdateConditionalLancerShelters(On.PlayerProgression.MiscProgressionData.orig_updateConditionalShelters orig,
+            PlayerProgression.MiscProgressionData self, string room, SlugName slugcatIndex)
+        {
+            if (IsStoryLancer)
+                if (HasLancer(slugcatIndex)) slugcatIndex = GetLancer(slugcatIndex);
+            orig(self, room, slugcatIndex);
         }
 
         #endregion Region

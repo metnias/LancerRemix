@@ -19,7 +19,6 @@ namespace LancerRemix.LancerMenu
             IL.Menu.FastTravelScreen.ctor += LancerTravelScreen;
 
             SelectMenuPatch.SubPatch();
-            /// To fix: passage to use lancer map progress
         }
 
         private static bool IsStoryLancer => ModifyCat.IsStoryLancer;
@@ -103,8 +102,7 @@ namespace LancerRemix.LancerMenu
                 {
                     var lancer = self.manager.rainWorld.progression.PlayingAsSlugcat;
                     if (HasLancer(lancer)) lancer = GetLancer(lancer);
-                    LancerPlugin.LogSource.LogInfo($"Switched FastTravelScreen for {lancer.value}({lancer.Index}) (basis: {self.manager.rainWorld.progression.PlayingAsSlugcat})");
-                    LancerPlugin.LogSource.LogInfo($"shelters: {self.playerShelters[lancer.Index]}");
+                    Debug.Log($"Lancer: Switched FastTravelScreen for {lancer.value}({lancer.Index}) (basis: {self.manager.rainWorld.progression.PlayingAsSlugcat})");
                     return lancer.Index;
                 }
                 );
