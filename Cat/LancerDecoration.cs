@@ -4,6 +4,7 @@ using SlugName = SlugcatStats.Name;
 using static LancerRemix.LancerEnums;
 using RWCustom;
 using System.Collections.Generic;
+using static UnityEngine.RectTransform;
 
 namespace LancerRemix.Cat
 {
@@ -20,6 +21,13 @@ namespace LancerRemix.Cat
         public override void InitiateSprites(On.PlayerGraphics.orig_InitiateSprites orig, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam)
         {
             base.InitiateSprites(null, sLeaser, rCam);
+
+            sprites = new FSprite[1];
+            var tris = new TriangleMesh.Triangle[] { new TriangleMesh.Triangle(0, 1, 2) };
+            var triangleMesh = new TriangleMesh("Futile_White", tris, false, false);
+            sprites[0] = triangleMesh;
+            container.AddChild(sprites[0]);
+            self.AddToContainer(sLeaser, rCam, null);
         }
 
         public override void AddToContainer(On.PlayerGraphics.orig_AddToContainer orig, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, FContainer newContatiner)
@@ -35,11 +43,23 @@ namespace LancerRemix.Cat
         public override void DrawSprites(On.PlayerGraphics.orig_DrawSprites orig, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
         {
             base.DrawSprites(null, sLeaser, rCam, timeStacker, camPos);
+
+            Vector2 head = Vector2.Lerp(self.head.lastPos, self.head.pos, timeStacker);
+            IntVector2 stat = HornStat(player.SlugCatClass);
+            Vector2 draw1 = Vector2.Lerp(self.drawPositions[1, 1], self.drawPositions[1, 0], timeStacker);
+            Vector2 tip = head + Custom.DirVec(draw1, head) * (float)stat.y;
+            Vector2 thicc = Custom.PerpendicularVector(head, tip);
+            Vector2 dir = (tip - head) * 0.6f;
+
+            (sprites[0] as TriangleMesh).MoveVertice(0, dir + tip - camPos);
+            (sprites[0] as TriangleMesh).MoveVertice(1, dir + head - thicc * (float)stat.x / 2f - camPos);
+            (sprites[0] as TriangleMesh).MoveVertice(2, dir + head + thicc * (float)stat.x / 2f - camPos);
         }
 
         public override void ApplyPalette(On.PlayerGraphics.orig_ApplyPalette orig, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, RoomPalette palette)
         {
             base.ApplyPalette(null, sLeaser, rCam, palette);
+            sprites[0].color = GetHornColor();
         }
 
         public override void SuckedIntoShortCut(On.PlayerGraphics.orig_SuckedIntoShortCut orig, Vector2 shortCutPosition)
@@ -52,8 +72,20 @@ namespace LancerRemix.Cat
             base.Reset(null);
         }
 
+        public Color GetHornColor()
+        {
+            if (self.useJollyColor)
+                return PlayerGraphics.JollyColor(self.player.playerState.playerNumber, HornIndex());
+            if (PlayerGraphics.CustomColorsEnabled())
+                return PlayerGraphics.CustomColorSafety(HornIndex());
+            return DefaultHornColor(state.slugcatCharacter);
+
+            int HornIndex() => PlayerGraphics.customColors.Count - 1;
+        }
+
         public static Color DefaultHornColor(SlugName basis)
         {
+            if (IsLancer(basis)) basis = GetBasis(basis);
             if (defaultHornColors.TryGetValue(basis, out var res)) return res;
 
             var c = PlayerGraphics.DefaultSlugcatColor(basis);
@@ -69,9 +101,25 @@ namespace LancerRemix.Cat
             = new Dictionary<SlugName, Color>()
             {
                 { SlugName.White, new Color(0.1f, 0.3f, 0.0f) },
-                {SlugName.Yellow, new Color(0.5f, 0.1f, 0.0f) },
-                {SlugName.Red, new Color(0.0f, 0.1f, 0.5f) },
-                {SlugName.Night, new Color(0.1f, 0.5f, 0.3f) }
+                { SlugName.Yellow, new Color(0.5f, 0.1f, 0.0f) },
+                { SlugName.Red, new Color(0.0f, 0.1f, 0.5f) },
+                { SlugName.Night, new Color(0.1f, 0.5f, 0.3f) }
+            };
+
+        private static IntVector2 HornStat(SlugName basis)
+        {
+            if (IsLancer(basis)) basis = GetBasis(basis);
+            if (vanillaHornStats.TryGetValue(basis, out var res)) return res;
+            return new IntVector2(3, 8);
+        }
+
+        private static readonly Dictionary<SlugName, IntVector2> vanillaHornStats
+            = new Dictionary<SlugName, IntVector2>()
+            {
+                { SlugName.White, new IntVector2(3, 8) },
+                { SlugName.Night, new IntVector2(3, 8) },
+                { SlugName.Yellow, new IntVector2(4, 6) },
+                { SlugName.Red, new IntVector2(3, 10) }
             };
     }
 }
