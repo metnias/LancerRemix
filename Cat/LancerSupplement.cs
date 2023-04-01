@@ -147,7 +147,7 @@ namespace LancerRemix.Cat
             (self.graphicsModule as PlayerGraphics)?.ThrowObject(grasp, spear);
             spear.Forbid();
             self.ReleaseGrasp(grasp);
-            lanceDelay = 30;
+            lanceDelay = 20;
             self.dontGrabStuff = 10;
             self.bodyChunks[0].vel += lanceDir.ToVector2() * 4f;
             self.bodyChunks[1].vel -= lanceDir.ToVector2() * 3f;
@@ -210,13 +210,13 @@ namespace LancerRemix.Cat
             {
                 default:
                 case 1:
-                    return 0.3f + 0.2f * Mathf.Pow(UnityEngine.Random.value, 3f);
+                    return 0.6f; //0.3f + 0.2f * Mathf.Pow(UnityEngine.Random.value, 3f);
 
                 case 0:
                     return 0.2f + 0.3f * Mathf.Pow(UnityEngine.Random.value, 4f);
 
                 case 2:
-                    return 0.4f + 0.3f * Mathf.Pow(UnityEngine.Random.value, 3f);
+                    return 0.8f; //0.4f + 0.3f * Mathf.Pow(UnityEngine.Random.value, 3f);
             }
         }
     }
