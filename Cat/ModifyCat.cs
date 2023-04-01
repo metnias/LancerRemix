@@ -200,7 +200,7 @@ namespace LancerRemix.Cat
         private static void GrafCtor(On.PlayerGraphics.orig_ctor orig, PlayerGraphics self, PhysicalObject ow)
         {
             orig(self, ow);
-            // if (IsLancer(self)) GetDeco<LancerDecoration>(self)?.Ctor(self);
+            if (IsLancer(self)) GetDeco<LancerDecoration>(self)?.Ctor(self);
         }
 
         #region Properties

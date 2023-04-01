@@ -203,11 +203,11 @@ namespace LancerRemix.Cat
 
         #region Region
 
-        private static SlugName GetStoryBasisForLancer(SlugName lancer)
+        private static SlugName GetStoryBasisForLancer(SlugName storyIndex)
         {
-            if (IsLancer(lancer) || IsStoryLancer)
-                lancer = GetStoryBasisForLancer(lancer);
-            return LancerGenerator.GetStoryBasisForLancer(lancer);
+            if (IsLancer(storyIndex) || IsStoryLancer)
+                return LancerGenerator.GetStoryBasisForLancer(storyIndex);
+            return storyIndex; // Not lancer
         }
 
         private static void LancerGetBasisRegion(On.Region.orig_ctor orig, Region self, string name, int firstRoomIndex, int regionNumber, SlugName storyIndex)
