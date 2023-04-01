@@ -1,11 +1,5 @@
 ﻿using LancerRemix.Cat;
 using RWCustom;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml;
 using UnityEngine;
 using static LancerRemix.Cat.ModifyCat;
 
@@ -19,6 +13,12 @@ namespace LancerRemix.Combat
             On.Spear.LodgeInCreature += SpearLodgeCreature;
             On.Spear.Update += SpearUpdate;
             On.Spear.DrawSprites += SpearDrawSprites;
+
+            /// TODO: implement block and parry
+            /// danger grasp lance
+            /// monk difficulty adjust
+            /// vulture mask
+            /// story patch
         }
 
         #region Spear

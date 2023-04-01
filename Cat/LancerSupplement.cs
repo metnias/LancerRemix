@@ -3,7 +3,6 @@ using MoreSlugcats;
 using RWCustom;
 using System;
 using UnityEngine;
-using static MonoMod.InlineRT.MonoModRule;
 using AnimIndex = Player.AnimationIndex;
 using BodyIndex = Player.BodyModeIndex;
 

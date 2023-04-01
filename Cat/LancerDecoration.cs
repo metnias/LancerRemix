@@ -4,7 +4,6 @@ using SlugName = SlugcatStats.Name;
 using static LancerRemix.LancerEnums;
 using RWCustom;
 using System.Collections.Generic;
-using static UnityEngine.RectTransform;
 
 namespace LancerRemix.Cat
 {
