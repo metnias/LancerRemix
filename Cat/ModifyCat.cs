@@ -25,6 +25,7 @@ namespace LancerRemix.Cat
             On.PlayerGraphics.ApplyPalette += GrafApplyPalette;
             On.PlayerGraphics.SuckedIntoShortCut += GrafSuckedIntoShortCut;
             On.PlayerGraphics.Reset += GrafReset;
+            On.PlayerGraphics.ctor += GrafCtor;
 
             var characterForColor = new Hook(
                 typeof(PlayerGraphics).GetProperty(nameof(PlayerGraphics.CharacterForColor), BindingFlags.Instance | BindingFlags.Public).GetGetMethod(),
@@ -63,7 +64,6 @@ namespace LancerRemix.Cat
         public static bool IsLancer(Player player) => IsLancer(player.playerState);
 
         public static bool IsLancer(PlayerGraphics playerGraphics) => IsLancer(playerGraphics.player.playerState);
-
 
         #region Player
 
@@ -119,7 +119,6 @@ namespace LancerRemix.Cat
             { GetSub<LancerSupplement>(self)?.Grabbed(orig, grasp); return; }
             orig(self, grasp);
         }
-
 
         #endregion Player
 
@@ -197,6 +196,12 @@ namespace LancerRemix.Cat
         }
 
         #endregion CatDeco
+
+        private static void GrafCtor(On.PlayerGraphics.orig_ctor orig, PlayerGraphics self, PhysicalObject ow)
+        {
+            orig(self, ow);
+            // if (IsLancer(self)) GetDeco<LancerDecoration>(self)?.Ctor(self);
+        }
 
         #region Properties
 

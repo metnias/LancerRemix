@@ -17,6 +17,15 @@ namespace LancerRemix.Cat
         {
         }
 
+        public void Ctor(PlayerGraphics instance)
+        {
+            instance.tail = new TailSegment[4];
+            instance.tail[0] = new TailSegment(instance, 4f, 2f, null, 0.85f, 1f, 0.5f, true);
+            instance.tail[1] = new TailSegment(instance, 3f, 3f, instance.tail[0], 0.85f, 1f, 0.5f, true);
+            instance.tail[2] = new TailSegment(instance, 1f, 1f, instance.tail[1], 0.85f, 1f, 0.5f, true);
+            instance.tail[3] = new TailSegment(instance, 0.3f, 0.3f, instance.tail[2], 0.85f, 1f, 0.5f, true);
+        }
+
         public override void InitiateSprites(On.PlayerGraphics.orig_InitiateSprites orig, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam)
         {
             base.InitiateSprites(null, sLeaser, rCam);
@@ -52,7 +61,6 @@ namespace LancerRemix.Cat
             base.Reset(null);
         }
 
-
         public static Color DefaultHornColor(SlugName basis)
         {
             if (defaultHornColors.TryGetValue(basis, out var res)) return res;
@@ -74,6 +82,5 @@ namespace LancerRemix.Cat
                 {SlugName.Red, new Color(0.0f, 0.1f, 0.5f) },
                 {SlugName.Night, new Color(0.1f, 0.5f, 0.3f) }
             };
-
     }
 }
