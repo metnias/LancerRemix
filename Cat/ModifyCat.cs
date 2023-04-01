@@ -157,13 +157,13 @@ namespace LancerRemix.Cat
         private static void PlayerStun(On.Player.orig_Stun orig, Player self, int st)
         {
             orig(self, st);
-            if (IsLancer(self)) GetSub<LancerSupplement>(self)?.StunOrDie();
+            if (IsLancer(self)) GetSub<LancerSupplement>(self)?.ReleaseLanceSpear();
         }
 
         private static void PlayerDie(On.Player.orig_Die orig, Player self)
         {
             orig(self);
-            if (IsLancer(self)) GetSub<LancerSupplement>(self)?.StunOrDie();
+            if (IsLancer(self)) GetSub<LancerSupplement>(self)?.ReleaseLanceSpear();
         }
 
         private static void LancerMovementUpdate(On.Player.orig_MovementUpdate orig, Player self, bool eu)

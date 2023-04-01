@@ -60,6 +60,7 @@ namespace LancerRemix
             MenuModifier.Patch();
             LancerGenerator.Patch();
             CreaturePatch.Patch();
+            WeaponPatch.Patch();
 
             instance.Logger.LogMessage("The Lancer is Intialized.");
         }

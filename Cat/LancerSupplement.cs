@@ -53,10 +53,7 @@ namespace LancerRemix.Cat
                 --lanceTimer;
                 if (lanceTimer == 0 && !slideLance
                     && (lanceSpear?.mode == Weapon.Mode.Thrown || lanceSpear?.mode == Weapon.Mode.Free))
-                {
-                    self.SlugcatGrab(lanceSpear, lanceGrasp); // retrieve
-                    lanceSpear = null;
-                }
+                    RetrieveLanceSpear(lanceSpear);
             }
             if (blockTimer > 0) --blockTimer;
             if (lanceDelay > 0) --lanceDelay;
@@ -190,12 +187,7 @@ namespace LancerRemix.Cat
             }
         }
 
-        public void StunOrDie()
-        {
-            ReleaseLanceSpear();
-        }
-
-        private void ReleaseLanceSpear()
+        internal void ReleaseLanceSpear()
         {
             if (lanceSpear != null)
             {
@@ -203,6 +195,13 @@ namespace LancerRemix.Cat
                 lanceSpear = null;
             }
             lanceTimer = 0;
+        }
+
+        internal void RetrieveLanceSpear(Spear spear = null)
+        {
+            if (spear == null) spear = lanceSpear;
+            self.SlugcatGrab(spear, lanceGrasp); // retrieve
+            lanceSpear = null;
         }
 
         private static float GetLanceDamage(int throwingSkill)

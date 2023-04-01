@@ -81,6 +81,7 @@
     <Compile Include="Cat\LancerGenerator.cs" />
     <Compile Include="Cat\SwapSave.cs" />
     <Compile Include="Combat\CreaturePatch.cs" />
+    <Compile Include="Combat\WeaponPatch.cs" />
     <Compile Include="LancerMenu\MenuModifier.cs" />
     <Compile Include="Cat\LancerSupplement.cs" />
     <Compile Include="Cat\ModifyCat.cs" />
