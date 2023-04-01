@@ -238,13 +238,9 @@ namespace LancerRemix.LancerMenu
 
         private static void LancerPortrait(SlugcatPage page)
         {
-            var relImage = (page.menu as SlugcatSelectMenu).slugcatPages[0].slugcatImage;
-            var relSprite = relImage.flatIllustrations.Count > 0 ? relImage.flatIllustrations[0].sprite
-                : relImage.depthIllustrations[0].sprite;
-            foreach (var illust in page.slugcatImage.depthIllustrations)
-                illust.sprite.MoveBehindOtherNode(relSprite);
-            foreach (var illust in page.slugcatImage.flatIllustrations)
-                illust.sprite.MoveBehindOtherNode(relSprite);
+            UpdateEffectColor();
+
+            MoveBehindGUIs();
 
             var basis = GetBasis(page.slugcatNumber);
             if (basis == SlugName.White)
@@ -265,6 +261,28 @@ namespace LancerRemix.LancerMenu
                 else
                     ReplaceIllust(page.slugcatImage, $"scenes{Path.DirectorySeparatorChar}slugcat - lancer",
                     "lancer - red dark - flat", "red slugcat - 1 - dark", "red lancer - 1 - dark", new Vector2(462f, 225f));
+                if (page.markSquare != null) { page.markSquare.RemoveFromContainer(); page.markSquare = null; }
+                if (page.markGlow != null) { page.markGlow.RemoveFromContainer(); page.markGlow = null; }
+            }
+
+            void UpdateEffectColor()
+            {
+                page.effectColor = PlayerGraphics.DefaultSlugcatColor(page.slugcatNumber);
+                if (page.HasMark)
+                {
+                    if (page.markSquare != null) page.markSquare.color = Color.Lerp(page.effectColor, Color.white, 0.7f);
+                    if (page.markGlow != null) page.markGlow.color = page.effectColor;
+                }
+            }
+            void MoveBehindGUIs()
+            {
+                var relImage = (page.menu as SlugcatSelectMenu).slugcatPages[0].slugcatImage;
+                var relSprite = relImage.flatIllustrations.Count > 0 ? relImage.flatIllustrations[0].sprite
+                    : relImage.depthIllustrations[0].sprite;
+                foreach (var illust in page.slugcatImage.depthIllustrations)
+                    illust.sprite.MoveBehindOtherNode(relSprite);
+                foreach (var illust in page.slugcatImage.flatIllustrations)
+                    illust.sprite.MoveBehindOtherNode(relSprite);
             }
         }
 
@@ -302,7 +320,6 @@ namespace LancerRemix.LancerMenu
 
                 LancerPortrait(this);
                 VanillaLancerText();
-                //sceneOffset.y -= VOFFSET;
             }
 
             internal SlugName basisNumber;
@@ -349,7 +366,6 @@ namespace LancerRemix.LancerMenu
                 slugcatNumber = lancerNumber;
 
                 LancerPortrait(this);
-                //sceneOffset.y -= VOFFSET;
             }
 
             internal SlugName basisNumber;
@@ -382,6 +398,15 @@ namespace LancerRemix.LancerMenu
                 if (IsLancerPage(self)) offset -= VOFFSET;
                 self.hud.karmaMeter.pos.y += offset;
                 self.hud.foodMeter.pos.y += offset;
+            }
+
+            public override bool HasMark
+            {
+                get
+                {
+                    if (basisNumber == SlugName.Red) return false;
+                    return base.HasMark;
+                }
             }
         }
     }
