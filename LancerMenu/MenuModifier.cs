@@ -38,19 +38,17 @@ namespace LancerRemix.LancerMenu
             {
                 ReplaceIllust(scene, $"scenes{Path.DirectorySeparatorChar}sleep screen - lancer",
                     "sleep lancer - white - flat", "sleep - 2 - white", "lancer - 2 - white", new Vector2(677f, 63f));
-                //ReplaceIllust(menu.scene, $"scenes{Path.DirectorySeparatorChar}sleep screen - white",
-                //    "sleep screen - white - flat", "sleep - 2 - white", "sleep - 2 - white", new Vector2(677f, 63f));
             }
-            /*
             else if (basis == SlugName.Yellow)
             {
-                ReplaceIllust(scene, $"scenes{Path.DirectorySeparatorChar}slugcat - lancer",
-                    "lancer - yellow - flat", "yellow slugcat - 1", "yellow lancer - 1", new Vector2(528f, 211f));
+                ReplaceIllust(scene, $"scenes{Path.DirectorySeparatorChar}sleep screen - lancer",
+                    "sleep lancer - yellow - flat", "sleep - 2 - yellow", "lancer - 2 - yellow", new Vector2(677f, 63f));
             }
+            /*
             else if (basis == SlugName.Red)
             {
-                ReplaceIllust(scene, $"scenes{Path.DirectorySeparatorChar}slugcat - lancer",
-                    "lancer - red - flat", "red slugcat - 1", "red lancer - 1", new Vector2(462f, 225f));
+                ReplaceIllust(scene, $"scenes{Path.DirectorySeparatorChar}sleep screen - lancer",
+                    "sleep lancer - white - flat", "sleep - 2 - white", "lancer - 2 - white", new Vector2(677f, 63f));
             }
             */
         }

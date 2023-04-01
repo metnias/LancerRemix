@@ -231,7 +231,6 @@ namespace LancerRemix.Cat
             {
                 var basis = GetBasis(i);
                 if (defaultLancerBodyColors.TryGetValue(basis, out var res)) return res;
-
                 return orig(basis);
             }
             return orig(i);

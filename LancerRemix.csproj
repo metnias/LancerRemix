@@ -102,6 +102,8 @@
     <AdditionalFiles Include="scenes\slugcat - lancer\white lancer - 2.png" />
     <AdditionalFiles Include="scenes\slugcat - lancer\lancer - red dark - flat.png" />
     <AdditionalFiles Include="text\text_kor\strings.txt" />
+    <Content Include="scenes\sleep screen - lancer\lancer - 2 - yellow.png" />
+    <Content Include="scenes\sleep screen - lancer\sleep lancer - yellow - flat.png" />
     <None Include="slugbase\Lancer.zip" />
     <Content Include="illustrations\lancer_off.png" />
     <Content Include="illustrations\lancer_on.png" />
