@@ -17,6 +17,7 @@ namespace LancerRemix.Cat
             On.Player.Update += PlayerUpdate;
             On.Player.Destroy += PlayerDestroy;
             On.Player.Grabbed += PlayerGrabbed;
+            On.Player.ShortCutColor += LancerShortCutColor;
 
             On.PlayerGraphics.InitiateSprites += GrafInitSprite;
             On.PlayerGraphics.AddToContainer += GrafAddToContainer;
@@ -65,6 +66,8 @@ namespace LancerRemix.Cat
         public static bool IsLancer(Player player) => IsLancer(player.playerState);
 
         public static bool IsLancer(PlayerGraphics playerGraphics) => IsLancer(playerGraphics.player.playerState);
+
+        public static bool IsLancer(SlugName name) => LancerEnums.IsLancer(name);
 
         #region Player
 
@@ -116,9 +119,17 @@ namespace LancerRemix.Cat
 
         private static void PlayerGrabbed(On.Player.orig_Grabbed orig, Player self, Creature.Grasp grasp)
         {
-            if (IsLancer(self.playerState))
+            if (IsLancer(self))
             { GetSub<LancerSupplement>(self)?.Grabbed(orig, grasp); return; }
             orig(self, grasp);
+        }
+
+        private static Color LancerShortCutColor(On.Player.orig_ShortCutColor orig, Player self)
+        {
+            if (!IsLancer(self)) return orig(self);
+            var lancer = self.playerState.slugcatCharacter;
+            if (HasLancer(lancer)) lancer = GetLancer(lancer);
+            return PlayerGraphics.SlugcatColor(lancer);
         }
 
         #endregion Player
@@ -228,7 +239,7 @@ namespace LancerRemix.Cat
 
         private static Color DefaultLancerColor(On.PlayerGraphics.orig_DefaultSlugcatColor orig, SlugName i)
         {
-            if (LancerEnums.IsLancer(i))
+            if (IsLancer(i))
             {
                 var basis = GetBasis(i);
                 if (defaultLancerBodyColors.TryGetValue(basis, out var res)) return res;
@@ -248,7 +259,7 @@ namespace LancerRemix.Cat
 
         private static List<string> ColoredLancerPartList(On.PlayerGraphics.orig_ColoredBodyPartList orig, SlugName slugcatID)
         {
-            if (!LancerEnums.IsLancer(slugcatID)) return orig(slugcatID);
+            if (!IsLancer(slugcatID)) return orig(slugcatID);
             var basis = GetBasis(slugcatID);
             var list = orig(basis);
             list.Add("Horn");
