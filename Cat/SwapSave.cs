@@ -8,6 +8,7 @@ namespace LancerRemix.Cat
 {
     internal static class SwapSave
     {
+        // To fix: passage to use lancer map progress
         internal static void SubPatch()
         {
             On.PlayerProgression.IsThereASavedGame += IsThereASavedLancer;

@@ -268,7 +268,7 @@ namespace LancerRemix.LancerMenu
             }
         }
 
-        internal static void ReplaceIllust(MenuScene scene, string sceneFolder, string flatImage, string layerImageOrig, string layerImage, Vector2 layerPos)
+        internal static void ReplaceIllust(MenuScene scene, string sceneFolder, string flatImage, string layerImageOrig, string layerImage, Vector2 layerPos, bool basic = true)
         {
             if (scene.flatMode)
             {
@@ -286,9 +286,10 @@ namespace LancerRemix.LancerMenu
                 scene.depthIllustrations[i] = null;
                 // LancerPlugin.LogSource.LogMessage($"({i}/{scene.depthIllustrations.Count}) replaced to {layerImage}");
                 scene.depthIllustrations[i] =
-                    new MenuDepthIllustration(scene.page.menu, scene, sceneFolder, layerImage, layerPos, depth, MenuDepthIllustration.MenuShader.Basic);
+                    new MenuDepthIllustration(scene.page.menu, scene, sceneFolder, layerImage, layerPos, depth, basic ? MenuDepthIllustration.MenuShader.Basic : MenuDepthIllustration.MenuShader.Normal);
                 if (i < scene.depthIllustrations.Count - 1)
                     scene.depthIllustrations[i].sprite.MoveBehindOtherNode(scene.depthIllustrations[i + 1].sprite);
+                scene.subObjects.Add(scene.depthIllustrations[i]);
             }
         }
 

@@ -94,11 +94,13 @@
     </AdditionalFiles>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="scenes\slugcat - lancer\red lancer - 1 - dark.png" />
-    <Content Include="scenes\slugcat - lancer\red lancer - 1.png" />
-    <Content Include="scenes\slugcat - lancer\yellow lancer - 1.png" />
-    <Content Include="scenes\slugcat - lancer\white lancer - 2.png" />
-    <Content Include="scenes\slugcat - lancer\lancer - red dark - flat.png" />
+    <AdditionalFiles Include="scenes\sleep screen - lancer\lancer - 2 - white.png" />
+    <AdditionalFiles Include="scenes\sleep screen - lancer\sleep lancer - white - flat.png" />
+    <AdditionalFiles Include="scenes\slugcat - lancer\red lancer - 1 - dark.png" />
+    <AdditionalFiles Include="scenes\slugcat - lancer\red lancer - 1.png" />
+    <AdditionalFiles Include="scenes\slugcat - lancer\yellow lancer - 1.png" />
+    <AdditionalFiles Include="scenes\slugcat - lancer\white lancer - 2.png" />
+    <AdditionalFiles Include="scenes\slugcat - lancer\lancer - red dark - flat.png" />
     <AdditionalFiles Include="text\text_kor\strings.txt" />
     <None Include="slugbase\Lancer.zip" />
     <Content Include="illustrations\lancer_off.png" />
