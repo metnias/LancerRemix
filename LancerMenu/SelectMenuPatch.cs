@@ -11,6 +11,7 @@ using UnityEngine;
 using static LancerRemix.LancerEnums;
 using static Menu.SlugcatSelectMenu;
 using SlugName = SlugcatStats.Name;
+using SceneID = Menu.MenuScene.SceneID;
 
 namespace LancerRemix.LancerMenu
 {
@@ -241,11 +242,11 @@ namespace LancerRemix.LancerMenu
 
         private static void LancerPortrait(SlugcatPage page)
         {
+            var basis = GetBasis(page.slugcatNumber);
             UpdateEffectColor();
-
+            ReloadScene();
             MoveBehindGUIs();
 
-            var basis = GetBasis(page.slugcatNumber);
             if (basis == SlugName.White)
             {
                 ReplaceIllust(page.slugcatImage, $"scenes{Path.DirectorySeparatorChar}slugcat - lancer",
@@ -275,6 +276,37 @@ namespace LancerRemix.LancerMenu
                 {
                     if (page.markSquare != null) page.markSquare.color = Color.Lerp(page.effectColor, Color.white, 0.7f);
                     if (page.markGlow != null) page.markGlow.color = page.effectColor;
+                }
+            }
+            void ReloadScene()
+            {
+                var sceneID = GetLancerBasisScene();
+                if (page.slugcatImage.sceneID == sceneID) return;
+                page.RemoveSubObject(page.slugcatImage);
+                page.slugcatImage.RemoveSprites(); page.slugcatImage.RemoveSubObject(page.slugcatImage); page.slugcatImage = null;
+                page.slugcatImage = new InteractiveMenuScene(page.menu, page, sceneID);
+
+                SceneID GetLancerBasisScene()
+                {
+                    var res = SceneID.Slugcat_White;
+                    bool ascended = page is LancerPageContinue lpc ? lpc.saveGameData.ascended : false;
+                    if (basis == SlugName.White)
+                    {
+                        if (ascended) res = SceneID.Ghost_White;
+                        else res = SceneID.Slugcat_White;
+                    }
+                    else if (basis == SlugName.Yellow)
+                    {
+                        if (ascended) res = SceneID.Ghost_Yellow;
+                        else res = SceneID.Slugcat_Yellow;
+                    }
+                    else if (basis == SlugName.Red)
+                    {
+                        if (ascended) res = SceneID.Ghost_Red;
+                        else if (page is LancerPageContinue && (page as LancerPageContinue).saveGameData.redsDeath) res = SceneID.Slugcat_Dead_Red;
+                        else res = SceneID.Slugcat_Red;
+                    }
+                    return res;
                 }
             }
             void MoveBehindGUIs()
