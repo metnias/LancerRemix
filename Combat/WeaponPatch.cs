@@ -19,6 +19,8 @@ namespace LancerRemix.Combat
             /// monk difficulty adjust
             /// vulture mask
             /// story patch
+            /// jolly & custom color ui support
+            /// expedition support
         }
 
         #region Spear

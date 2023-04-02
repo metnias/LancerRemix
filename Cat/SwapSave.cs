@@ -3,6 +3,7 @@ using System.IO;
 using System.Text.RegularExpressions;
 using static LancerRemix.LancerEnums;
 using SlugName = SlugcatStats.Name;
+using static CatSub.Story.SaveManager;
 
 namespace LancerRemix.Cat
 {
@@ -25,6 +26,8 @@ namespace LancerRemix.Cat
         }
 
         private static bool IsStoryLancer => ModifyCat.IsStoryLancer;
+
+        internal const string CURRSLUGCATLANCER = "CurrentlySelectedSinglePlayerIsLancer";
 
         #region SlugcatSelectMenu
 
@@ -73,6 +76,7 @@ namespace LancerRemix.Cat
         {
             if (IsStoryLancer && self.currentSaveState != null)
             {
+                SetMiscValue(self.miscProgressionData, CURRSLUGCATLANCER, true);
                 var basis = self.currentSaveState.saveStateNumber;
                 if (HasLancer(basis))
                     self.currentSaveState.saveStateNumber = GetLancer(basis);
@@ -80,6 +84,7 @@ namespace LancerRemix.Cat
                 self.currentSaveState.saveStateNumber = basis;
                 return res;
             }
+            SetMiscValue(self.miscProgressionData, CURRSLUGCATLANCER, false);
             return orig(self, saveCurrentState, saveMaps, saveMiscProg);
         }
 

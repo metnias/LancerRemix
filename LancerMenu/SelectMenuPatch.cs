@@ -1,4 +1,5 @@
-﻿using JollyCoop.JollyMenu;
+﻿using CatSub.Story;
+using JollyCoop.JollyMenu;
 using LancerRemix.Cat;
 using Menu;
 using MonoMod.RuntimeDetour;
@@ -36,7 +37,11 @@ namespace LancerRemix.LancerMenu
             _lancerInit = false;
             ModifyCat.SetIsLancer(false, new bool[4]);
             orig(self, manager);
-            slugcatPageLancer = false; lancerTransition = 0f; lastLancerTransition = 0f;
+            if (TryGetCurrSlugcatLancer())
+            { slugcatPageLancer = true; lancerTransition = 1f; lastLancerTransition = 1f; }
+            else
+            { slugcatPageLancer = false; lancerTransition = 0f; lastLancerTransition = 0f; }
+
             lancerPages = new SlugcatPage[self.slugcatPages.Count];
             foreach (var lancer in AllLancer)
             {
@@ -48,8 +53,6 @@ namespace LancerRemix.LancerMenu
                 else
                     lancerPages[order] = new LancerPageNewGame(self, null, 1 + order, lancer);
                 self.pages.Add(lancerPages[order]);
-
-                UpdateCurrentlySelectedLancer(lancer, order);
             }
             // Add Toggle Button
             lancerButton = new SymbolButtonToggle(self, self.pages[0], LANCER_SIGNAL, new Vector2(1016f, 50f), new Vector2(50f, 50f),
@@ -68,13 +71,13 @@ namespace LancerRemix.LancerMenu
                 return -1;
             }
 
-            void UpdateCurrentlySelectedLancer(SlugName lancer, int order)
+            bool TryGetCurrSlugcatLancer()
             {
-                if (self.manager.rainWorld.progression.miscProgressionData.currentlySelectedSinglePlayerSlugcat == lancer)
-                {
-                    slugcatPageLancer = true; lancerTransition = 1f; lastLancerTransition = 1f;
-                    self.slugcatPageIndex = order;
-                }
+                try
+                { return SaveManager.GetMiscValue<bool>(manager.rainWorld.progression.miscProgressionData, SwapSave.CURRSLUGCATLANCER); }
+                catch // first install
+                { SaveManager.SetMiscValue(manager.rainWorld.progression.miscProgressionData, SwapSave.CURRSLUGCATLANCER, true); }
+                return true;
             }
         }
 
