@@ -12,6 +12,9 @@ using static LancerRemix.LancerEnums;
 using static Menu.SlugcatSelectMenu;
 using SlugName = SlugcatStats.Name;
 using SceneID = Menu.MenuScene.SceneID;
+using SlugBase;
+using SlugBase.Features;
+using SlugBase.Assets;
 
 namespace LancerRemix.LancerMenu
 {
@@ -288,7 +291,7 @@ namespace LancerRemix.LancerMenu
 
                 SceneID GetLancerBasisScene()
                 {
-                    var res = SceneID.Slugcat_White;
+                    var res = page.slugcatImage.sceneID;
                     bool ascended = page is LancerPageContinue lpc ? lpc.saveGameData.ascended : false;
                     if (basis == SlugName.White)
                     {
@@ -306,6 +309,26 @@ namespace LancerRemix.LancerMenu
                         else if (page is LancerPageContinue && (page as LancerPageContinue).saveGameData.redsDeath) res = SceneID.Slugcat_Dead_Red;
                         else res = SceneID.Slugcat_Red;
                     }
+                    else if (ModManager.MSC && SlugcatStats.IsSlugcatFromMSC(basis))
+                    {
+                        // TODO: fill this
+                    }
+                    else if (SlugBaseCharacter.Registry.TryGet(basis, out var slugbase))
+                    {
+                        if (ascended && GameFeatures.SelectMenuSceneAscended.TryGet(slugbase, out var sbSceneAscended))
+                            res = sbSceneAscended;
+                        else if (GameFeatures.SelectMenuScene.TryGet(slugbase, out var sbScene))
+                            res = sbScene;
+
+                        if (CustomScene.Registry.TryGet(res, out var ctmScene))
+                        {
+                            page.markOffset = ctmScene.MarkPos ?? page.markOffset;
+                            page.glowOffset = ctmScene.GlowPos ?? page.glowOffset;
+                            page.sceneOffset = ctmScene.SelectMenuOffset ?? page.sceneOffset;
+                            page.slugcatDepth = ctmScene.SlugcatDepth ?? page.slugcatDepth;
+                        }
+                    }
+
                     return res;
                 }
             }
