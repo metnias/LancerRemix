@@ -17,22 +17,22 @@ namespace LancerRemix.Story
             On.DreamsState.StaticEndOfCycleProgress += LancerDreamProgress;
             On.Menu.DreamScreen.SceneFromDream += LancerSceneFromDream;
 
+            HunterLancerScripts.SubPatch();
+
             if (ModManager.MSC) OnMSCEnablePatch();
         }
 
         internal static void OnMSCEnablePatch()
         {
-            On.DaddyLongLegs.Update += HunterMeetLancerTrigger;
-            On.DaddyLongLegs.CheckDaddyConsumption += HunterRecognizeLancer;
+            HunterLancerScripts.OnMSCEnableSubPatch();
         }
 
         internal static void OnMSCDisablePatch()
         {
-            On.DaddyLongLegs.Update -= HunterMeetLancerTrigger;
-            On.DaddyLongLegs.CheckDaddyConsumption -= HunterRecognizeLancer;
+            HunterLancerScripts.OnMSCDisableSubPatch();
         }
 
-        private const string HUNTERMEET = "LancerHunterMeet";
+        internal const string COORDNULL = "COORDNULL";
 
         private static bool IsStoryLancer => ModifyCat.IsStoryLancer;
 
@@ -46,7 +46,7 @@ namespace LancerRemix.Story
 
             if (basis != SlugName.Red) return;
             self.dreamsState = new DreamsState(); // add dream state to lancer hunter
-            SetProgValue(self.miscWorldSaveData, HUNTERMEET, 0); // never met
+            SetProgValue(self.miscWorldSaveData, HunterLancerScripts.HUNTERMEET, 0); // never met
         }
 
         private static void WinLancer(On.RainWorldGame.orig_Win orig, RainWorldGame self, bool malnourished)
@@ -69,7 +69,7 @@ namespace LancerRemix.Story
                 //if (GetProgValue<int>(saveState.miscWorldSaveData, HUNTERMEET) == 1) // met once
                 {
                     dreamsState.InitiateEventDream(DreamHunterMeet);
-                    SetProgValue(saveState.miscWorldSaveData, HUNTERMEET, 2); // met and dreamed
+                    SetProgValue(saveState.miscWorldSaveData, HunterLancerScripts.HUNTERMEET, 2); // met and dreamed
                 }
             }
         }
@@ -93,27 +93,18 @@ namespace LancerRemix.Story
             return orig(self, dreamID);
         }
 
-        private static void HunterMeetLancerTrigger(On.DaddyLongLegs.orig_Update orig, DaddyLongLegs self, bool eu)
+        internal static WorldCoordinate? GetMiscWorldCoord(PlayerProgression.MiscProgressionData data, string key)
         {
-            orig(self, eu);
-            if (self.room != null || !self.HDmode || !self.room.game.IsStorySession || !IsStoryLancer) return;
-            var basis = self.room.game.StoryCharacter;
-            if (IsLancer(basis)) basis = GetBasis(basis);
-            if (basis != SlugName.Red) return;
-            if (GetProgValue<int>(self.room.game.GetStorySession.saveState.miscWorldSaveData, HUNTERMEET) > 0) return; // already triggered
-            if (!(self.room.game.FirstAlivePlayer?.realizedCreature is Player player)) return;
-            if (self.room.VisualContact(self.mainBodyChunk.pos, player.mainBodyChunk.pos))
-                SetProgValue<int>(self.room.game.GetStorySession.saveState.miscWorldSaveData, HUNTERMEET, 1);
+            try
+            {
+                string text = GetMiscValue<string>(data, key);
+                if (text == COORDNULL) return null;
+                return WorldCoordinate.FromString(text);
+            }
+            catch { SetMiscValue(data, key, COORDNULL); return null; }
         }
 
-        private static bool HunterRecognizeLancer(On.DaddyLongLegs.orig_CheckDaddyConsumption orig, DaddyLongLegs self, PhysicalObject otherObject)
-        {
-            var result = orig(self, otherObject);
-            if (self.room != null || !self.HDmode || !self.room.game.IsStorySession || !IsStoryLancer) return result;
-            var basis = self.room.game.StoryCharacter;
-            if (IsLancer(basis)) basis = GetBasis(basis);
-            if (basis != SlugName.Red) return result;
-            return !(otherObject is Player);
-        }
+        internal static void SetMiscWorldCoord(PlayerProgression.MiscProgressionData data, string key, WorldCoordinate? coord)
+            => SetMiscValue(data, key, coord.HasValue ? coord.Value.SaveToString() : COORDNULL);
     }
 }

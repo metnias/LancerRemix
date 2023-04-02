@@ -198,6 +198,20 @@ namespace LancerRemix.Cat
             return basis;
         }
 
+        // Exclusive
+        internal static bool IsTimelineInbetween(SlugName check, SlugName left = null, SlugName right = null)
+        {
+            var timeline = SlugcatStats.getSlugcatTimelineOrder();
+            int c = -1, l = -1, r = timeline.Length;
+            for (int i = 0; i < timeline.Length; ++i)
+            {
+                if (timeline[i] == check) c = i;
+                if (timeline[i] == left) l = i;
+                if (timeline[i] == right) r = i;
+            }
+            return l < c && c < r;
+        }
+
         private static readonly Dictionary<SlugName, StatModifier> lancerModifiers
             = new Dictionary<SlugName, StatModifier>();
 
