@@ -29,6 +29,8 @@ using LancerRemix.Combat;
 
 namespace LancerRemix
 {
+    [BepInDependency("com.rainworldgame.topicular.catsupplement.plugin")]
+    [BepInDependency("slime-cubed.slugbase")]
     [BepInPlugin(PLUGIN_ID, PLUGIN_NAME, PLUGIN_VERSION)]
     [BepInProcess("RainWorld.exe")]
     public class LancerPlugin : BaseUnityPlugin
