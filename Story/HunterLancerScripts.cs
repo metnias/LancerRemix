@@ -52,20 +52,23 @@ namespace LancerRemix.Story
         private static void HunterMeetLancerTrigger(On.DaddyLongLegs.orig_Update orig, DaddyLongLegs self, bool eu)
         {
             orig(self, eu);
-            if (self.room != null || !self.HDmode || !self.room.game.IsStorySession || !IsStoryLancer) return;
+            if (self.room == null || !self.HDmode || !self.room.game.IsStorySession || !IsStoryLancer) return;
             var basis = self.room.game.StoryCharacter;
             if (IsLancer(basis)) basis = GetBasis(basis);
             if (basis != SlugName.Red) return;
             if (GetProgValue<int>(self.room.game.GetStorySession.saveState.miscWorldSaveData, HUNTERMEET) > 0) return; // already triggered
             if (!(self.room.game.FirstAlivePlayer?.realizedCreature is Player player)) return;
             if (self.room.VisualContact(self.mainBodyChunk.pos, player.mainBodyChunk.pos))
+            {
                 SetProgValue<int>(self.room.game.GetStorySession.saveState.miscWorldSaveData, HUNTERMEET, 1);
+                Debug.Log("Lunter meet Hunter: trigger nightmare");
+            }
         }
 
         private static bool HunterRecognizeLancer(On.DaddyLongLegs.orig_CheckDaddyConsumption orig, DaddyLongLegs self, PhysicalObject otherObject)
         {
             var result = orig(self, otherObject);
-            if (self.room != null || !self.HDmode || !self.room.game.IsStorySession || !IsStoryLancer) return result;
+            if (self.room == null || !self.HDmode || !self.room.game.IsStorySession || !IsStoryLancer) return result;
             var basis = self.room.game.StoryCharacter;
             if (IsLancer(basis)) basis = GetBasis(basis);
             if (basis != SlugName.Red) return result;
@@ -161,9 +164,12 @@ namespace LancerRemix.Story
                 if (ModManager.MSC) // Add normal hunter daddy
                 {
                     if (LancerGenerator.IsTimelineInbetween(story, SlugName.Red, MSCSlugName.Gourmand))
+                    {
+                        Debug.Log($"Lancer added HunterDaddy at {miscData.redsFlower}");
                         self.world.GetAbstractRoom(miscData.redsFlower.Value)
                             .AddEntity(new AbstractCreature(self.world, StaticWorld.GetCreatureTemplate(MoreSlugcatsEnums.CreatureTemplateType.HunterDaddy),
                             null, miscData.redsFlower.Value, self.world.game.GetNewID()));
+                    }
                 }
             }
             var lancerFlower = DreamHandler.GetMiscWorldCoord(miscData, HUNTERLANCERFLOWER);
@@ -173,6 +179,7 @@ namespace LancerRemix.Story
                 {
                     if (LancerGenerator.IsTimelineInbetween(story, GetLancer(SlugName.Red), SlugName.White))
                     {
+                        Debug.Log($"Lancer added LunterDaddy at {lancerFlower}");
                         var id = self.world.game.GetNewID();
                         id.setAltSeed(LUNTERSEED);
                         self.world.GetAbstractRoom(lancerFlower.Value)
@@ -182,6 +189,7 @@ namespace LancerRemix.Story
                 }
                 if (story == SlugName.White || LancerGenerator.IsTimelineInbetween(story, SlugName.White, ModManager.MSC ? MSCSlugName.Rivulet : null))
                 { // Add lancer hunter flower
+                    Debug.Log($"Lancer added LunterFlower at {lancerFlower}");
                     self.world.GetAbstractRoom(lancerFlower.Value)
                         .AddEntity(new AbstractConsumable(self.world, AbstractPhysicalObject.AbstractObjectType.KarmaFlower,
                         null, lancerFlower.Value, self.world.game.GetNewID(), -1, -1, null));

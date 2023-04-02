@@ -30,6 +30,7 @@ namespace LancerRemix.LancerMenu
             On.Menu.SlugcatSelectMenu.UpdateStartButtonText += UpdateLancerStartButtonText;
             On.Menu.SlugcatSelectMenu.UpdateSelectedSlugcatInMiscProg += UpdateSelectedLancerInMiscProg;
             On.Menu.SlugcatSelectMenu.Singal += SignalPatch;
+            On.Menu.SlugcatSelectMenu.ContinueStartedGame += ContinueLancerStartedGame;
             On.Menu.SlugcatSelectMenu.SlugcatPage.GrafUpdate += PageGrafUpdatePatch;
             On.Menu.SlugcatSelectMenu.SlugcatPageContinue.Update += LancerPageContinue.PageContinueUpdatePatch;
 
@@ -210,6 +211,35 @@ namespace LancerRemix.LancerMenu
                 // StartGame(this.slugcatPages[this.slugcatPageIndex].slugcatNumber);
             }
             orig(self, sender, message);
+        }
+
+        private static void ContinueLancerStartedGame(On.Menu.SlugcatSelectMenu.orig_ContinueStartedGame orig, SlugcatSelectMenu self, SlugName storyGameCharacter)
+        {
+            if (slugcatPageLancer)
+            {
+                var basis = storyGameCharacter;
+                if (IsLancer(basis)) basis = GetBasis(basis);
+                var lancer = GetLancer(basis);
+                if (basis == SlugName.Red)
+                {
+                    if (self.saveGameData[lancer].redsDeath)
+                    {
+                        self.redSaveState = self.manager.rainWorld.progression.GetOrInitiateSaveState(lancer, null, self.manager.menuSetup, false);
+                        self.manager.RequestMainProcessSwitch(ProcessManager.ProcessID.Statistics);
+                        self.PlaySound(SoundID.MENU_Switch_Page_Out);
+                    }
+                    else ContinueGame();
+                    return;
+                }
+            }
+            orig(self, storyGameCharacter);
+
+            void ContinueGame()
+            {
+                self.manager.menuSetup.startGameCondition = ProcessManager.MenuSetup.StoryGameInitCondition.Load;
+                self.manager.RequestMainProcessSwitch(ProcessManager.ProcessID.Game);
+                self.PlaySound(SoundID.MENU_Continue_Game);
+            }
         }
 
         private static void PageGrafUpdatePatch(On.Menu.SlugcatSelectMenu.SlugcatPage.orig_GrafUpdate orig, SlugcatPage self, float timeStacker)

@@ -209,6 +209,7 @@ namespace LancerRemix.Cat
                 if (timeline[i] == left) l = i;
                 if (timeline[i] == right) r = i;
             }
+            //Debug.Log($"Timeline Check: {l}<{c}<{r}");
             return l < c && c < r;
         }
 

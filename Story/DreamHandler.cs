@@ -66,8 +66,9 @@ namespace LancerRemix.Story
                 if (basis != SlugName.Red) return;
 
                 var dreamsState = saveState.dreamsState;
-                //if (GetProgValue<int>(saveState.miscWorldSaveData, HUNTERMEET) == 1) // met once
+                if (GetProgValue<int>(saveState.miscWorldSaveData, HunterLancerScripts.HUNTERMEET) == 1) // met once
                 {
+                    UnityEngine.Debug.Log("Trigger DreamHunterMeet");
                     dreamsState.InitiateEventDream(DreamHunterMeet);
                     SetProgValue(saveState.miscWorldSaveData, HunterLancerScripts.HUNTERMEET, 2); // met and dreamed
                 }
