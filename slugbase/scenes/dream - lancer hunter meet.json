@@ -1,0 +1,33 @@
+{
+  "id": "dream - lancer hunter meet",
+  "scene_folder": "slugbase/scenes/dream - lancer hunter meet",
+  "images": [
+    {
+      "name": "dream - lancer hunter meet - flat",
+      "pos": [ 0, 0 ],
+      "depth": -1.0,
+      "flatmode": true
+    },
+    {
+      "name": "4 - BG",
+      "pos": [ 287, 14 ],
+      "depth": 8
+    },
+    {
+      "name": "2 - HLL",
+      "pos": [ 244, 54 ],
+      "depth": 5
+    },
+    {
+      "name": "3 - HLancer",
+      "pos": [ 782, 44 ],
+      "depth": 2
+    },
+    {
+      "name": "1 - FG",
+      "pos": [ 172, 1 ],
+      "depth": 1
+    }
+  ],
+  "idle_depths": [ 5, 2 ]
+}

@@ -13,6 +13,7 @@ using BepInEx;
 using LancerRemix.LancerMenu;
 using UnityEngine;
 using LancerRemix.Combat;
+using LancerRemix.Story;
 
 #region Assembly attributes
 
@@ -63,6 +64,7 @@ namespace LancerRemix
             LancerGenerator.Patch();
             CreaturePatch.Patch();
             WeaponPatch.Patch();
+            DreamHandler.Patch();
 
             instance.Logger.LogMessage("The Lancer is Intialized.");
         }
@@ -115,9 +117,9 @@ namespace LancerRemix
             if (newlyEnabledMods.Length > 0) AnyModChanged = true;
             if (!lastMSCEnabled && ModManager.MSC)
             {
-                //LogSource.LogInfo("Lancer detected MSC newly enabled.");
-                //ModifyCat.OnMSCEnablePatch();
-                //AltEndingHandler.OnMSCEnablePatch();
+                LogSource.LogInfo("Lancer detected MSC newly enabled.");
+                ModifyCat.OnMSCEnablePatch();
+                DreamHandler.OnMSCEnablePatch();
                 lastMSCEnabled = ModManager.MSC;
             }
         }
@@ -128,23 +130,11 @@ namespace LancerRemix
             if (newlyDisabledMods.Length > 0) AnyModChanged = true;
             if (lastMSCEnabled && !ModManager.MSC)
             {
-                //LogSource.LogInfo("Lancer detected MSC newly disabled.");
-                //ModifyCat.OnMSCDisablePatch();
-                //AltEndingHandler.OnMSCDisablePatch();
+                LogSource.LogInfo("Lancer detected MSC newly disabled.");
+                ModifyCat.OnMSCDisablePatch();
+                DreamHandler.OnMSCDisablePatch();
                 lastMSCEnabled = ModManager.MSC;
             }
-            /*
-            if (!init) return;
-            foreach (var mod in newlyDisabledMods)
-            {
-                if (mod.id == "maplecollection")
-                {
-                    ExtEnum_Maple.UnregisterExtEnum();
-
-                    init = false;
-                    return;
-                }
-            }*/
         }
     }
 }

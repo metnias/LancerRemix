@@ -14,6 +14,27 @@ namespace LancerRemix
 {
     public static class LancerEnums
     {
+        #region Enums
+
+        internal static MenuSceneID SceneHunterMeet;
+        internal static DreamID DreamHunterMeet;
+
+        internal static void RegisterExtEnum()
+        {
+            SceneHunterMeet = new MenuSceneID("dream - lancer hunter meet", false);
+            DreamHunterMeet = new DreamID(nameof(DreamHunterMeet), true);
+        }
+
+        internal static void UnregisterExtEnum()
+        {
+            SceneHunterMeet = null;
+            DreamHunterMeet?.Unregister(); DreamHunterMeet = null;
+        }
+
+        #endregion Enums
+
+        #region Lancers
+
         private static readonly Dictionary<SlugName, SlugName> NameLancer = new Dictionary<SlugName, SlugName>();
         private static readonly Dictionary<SlugName, SlugName> NameBasis = new Dictionary<SlugName, SlugName>();
         internal static readonly HashSet<SlugName> AllLancer = new HashSet<SlugName>();
@@ -26,10 +47,6 @@ namespace LancerRemix
         internal static SlugName GetLancer(SlugName basis) => NameLancer[basis];
 
         internal static SlugName GetBasis(SlugName lancer) => NameBasis[lancer];
-
-        internal static void RegisterExtEnum()
-        {
-        }
 
         internal static void RegisterLancers()
         {
@@ -68,7 +85,6 @@ namespace LancerRemix
             AllBasis.Clear();
         }
 
-        // private static HashSet<string> enabledMods = new HashSet<string>();
         private static int slugNameVersion = -1;
 
         private static bool CheckModState()
@@ -102,8 +118,6 @@ namespace LancerRemix
             */
         }
 
-        internal static void UnregisterExtEnum()
-        {
-        }
+        #endregion Lancers
     }
 }
