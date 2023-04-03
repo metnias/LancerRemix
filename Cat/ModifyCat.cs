@@ -285,7 +285,7 @@ namespace LancerRemix.Cat
             return orig(i);
         }
 
-        private static readonly Dictionary<SlugName, Color> defaultLancerBodyColors
+        internal static readonly Dictionary<SlugName, Color> defaultLancerBodyColors
             = new Dictionary<SlugName, Color>()
             {
                 { SlugName.White, new Color(0.8f, 1.0f, 0.5f) },

@@ -276,28 +276,34 @@ namespace LancerRemix.LancerMenu
         private static void LancerPortrait(SlugcatPage page)
         {
             var basis = GetBasis(page.slugcatNumber);
+            bool ascended = page is SlugcatPageContinue pageCont && pageCont.saveGameData.ascended;
             UpdateEffectColor();
             ReloadScene();
             MoveBehindGUIs();
 
             if (basis == SlugName.White)
             {
-                ReplaceIllust(page.slugcatImage, $"scenes{Path.DirectorySeparatorChar}slugcat - lancer",
-                    "lancer - white - flat", "white slugcat - 2", "white lancer - 2", new Vector2(503f, 178f));
+                if (!ascended)
+                    ReplaceIllust(page.slugcatImage, $"scenes{Path.DirectorySeparatorChar}slugcat - lancer",
+                        "lancer - white - flat", "white slugcat - 2", "white lancer - 2", new Vector2(503f, 178f));
             }
             else if (basis == SlugName.Yellow)
             {
-                ReplaceIllust(page.slugcatImage, $"scenes{Path.DirectorySeparatorChar}slugcat - lancer",
+                if (!ascended)
+                    ReplaceIllust(page.slugcatImage, $"scenes{Path.DirectorySeparatorChar}slugcat - lancer",
                     "lancer - yellow - flat", "yellow slugcat - 1", "yellow lancer - 1", new Vector2(528f, 211f));
             }
             else if (basis == SlugName.Red)
             {
-                if (page.menu.manager.rainWorld.progression.miscProgressionData.redUnlocked)
-                    ReplaceIllust(page.slugcatImage, $"scenes{Path.DirectorySeparatorChar}slugcat - lancer",
-                        "lancer - red - flat", "red slugcat - 1", "red lancer - 1", new Vector2(462f, 225f));
-                else
-                    ReplaceIllust(page.slugcatImage, $"scenes{Path.DirectorySeparatorChar}slugcat - lancer",
-                    "lancer - red dark - flat", "red slugcat - 1 - dark", "red lancer - 1 - dark", new Vector2(462f, 225f));
+                if (page.slugcatImage.sceneID != SceneID.Slugcat_Dead_Red && !ascended)
+                {
+                    if (page.menu.manager.rainWorld.progression.miscProgressionData.redUnlocked)
+                        ReplaceIllust(page.slugcatImage, $"scenes{Path.DirectorySeparatorChar}slugcat - lancer",
+                            "lancer - red - flat", "red slugcat - 1", "red lancer - 1", new Vector2(462f, 225f));
+                    else
+                        ReplaceIllust(page.slugcatImage, $"scenes{Path.DirectorySeparatorChar}slugcat - lancer",
+                        "lancer - red dark - flat", "red slugcat - 1 - dark", "red lancer - 1 - dark", new Vector2(462f, 225f));
+                }
                 if (page.markSquare != null) { page.markSquare.RemoveFromContainer(); page.markSquare = null; }
                 if (page.markGlow != null) { page.markGlow.RemoveFromContainer(); page.markGlow = null; }
             }
@@ -322,7 +328,6 @@ namespace LancerRemix.LancerMenu
                 SceneID GetLancerBasisScene()
                 {
                     var res = page.slugcatImage.sceneID;
-                    bool ascended = page is LancerPageContinue lpc ? lpc.saveGameData.ascended : false;
                     if (basis == SlugName.White)
                     {
                         if (ascended) res = SceneID.Ghost_White;

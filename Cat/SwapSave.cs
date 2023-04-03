@@ -80,6 +80,7 @@ namespace LancerRemix.Cat
                 var basis = self.currentSaveState.saveStateNumber;
                 if (HasLancer(basis))
                     self.currentSaveState.saveStateNumber = GetLancer(basis);
+                UnityEngine.Debug.Log($"{self.currentSaveState.saveStateNumber}({basis}) redsDeath: {self.currentSaveState.deathPersistentSaveData.redsDeath}");
                 var res = orig(self, saveCurrentState, saveMaps, saveMiscProg);
                 self.currentSaveState.saveStateNumber = basis;
                 return res;
