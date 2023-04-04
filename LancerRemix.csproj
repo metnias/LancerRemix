@@ -87,8 +87,9 @@
     <Compile Include="Cat\ModifyCat.cs" />
     <Compile Include="Cat\LancerDecoration.cs" />
     <Compile Include="Story\DreamHandler.cs" />
-    <Compile Include="Story\HunterLancerScripts.cs" />
+    <Compile Include="Story\LunterScripts.cs" />
     <Compile Include="Story\LunterDummyDecoration.cs" />
+    <Compile Include="Story\SLOracleModify.cs" />
     <None Include="JsonBuilder.cs" />
     <Compile Include="LancerPlugin.cs" />
     <Compile Include="LancerEnums.cs" />
@@ -120,6 +121,11 @@
     <Content Include="slugbase\scenes\dream - lancer hunter meet\3 - HLancer.png" />
     <Content Include="slugbase\scenes\dream - lancer hunter meet\4 - BG.png" />
     <Content Include="slugbase\scenes\dream - lancer hunter meet\dream - lancer hunter meet - flat.png" />
+    <Content Include="text\text_eng\54-RedLancer.txt" />
+    <Content Include="text\text_eng\51-RedLancer.txt" />
+    <Content Include="text\text_eng\55-RedLancer.txt" />
+    <Content Include="text\text_eng\50-RedLancer.txt" />
+    <Content Include="text\text_eng\49-RedLancer.txt" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
