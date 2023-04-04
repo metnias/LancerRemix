@@ -39,6 +39,10 @@ namespace LancerRemix.Story
                 self.neuronsLeft = TryMineRedData(); // dead if red has not succeed and before white
                 SetProgValue(Custom.rainWorld.progression.currentSaveState.miscWorldSaveData, REDALREADYSUCCEED, self.neuronsLeft > 0);
             }
+            else if (ModManager.MSC && IsTimelineInbetween(story, MSCName.Rivulet, null)) // after riv
+            {
+                self.neuronsLeft = 7;
+            }
 
             int TryMineRedData()
             {
@@ -108,6 +112,7 @@ namespace LancerRemix.Story
             var slBehavior = self.myBehavior as SLOracleBehaviorHasMark;
 
             #region Lurvivor
+
             // Lonk cannot talk with moon
             if (self.id == ConvID.MoonFirstPostMarkConversation)
             {
@@ -131,13 +136,13 @@ namespace LancerRemix.Story
                         self.LoadEventsFromFile(35);
                         self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("I see that someone has given you the gift of communication.<LINE>Must have been Five Pebbles, as you don't look like you can travel very far at all..."), 0));
                         self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("He's sick, if you haven't noticed. Being corrupted from the inside by his own experiments. Maybe they all are by now, who knows.<LINE>We weren't designed to transcend and it drives us mad."), 0));
-                        self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("It is good to have someone to talk to after all this time even if that's a child like you.<LINE>The scavengers aren't exactly good listeners. They do bring me things though, occasionally..."), 0));
+                        self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("It is good to have someone to talk to even if that's a child like you.<LINE>My last visitor stopped coming here many cycles ago, and<LINE>here I was about to get used to its visits."), 0));
                         break;
 
                     default:
                     case 5:
-                        self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("Hello <PlayerName>."), 0));
-                        self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("What are you? If I had my memories I would know..."), 0));
+                        self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("Hello <PlayerName>. Are you lost?"), 0));
+                        self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("I am sorry to say that there is nothing here for you."), 0));
                         if (self.State.playerEncounters > 0 && self.State.playerEncountersWithMark == 0)
                         {
                             self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("Perhaps... I saw you before?"), 0));
@@ -147,7 +152,7 @@ namespace LancerRemix.Story
                         self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("Or did I say that already?"), 5));
                         self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("I see that someone has given you the gift of communication.<LINE>Must have been Five Pebbles, as you don't look like you can travel very far at all..."), 0));
                         self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("He's sick, if you haven't noticed. Being corrupted from the inside by his own experiments. Maybe they all are by now, who knows.<LINE>We weren't designed to transcend and it drives us mad."), 0));
-                        self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("It is good to have someone to talk to after all this time even if that's a child like you.<LINE>The scavengers aren't exactly good listeners. They do bring me things though, occasionally..."), 0));
+                        self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("It is good to have someone to talk to even if that's a child like you.<LINE>My last visitor stopped coming here many cycles ago, and<LINE>here I was about to get used to its visits."), 0));
                         break;
                 }
                 return;
@@ -185,7 +190,7 @@ namespace LancerRemix.Story
                                 self.events.Add(new Conversation.TextEvent(self, 30, self.Translate("Hello there. You again!"), 0));
                             }
                             self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("I wonder what it is that you want?"), 0));
-                            if (self.State.GetOpinion != SLOrcacleState.PlayerOpinion.Dislikes)
+                            if (self.State.GetOpinion != SLOrcacleState.PlayerOpinion.Dislikes && (!ModManager.MSC || IsTimelineInbetween(GetLancer(basis), MSCName.Rivulet))) // after riv
                             {
                                 self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("I have had scavengers come by before. Scavengers!<LINE>And they left me alive!<LINE>But... I have told you that already, haven't I?"), 0));
                                 self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("You must excuse me if I repeat myself. My memory is bad.<LINE>I used to have a pathetic five neurons... And then you ate one.<LINE>Maybe I've told you that before as well."), 0));
@@ -322,8 +327,11 @@ namespace LancerRemix.Story
                 slBehavior.respondToNeuronFromNoSpeakMode = false;
                 return;
             }
+
             #endregion Lurvivor
+
             #region Lunter
+
             bool already = GetProgValue<bool>(Custom.rainWorld.progression?.currentSaveState.miscWorldSaveData, REDALREADYSUCCEED);
             if (self.id == ConvID.Moon_Red_First_Conversation)
             {
@@ -352,14 +360,13 @@ namespace LancerRemix.Story
                     self.events.Add(new Conversation.TextEvent(self, 40, "...", 10));
                 return;
             }
-            #endregion Lunter
 
+            #endregion Lunter
 
             orig.Invoke(self);
 
             return;
         NoLancer: orig.Invoke(self);
         }
-
     }
 }
