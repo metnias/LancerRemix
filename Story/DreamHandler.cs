@@ -17,19 +17,20 @@ namespace LancerRemix.Story
             On.DreamsState.StaticEndOfCycleProgress += LancerDreamProgress;
             On.Menu.DreamScreen.SceneFromDream += LancerSceneFromDream;
 
-            HunterLancerScripts.SubPatch();
+            LunterScripts.SubPatch();
+            LonkScripts.SubPatch();
 
             if (ModManager.MSC) OnMSCEnablePatch();
         }
 
         internal static void OnMSCEnablePatch()
         {
-            HunterLancerScripts.OnMSCEnableSubPatch();
+            LunterScripts.OnMSCEnableSubPatch();
         }
 
         internal static void OnMSCDisablePatch()
         {
-            HunterLancerScripts.OnMSCDisableSubPatch();
+            LunterScripts.OnMSCDisableSubPatch();
         }
 
         internal const string COORDNULL = "COORDNULL";
@@ -46,7 +47,7 @@ namespace LancerRemix.Story
 
             if (basis != SlugName.Red) return;
             self.dreamsState = new DreamsState(); // add dream state to lancer hunter
-            SetProgValue(self.miscWorldSaveData, HunterLancerScripts.HUNTERMEET, 0); // never met
+            SetProgValue(self.miscWorldSaveData, LunterScripts.HUNTERMEET, 0); // never met
         }
 
         private static void WinLancer(On.RainWorldGame.orig_Win orig, RainWorldGame self, bool malnourished)
@@ -66,11 +67,11 @@ namespace LancerRemix.Story
                 if (basis != SlugName.Red) return;
 
                 var dreamsState = saveState.dreamsState;
-                if (GetProgValue<int>(saveState.miscWorldSaveData, HunterLancerScripts.HUNTERMEET) == 1) // met once
+                if (GetProgValue<int>(saveState.miscWorldSaveData, LunterScripts.HUNTERMEET) == 1) // met once
                 {
                     UnityEngine.Debug.Log("Trigger DreamHunterMeet");
                     dreamsState.InitiateEventDream(DreamHunterMeet);
-                    SetProgValue(saveState.miscWorldSaveData, HunterLancerScripts.HUNTERMEET, 2); // met and dreamed
+                    SetProgValue(saveState.miscWorldSaveData, LunterScripts.HUNTERMEET, 2); // met and dreamed
                 }
             }
         }
