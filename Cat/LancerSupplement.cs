@@ -19,6 +19,8 @@ namespace LancerRemix.Cat
         /// grab parry will flip lizards
         ///
         /// normal stab: will never stun
+        ///
+        /// TODO: don't block when you grabbed stuff with grab key this frame
         /// </summary>
         public LancerSupplement(Player player) : base(player)
         {
