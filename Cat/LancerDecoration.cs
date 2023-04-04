@@ -105,7 +105,7 @@ namespace LancerRemix.Cat
                 { SlugName.Night, new Color(0.1f, 0.5f, 0.3f) }
             };
 
-        private static IntVector2 HornStat(SlugName basis)
+        internal static IntVector2 HornStat(SlugName basis)
         {
             if (IsLancer(basis)) basis = GetBasis(basis);
             if (vanillaHornStats.TryGetValue(basis, out var res)) return res;

@@ -1,14 +1,16 @@
-﻿using SlugName = SlugcatStats.Name;
-using MSCSlugName = MoreSlugcats.MoreSlugcatsEnums.SlugcatStatsName;
-using static LancerRemix.LancerEnums;
-using static CatSub.Story.SaveManager;
-using LancerRemix.Cat;
-using MoreSlugcats;
-using UnityEngine;
-using System.Collections.Generic;
-using MonoMod.Cil;
+﻿using LancerRemix.Cat;
 using Mono.Cecil.Cil;
+using MonoMod.Cil;
+using MoreSlugcats;
 using System;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using UnityEngine;
+using static CatSub.Story.SaveManager;
+using static DaddyGraphics;
+using static LancerRemix.LancerEnums;
+using MSCSlugName = MoreSlugcats.MoreSlugcatsEnums.SlugcatStatsName;
+using SlugName = SlugcatStats.Name;
 
 namespace LancerRemix.Story
 {
@@ -30,6 +32,9 @@ namespace LancerRemix.Story
             On.DaddyLongLegs.Die += LunterDaddyDie;
             On.DaddyGraphics.ApplyPalette += LunterDaddyApplyPalette;
             On.DaddyGraphics.HunterDummy.ctor += LunterDummyCtor;
+            On.DaddyGraphics.HunterDummy.InitiateSprites += LunterDummyInitSprites;
+            On.DaddyGraphics.HunterDummy.AddToContainer += LunterDummyAddToContainer;
+            On.DaddyGraphics.HunterDummy.DrawSprites += LunterDummyDrawSprites;
             On.DaddyGraphics.HunterDummy.ApplyPalette += LunterDummyApplyPalette;
             On.DaddyGraphics.DaddyTubeGraphic.ApplyPalette += LunterTubeApplyPalette;
             On.DaddyGraphics.DaddyDangleTube.ApplyPalette += LunterTubeDangleApplyPalette;
@@ -45,6 +50,9 @@ namespace LancerRemix.Story
             On.DaddyLongLegs.Die -= LunterDaddyDie;
             On.DaddyGraphics.ApplyPalette -= LunterDaddyApplyPalette;
             On.DaddyGraphics.HunterDummy.ctor -= LunterDummyCtor;
+            On.DaddyGraphics.HunterDummy.InitiateSprites -= LunterDummyInitSprites;
+            On.DaddyGraphics.HunterDummy.AddToContainer -= LunterDummyAddToContainer;
+            On.DaddyGraphics.HunterDummy.DrawSprites -= LunterDummyDrawSprites;
             On.DaddyGraphics.HunterDummy.ApplyPalette -= LunterDummyApplyPalette;
             On.DaddyGraphics.DaddyTubeGraphic.ApplyPalette -= LunterTubeApplyPalette;
             On.DaddyGraphics.DaddyDangleTube.ApplyPalette -= LunterTubeDangleApplyPalette;
@@ -126,11 +134,19 @@ namespace LancerRemix.Story
             orig(self);
         }
 
-        private static void LunterDummyCtor(On.DaddyGraphics.HunterDummy.orig_ctor orig, DaddyGraphics.HunterDummy self,
+        #region Dummy
+
+        private readonly static ConditionalWeakTable<HunterDummy, LunterDummyDecoration> dummyDecos;
+
+        private static LunterDummyDecoration GetDeco(HunterDummy dummy)
+            => dummyDecos.GetValue(dummy, (d) => new LunterDummyDecoration(d));
+
+        private static void LunterDummyCtor(On.DaddyGraphics.HunterDummy.orig_ctor orig, HunterDummy self,
             DaddyGraphics dg, int startSprite)
         {
             orig(self, dg, startSprite);
             if (!IsLunter(dg.daddy)) return;
+            dummyDecos.Add(self, new LunterDummyDecoration(self));
 
             var partList = new List<BodyPart>();
             foreach (var part in self.bodyParts)
@@ -145,17 +161,32 @@ namespace LancerRemix.Story
             self.bodyParts = partList.ToArray();
         }
 
-        private static void LunterDaddyApplyPalette(On.DaddyGraphics.orig_ApplyPalette orig, DaddyGraphics self,
-            RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, RoomPalette palette)
+        private static void LunterDummyInitSprites(On.DaddyGraphics.HunterDummy.orig_InitiateSprites orig, HunterDummy self,
+            RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam)
         {
-            orig(self, sLeaser, rCam, palette);
-            if (!IsLunter(self.daddy)) return;
-            var color = Color.Lerp(LunterColor, Color.gray, 0.4f);
-            for (int i = 0; i < self.daddy.bodyChunks.Length; i++)
-                sLeaser.sprites[self.BodySprite(i)].color = color;
+            orig(self, sLeaser, rCam);
+            if (IsLunter(self.owner.daddy))
+                GetDeco(self).InitiateSprites(null, sLeaser, rCam);
         }
 
-        private static void LunterDummyApplyPalette(On.DaddyGraphics.HunterDummy.orig_ApplyPalette orig, DaddyGraphics.HunterDummy self,
+        private static void LunterDummyAddToContainer(On.DaddyGraphics.HunterDummy.orig_AddToContainer orig, HunterDummy self,
+            RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, FContainer newContatiner)
+        {
+
+            orig(self, sLeaser, rCam, newContatiner);
+            if (IsLunter(self.owner.daddy))
+                GetDeco(self).AddToContainer(null, sLeaser, rCam, newContatiner);
+        }
+
+        private static void LunterDummyDrawSprites(On.DaddyGraphics.HunterDummy.orig_DrawSprites orig, HunterDummy self,
+            RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
+        {
+            orig(self, sLeaser, rCam, timeStacker, camPos);
+            if (IsLunter(self.owner.daddy))
+                GetDeco(self).DrawSprites(null, sLeaser, rCam, timeStacker, camPos);
+        }
+
+        private static void LunterDummyApplyPalette(On.DaddyGraphics.HunterDummy.orig_ApplyPalette orig, HunterDummy self,
             RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, RoomPalette palette)
         {
             if (IsLunter(self.owner.daddy))
@@ -167,12 +198,26 @@ namespace LancerRemix.Story
                     sLeaser.sprites[self.startSprite + i].color = color;
                 }
                 sLeaser.sprites[self.startSprite + 5].color = blackColor;
+
+                GetDeco(self).ApplyPalette(null, sLeaser, rCam, palette);
                 return;
             }
             orig(self, sLeaser, rCam, palette);
         }
 
-        private static void LunterTubeApplyPalette(On.DaddyGraphics.DaddyTubeGraphic.orig_ApplyPalette orig, DaddyGraphics.DaddyTubeGraphic self,
+        #endregion Dummy
+
+        private static void LunterDaddyApplyPalette(On.DaddyGraphics.orig_ApplyPalette orig, DaddyGraphics self,
+            RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, RoomPalette palette)
+        {
+            orig(self, sLeaser, rCam, palette);
+            if (!IsLunter(self.daddy)) return;
+            var color = Color.Lerp(LunterColor, Color.gray, 0.4f);
+            for (int i = 0; i < self.daddy.bodyChunks.Length; i++)
+                sLeaser.sprites[self.BodySprite(i)].color = color;
+        }
+
+        private static void LunterTubeApplyPalette(On.DaddyGraphics.DaddyTubeGraphic.orig_ApplyPalette orig, DaddyTubeGraphic self,
             RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, RoomPalette palette)
         {
             if (IsLunter(self.owner.daddy))
@@ -198,7 +243,7 @@ namespace LancerRemix.Story
             orig(self, sLeaser, rCam, palette);
         }
 
-        private static void LunterTubeDangleApplyPalette(On.DaddyGraphics.DaddyDangleTube.orig_ApplyPalette orig, DaddyGraphics.DaddyDangleTube self,
+        private static void LunterTubeDangleApplyPalette(On.DaddyGraphics.DaddyDangleTube.orig_ApplyPalette orig, DaddyDangleTube self,
             RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, RoomPalette palette)
         {
             if (IsLunter(self.owner.daddy))
@@ -219,7 +264,7 @@ namespace LancerRemix.Story
             orig(self, sLeaser, rCam, palette);
         }
 
-        private static void LunterDeadLegApplyPalette(On.DaddyGraphics.DaddyDeadLeg.orig_ApplyPalette orig, DaddyGraphics.DaddyDeadLeg self,
+        private static void LunterDeadLegApplyPalette(On.DaddyGraphics.DaddyDeadLeg.orig_ApplyPalette orig, DaddyDeadLeg self,
             RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, RoomPalette palette)
         {
             if (IsLunter(self.owner.daddy))
