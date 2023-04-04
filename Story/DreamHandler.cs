@@ -19,6 +19,7 @@ namespace LancerRemix.Story
 
             LunterScripts.SubPatch();
             SLOracleModify.SubPatch();
+            SSOracleModify.SubPatch();
 
             if (ModManager.MSC) OnMSCEnablePatch();
         }

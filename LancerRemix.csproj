@@ -90,6 +90,7 @@
     <Compile Include="Story\LunterScripts.cs" />
     <Compile Include="Story\LunterDummyDecoration.cs" />
     <Compile Include="Story\SLOracleModify.cs" />
+    <Compile Include="Story\SSOracleModify.cs" />
     <None Include="JsonBuilder.cs" />
     <Compile Include="LancerPlugin.cs" />
     <Compile Include="LancerEnums.cs" />

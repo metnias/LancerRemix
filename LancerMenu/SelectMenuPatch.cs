@@ -40,6 +40,7 @@ namespace LancerRemix.LancerMenu
         private static void CtorPatch(On.Menu.SlugcatSelectMenu.orig_ctor orig, SlugcatSelectMenu self, ProcessManager manager)
         {
             _lancerInit = false;
+            redIsDead = false;
             ModifyCat.SetIsLancer(false, new bool[4]);
             orig(self, manager);
             if (TryGetCurrSlugcatLancer())
@@ -53,12 +54,19 @@ namespace LancerRemix.LancerMenu
                 int order = GetBasisOrder(lancer);
                 if (order < 0) continue;
                 self.saveGameData[lancer] = MineForSaveData(manager, lancer);
+
                 if (self.saveGameData[lancer] != null)
+                {
+                    if (GetBasis(lancer) == SlugName.Red)
+                        if ((self.saveGameData[lancer].redsDeath && self.saveGameData[lancer].cycle >= RedsIllness.RedsCycles(self.saveGameData[lancer].redsExtraCycles)) || self.saveGameData[lancer].ascended)
+                            redIsDead = true;
                     lancerPages[order] = new LancerPageContinue(self, null, 1 + order, lancer);
+                }
                 else
                     lancerPages[order] = new LancerPageNewGame(self, null, 1 + order, lancer);
                 self.pages.Add(lancerPages[order]);
             }
+
             // Add Toggle Button
             lancerButton = new SymbolButtonToggle(self, self.pages[0], LANCER_SIGNAL, new Vector2(1016f, 50f), new Vector2(50f, 50f),
                 "lancer_on", "lancer_off", slugcatPageLancer, false);
@@ -89,6 +97,7 @@ namespace LancerRemix.LancerMenu
         private static SlugcatPage[] lancerPages;
         private static bool slugcatPageLancer;
         private static bool _lancerInit = false;
+        private static bool redIsDead = false;
         private static SymbolButtonToggle lancerButton;
         private static float lancerTransition = 0f;
         private static float lastLancerTransition = 0f;
@@ -165,7 +174,7 @@ namespace LancerRemix.LancerMenu
                 self.startButton.menuLabel.text = self.Translate("DELETE SAVE").Replace(" ", "\r\n");
                 return;
             }
-            if (GetBasis(lancer) == SlugName.Red && self.saveGameData[lancer].redsDeath)
+            if (GetBasis(lancer) == SlugName.Red && redIsDead)
             {
                 self.startButton.menuLabel.text = self.Translate("STATISTICS");
                 return;
@@ -222,7 +231,7 @@ namespace LancerRemix.LancerMenu
                 var lancer = GetLancer(basis);
                 if (basis == SlugName.Red)
                 {
-                    if (self.saveGameData[lancer].redsDeath)
+                    if (redIsDead)
                     {
                         self.redSaveState = self.manager.rainWorld.progression.GetOrInitiateSaveState(lancer, null, self.manager.menuSetup, false);
                         self.manager.RequestMainProcessSwitch(ProcessManager.ProcessID.Statistics);
@@ -341,7 +350,7 @@ namespace LancerRemix.LancerMenu
                     else if (basis == SlugName.Red)
                     {
                         if (ascended) res = SceneID.Ghost_Red;
-                        else if (page is LancerPageContinue && (page as LancerPageContinue).saveGameData.redsDeath) res = SceneID.Slugcat_Dead_Red;
+                        else if (page is LancerPageContinue && redIsDead) res = SceneID.Slugcat_Dead_Red;
                         else res = SceneID.Slugcat_Red;
                     }
                     else if (ModManager.MSC && SlugcatStats.IsSlugcatFromMSC(basis))
