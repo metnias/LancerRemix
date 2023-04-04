@@ -1,0 +1,9 @@
+﻿0Hello <PlayerName>. Are you lost?
+0 : 40 : ...
+40 : 0 : Oh.
+Tiny creature...
+You are not well.
+I am so sorry to say, but you do not have much time left.
+You reminds me of my last visitor. They were also very sick, so they weren't here very long.
+Maybe you know them? You both share similar affliction,<LINE>so I can only imagine you two already knew each other.
+My last overseer watched them head to the west. Perhaps you can catch them if you hurry.

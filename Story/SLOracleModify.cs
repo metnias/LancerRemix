@@ -136,7 +136,7 @@ namespace LancerRemix.Story
                         self.LoadEventsFromFile(35);
                         self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("I see that someone has given you the gift of communication.<LINE>Must have been Five Pebbles, as you don't look like you can travel very far at all..."), 0));
                         self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("He's sick, if you haven't noticed. Being corrupted from the inside by his own experiments. Maybe they all are by now, who knows.<LINE>We weren't designed to transcend and it drives us mad."), 0));
-                        self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("It is good to have someone to talk to even if that's a child like you.<LINE>My last visitor stopped coming here many cycles ago, and<LINE>here I was about to get used to its visits."), 0));
+                        self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("It is good to have someone to talk to even if that's a child like you.<LINE>My last visitor stopped coming here some time ago, and<LINE>here I was about to get used to their visits."), 0));
                         break;
 
                     default:
@@ -192,7 +192,7 @@ namespace LancerRemix.Story
                             self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("I wonder what it is that you want?"), 0));
                             if (self.State.GetOpinion != SLOrcacleState.PlayerOpinion.Dislikes && (!ModManager.MSC || IsTimelineInbetween(GetLancer(basis), MSCName.Rivulet))) // after riv
                             {
-                                self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("I have had scavengers come by before. Scavengers!<LINE>And they left me alive!<LINE>But... I have told you that already, haven't I?"), 0));
+                                self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("I have had another visitor from your specie before. And they left me alive!<LINE>But... I have told you that already, haven't I?"), 0));
                                 self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("You must excuse me if I repeat myself. My memory is bad.<LINE>I used to have a pathetic five neurons... And then you ate one.<LINE>Maybe I've told you that before as well."), 0));
                             }
                         }
@@ -218,7 +218,7 @@ namespace LancerRemix.Story
                             if (self.State.GetOpinion != SLOrcacleState.PlayerOpinion.Dislikes)
                             {
                                 self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("There is nothing here. Not even my memories remain."), 0));
-                                self.events.Add(new Conversation.TextEvent(self, 30, self.Translate("Even the scavengers that come here from time to time leave with nothing. But... I have told you that already, haven't I?"), 0));
+                                self.events.Add(new Conversation.TextEvent(self, 30, self.Translate("Even the last visitor that came here from time to time left with nothing. But... I have told you that already, haven't I?"), 0));
                                 if (self.State.GetOpinion == SLOrcacleState.PlayerOpinion.Likes)
                                 {
                                     self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("I do enjoy the company though. You're welcome to stay a while, quiet petite thing."), 5));
@@ -241,57 +241,28 @@ namespace LancerRemix.Story
                 {
                     case 0:
                     case 1:
-                        break;
-
                     case 2:
-                        self.events.Add(new Conversation.TextEvent(self, 40, "...", 10));
-                        self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("You!"), 10));
-                        self.events.Add(new Conversation.TextEvent(self, 10, self.Translate("...you...killed..."), 10));
-                        self.events.Add(new Conversation.TextEvent(self, 0, "...", 10));
-                        self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("...me"), 10));
-                        break;
-
                     case 3:
-                        self.events.Add(new Conversation.TextEvent(self, 10, self.Translate("...thank you... better..."), 10));
-                        self.events.Add(new Conversation.TextEvent(self, 20, self.Translate("still, very... bad."), 10));
-                        break;
+                        goto NoLancer;
 
                     case 4:
                         self.events.Add(new Conversation.TextEvent(self, 20, self.Translate("Thank you... That is a little better. Thank you, creature."), 10));
                         if (!slBehavior.respondToNeuronFromNoSpeakMode)
                         {
-                            self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("Maybe this is asking too much for a child like you but... could you bring me another one?"), 0));
+                            self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("Maybe this is asking too much for a child like you but...<LINE>could you bring me another one?"), 0));
                         }
                         break;
 
                     default:
                         if (slBehavior.respondToNeuronFromNoSpeakMode)
                         {
-                            self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("Thank you. I do wonder what you want."), 10));
+                            goto NoLancer;
                         }
                         else
                         {
                             if (self.State.neuronGiveConversationCounter == 0)
                             {
-                                Debug.Log("moon recieve first neuron. Has neurons: " + self.State.neuronsLeft);
-                                if (self.State.neuronsLeft == 5)
-                                {
-                                    self.LoadEventsFromFile(45);
-                                    //instance.events.Add(new Conversation.TextEvent(instance, 0, LancerMod.oi.Translate("After all this time, a lifeline. Thank you, tiny creature."), 0));
-                                    //instance.events.Add(new Conversation.TextEvent(instance, 0, instance.Translate("I'll never feel the power I once had, but this is something to sustain an old soul."), 0));
-                                    //instance.events.Add(new Conversation.TextEvent(instance, 0, instance.Translate("I could read a bit of Five Pebbles in this neuron before formatting it.<LINE>A ghost left from his processing routines."), 0));
-                                    //instance.events.Add(new Conversation.TextEvent(instance, 0, instance.Translate("Erratic... Pulse. \"Erratic Pulse.\" I wonder what that means."), 0));
-                                }
-                                else
-                                {
-                                    self.LoadEventsFromFile(19);
-                                    //instance.events.Add(new Conversation.TextEvent(instance, 0, instance.Translate("I am grateful - the relief is indescribable!"), 0));
-                                    //instance.events.Add(new Conversation.TextEvent(instance, 0, "...", 0));
-                                    //instance.events.Add(new Conversation.TextEvent(instance, 0, instance.Translate("I could read a bit of Five Pebbles in this neuron before formatting it. His condition has severely deteriorated since last I<LINE>heard of him. The frustration he feels is profound, and that angst has seeped into every part of him, every neuron. "), 0));
-                                    //instance.events.Add(new Conversation.TextEvent(instance, 0, instance.Translate("We were supposed to help everyone, you know. Everything. That was our purpose: a great gift to the lesser beings of the world. <LINE>When facing our inability to do so, we all reacted differently. Many with madness."), 0));
-                                    //instance.events.Add(new Conversation.TextEvent(instance, 0, instance.Translate("But even back when we were all more or less connected there were those who reacted to their task with anger.<LINE>I can only imagine they are angrier now, alone in their cans, left only with their insatiable drive. "), 0));
-                                    //instance.events.Add(new Conversation.TextEvent(instance, 0, instance.Translate("But to be honest, I don't know how many of us are still alive at this point."), 0));
-                                }
+                                goto NoLancer;
                             }
                             else if (self.State.neuronGiveConversationCounter == 1)
                             {
@@ -301,24 +272,7 @@ namespace LancerRemix.Story
                             }
                             else
                             {
-                                switch (UnityEngine.Random.Range(0, 4))
-                                {
-                                    case 0:
-                                        self.events.Add(new Conversation.TextEvent(self, 30, self.Translate("Thank you, again. I feel wonderful."), 10));
-                                        break;
-
-                                    case 1:
-                                        self.events.Add(new Conversation.TextEvent(self, 30, self.Translate("Thank you so very much!"), 10));
-                                        break;
-
-                                    case 2:
-                                        self.events.Add(new Conversation.TextEvent(self, 30, self.Translate("It is strange... I'm remembering myself, but also... him."), 10));
-                                        break;
-
-                                    default:
-                                        self.events.Add(new Conversation.TextEvent(self, 30, self.Translate("Thank you tiny creature... Sincerely."), 10));
-                                        break;
-                                }
+                                goto NoLancer;
                             }
                             self.State.neuronGiveConversationCounter++;
                         }
@@ -336,7 +290,7 @@ namespace LancerRemix.Story
             if (self.id == ConvID.Moon_Red_First_Conversation)
             {
                 if (already)
-                    self.LoadEventsFromFile(49, GetLancer(basis), false, 0);
+                    self.LoadEventsFromFile(250, GetLancer(basis), false, 0);
                 else
                     self.LoadEventsFromFile(50, GetLancer(basis), false, 0);
                 return;
@@ -344,7 +298,7 @@ namespace LancerRemix.Story
             if (self.id == ConvID.Moon_Red_Second_Conversation)
             {
                 if (already)
-                    self.LoadEventsFromFile(54, GetLancer(basis), false, 0);
+                    self.LoadEventsFromFile(255, GetLancer(basis), false, 0);
                 else
                     self.LoadEventsFromFile(55, GetLancer(basis), false, 0);
                 return;
@@ -353,11 +307,11 @@ namespace LancerRemix.Story
             {
                 self.PearlIntro();
                 self.LoadEventsFromFile(51, GetLancer(basis), false, 0);
-                // add remarks depending on red success
                 if (already)
-                    self.events.Add(new Conversation.TextEvent(self, 40, "...", 10));
+                    self.events.Add(new Conversation.TextEvent(self, 0, "Thank you, No Significant Harassment, for trying so hard.", 20));
                 else
-                    self.events.Add(new Conversation.TextEvent(self, 40, "...", 10));
+                    self.events.Add(new Conversation.TextEvent(self, 0, "I see now. Again, thank you, No Significant Harassment.", 20));
+                self.events.Add(new Conversation.TextEvent(self, 0, "I am happy to not be alone.", 20));
                 return;
             }
 
