@@ -139,7 +139,8 @@ namespace LancerRemix.Story
 
         #region Dummy
 
-        private static readonly ConditionalWeakTable<HunterDummy, LunterDummyDecoration> dummyDecos;
+        private static readonly ConditionalWeakTable<HunterDummy, LunterDummyDecoration> dummyDecos
+            = new ConditionalWeakTable<HunterDummy, LunterDummyDecoration>();
 
         private static LunterDummyDecoration GetDeco(HunterDummy dummy)
             => dummyDecos.GetValue(dummy, (d) => new LunterDummyDecoration(d));
