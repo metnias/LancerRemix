@@ -9,15 +9,17 @@ namespace LancerRemix.Combat
     {
         internal static void Patch()
         {
-            On.Creature.Violence += LancerStabNoStun;
+            On.Creature.Violence += LancerViolencePatch;
             On.Vulture.Violence += VultureLancerDropMask;
         }
 
-        private static void LancerStabNoStun(On.Creature.orig_Violence orig, Creature self,
+        private static void LancerViolencePatch(On.Creature.orig_Violence orig, Creature self,
             BodyChunk source, Vector2? directionAndMomentum, BodyChunk hitChunk, PhysicalObject.Appendage.Pos hitAppendage, Creature.DamageType type, float damage, float stunBonus)
         {
-            if (source?.owner is Player player && IsLancer(player))
+            if (source?.owner is Player atkPlayer && IsLancer(atkPlayer))
                 if (damage < 0.9f) stunBonus = -10000f;
+            if (self is Player player && IsLancer(player))
+            { GetSub<LancerSupplement>(player)?.Violence(orig, source, directionAndMomentum, hitChunk, hitAppendage, type, damage, stunBonus); return; }
             orig(self, source, directionAndMomentum, hitChunk, hitAppendage, type, damage, stunBonus);
         }
 
