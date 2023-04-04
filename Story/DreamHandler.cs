@@ -18,7 +18,7 @@ namespace LancerRemix.Story
             On.Menu.DreamScreen.SceneFromDream += LancerSceneFromDream;
 
             LunterScripts.SubPatch();
-            LonkScripts.SubPatch();
+            SLOracleModify.SubPatch();
 
             if (ModManager.MSC) OnMSCEnablePatch();
         }

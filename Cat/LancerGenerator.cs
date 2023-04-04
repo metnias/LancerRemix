@@ -14,7 +14,7 @@ using System.IO;
 using Menu;
 using LancerRemix.LancerMenu;
 
-namespace LancerRemix.Cat
+namespace LancerRemix
 {
     internal static class LancerGenerator
     {
