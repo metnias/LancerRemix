@@ -39,12 +39,12 @@ namespace LancerRemix.Cat
         public float BlockAmount(float timeStacker)
             => Mathf.Lerp((float)blockTimer, blockTimer - blockTimer != 0 ? Math.Sign(blockTimer) : 0, timeStacker);
 
-        public bool HasLanceReady()
+        public int HasLanceReady()
         {
-            if (lanceSpear != null) return false;
-            foreach (var grasp in self.grasps)
-                if (grasp?.grabbed is Spear) return true;
-            return false;
+            if (lanceSpear != null) return -1;
+            for (int i = 0; i < self.grasps.Length; ++i)
+                if (self.grasps[i]?.grabbed is Spear) return i;
+            return -1;
         }
 
         public override string TargetSubVersion => "1.0";
@@ -65,7 +65,7 @@ namespace LancerRemix.Cat
                     RetrieveLanceSpear(lanceSpear);
             }
             else if (lanceTimer < 0) ++lanceTimer;
-            if (HasLanceReady())
+            if (HasLanceReady() >= 0)
             {
                 if (blockTimer > 0)
                 {
@@ -236,15 +236,23 @@ namespace LancerRemix.Cat
             return res;
         }
 
+        public virtual void ThrowToGetFree(On.Player.orig_ThrowToGetFree orig, bool eu)
+        {
+            int lance = HasLanceReady();
+            if (lance >= 0)
+            { lanceSpear = self.grasps[lance].grabbed as Spear; lanceTimer = 4; lanceGrasp = lance; }
+            orig.Invoke(self, eu);
+        }
+
         internal void FlingLance()
         {
             Spear spear = lanceSpear;
             if (lanceSpear != null) ReleaseLanceSpear();
             else
             {
-                foreach (var grasp in self.grasps)
-                    if (grasp?.grabbed is Spear)
-                    { spear = grasp.grabbed as Spear; self.ReleaseGrasp(grasp.graspUsed); break; }
+                for (int i = 0; i < self.grasps.Length; ++i)
+                    if (self.grasps[i]?.grabbed is Spear)
+                    { spear = self.grasps[i].grabbed as Spear; self.ReleaseGrasp(i); break; }
             }
             if (spear == null) return;
 
@@ -290,7 +298,7 @@ namespace LancerRemix.Cat
             SetLanceCooltime();
         }
 
-        private void SetLanceCooltime() => lanceTimer = -12;
+        private void SetLanceCooltime() => lanceTimer = -8;
 
         private static float GetLanceDamage(int throwingSkill)
         {

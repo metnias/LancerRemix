@@ -14,8 +14,7 @@ namespace LancerRemix.Combat
             On.Spear.Update += SpearUpdate;
             On.Spear.DrawSprites += SpearDrawSprites;
 
-            /// TODO: implement block and parry
-            /// danger grasp lance
+            /// TODO: 
             /// monk difficulty adjust
             /// story patch
             /// jolly & custom color ui support

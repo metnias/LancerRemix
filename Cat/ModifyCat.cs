@@ -165,6 +165,12 @@ namespace LancerRemix.Cat
             return orig(self, obj);
         }
 
+        private static void PlayerThrowToGetFree(On.Player.orig_ThrowToGetFree orig, Player self, bool eu)
+        {
+            if (IsLancer(self)) GetSub<LancerSupplement>(self)?.ThrowToGetFree(orig, eu);
+            orig(self, eu);
+        }
+
         private static void PlayerStun(On.Player.orig_Stun orig, Player self, int st)
         {
             orig(self, st);
