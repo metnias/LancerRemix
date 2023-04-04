@@ -13,7 +13,7 @@ namespace LancerRemix.Cat
         /// <summary>
         /// Slide throw backward: backflip upwards
         /// forward: hard hit & stun, but loses spear
-        /// pulling spear from wall/creatures takes time
+        /// cannot pull spear from wall/alive creatures
         ///
         /// parry: grab / throw. throw parry will fling your spear. (12 ticks for now)
         /// grab parry will flip lizards
@@ -65,20 +65,21 @@ namespace LancerRemix.Cat
                     RetrieveLanceSpear(lanceSpear);
             }
             else if (lanceTimer < 0) ++lanceTimer;
-            if (blockTimer > 0)
+            if (HasLanceReady())
             {
-                --blockTimer;
-                if (blockTimer == 0) blockTimer = -12; // block cooltime
-            }
-            else if (blockTimer < 0) ++blockTimer;
-            else if(HasLanceReady())
-            {
-                if (self.input[0].pckp && !self.input[1].pckp)
+                if (blockTimer > 0)
+                {
+                    --blockTimer;
+                    if (blockTimer == 0) blockTimer = -12; // block cooltime
+                }
+                else if (blockTimer < 0) ++blockTimer;
+                else if (self.input[0].pckp && !self.input[1].pckp)
                 {
                     blockTimer = 12; // block
                     self.room.PlaySound(SoundID.Slugcat_Pick_Up_Spear, self.mainBodyChunk, false, 1.2f, 1.2f);
                 }
             }
+            else blockTimer = 0;
         }
 
         public override void Destroy(On.Player.orig_Destroy orig)
@@ -222,6 +223,17 @@ namespace LancerRemix.Cat
                     }
                 }
             }
+        }
+
+        public virtual bool CanIPickThisUp(On.Player.orig_CanIPickThisUp orig, PhysicalObject obj)
+        {
+            var res = orig(self, obj);
+            if (obj is Spear spear)
+            {
+                if (ModManager.MMF && MMF.cfgDislodgeSpears.Value) return res;
+                if (spear.mode == Weapon.Mode.StuckInCreature && !(spear.stuckInObject as Creature).dead) return false;
+            }
+            return res;
         }
 
         internal void FlingLance()

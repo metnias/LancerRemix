@@ -20,6 +20,7 @@ namespace LancerRemix.Cat
             On.Player.ShortCutColor += LancerShortCutColor;
             On.Player.DeathByBiteMultiplier += LancerDeathByBiteMultiplier;
             On.Player.ThrowObject += PlayerThrowObject;
+            On.Player.CanIPickThisUp += PlayerCanIPickThisUp;
             On.Player.Stun += PlayerStun;
             On.Player.Die += PlayerDie;
             On.Player.MovementUpdate += LancerMovementUpdate;
@@ -152,6 +153,16 @@ namespace LancerRemix.Cat
             if (IsLancer(self))
             { GetSub<LancerSupplement>(self)?.ThrowObject(orig, grasp, eu); return; }
             orig(self, grasp, eu);
+        }
+
+        private static bool PlayerCanIPickThisUp(On.Player.orig_CanIPickThisUp orig, Player self, PhysicalObject obj)
+        {
+            if (IsLancer(self))
+            {
+                var res = GetSub<LancerSupplement>(self)?.CanIPickThisUp(orig, obj);
+                if (res.HasValue) return res.Value;
+            }
+            return orig(self, obj);
         }
 
         private static void PlayerStun(On.Player.orig_Stun orig, Player self, int st)
