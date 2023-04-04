@@ -21,6 +21,9 @@ namespace LancerRemix.Story
             On.RegionState.AdaptWorldToRegionState += AdaptWorldToRegionState;
             On.StoryGameSession.PlaceKarmaFlowerOnDeathSpot += PlaceLancerKarmaFlower;
             IL.Menu.SlugcatSelectMenu.MineForSaveData += MineForLunterData;
+            On.WorldLoader.OverseerSpawnConditions += LunterOverseerSpawn;
+            On.OverseerAbstractAI.SetAsPlayerGuide += LunterOverseerGuide;
+            On.OverseersWorldAI.DirectionFinder.ctor += LunterOverseerDirection;
         }
 
         internal static void OnMSCEnableSubPatch()
@@ -136,7 +139,7 @@ namespace LancerRemix.Story
 
         #region Dummy
 
-        private readonly static ConditionalWeakTable<HunterDummy, LunterDummyDecoration> dummyDecos;
+        private static readonly ConditionalWeakTable<HunterDummy, LunterDummyDecoration> dummyDecos;
 
         private static LunterDummyDecoration GetDeco(HunterDummy dummy)
             => dummyDecos.GetValue(dummy, (d) => new LunterDummyDecoration(d));
@@ -172,7 +175,6 @@ namespace LancerRemix.Story
         private static void LunterDummyAddToContainer(On.DaddyGraphics.HunterDummy.orig_AddToContainer orig, HunterDummy self,
             RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, FContainer newContatiner)
         {
-
             orig(self, sLeaser, rCam, newContatiner);
             if (IsLunter(self.owner.daddy))
                 GetDeco(self).AddToContainer(null, sLeaser, rCam, newContatiner);
@@ -382,6 +384,39 @@ namespace LancerRemix.Story
 
             void DebugLogCursor() =>
                 LancerPlugin.LogSource.LogInfo($"{cursor.Prev.OpCode.Name} > Cursor < {cursor.Next.OpCode.Name}");
+        }
+
+        private static bool LunterOverseerSpawn(On.WorldLoader.orig_OverseerSpawnConditions orig, WorldLoader self, SlugName character)
+        {
+            if (IsStoryLancer)
+            {
+                var basis = character;
+                if (IsLancer(basis)) basis = GetBasis(basis);
+                if (basis == SlugName.Red) return true;
+            }
+            return orig(self, character);
+        }
+
+        private static void LunterOverseerGuide(On.OverseerAbstractAI.orig_SetAsPlayerGuide orig, OverseerAbstractAI self, int ownerOverride)
+        {
+            if (IsStoryLancer)
+            {
+                var basis = self.world.game.StoryCharacter;
+                if (IsLancer(basis)) basis = GetBasis(basis);
+                if (basis == SlugName.Red) ownerOverride = 2;
+            }
+            orig(self, ownerOverride);
+        }
+
+        private static void LunterOverseerDirection(On.OverseersWorldAI.DirectionFinder.orig_ctor orig, OverseersWorldAI.DirectionFinder self, World world)
+        {
+            orig(self, world);
+            if (IsStoryLancer)
+            {
+                var basis = world.game.StoryCharacter;
+                if (IsLancer(basis)) basis = GetBasis(basis);
+                if (basis == SlugName.Red && (world.game.session as StoryGameSession).saveState.miscWorldSaveData.EverMetMoon) self.destroy = true;
+            }
         }
     }
 }
