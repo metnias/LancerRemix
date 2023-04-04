@@ -13,7 +13,7 @@ namespace LancerRemix.Story
         {
         }
 
-        public LunterDummyDecoration(HunterDummy dummy) : base(null)
+        public LunterDummyDecoration(HunterDummy dummy) : base()
         {
             this.dummy = dummy;
         }
@@ -29,7 +29,8 @@ namespace LancerRemix.Story
             var triangleMesh = new TriangleMesh("Futile_White", tris, false, false);
             sprites[0] = triangleMesh;
             container.AddChild(sprites[0]);
-            self.AddToContainer(sLeaser, rCam, null);
+
+            AddToContainer(null, sLeaser, rCam, null);
         }
 
         public override void AddToContainer(On.PlayerGraphics.orig_AddToContainer orig, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, FContainer newContatiner)
@@ -65,6 +66,5 @@ namespace LancerRemix.Story
             (sprites[0] as TriangleMesh).MoveVertice(1, dir + head - thicc * (float)stat.x / 2f - camPos);
             (sprites[0] as TriangleMesh).MoveVertice(2, dir + head + thicc * (float)stat.x / 2f - camPos);
         }
-
     }
 }
