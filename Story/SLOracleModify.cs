@@ -3,11 +3,12 @@ using RWCustom;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using UnityEngine;
+using static CatSub.Story.SaveManager;
 using static LancerRemix.LancerEnums;
 using static LancerRemix.LancerGenerator;
+using ConvID = Conversation.ID;
 using MSCName = MoreSlugcats.MoreSlugcatsEnums.SlugcatStatsName;
 using SlugName = SlugcatStats.Name;
-using ConvID = Conversation.ID;
 
 namespace LancerRemix.Story
 {
@@ -17,9 +18,11 @@ namespace LancerRemix.Story
         {
             On.SLOrcacleState.ForceResetState += LancerMoonState;
             On.SLOracleBehaviorHasMark.NameForPlayer += NameForLancer;
+            On.SLOracleBehaviorHasMark.MoonConversation.AddEvents += AddLancerEvents;
         }
 
         private static bool IsStoryLancer => ModifyCat.IsStoryLancer;
+        private const string REDALREADYSUCCEED = "RedAlreadyDeliveredPayload";
 
         private static void LancerMoonState(On.SLOrcacleState.orig_ForceResetState orig, SLOrcacleState self, SlugName saveStateNumber)
         {
@@ -32,7 +35,10 @@ namespace LancerRemix.Story
             if (IsTimelineInbetween(story, ModManager.MSC ? MSCName.Spear : null, SlugName.Red))
                 self.neuronsLeft = 0; // dead after spear and before red
             else if (IsTimelineInbetween(story, SlugName.Red, SlugName.White))
+            {
                 self.neuronsLeft = TryMineRedData(); // dead if red has not succeed and before white
+                SetProgValue(Custom.rainWorld.progression.currentSaveState.miscWorldSaveData, REDALREADYSUCCEED, self.neuronsLeft > 0);
+            }
 
             int TryMineRedData()
             {
@@ -101,6 +107,8 @@ namespace LancerRemix.Story
             Debug.Log($"Lancer {self.id} {self.State.neuronsLeft}");
             var slBehavior = self.myBehavior as SLOracleBehaviorHasMark;
 
+            #region Lurvivor
+            // Lonk cannot talk with moon
             if (self.id == ConvID.MoonFirstPostMarkConversation)
             {
                 switch (self.State.neuronsLeft)
@@ -126,6 +134,7 @@ namespace LancerRemix.Story
                         self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("It is good to have someone to talk to after all this time even if that's a child like you.<LINE>The scavengers aren't exactly good listeners. They do bring me things though, occasionally..."), 0));
                         break;
 
+                    default:
                     case 5:
                         self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("Hello <PlayerName>."), 0));
                         self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("What are you? If I had my memories I would know..."), 0));
@@ -141,8 +150,9 @@ namespace LancerRemix.Story
                         self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("It is good to have someone to talk to after all this time even if that's a child like you.<LINE>The scavengers aren't exactly good listeners. They do bring me things though, occasionally..."), 0));
                         break;
                 }
+                return;
             }
-            else if (self.id == ConvID.MoonSecondPostMarkConversation)
+            if (self.id == ConvID.MoonSecondPostMarkConversation)
             {
                 switch (self.State.neuronsLeft)
                 {
@@ -183,6 +193,7 @@ namespace LancerRemix.Story
                         }
                         break;
 
+                    default:
                     case 5:
                         if (self.State.GetOpinion == SLOrcacleState.PlayerOpinion.Dislikes)
                         {
@@ -211,8 +222,9 @@ namespace LancerRemix.Story
                         }
                         break;
                 }
+                return;
             }
-            else if (self.id == ConvID.MoonRecieveSwarmer)
+            if (self.id == ConvID.MoonRecieveSwarmer)
             {
                 if (self.State.neuronsLeft - 1 > 2 && slBehavior.respondToNeuronFromNoSpeakMode)
                 {
@@ -308,7 +320,41 @@ namespace LancerRemix.Story
                         break;
                 }
                 slBehavior.respondToNeuronFromNoSpeakMode = false;
+                return;
             }
+            #endregion Lurvivor
+            #region Lunter
+            bool already = GetProgValue<bool>(Custom.rainWorld.progression?.currentSaveState.miscWorldSaveData, REDALREADYSUCCEED);
+            if (self.id == ConvID.Moon_Red_First_Conversation)
+            {
+                if (already)
+                    self.LoadEventsFromFile(49, GetLancer(basis), false, 0);
+                else
+                    self.LoadEventsFromFile(50, GetLancer(basis), false, 0);
+                return;
+            }
+            if (self.id == ConvID.Moon_Red_Second_Conversation)
+            {
+                if (already)
+                    self.LoadEventsFromFile(54, GetLancer(basis), false, 0);
+                else
+                    self.LoadEventsFromFile(55, GetLancer(basis), false, 0);
+                return;
+            }
+            if (self.id == ConvID.Moon_Pearl_Red_stomach)
+            {
+                self.PearlIntro();
+                self.LoadEventsFromFile(51, GetLancer(basis), false, 0);
+                // add remarks depending on red success
+                if (already)
+                    self.events.Add(new Conversation.TextEvent(self, 40, "...", 10));
+                else
+                    self.events.Add(new Conversation.TextEvent(self, 40, "...", 10));
+                return;
+            }
+            #endregion Lunter
+
+
             orig.Invoke(self);
 
             return;
