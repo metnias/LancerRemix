@@ -22,6 +22,7 @@ namespace LancerRemix.Cat
         {
             On.SlugcatStats.ctor += LancerStats;
             On.SlugcatStats.SlugcatUnlocked += LancerUnlocked;
+            On.SlugcatStats.NourishmentOfObjectEaten += LancerNourishmentOfObjectEaten;
             On.Menu.MenuScene.UseSlugcatUnlocked += UseLancerUnlocked;
             On.SlugcatStats.HiddenOrUnplayableSlugcat += DisableLancerRegularSelect;
         }
@@ -65,6 +66,16 @@ namespace LancerRemix.Cat
 
             self.generalVisibilityBonus += mod.generalVisibilityBonus;
             self.visualStealthInSneakMode += mod.visualStealthInSneakMode;
+
+            if (basis == SlugName.Yellow) { self.foodToHibernate = 2; self.maxFood = 3; }
+        }
+
+        private static int LancerNourishmentOfObjectEaten(On.SlugcatStats.orig_NourishmentOfObjectEaten orig, SlugName slugcatIndex, IPlayerEdible eatenObject)
+        {
+            var res = orig(slugcatIndex, eatenObject);
+            var basis = slugcatIndex; if (IsLancer(slugcatIndex)) basis = GetBasis(basis);
+            if (basis == SlugName.Yellow) res >>= 2;
+            return res;
         }
 
         internal static bool CreateLancer(SlugName basis, out SlugName lancer)

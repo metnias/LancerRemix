@@ -14,7 +14,7 @@ using SlugName = SlugcatStats.Name;
 
 namespace LancerRemix.Story
 {
-    internal static class HunterLancerScripts
+    internal static class LunterScripts
     {
         internal static void SubPatch()
         {

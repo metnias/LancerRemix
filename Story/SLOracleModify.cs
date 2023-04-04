@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace LancerRemix.Story
 {
-    internal static class LonkScripts
+    internal static class SLOracleModify
     {
         internal static void SubPatch()
         {
-
+            
         }
 
 
