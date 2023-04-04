@@ -17,7 +17,6 @@ namespace LancerRemix.Combat
             /// TODO: implement block and parry
             /// danger grasp lance
             /// monk difficulty adjust
-            /// vulture mask
             /// story patch
             /// jolly & custom color ui support
             /// expedition support

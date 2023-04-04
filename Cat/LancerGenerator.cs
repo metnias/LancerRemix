@@ -6,7 +6,6 @@ using System.Text;
 using System.Threading.Tasks;
 using SlugName = SlugcatStats.Name;
 using MSCName = MoreSlugcats.MoreSlugcatsEnums.SlugcatStatsName;
-using static UnityEngine.RectTransform;
 using UnityEngine;
 using static LancerRemix.LancerEnums;
 using CatSub.Cat;
