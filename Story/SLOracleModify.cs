@@ -2,6 +2,7 @@
 using RWCustom;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using UnityEngine;
 using static LancerRemix.LancerEnums;
 using static LancerRemix.LancerGenerator;
 using MSCName = MoreSlugcats.MoreSlugcatsEnums.SlugcatStatsName;
@@ -14,6 +15,7 @@ namespace LancerRemix.Story
         internal static void SubPatch()
         {
             On.SLOrcacleState.ForceResetState += LancerMoonState;
+            On.SLOracleBehaviorHasMark.NameForPlayer += NameForLancer;
         }
 
         private static bool IsStoryLancer => ModifyCat.IsStoryLancer;
@@ -50,6 +52,44 @@ namespace LancerRemix.Story
                 return 0;
             }
         }
+
+        private static string NameForLancer(On.SLOracleBehaviorHasMark.orig_NameForPlayer orig, SLOracleBehaviorHasMark self, bool capitalized)
+        {
+            if (!IsStoryLancer && self.player?.playerState.isPup != true) return orig(self, capitalized);
+            const string PREFIX = "lancersl-";
+            string name = PREFIX + "animal";
+            bool damaged = self.DamagedMode && Random.value < 0.5f;
+            if (Random.value > 0.3f)
+            {
+                if (self.State.GetOpinion == SLOrcacleState.PlayerOpinion.Likes)
+                {
+                    if (self.State.totalPearlsBrought > 5 && !self.DamagedMode)
+                        name = PREFIX + "student";
+                    else
+                        name = PREFIX + "child";
+                }
+                else if (self.State.GetOpinion == SLOrcacleState.PlayerOpinion.Dislikes)
+                    name = PREFIX + "imp";
+                else
+                    name = "creature";
+            }
+            if (self.oracle.room.game.rainWorld.inGameTranslator.currentLanguage == InGameTranslator.LanguageID.Portuguese && (name == "friend" || name == "creature"))
+            {
+                string porName = self.Translate(name);
+                if (porName.StartsWith(PREFIX)) porName = porName.Substring(PREFIX.Length);
+                if (capitalized && InGameTranslator.LanguageID.UsesCapitals(self.oracle.room.game.rainWorld.inGameTranslator.currentLanguage))
+                    porName = char.ToUpper(porName[0]).ToString() + porName.Substring(1);
+                return porName;
+            }
+            string transName = self.Translate(name);
+            if (transName.StartsWith(PREFIX)) transName = transName.Substring(PREFIX.Length);
+            string little = self.Translate(PREFIX + "tiny");
+            if (little.StartsWith(PREFIX)) little = little.Substring(PREFIX.Length);
+            if (capitalized && InGameTranslator.LanguageID.UsesCapitals(self.oracle.room.game.rainWorld.inGameTranslator.currentLanguage))
+                little = char.ToUpper(little[0]).ToString() + little.Substring(1);
+            return little + (damaged ? "... " : " ") + transName;
+        }
+
 
 
     }
