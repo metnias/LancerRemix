@@ -66,11 +66,9 @@ namespace LancerRemix.Cat
             for (int i = 0; i < 4; ++i) isLancer[i] = players[i];
         }
 
-        public static bool IsCatLancer(PlayerState playerState) => isLancer[playerState.playerNumber];
+        public static bool IsCatLancer(Player player) => !player.isNPC && isLancer[player.playerState.playerNumber];
 
-        public static bool IsCatLancer(Player player) => IsCatLancer(player.playerState);
-
-        public static bool IsCatLancer(PlayerGraphics playerGraphics) => IsCatLancer(playerGraphics.player.playerState);
+        public static bool IsCatLancer(PlayerGraphics playerGraphics) => IsCatLancer(playerGraphics.player);
 
         public static bool IsLancer(SlugName name) => LancerEnums.IsLancer(name);
 
@@ -101,7 +99,7 @@ namespace LancerRemix.Cat
         private static void PlayerCtor(On.Player.orig_ctor orig, Player self, AbstractCreature abstractCreature, World world)
         {
             orig(self, abstractCreature, world);
-            if (!IsCatLancer(self.playerState)) return;
+            if (!IsCatLancer(self)) return;
             catSubs.Add(self.playerState, new LancerSupplement(self));
             catDecos.Add(self.playerState, new LancerDecoration(self));
         }
@@ -109,14 +107,14 @@ namespace LancerRemix.Cat
         private static void PlayerUpdate(On.Player.orig_Update orig, Player self, bool eu)
         {
             orig(self, eu);
-            if (IsCatLancer(self.playerState))
+            if (IsCatLancer(self))
                 GetSub<LancerSupplement>(self)?.Update(null, eu);
         }
 
         private static void PlayerDestroy(On.Player.orig_Destroy orig, Player self)
         {
             orig(self);
-            if (IsCatLancer(self.playerState))
+            if (IsCatLancer(self))
                 GetSub<LancerSupplement>(self)?.Destroy(null);
         }
 
@@ -217,49 +215,49 @@ namespace LancerRemix.Cat
         private static void GrafInitSprite(On.PlayerGraphics.orig_InitiateSprites orig, PlayerGraphics self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam)
         {
             orig(self, sLeaser, rCam);
-            if (IsCatLancer(self.player.playerState))
+            if (IsCatLancer(self))
                 GetDeco<LancerDecoration>(self)?.InitiateSprites(null, sLeaser, rCam);
         }
 
         private static void GrafAddToContainer(On.PlayerGraphics.orig_AddToContainer orig, PlayerGraphics self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, FContainer newContatiner)
         {
             orig(self, sLeaser, rCam, newContatiner);
-            if (IsCatLancer(self.player.playerState))
+            if (IsCatLancer(self))
                 GetDeco<LancerDecoration>(self)?.AddToContainer(null, sLeaser, rCam, newContatiner);
         }
 
         private static void GrafUpdate(On.PlayerGraphics.orig_Update orig, PlayerGraphics self)
         {
             orig(self);
-            if (IsCatLancer(self.player.playerState))
+            if (IsCatLancer(self))
                 GetDeco<LancerDecoration>(self)?.Update(null);
         }
 
         private static void GrafDrawSprite(On.PlayerGraphics.orig_DrawSprites orig, PlayerGraphics self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
         {
             orig(self, sLeaser, rCam, timeStacker, camPos);
-            if (IsCatLancer(self.player.playerState))
+            if (IsCatLancer(self))
                 GetDeco<LancerDecoration>(self)?.DrawSprites(null, sLeaser, rCam, timeStacker, camPos);
         }
 
         private static void GrafApplyPalette(On.PlayerGraphics.orig_ApplyPalette orig, PlayerGraphics self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, RoomPalette palette)
         {
             orig(self, sLeaser, rCam, palette);
-            if (IsCatLancer(self.player.playerState))
+            if (IsCatLancer(self))
                 GetDeco<LancerDecoration>(self)?.ApplyPalette(null, sLeaser, rCam, palette);
         }
 
         private static void GrafSuckedIntoShortCut(On.PlayerGraphics.orig_SuckedIntoShortCut orig, PlayerGraphics self, Vector2 shortCutPosition)
         {
             orig(self, shortCutPosition);
-            if (IsCatLancer(self.player.playerState))
+            if (IsCatLancer(self))
                 GetDeco<LancerDecoration>(self)?.SuckedIntoShortCut(null, shortCutPosition);
         }
 
         private static void GrafReset(On.PlayerGraphics.orig_Reset orig, PlayerGraphics self)
         {
             orig(self);
-            if (IsCatLancer(self.player.playerState))
+            if (IsCatLancer(self))
                 GetDeco<LancerDecoration>(self)?.Reset(null);
         }
 
