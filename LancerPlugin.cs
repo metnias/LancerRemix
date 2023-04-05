@@ -48,7 +48,7 @@ namespace LancerRemix
         public void OnEnable()
         {
             instance = this;
-            LogSource = this.Logger;
+            LogSource = Logger;
 
             On.RainWorld.OnModsInit += WrapInit(Init);
             On.ProcessManager.PreSwitchMainProcess += RegisterLancersAfterMainMenu;

@@ -70,7 +70,15 @@ namespace LancerRemix.LancerMenu
 
         public SymbolButtonToggleLancerButton(Menu.Menu menu, MenuObject owner, string signal, Vector2 pos, Vector2 size, string symbolNameOn, string symbolNameOff, int status, string stringLabelOn = null, string stringLabelOff = null) : base(menu, owner, signal, pos, size, symbolNameOn, symbolNameOff, status > 0, stringLabelOn, stringLabelOff)
         {
+            this.status = status;
+            rawSignalText = signal;
         }
+
+        /// <summary>
+        /// 0off 1on 2lancer
+        /// </summary>
+        public int status;
+        public string rawSignalText;
 
         public string symbolLancerOn;
 
@@ -80,28 +88,41 @@ namespace LancerRemix.LancerMenu
             base.LoadIcon();
         }
 
+        public void ToPup()
+        {
+            signalText = rawSignalText + "on";
+            isToggled = false;
+            if (belowLabel != null) belowLabel.label.text = labelNameOff;
+        }
+
         public override void Toggle()
         {
-            if (symbol.fileName == symbolNameOn)
+            switch (status)
             {
-                symbol.fileName = symbolNameOff;
-                signalText = signalText.Replace("off", "on");
-                isToggled = false;
-                if (belowLabel != null)
-                {
-                    belowLabel.label.text = labelNameOff;
-                }
+                case 0: // off > on
+                    {
+                        ToPup();
+                    }
+                    break;
+
+                case 1: // on > lancer
+                    {
+                        signalText = rawSignalText + "lancer";
+                        isToggled = false;
+                        //if (belowLabel != null) belowLabel.label.text = labelNameOn;
+                    }
+                    break;
+
+                case 2: // on > off
+                    {
+                        signalText = rawSignalText + "off";
+                        isToggled = true;
+                        if (belowLabel != null) belowLabel.label.text = labelNameOff;
+                    }
+                    break;
             }
-            else
-            {
-                symbol.fileName = symbolNameOn;
-                signalText = signalText.Replace("on", "off");
-                isToggled = true;
-                if (belowLabel != null)
-                {
-                    belowLabel.label.text = labelNameOn;
-                }
-            }
+            status = (status + 1) % 3;
+
             faceSymbol.fileName = "face_" + symbol.fileName;
             LoadIcon();
         }
