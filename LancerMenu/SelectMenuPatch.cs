@@ -4,17 +4,18 @@ using LancerRemix.Cat;
 using Menu;
 using MonoMod.RuntimeDetour;
 using RWCustom;
+using SlugBase;
+using SlugBase.Assets;
+using SlugBase.Features;
+using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
 using static LancerRemix.LancerEnums;
 using static Menu.SlugcatSelectMenu;
-using SlugName = SlugcatStats.Name;
 using SceneID = Menu.MenuScene.SceneID;
-using SlugBase;
-using SlugBase.Features;
-using SlugBase.Assets;
+using SlugName = SlugcatStats.Name;
 
 namespace LancerRemix.LancerMenu
 {
@@ -29,6 +30,7 @@ namespace LancerRemix.LancerMenu
             On.Menu.SlugcatSelectMenu.Update += UpdatePatch;
             On.Menu.SlugcatSelectMenu.UpdateStartButtonText += UpdateLancerStartButtonText;
             On.Menu.SlugcatSelectMenu.UpdateSelectedSlugcatInMiscProg += UpdateSelectedLancerInMiscProg;
+            On.Menu.SlugcatSelectMenu.CommunicateWithUpcomingProcess += CommWithNextProcess;
             On.Menu.SlugcatSelectMenu.Singal += SignalPatch;
             On.Menu.SlugcatSelectMenu.ContinueStartedGame += ContinueLancerStartedGame;
             On.Menu.SlugcatSelectMenu.SlugcatPage.GrafUpdate += PageGrafUpdatePatch;
@@ -42,6 +44,7 @@ namespace LancerRemix.LancerMenu
             _lancerInit = false;
             redIsDead = false;
             ModifyCat.SetIsLancer(false, new bool[4]);
+            LoadLancerPlayers(Custom.rainWorld.progression.miscProgressionData);
             orig(self, manager);
             if (TryGetCurrSlugcatLancer())
             { slugcatPageLancer = true; lancerTransition = 1f; lastLancerTransition = 1f; }
@@ -202,6 +205,41 @@ namespace LancerRemix.LancerMenu
                 lancerPages[self.slugcatPageIndex]?.slugcatNumber;
         }
 
+        #region LancerPlayers
+
+        private static readonly bool[] lancerPlayers = new bool[4];
+        internal static void SetLancerPlayers(int num, bool lancer)
+            => lancerPlayers[num] = lancer;
+        internal static bool GetLancerPlayers(int num) => lancerPlayers[num];
+
+        private const string LANCERPLAYERS = "LancerPlayers";
+
+        private static void SaveLancerPlayers(PlayerProgression.MiscProgressionData miscData)
+        {
+            int res = 0;
+            for (int i = 0; i < lancerPlayers.Length; ++i)
+                res |= lancerPlayers[i] ? 1 << i : 0;
+            SaveManager.SetMiscValue(miscData, LANCERPLAYERS, res);
+        }
+
+        private static void LoadLancerPlayers(PlayerProgression.MiscProgressionData miscData)
+        {
+            int data = 0;
+            try { data = SaveManager.GetMiscValue<int>(miscData, LANCERPLAYERS); }
+            catch (Exception) { SaveManager.SetMiscValue(miscData, LANCERPLAYERS, 0); }
+
+            for (int i = 0; i < lancerPlayers.Length; ++i)
+                lancerPlayers[i] = (data & (1 << i)) > 0;
+        }
+
+        private static void CommWithNextProcess(On.Menu.SlugcatSelectMenu.orig_CommunicateWithUpcomingProcess orig, SlugcatSelectMenu self, MainLoopProcess nextProcess)
+        {
+            SaveLancerPlayers(self.manager.rainWorld.progression.miscProgressionData);
+            orig(self, nextProcess);
+        }
+
+        #endregion LancerPlayers
+
         private static void SignalPatch(On.Menu.SlugcatSelectMenu.orig_Singal orig, SlugcatSelectMenu self, MenuObject sender, string message)
         {
             if (message.StartsWith(LANCER_SIGNAL))
@@ -214,9 +252,9 @@ namespace LancerRemix.LancerMenu
             }
             if (message == "START")
             {
-                bool[] players = new bool[4];
-                players[0] = slugcatPageLancer; // TODO: get jolly status as well
-                ModifyCat.SetIsLancer(slugcatPageLancer, players);
+                if (!ModManager.JollyCoop) lancerPlayers[0] = slugcatPageLancer;
+                ModifyCat.SetIsLancer(slugcatPageLancer, lancerPlayers);
+                SaveLancerPlayers(self.manager.rainWorld.progression.miscProgressionData);
                 // StartGame(this.slugcatPages[this.slugcatPageIndex].slugcatNumber);
             }
             orig(self, sender, message);

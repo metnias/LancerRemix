@@ -8,6 +8,7 @@ using MenueSceneID = Menu.MenuScene.SceneID;
 using MonoMod.Cil;
 using Mono.Cecil.Cil;
 using System;
+using LancerRemix.Story;
 
 namespace LancerRemix.LancerMenu
 {
@@ -19,7 +20,19 @@ namespace LancerRemix.LancerMenu
             IL.Menu.FastTravelScreen.ctor += LancerTravelScreen;
 
             SelectMenuPatch.SubPatch();
+            if (ModManager.JollyCoop) OnJollyEnablePatch();
         }
+
+        internal static void OnJollyEnablePatch()
+        {
+            SymbolButtonToggleLancerButton.SubPatch();
+        }
+
+        internal static void OnJollyDisablePatch()
+        {
+            SymbolButtonToggleLancerButton.SubUnpatch();
+        }
+
 
         private static bool IsStoryLancer => ModifyCat.IsStoryLancer;
 

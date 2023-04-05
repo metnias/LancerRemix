@@ -106,6 +106,7 @@ namespace LancerRemix
         }
 
         private static bool lastMSCEnabled;
+        private static bool lastJollyEnabled;
 
         internal static bool AnyModChanged { get; private set; } = true;
 
@@ -122,6 +123,12 @@ namespace LancerRemix
                 DreamHandler.OnMSCEnablePatch();
                 lastMSCEnabled = ModManager.MSC;
             }
+            if (!lastJollyEnabled && ModManager.JollyCoop)
+            {
+                LogSource.LogInfo("Lancer detected Jolly newly enabled.");
+                MenuModifier.OnJollyEnablePatch();
+                lastJollyEnabled = ModManager.JollyCoop;
+            }
         }
 
         private static void OnModsDisabled(On.RainWorld.orig_OnModsDisabled orig, RainWorld rw, ModManager.Mod[] newlyDisabledMods)
@@ -134,6 +141,12 @@ namespace LancerRemix
                 ModifyCat.OnMSCDisablePatch();
                 DreamHandler.OnMSCDisablePatch();
                 lastMSCEnabled = ModManager.MSC;
+            }
+            if (lastJollyEnabled && !ModManager.JollyCoop)
+            {
+                LogSource.LogInfo("Lancer detected Jolly newly disabled.");
+                MenuModifier.OnJollyDisablePatch();
+                lastJollyEnabled = ModManager.JollyCoop;
             }
         }
     }
