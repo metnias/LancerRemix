@@ -4,6 +4,7 @@ using System.Text.RegularExpressions;
 using static LancerRemix.LancerEnums;
 using SlugName = SlugcatStats.Name;
 using static CatSub.Story.SaveManager;
+using MoreSlugcats;
 
 namespace LancerRemix.Cat
 {
@@ -20,6 +21,10 @@ namespace LancerRemix.Cat
             On.PlayerProgression.LoadGameState += LoadLancerStateInstead;
             //IL.PlayerProgression.LoadGameState += LoadLancerState;
 
+            On.RoomSettings.ctor += LancerRoomSettings;
+            On.Region.GetRegionFullName += LancerRegionFullName;
+            On.WorldLoader.ctor_RainWorldGame_Name_bool_string_Region_SetupValues += LancerWorldLoader;
+            On.DeathPersistentSaveData.CanUseUnlockedGates += LonkNoUnlockGate;
             On.Region.ctor += LancerGetBasisRegion;
             On.Region.LoadAllRegions += LoadAllLancerRegion;
             On.PlayerProgression.MiscProgressionData.updateConditionalShelters += UpdateConditionalLancerShelters;
@@ -33,7 +38,7 @@ namespace LancerRemix.Cat
 
         private static bool IsThereASavedLancer(On.PlayerProgression.orig_IsThereASavedGame orig, PlayerProgression self, SlugName saveStateNumber)
         {
-            if (IsStoryLancer && HasLancer(saveStateNumber)) saveStateNumber = GetLancer(saveStateNumber);
+            if (IsStoryLancer) saveStateNumber = GetLancer(saveStateNumber);
             return orig(self, saveStateNumber);
         }
 
@@ -56,7 +61,7 @@ namespace LancerRemix.Cat
 
         private static void WipeSaveLancer(On.PlayerProgression.orig_WipeSaveState orig, PlayerProgression self, SlugName saveStateNumber)
         {
-            if (IsStoryLancer && HasLancer(saveStateNumber)) saveStateNumber = GetLancer(saveStateNumber);
+            if (IsStoryLancer) saveStateNumber = GetLancer(saveStateNumber);
             orig(self, saveStateNumber);
         }
 
@@ -78,8 +83,7 @@ namespace LancerRemix.Cat
             {
                 SetMiscValue(self.miscProgressionData, CURRSLUGCATLANCER, true);
                 var basis = self.currentSaveState.saveStateNumber;
-                if (HasLancer(basis))
-                    self.currentSaveState.saveStateNumber = GetLancer(basis);
+                self.currentSaveState.saveStateNumber = GetLancer(basis);
                 UnityEngine.Debug.Log($"{self.currentSaveState.saveStateNumber}({basis}) redsDeath: {self.currentSaveState.deathPersistentSaveData.redsDeath}");
                 var res = orig(self, saveCurrentState, saveMaps, saveMiscProg);
                 self.currentSaveState.saveStateNumber = basis;
@@ -94,8 +98,7 @@ namespace LancerRemix.Cat
         {
             if (!IsStoryLancer) return orig(self, saveFilePath, game, saveAsDeathOrQuit);
             string[] rawData = GetRawData();
-            var lancer = self.currentSaveState.saveStateNumber;
-            if (HasLancer(lancer)) lancer = GetLancer(lancer);
+            var lancer = GetLancer(self.currentSaveState.saveStateNumber);
             for (int i = 0; i < rawData.Length; i++)
             {
                 string[] rawStates = Regex.Split(rawData[i], "<progDivB>");
@@ -211,9 +214,37 @@ namespace LancerRemix.Cat
 
         private static SlugName GetStoryBasisForLancer(SlugName storyIndex)
         {
+            if (storyIndex == null) return null;
             if (IsLancer(storyIndex) || IsStoryLancer)
                 return LancerGenerator.GetStoryBasisForLancer(storyIndex);
             return storyIndex; // Not lancer
+        }
+
+        private static void LancerRoomSettings(On.RoomSettings.orig_ctor orig, RoomSettings self, string name, Region region, bool template, bool firstTemplate, SlugName playerChar)
+        {
+            playerChar = GetStoryBasisForLancer(playerChar);
+            orig(self, name, region, template, firstTemplate, playerChar);
+        }
+
+        private static string LancerRegionFullName(On.Region.orig_GetRegionFullName orig, string regionAcro, SlugName slugcatIndex)
+        {
+            slugcatIndex = GetStoryBasisForLancer(slugcatIndex);
+            return orig(regionAcro, slugcatIndex);
+        }
+
+        private static void LancerWorldLoader(On.WorldLoader.orig_ctor_RainWorldGame_Name_bool_string_Region_SetupValues orig, WorldLoader self,
+            RainWorldGame game, SlugName playerCharacter, bool singleRoomWorld, string worldName, Region region, RainWorldGame.SetupValues setupValues)
+        {
+            if (singleRoomWorld) goto Init;
+            playerCharacter = GetStoryBasisForLancer(playerCharacter);
+        Init: orig(self, game, playerCharacter, singleRoomWorld, worldName, region, setupValues);
+        }
+
+        private static bool LonkNoUnlockGate(On.DeathPersistentSaveData.orig_CanUseUnlockedGates orig, DeathPersistentSaveData self, SlugName slugcat)
+        {
+            if (IsStoryLancer && GetBasis(slugcat) == SlugName.Yellow)
+                return ModManager.MMF && MMF.cfgGlobalMonkGates != null && MMF.cfgGlobalMonkGates.Value;
+            return orig(self, slugcat);
         }
 
         private static void LancerGetBasisRegion(On.Region.orig_ctor orig, Region self, string name, int firstRoomIndex, int regionNumber, SlugName storyIndex)
@@ -231,8 +262,7 @@ namespace LancerRemix.Cat
         private static void UpdateConditionalLancerShelters(On.PlayerProgression.MiscProgressionData.orig_updateConditionalShelters orig,
             PlayerProgression.MiscProgressionData self, string room, SlugName slugcatIndex)
         {
-            if (IsStoryLancer)
-                if (HasLancer(slugcatIndex)) slugcatIndex = GetLancer(slugcatIndex);
+            if (IsStoryLancer) slugcatIndex = GetLancer(slugcatIndex);
             orig(self, room, slugcatIndex);
         }
 

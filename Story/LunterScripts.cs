@@ -76,8 +76,7 @@ namespace LancerRemix.Story
         {
             orig(self, eu);
             if (self.room == null || !self.HDmode || !self.room.game.IsStorySession || !IsStoryLancer) return;
-            var basis = self.room.game.StoryCharacter;
-            if (IsLancer(basis)) basis = GetBasis(basis);
+            var basis = GetBasis(self.room.game.StoryCharacter);
             if (basis != SlugName.Red) return;
             if (GetProgValue<int>(self.room.game.GetStorySession.saveState.miscWorldSaveData, HUNTERMEET) > 0) return; // already triggered
             if (!(self.room.game.FirstAlivePlayer?.realizedCreature is Player player)) return;
@@ -94,8 +93,7 @@ namespace LancerRemix.Story
             if (self.room == null || !self.HDmode) return result;
             if (otherObject is DaddyLongLegs ddl && ddl.HDmode) return false; // don't eat each other
             if (!self.room.game.IsStorySession || !IsStoryLancer) return result;
-            var basis = self.room.game.StoryCharacter;
-            if (IsLancer(basis)) basis = GetBasis(basis);
+            var basis = GetBasis(self.room.game.StoryCharacter);
             if (basis != SlugName.Red) return result;
             return !(otherObject is Player);
         }
@@ -190,8 +188,7 @@ namespace LancerRemix.Story
             else
             {
                 if (!self.owner.daddy.room.game.IsStorySession || !IsStoryLancer) return;
-                var basis = self.owner.daddy.room.game.StoryCharacter;
-                if (IsLancer(basis)) basis = GetBasis(basis);
+                var basis = GetBasis(self.owner.daddy.room.game.StoryCharacter);
                 if (basis != SlugName.Red) return;
                 sLeaser.sprites[self.startSprite + 5].element = Futile.atlasManager.GetElementWithName("FaceA" +
                     sLeaser.sprites[self.startSprite + 3].element.name.Substring(5));
@@ -308,8 +305,7 @@ namespace LancerRemix.Story
         private static void AdaptWorldToRegionState(On.RegionState.orig_AdaptWorldToRegionState orig, RegionState self)
         {
             orig(self);
-            var basis = self.saveState.saveStateNumber;
-            if (IsLancer(basis)) basis = GetBasis(basis);
+            var basis = GetBasis(self.saveState.saveStateNumber);
             var lancer = GetLancer(basis);
             var story = IsStoryLancer ? lancer : basis;
             var miscData = self.world.game.rainWorld.progression.miscProgressionData;
@@ -403,8 +399,7 @@ namespace LancerRemix.Story
         {
             if (IsStoryLancer)
             {
-                var basis = character;
-                if (IsLancer(basis)) basis = GetBasis(basis);
+                var basis = GetBasis(character);
                 if (basis == SlugName.Red) return true;
                 if (basis == SlugName.Yellow) return false;
                 return orig(self, basis);
@@ -416,8 +411,7 @@ namespace LancerRemix.Story
         {
             if (IsStoryLancer)
             {
-                var basis = self.world.game.StoryCharacter;
-                if (IsLancer(basis)) basis = GetBasis(basis);
+                var basis = GetBasis(self.world.game.StoryCharacter);
                 if (basis == SlugName.Red) ownerOverride = 2;
             }
             orig(self, ownerOverride);
@@ -428,8 +422,7 @@ namespace LancerRemix.Story
             orig(self, world);
             if (IsStoryLancer)
             {
-                var basis = world.game.StoryCharacter;
-                if (IsLancer(basis)) basis = GetBasis(basis);
+                var basis = GetBasis(world.game.StoryCharacter);
                 if (basis == SlugName.Red && (world.game.session as StoryGameSession).saveState.miscWorldSaveData.EverMetMoon) self.destroy = true;
             }
         }

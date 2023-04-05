@@ -25,10 +25,10 @@ namespace LancerRemix.Combat
 
         private static bool SpearHit(On.Spear.orig_HitSomething orig, Spear self, SharedPhysics.CollisionResult result, bool eu)
         {
-            if (self.thrownBy is Player atkPlayer && IsLancer(atkPlayer))
+            if (self.thrownBy is Player atkPlayer && IsCatLancer(atkPlayer))
             { // Retrieve spear
             }
-            else if (result.obj is Player defPlayer && IsLancer(defPlayer))
+            else if (result.obj is Player defPlayer && IsCatLancer(defPlayer))
             { // Parry check
             }
             return orig(self, result, eu);
@@ -37,7 +37,7 @@ namespace LancerRemix.Combat
         private static void SpearLodgeCreature(On.Spear.orig_LodgeInCreature orig, Spear self, SharedPhysics.CollisionResult result, bool eu)
         {
             orig(self, result, eu);
-            if (!(self.thrownBy is Player player) || !IsLancer(player)) return;
+            if (!(self.thrownBy is Player player) || !IsCatLancer(player)) return;
 
             if (self is ExplosiveSpear)
             {
@@ -59,7 +59,7 @@ namespace LancerRemix.Combat
         private static void SpearUpdate(On.Spear.orig_Update orig, Spear self, bool eu)
         {
             orig(self, eu);
-            if (self.grabbedBy.Count <= 0 || !(self.grabbedBy[0].grabber is Player player) || !IsLancer(player))
+            if (self.grabbedBy.Count <= 0 || !(self.grabbedBy[0].grabber is Player player) || !IsCatLancer(player))
                 return;
 
             Vector2 aimDir = GetAimDir(self, player, 0f);;
@@ -93,7 +93,7 @@ namespace LancerRemix.Combat
         {
             orig.Invoke(self, sLeaser, rCam, timeStacker, camPos);
             if (!sLeaser.sprites[0].isVisible) return;
-            if (self.grabbedBy.Count <= 0 || !(self.grabbedBy[0].grabber is Player player) || !IsLancer(player)) return;
+            if (self.grabbedBy.Count <= 0 || !(self.grabbedBy[0].grabber is Player player) || !IsCatLancer(player)) return;
 
             Vector2 aimDir = GetAimDir(self, player, timeStacker);
             if (self is ExplosiveSpear)

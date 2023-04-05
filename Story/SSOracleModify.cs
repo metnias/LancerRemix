@@ -27,10 +27,9 @@ namespace LancerRemix.Story
         private static void LonkKarmaCapOneStep(On.SSOracleBehavior.orig_Update orig, SSOracleBehavior self, bool eu)
         {
             if (!IsStoryLancer) goto NoLonk;
-            var basis = self.player?.slugcatStats.name;
-            if (IsLancer(basis)) basis = GetBasis(basis);
+            var basis = GetBasis(self.oracle.room.game.StoryCharacter);
             if (basis != SlugName.Yellow) goto NoLonk;
-            if (self.inActionCounter == 299 && self.action == SSOracleBehavior.Action.General_GiveMark)
+            if (self.inActionCounter == 299 && self.action == SSAction.General_GiveMark)
             {
                 self.inActionCounter += 2;
 
@@ -56,8 +55,7 @@ namespace LancerRemix.Story
 
             if (self.id == ConvID.Pebbles_White || self.id == ConvID.Pebbles_Yellow)
             {
-                var lancer = self.owner.oracle.room.game.StoryCharacter;
-                if (HasLancer(lancer)) lancer = GetLancer(lancer);
+                var lancer = GetLancer(self.owner.oracle.room.game.StoryCharacter);
                 if (IsTimelineInbetween(lancer, SlugName.Yellow, ModManager.MSC ? MSCName.Rivulet : null))
                 {
                     // Hidden Lonk Dialogue
@@ -140,8 +138,7 @@ namespace LancerRemix.Story
         private static void ThrowUpdatePatch(On.SSOracleBehavior.ThrowOutBehavior.orig_Update orig, SSOracleBehavior.ThrowOutBehavior self)
         {
             if (!IsStoryLancer) goto NoLancer;
-            var basis = self.owner.oracle.room.game.StoryCharacter;
-            if (IsLancer(basis)) basis = GetBasis(basis);
+            var basis = GetBasis(self.owner.oracle.room.game.StoryCharacter);
             if (basis != SlugName.Red) goto NoLancer;
 
             Vector2 GrabPos = (self.oracle.graphicsModule == null) ? self.oracle.firstChunk.pos : (self.oracle.graphicsModule as OracleGraphics).hands[1].pos;

@@ -57,7 +57,7 @@ namespace LancerRemix
 
         private static void LancerStats(On.SlugcatStats.orig_ctor orig, SlugcatStats self, SlugName slugcat, bool malnourished)
         {
-            var basis = slugcat; if (IsLancer(basis)) basis = GetBasis(basis);
+            var basis = GetBasis(slugcat);
             orig(self, basis, malnourished);
             if (!IsStoryLancer || !IsLancer(slugcat)) return;
             if (!lancerModifiers.TryGetValue(basis, out var mod)) return;
@@ -77,7 +77,7 @@ namespace LancerRemix
 
         private static IntVector2 LancerFoodMeter(On.SlugcatStats.orig_SlugcatFoodMeter orig, SlugName slugcat)
         {
-            var basis = slugcat; if (IsLancer(slugcat)) basis = GetBasis(basis);
+            var basis = GetBasis(slugcat);
             var res = orig(basis);
             if (!IsStoryLancer || !IsLancer(slugcat)) return res;
             if (basis == SlugName.Yellow) return new IntVector2(3, 2);
@@ -86,7 +86,7 @@ namespace LancerRemix
 
         private static int LancerNourishmentOfObjectEaten(On.SlugcatStats.orig_NourishmentOfObjectEaten orig, SlugName slugcatIndex, IPlayerEdible eatenObject)
         {
-            var basis = slugcatIndex; if (IsLancer(slugcatIndex)) basis = GetBasis(basis);
+            var basis = GetBasis(slugcatIndex);
             var res = orig(basis, eatenObject);
             if (!IsStoryLancer || !IsLancer(slugcatIndex)) return res;
             if (basis == SlugName.Yellow) res >>= 2;
@@ -217,8 +217,7 @@ namespace LancerRemix
 
         internal static SlugName GetStoryBasisForLancer(SlugName lancer)
         {
-            var basis = lancer;
-            if (IsLancer(basis)) basis = GetBasis(basis);
+            var basis = GetBasis(lancer);
             if (basis == SlugName.Yellow) basis = SlugName.Red;
             return basis;
         }

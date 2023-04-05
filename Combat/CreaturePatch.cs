@@ -16,9 +16,9 @@ namespace LancerRemix.Combat
         private static void LancerViolencePatch(On.Creature.orig_Violence orig, Creature self,
             BodyChunk source, Vector2? directionAndMomentum, BodyChunk hitChunk, PhysicalObject.Appendage.Pos hitAppendage, Creature.DamageType type, float damage, float stunBonus)
         {
-            if (source?.owner is Player atkPlayer && IsLancer(atkPlayer))
+            if (source?.owner is Player atkPlayer && IsCatLancer(atkPlayer))
                 if (damage < 0.9f) stunBonus = -10000f;
-            if (self is Player player && IsLancer(player))
+            if (self is Player player && IsCatLancer(player))
             { GetSub<LancerSupplement>(player)?.Violence(orig, source, directionAndMomentum, hitChunk, hitAppendage, type, damage, stunBonus); return; }
             orig(self, source, directionAndMomentum, hitChunk, hitAppendage, type, damage, stunBonus);
         }
@@ -26,7 +26,7 @@ namespace LancerRemix.Combat
         private static void VultureLancerDropMask(On.Vulture.orig_Violence orig, Vulture vulture, BodyChunk source, Vector2? directionAndMomentum, BodyChunk hitChunk, PhysicalObject.Appendage.Pos onAppendagePos, Creature.DamageType type, float damage, float stunBonus)
         {
             bool lancer = source?.owner is Spear && (source.owner as Spear).thrownBy is Player player
-                && IsLancer(player);
+                && IsCatLancer(player);
             if (hitChunk != null && hitChunk.index == 4 && (vulture.State as Vulture.VultureState).mask
                 && damage <= 0.9f && lancer && Random.value > Custom.LerpMap(damage, 0.0f, 0.9f, 0.0f, 0.5f))
             {

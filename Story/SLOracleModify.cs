@@ -27,8 +27,7 @@ namespace LancerRemix.Story
         private static void LancerMoonState(On.SLOrcacleState.orig_ForceResetState orig, SLOrcacleState self, SlugName saveStateNumber)
         {
             orig(self, saveStateNumber);
-            var basis = saveStateNumber;
-            if (IsLancer(basis)) basis = GetBasis(basis);
+            var basis = GetBasis(saveStateNumber);
             var lancer = GetLancer(basis);
             var story = IsStoryLancer ? lancer : basis;
 
@@ -108,8 +107,7 @@ namespace LancerRemix.Story
         private static void AddLancerEvents(On.SLOracleBehaviorHasMark.MoonConversation.orig_AddEvents orig, SLOracleBehaviorHasMark.MoonConversation self)
         {
             if (!IsStoryLancer) goto NoLancer;
-            var basis = self.currentSaveFile;
-            if (IsLancer(basis)) basis = GetBasis(basis);
+            var basis = GetBasis(self.currentSaveFile);
             if (basis != SlugName.Red && basis != SlugName.White && basis != SlugName.Yellow) goto NoLancer;
 
             Debug.Log($"Lancer {self.id} {self.State.neuronsLeft}");

@@ -84,7 +84,7 @@ namespace LancerRemix.Cat
 
         public static Color DefaultHornColor(SlugName basis)
         {
-            if (IsLancer(basis)) basis = GetBasis(basis);
+            basis = GetBasis(basis);
             if (defaultHornColors.TryGetValue(basis, out var res)) return res;
 
             var c = PlayerGraphics.DefaultSlugcatColor(basis);
@@ -107,7 +107,7 @@ namespace LancerRemix.Cat
 
         internal static IntVector2 HornStat(SlugName basis)
         {
-            if (IsLancer(basis)) basis = GetBasis(basis);
+            basis = GetBasis(basis);
             if (vanillaHornStats.TryGetValue(basis, out var res)) return res;
             return new IntVector2(3, 8);
         }

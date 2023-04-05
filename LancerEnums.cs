@@ -44,9 +44,17 @@ namespace LancerRemix
 
         internal static bool HasLancer(SlugName basis) => AllBasis.Contains(basis);
 
-        internal static SlugName GetLancer(SlugName basis) => NameLancer[basis];
+        internal static SlugName GetLancer(SlugName basis)
+        {
+            if (NameLancer.TryGetValue(basis, out var lancer)) return lancer;
+            return basis;
+        }
 
-        internal static SlugName GetBasis(SlugName lancer) => NameBasis[lancer];
+        internal static SlugName GetBasis(SlugName lancer)
+        {
+            if (NameBasis.TryGetValue(lancer, out var basis)) return basis;
+            return lancer;
+        }
 
         internal static void RegisterLancers()
         {

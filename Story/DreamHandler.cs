@@ -43,8 +43,7 @@ namespace LancerRemix.Story
             orig(self, saveStateNumber, progression);
             if (!IsStoryLancer) return;
 
-            var basis = saveStateNumber;
-            if (IsLancer(basis)) basis = GetBasis(basis);
+            var basis = GetBasis(saveStateNumber);
 
             if (basis != SlugName.Red) return;
             self.dreamsState = new DreamsState(); // add dream state to lancer hunter
@@ -62,8 +61,7 @@ namespace LancerRemix.Story
 
             void LancerCheckEventDream(SaveState saveState)
             {
-                var basis = saveState.saveStateNumber;
-                if (IsLancer(basis)) basis = GetBasis(basis);
+                var basis = GetBasis(saveState.saveStateNumber);
 
                 if (basis != SlugName.Red) return;
 
@@ -82,8 +80,7 @@ namespace LancerRemix.Story
             orig(saveState, currentRegion, denPosition, ref cyclesSinceLastDream, ref cyclesSinceLastFamilyDream, ref cyclesSinceLastGuideDream, ref inGWOrSHCounter, ref upcomingDream, ref eventDream, ref everSleptInSB, ref everSleptInSB_S01, ref guideHasShownHimselfToPlayer, ref guideThread, ref guideHasShownMoonThisRound, ref familyThread);
             if (!IsStoryLancer) return;
 
-            var basis = saveState.saveStateNumber;
-            if (IsLancer(basis)) basis = GetBasis(basis);
+            var basis = GetBasis(saveState.saveStateNumber);
 
             if (basis != SlugName.Red) return;
             if (upcomingDream != DreamHunterMeet) upcomingDream = null;

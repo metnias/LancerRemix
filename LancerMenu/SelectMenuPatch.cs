@@ -128,10 +128,7 @@ namespace LancerRemix.LancerMenu
         }
 
         private static int IndexFromLancer(On.Menu.SlugcatSelectMenu.orig_indexFromColor orig, SlugcatSelectMenu self, SlugName color)
-        {
-            if (IsLancer(color)) color = GetBasis(color);
-            return orig(self, color);
-        }
+            => orig(self, GetBasis(color));
 
         private static void SetLancerChecked(On.Menu.SlugcatSelectMenu.orig_SetChecked orig, SlugcatSelectMenu self, CheckBox box, bool c)
         {
@@ -267,8 +264,7 @@ namespace LancerRemix.LancerMenu
         {
             if (slugcatPageLancer)
             {
-                var basis = storyGameCharacter;
-                if (IsLancer(basis)) basis = GetBasis(basis);
+                var basis = GetBasis(storyGameCharacter);
                 var lancer = GetLancer(basis);
                 if (basis == SlugName.Red)
                 {
@@ -526,11 +522,7 @@ namespace LancerRemix.LancerMenu
             private static SaveGameData LancerGameData(orig_saveGameData orig, SlugcatPageContinue self)
             {
                 if (self is LancerPageContinue)
-                {
-                    var lancerNumber = self.slugcatNumber;
-                    if (HasLancer(lancerNumber)) lancerNumber = GetLancer(lancerNumber);
-                    return (self.menu as SlugcatSelectMenu).saveGameData[lancerNumber];
-                }
+                    return (self.menu as SlugcatSelectMenu).saveGameData[GetLancer(self.slugcatNumber)];
                 return orig(self);
             }
 

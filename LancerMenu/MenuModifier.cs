@@ -33,7 +33,6 @@ namespace LancerRemix.LancerMenu
             SymbolButtonToggleLancerButton.SubUnpatch();
         }
 
-
         private static bool IsStoryLancer => ModifyCat.IsStoryLancer;
 
         private static void ReplaceIllust(MenuScene scene, string sceneFolder, string flatImage, string layerImageOrig, string layerImage, Vector2 layerPos)
@@ -46,7 +45,7 @@ namespace LancerRemix.LancerMenu
                 basis = (scene.menu.manager.currentMainLoop as RainWorldGame).StoryCharacter;
             else
                 basis = scene.menu.manager.rainWorld.progression.PlayingAsSlugcat;
-            if (IsLancer(basis)) basis = GetBasis(basis);
+            basis = GetBasis(basis);
             if (basis == SlugName.White)
             {
                 ReplaceIllust(scene, $"scenes{Path.DirectorySeparatorChar}sleep screen - lancer",
