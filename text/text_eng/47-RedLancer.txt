@@ -1,12 +1,13 @@
-0As I feared, here you are. Empty handed.
+0-47
+As I feared, here you are. Empty handed.
 They were never one to think ahead. Their last messenger came through here not so long ago. So too did it visit my can as you have.
 Though at least that one didn't lose its payload. They should have equipped you more than an overseer.
 What else to expect from a cub. What else did they think would happen?<LINE>Not only did you abandon the delivery, you managed to travel<LINE>a more treacherous path to the wrong destination.
 I'm having trouble choosing which to be more angry over, their reckless and<LINE>desperate endangerment of a child, or the fact that you came all this way for nothing...
-self.events.Add(new SSOracleBehavior.PebblesConversation.PauseAndWaitForStillEvent(self, self.convBehav, 20));
+PEBBLESWAIT : 20
 Tiny creature, you are not healthy. We are bearers of similar ailments, you and I.
 It is a shame you have to deal with this sickness at such a young age. I would not feel right if I didn't try to help in any way I can.
-self.events.Add(new Conversation.SpecialEvent(self, 0, "karma"));
+SPECEVENT : karma
 I hope I have repaid what little time you have left that was spent coming here.
 You can use your remaining time for a greater purpose, however. There is still a chance for your salvation, little one.<LINE>Go west, past the Farm Arrays, and descend below the earth as far as you can reach. There you will find a solution to<LINE>a problem that has afflicted everything since the beginning of time.
 You'd only be helping yourself, though. Sadly my kind are the only ones left in this world<LINE>who can do something about that. Either way, it's time for you to go.

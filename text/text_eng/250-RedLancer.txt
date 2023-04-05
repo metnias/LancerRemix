@@ -1,4 +1,5 @@
-0Hello <PlayerName>. Are you lost?
+0-250
+Hello <PlayerName>. Are you lost?
 0 : 40 : ...
 40 : 0 : Oh.
 Tiny creature...
