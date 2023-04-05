@@ -59,7 +59,7 @@ namespace LancerRemix
         {
             var basis = GetBasis(slugcat);
             orig(self, basis, malnourished);
-            if (!IsStoryLancer || !IsLancer(slugcat)) return;
+            if (!IsStoryLancer && !IsLancer(slugcat)) return;
             if (!lancerModifiers.TryGetValue(basis, out var mod)) return;
 
             self.lungsFac *= mod.lungsFac;
@@ -79,7 +79,7 @@ namespace LancerRemix
         {
             var basis = GetBasis(slugcat);
             var res = orig(basis);
-            if (!IsStoryLancer || !IsLancer(slugcat)) return res;
+            if (!IsStoryLancer && !IsLancer(slugcat)) return res;
             if (basis == SlugName.Yellow) return new IntVector2(3, 2);
             return res;
         }
@@ -88,7 +88,8 @@ namespace LancerRemix
         {
             var basis = GetBasis(slugcatIndex);
             var res = orig(basis, eatenObject);
-            if (!IsStoryLancer || !IsLancer(slugcatIndex)) return res;
+            //Debug.Log($"{slugcatIndex}({IsStoryLancer}) Nourishment: {res}");
+            if (!IsStoryLancer && !IsLancer(slugcatIndex)) return res;
             if (basis == SlugName.Yellow) res >>= 2;
             return res;
         }

@@ -5,6 +5,8 @@ using static LancerRemix.LancerEnums;
 using SlugName = SlugcatStats.Name;
 using static CatSub.Story.SaveManager;
 using MoreSlugcats;
+using MonoMod.Cil;
+using System.Globalization;
 
 namespace LancerRemix.Cat
 {
@@ -18,6 +20,8 @@ namespace LancerRemix.Cat
 
             On.PlayerProgression.SaveToDisk += SaveToLancer;
             //On.SaveState.SaveToString += SaveStateToLancer;
+            IL.PlayerProgression.SaveDeathPersistentDataOfCurrentState += SaveLancerPersDataOfCurrentState;
+            IL.PlayerProgression.LoadMapTexture += LoadLancerMapTexture;
             On.PlayerProgression.LoadGameState += LoadLancerStateInstead;
             //IL.PlayerProgression.LoadGameState += LoadLancerState;
 
@@ -91,6 +95,28 @@ namespace LancerRemix.Cat
             }
             SetMiscValue(self.miscProgressionData, CURRSLUGCATLANCER, false);
             return orig(self, saveCurrentState, saveMaps, saveMiscProg);
+        }
+
+        private static void SaveLancerPersDataOfCurrentState(ILContext il)
+        {
+            var cursor = new ILCursor(il);
+            LancerPlugin.LogSource.LogInfo("SaveLancerPersDataOfCurrentState Patch");
+
+            LancerPlugin.LogSource.LogInfo("SaveLancerPersDataOfCurrentState Patch Done");
+
+            void DebugLogCursor() =>
+                LancerPlugin.LogSource.LogInfo($"{cursor.Prev.OpCode.Name} > Cursor < {cursor.Next.OpCode.Name}");
+        }
+
+        private static void LoadLancerMapTexture(ILContext il)
+        {
+            var cursor = new ILCursor(il);
+            LancerPlugin.LogSource.LogInfo("LoadLancerMapTexture Patch");
+
+            LancerPlugin.LogSource.LogInfo("LoadLancerMapTexture Patch Done");
+
+            void DebugLogCursor() =>
+                LancerPlugin.LogSource.LogInfo($"{cursor.Prev.OpCode.Name} > Cursor < {cursor.Next.OpCode.Name}");
         }
 
         private static SaveState LoadLancerStateInstead(On.PlayerProgression.orig_LoadGameState orig, PlayerProgression self,

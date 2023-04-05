@@ -108,8 +108,7 @@ namespace LancerRemix.LancerMenu
             cursor.EmitDelegate<Func<FastTravelScreen, int>>(
                 (self) =>
                 {
-                    var lancer = self.manager.rainWorld.progression.PlayingAsSlugcat;
-                    if (HasLancer(lancer)) lancer = GetLancer(lancer);
+                    var lancer = GetLancer(self.manager.rainWorld.progression.PlayingAsSlugcat);
                     Debug.Log($"Lancer: Switched FastTravelScreen for {lancer.value}({lancer.Index}) (basis: {self.manager.rainWorld.progression.PlayingAsSlugcat})");
                     return lancer.Index;
                 }
