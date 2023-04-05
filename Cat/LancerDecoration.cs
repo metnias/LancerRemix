@@ -50,6 +50,13 @@ namespace LancerRemix.Cat
             Vector2 thicc = Custom.PerpendicularVector(head, tip);
             Vector2 dir = (tip - head) * 0.6f;
 
+            for (int j = 0; j < 2; ++j)
+            {
+                Vector2 hand = Vector2.Lerp(self.hands[j].lastPos, self.hands[j].pos, timeStacker);
+                sLeaser.sprites[5 + j].x = hand.x + thicc.x * 5f - camPos.x;
+                sLeaser.sprites[5 + j].y = hand.y + thicc.y * 5f - camPos.y;
+            }
+
             (sprites[0] as TriangleMesh).MoveVertice(0, dir + tip - camPos);
             (sprites[0] as TriangleMesh).MoveVertice(1, dir + head - thicc * (float)stat.x / 2f - camPos);
             (sprites[0] as TriangleMesh).MoveVertice(2, dir + head + thicc * (float)stat.x / 2f - camPos);
