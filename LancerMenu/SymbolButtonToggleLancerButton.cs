@@ -74,6 +74,7 @@ namespace LancerRemix.LancerMenu
 
         public string symbolLancerOn;
 
+
         public override void LoadIcon()
         {
             base.LoadIcon();
@@ -81,7 +82,28 @@ namespace LancerRemix.LancerMenu
 
         public override void Toggle()
         {
-            base.Toggle();
+            if (symbol.fileName == symbolNameOn)
+            {
+                symbol.fileName = symbolNameOff;
+                signalText = signalText.Replace("off", "on");
+                isToggled = false;
+                if (belowLabel != null)
+                {
+                    belowLabel.label.text = labelNameOff;
+                }
+            }
+            else
+            {
+                symbol.fileName = symbolNameOn;
+                signalText = signalText.Replace("on", "off");
+                isToggled = true;
+                if (belowLabel != null)
+                {
+                    belowLabel.label.text = labelNameOn;
+                }
+            }
+            faceSymbol.fileName = "face_" + symbol.fileName;
+            LoadIcon();
         }
 
         public override void Update()
