@@ -78,10 +78,10 @@ namespace LancerRemix.LancerMenu
         /// 0off 1on 2lancer
         /// </summary>
         public int status;
+
         public string rawSignalText;
 
-        public string symbolLancerOn;
-
+        public string symbolLancerOn = "";
 
         public override void LoadIcon()
         {

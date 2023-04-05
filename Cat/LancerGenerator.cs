@@ -13,6 +13,8 @@ using CatSub.Story;
 using System.IO;
 using Menu;
 using LancerRemix.LancerMenu;
+using LancerRemix.Cat;
+using RWCustom;
 
 namespace LancerRemix
 {
@@ -21,11 +23,14 @@ namespace LancerRemix
         internal static void Patch()
         {
             On.SlugcatStats.ctor += LancerStats;
+            On.SlugcatStats.SlugcatFoodMeter += LancerFoodMeter;
             On.SlugcatStats.SlugcatUnlocked += LancerUnlocked;
             On.SlugcatStats.NourishmentOfObjectEaten += LancerNourishmentOfObjectEaten;
             On.Menu.MenuScene.UseSlugcatUnlocked += UseLancerUnlocked;
             On.SlugcatStats.HiddenOrUnplayableSlugcat += DisableLancerRegularSelect;
         }
+
+        private static bool IsStoryLancer => ModifyCat.IsStoryLancer;
 
         private static bool LancerUnlocked(On.SlugcatStats.orig_SlugcatUnlocked orig, SlugName i, RainWorld rainWorld)
         {
@@ -52,9 +57,9 @@ namespace LancerRemix
 
         private static void LancerStats(On.SlugcatStats.orig_ctor orig, SlugcatStats self, SlugName slugcat, bool malnourished)
         {
-            if (!IsLancer(slugcat)) { orig(self, slugcat, malnourished); return; }
-            var basis = GetBasis(slugcat);
+            var basis = slugcat; if (IsLancer(basis)) basis = GetBasis(basis);
             orig(self, basis, malnourished);
+            if (!IsStoryLancer || !IsLancer(slugcat)) return;
             if (!lancerModifiers.TryGetValue(basis, out var mod)) return;
 
             self.lungsFac *= mod.lungsFac;
@@ -70,10 +75,20 @@ namespace LancerRemix
             if (basis == SlugName.Yellow) { self.foodToHibernate = 2; self.maxFood = 3; }
         }
 
+        private static IntVector2 LancerFoodMeter(On.SlugcatStats.orig_SlugcatFoodMeter orig, SlugName slugcat)
+        {
+            var basis = slugcat; if (IsLancer(slugcat)) basis = GetBasis(basis);
+            var res = orig(basis);
+            if (!IsStoryLancer || !IsLancer(slugcat)) return res;
+            if (basis == SlugName.Yellow) return new IntVector2(3, 2);
+            return res;
+        }
+
         private static int LancerNourishmentOfObjectEaten(On.SlugcatStats.orig_NourishmentOfObjectEaten orig, SlugName slugcatIndex, IPlayerEdible eatenObject)
         {
-            var res = orig(slugcatIndex, eatenObject);
             var basis = slugcatIndex; if (IsLancer(slugcatIndex)) basis = GetBasis(basis);
+            var res = orig(basis, eatenObject);
+            if (!IsStoryLancer || !IsLancer(slugcatIndex)) return res;
             if (basis == SlugName.Yellow) res >>= 2;
             return res;
         }

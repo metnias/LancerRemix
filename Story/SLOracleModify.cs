@@ -194,7 +194,7 @@ namespace LancerRemix.Story
                                 self.events.Add(new Conversation.TextEvent(self, 30, self.Translate("Hello there. You again!"), 0));
                             }
                             self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("I wonder what it is that you want?"), 0));
-                            if (self.State.GetOpinion != SLOrcacleState.PlayerOpinion.Dislikes && (!ModManager.MSC || IsTimelineInbetween(GetLancer(basis), MSCName.Rivulet))) // after riv
+                            if (self.State.GetOpinion != SLOrcacleState.PlayerOpinion.Dislikes && (!ModManager.MSC || IsTimelineInbetween(GetLancer(basis), MSCName.Rivulet, null))) // after riv
                             {
                                 self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("I have had another visitor from your specie before. And they left me alive!<LINE>But... I have told you that already, haven't I?"), 0));
                                 self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("You must excuse me if I repeat myself. My memory is bad.<LINE>I used to have a pathetic five neurons... And then you ate one.<LINE>Maybe I've told you that before as well."), 0));

@@ -187,6 +187,16 @@ namespace LancerRemix.Story
             orig(self, sLeaser, rCam, timeStacker, camPos);
             if (IsLunter(self.owner.daddy))
                 GetDeco(self).DrawSprites(null, sLeaser, rCam, timeStacker, camPos);
+            else
+            {
+                if (!self.owner.daddy.room.game.IsStorySession || !IsStoryLancer) return;
+                var basis = self.owner.daddy.room.game.StoryCharacter;
+                if (IsLancer(basis)) basis = GetBasis(basis);
+                if (basis != SlugName.Red) return;
+                sLeaser.sprites[self.startSprite + 5].element = Futile.atlasManager.GetElementWithName("FaceA" +
+                    sLeaser.sprites[self.startSprite + 3].element.name.Substring(5));
+                sLeaser.sprites[self.startSprite + 5].scaleX = sLeaser.sprites[self.startSprite + 3].scaleX;
+            }
         }
 
         private static void LunterDummyApplyPalette(On.DaddyGraphics.HunterDummy.orig_ApplyPalette orig, HunterDummy self,
@@ -396,6 +406,8 @@ namespace LancerRemix.Story
                 var basis = character;
                 if (IsLancer(basis)) basis = GetBasis(basis);
                 if (basis == SlugName.Red) return true;
+                if (basis == SlugName.Yellow) return false;
+                return orig(self, basis);
             }
             return orig(self, character);
         }
@@ -423,6 +435,5 @@ namespace LancerRemix.Story
         }
 
         #endregion Overseer
-
     }
 }

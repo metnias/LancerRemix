@@ -1,4 +1,5 @@
 ﻿using CatSub.Story;
+using HUD;
 using JollyCoop.JollyMenu;
 using LancerRemix.Cat;
 using Menu;
@@ -208,8 +209,10 @@ namespace LancerRemix.LancerMenu
         #region LancerPlayers
 
         private static readonly bool[] lancerPlayers = new bool[4];
+
         internal static void SetLancerPlayers(int num, bool lancer)
             => lancerPlayers[num] = lancer;
+
         internal static bool GetLancerPlayers(int num) => lancerPlayers[num];
 
         private const string LANCERPLAYERS = "LancerPlayers";
@@ -506,6 +509,14 @@ namespace LancerRemix.LancerMenu
                 slugcatNumber = lancerNumber;
 
                 LancerPortrait(this);
+
+                if (SlugcatStats.SlugcatFoodMeter(slugcatNumber) != SlugcatStats.SlugcatFoodMeter(basisNumber))
+                {
+                    hud.foodMeter.slatedForDeletion = true;
+                    hud.parts.Remove(hud.foodMeter);
+                    hud.foodMeter.ClearSprites();
+                    hud.AddPart(new FoodMeter(hud, SlugcatStats.SlugcatFoodMeter(slugcatNumber).x, SlugcatStats.SlugcatFoodMeter(slugcatNumber).y, null, 0));
+                }
             }
 
             internal SlugName basisNumber;
