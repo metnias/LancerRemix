@@ -17,7 +17,7 @@ namespace LancerRemix.Story
         internal static void SubPatch()
         {
             On.SLOrcacleState.ForceResetState += LancerMoonState;
-            On.SLOracleBehaviorHasMark.NameForPlayer += NameForLancer;
+            // On.SLOracleBehaviorHasMark.NameForPlayer += NameForLancer;
             On.SLOracleBehaviorHasMark.MoonConversation.AddEvents += AddLancerEvents;
         }
 
@@ -311,10 +311,10 @@ namespace LancerRemix.Story
                 self.PearlIntro();
                 self.LoadEventsFromFile(51, GetLancer(basis), false, 0);
                 if (already)
-                    self.events.Add(new Conversation.TextEvent(self, 0, "Thank you, No Significant Harassment, for trying so hard.", 20));
+                    self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("Thank you, No Significant Harassment, for trying so hard."), 20));
                 else
-                    self.events.Add(new Conversation.TextEvent(self, 0, "I see now. Again, thank you, No Significant Harassment.", 20));
-                self.events.Add(new Conversation.TextEvent(self, 0, "I am happy to not be alone.", 20));
+                    self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("I see now. Again, thank you, No Significant Harassment."), 20));
+                self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("I am happy to not be alone."), 20));
                 return;
             }
 
