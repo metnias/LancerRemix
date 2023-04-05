@@ -40,6 +40,7 @@ namespace LancerRemix.Story
                 if (basis == SlugName.Red && story == GetLancer(SlugName.Red))
                 {
                     SetProgValue(Custom.rainWorld.progression.currentSaveState.miscWorldSaveData, REDALREADYSUCCEED, self.neuronsLeft > 0);
+                    SetProgValue(Custom.rainWorld.progression.currentSaveState.miscWorldSaveData, SSOracleModify.LUNTERTOOKNSHKEYBACK, false);
                 }
             }
             else if (ModManager.MSC && IsTimelineInbetween(story, MSCName.Rivulet, null)) // after riv
