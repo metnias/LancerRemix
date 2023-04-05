@@ -56,13 +56,11 @@ namespace LancerRemix.LancerMenu
                 ReplaceIllust(scene, $"scenes{Path.DirectorySeparatorChar}sleep screen - lancer",
                     "sleep lancer - yellow - flat", "sleep - 2 - yellow", "lancer - 2 - yellow", new Vector2(677f, 63f));
             }
-            /*
             else if (basis == SlugName.Red)
             {
                 ReplaceIllust(scene, $"scenes{Path.DirectorySeparatorChar}sleep screen - lancer",
-                    "sleep lancer - white - flat", "sleep - 2 - white", "lancer - 2 - white", new Vector2(677f, 63f));
+                    "sleep lancer - red - flat", "sleep - 2 - red", "lancer - 2 - red", new Vector2(817f, 112f));
             }
-            */
         }
 
         private static void LancerSceneSwap(On.Menu.MenuScene.orig_ctor orig, MenuScene self, Menu.Menu menu, MenuObject owner, MenueSceneID sceneID)

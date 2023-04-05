@@ -1,4 +1,4 @@
-﻿0Should I start leaving a cushion under my access shafts? If visits from you things<LINE>are going to be so frequent, why not make it a bit more comfortable?
+0Should I start leaving a cushion under my access shafts? If visits from you things<LINE>are going to be so frequent, why not make it a bit more comfortable?
 Time and time again, young and old, your kind manage to wander through<LINE>my systems and across my exterior until they end up here,<LINE>and every time I help them and they go on their way.
 Is this what has become of me? A simple a rat-attunement device?<LINE>That's all I do nowadays, after all!
 self.events.Add(new SSOracleBehavior.PebblesConversation.PauseAndWaitForStillEvent(self, self.convBehav, 4));

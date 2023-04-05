@@ -1,4 +1,4 @@
-﻿0And so comes the second.
+0And so comes the second.
 self.events.Add(new SSOracleBehavior.PebblesConversation.PauseAndWaitForStillEvent(self, self.convBehav, 10));
 They were never one to think ahead. Their last messenger came through here not so long ago, and it also did not possess any major enhancement.
 So too did it visit my can as you have.<LINE>That's just what happens when you trust wild animals to follow basic instructions with no other precaution.

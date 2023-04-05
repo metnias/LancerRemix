@@ -112,12 +112,14 @@
     <AdditionalFiles Include="scenes\slugcat - lancer\lancer - red dark - flat.png" />
     <AdditionalFiles Include="text\text_kor\strings.txt" />
     <Content Include="scenes\sleep screen - lancer\lancer - 2 - yellow.png" />
+    <Content Include="scenes\sleep screen - lancer\lancer - 2 - red.png" />
     <Content Include="scenes\sleep screen - lancer\sleep lancer - yellow - flat.png" />
     <Content Include="illustrations\lancer_off.png" />
     <Content Include="illustrations\lancer_on.png" />
     <AdditionalFiles Include="scenes\slugcat - lancer\lancer - red - flat.png" />
     <AdditionalFiles Include="scenes\slugcat - lancer\lancer - yellow - flat.png" />
     <AdditionalFiles Include="scenes\slugcat - lancer\lancer - white - flat.png" />
+    <Content Include="scenes\sleep screen - lancer\sleep lancer - red - flat.png" />
     <Content Include="slugbase\scenes\dream - lancer hunter meet\1 - FG.png" />
     <Content Include="slugbase\scenes\dream - lancer hunter meet\2 - HLL.png" />
     <Content Include="slugbase\scenes\dream - lancer hunter meet\3 - HLancer.png" />

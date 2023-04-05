@@ -1,4 +1,4 @@
-﻿0topicular.lancer-name|랜서
+0topicular.lancer-name|랜서
 topicular.lancer-description|캠페인에 근접 전투하는 랜서 버전을 추가합니다.
 
 Horn|뿔
