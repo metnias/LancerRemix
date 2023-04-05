@@ -53,8 +53,8 @@ namespace LancerRemix.Cat
             for (int j = 0; j < 2; ++j)
             {
                 Vector2 hand = Vector2.Lerp(self.hands[j].lastPos, self.hands[j].pos, timeStacker);
-                sLeaser.sprites[5 + j].x = hand.x + thicc.x * 5f - camPos.x;
-                sLeaser.sprites[5 + j].y = hand.y + thicc.y * 5f - camPos.y;
+                sLeaser.sprites[5 + j].x = hand.x + thicc.x * (j == 0 ? 3f : -3f) - camPos.x;
+                sLeaser.sprites[5 + j].y = hand.y + thicc.y * (j == 0 ? 3f : -3f) - camPos.y;
             }
 
             (sprites[0] as TriangleMesh).MoveVertice(0, dir + tip - camPos);
