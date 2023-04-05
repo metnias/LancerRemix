@@ -37,7 +37,10 @@ namespace LancerRemix.Story
             else if (IsTimelineInbetween(story, SlugName.Red, SlugName.White))
             {
                 self.neuronsLeft = TryMineRedData(); // dead if red has not succeed and before white
-                SetProgValue(Custom.rainWorld.progression.currentSaveState.miscWorldSaveData, REDALREADYSUCCEED, self.neuronsLeft > 0);
+                if (basis == SlugName.Red && story == GetLancer(SlugName.Red))
+                {
+                    SetProgValue(Custom.rainWorld.progression.currentSaveState.miscWorldSaveData, REDALREADYSUCCEED, self.neuronsLeft > 0);
+                }
             }
             else if (ModManager.MSC && IsTimelineInbetween(story, MSCName.Rivulet, null)) // after riv
             {
@@ -287,6 +290,7 @@ namespace LancerRemix.Story
             #region Lunter
 
             bool already = GetProgValue<bool>(Custom.rainWorld.progression?.currentSaveState.miscWorldSaveData, REDALREADYSUCCEED);
+            //bool nsh = GetProgValue<bool>(Custom.rainWorld.progression.currentSaveState.miscWorldSaveData, LUNTERNSHAWARE);
             if (self.id == ConvID.Moon_Red_First_Conversation)
             {
                 if (already)

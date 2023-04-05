@@ -387,6 +387,8 @@ namespace LancerRemix.Story
                 LancerPlugin.LogSource.LogInfo($"{cursor.Prev.OpCode.Name} > Cursor < {cursor.Next.OpCode.Name}");
         }
 
+        #region Overseer
+
         private static bool LunterOverseerSpawn(On.WorldLoader.orig_OverseerSpawnConditions orig, WorldLoader self, SlugName character)
         {
             if (IsStoryLancer)
@@ -419,5 +421,8 @@ namespace LancerRemix.Story
                 if (basis == SlugName.Red && (world.game.session as StoryGameSession).saveState.miscWorldSaveData.EverMetMoon) self.destroy = true;
             }
         }
+
+        #endregion Overseer
+
     }
 }
