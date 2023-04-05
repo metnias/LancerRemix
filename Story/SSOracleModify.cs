@@ -55,28 +55,87 @@ namespace LancerRemix.Story
         {
             if (!IsStoryLancer) goto NoLancer;
 
-            if (self.id == ConvID.Pebbles_White)
+            if (self.id == ConvID.Pebbles_White || self.id == ConvID.Pebbles_Yellow)
             {
+                var lancer = self.owner.oracle.room.game.StoryCharacter;
+                if (HasLancer(lancer)) lancer = GetLancer(lancer);
+                if (IsTimelineInbetween(lancer, SlugName.Yellow, ModManager.MSC ? MSCName.Rivulet : null))
+                {
+                    // Hidden Lonk Dialogue
+                    self.LoadEventsFromFile(48, GetLancer(SlugName.Yellow), false, 0);
+                    return;
+                }
+                bool preMove = IsTimelineInbetween(lancer, null, ModManager.MSC ? MSCName.Gourmand : SlugName.White);
+                if (!self.owner.playerEnteredWithMark)
+                {
+                    self.events.Add(new Conversation.TextEvent(self, 0, ".  .  .", 0));
+                    self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("...is this reaching you?"), 0));
+                    self.events.Add(new SSOracleBehavior.PebblesConversation.PauseAndWaitForStillEvent(self, self.convBehav, 4));
+                }
+                else
+                {
+                    self.events.Add(new SSOracleBehavior.PebblesConversation.PauseAndWaitForStillEvent(self, self.convBehav, 210));
+                }
+                self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("A tiny animal. A young one, too. Your journey has taken you deep into my chamber,<LINE>but I doubt you came here on purpose."), 0));
+                if (preMove) // Yellow
+                {
+                    self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("I'm afraid I can't assist you in the way you would have hoped for.<LINE> I do not know what would drive you to come all the way here in search for your family... Or how you managed it."), 0));
+                    self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("Your family may be long gone by now... I can assure you they are nowhere in my premises, your kind don't seem to take well to this place.<LINE>My overseers would take great delight in reporting an entire group of you, seeing how they react to just one."), 0));
+                }
+                else // White
+                {
+                    self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("I'm afraid I can't assist you in the way you would have hoped for.<LINE> I do not know what would drive you to come all the way here in search for your family... Or how you managed it."), 0));
+                    self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("Your family may be long gone by now... I can assure you they are nowhere in my premises, your kind don't seem to take well to this place.<LINE>My overseers would take great delight in reporting an entire group of you, seeing how they react to just one."), 0));
+                }
+                self.events.Add(new SSOracleBehavior.PebblesConversation.PauseAndWaitForStillEvent(self, self.convBehav, 20));
+                self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("However, if it's any consolation, I will give you an opportunity. To go the way of my creators. Eternal bliss, how does that sound?"), 0));
+                self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("From here, go west past the Farm Arrays and find the place where the land fissures.<LINE>Clamber down into the earth, as deep as you can reach, and then go further."), 0));
+                self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("Saying you'll need luck is an understatement... but I admit I feel a pang of sympathy for you, and it feels wrong to leave you empty handed."), 0));
+                self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("At the end of time none of this will matter, I suppose. Even if you fail you'll live an eternity of lives more, and maybe eventually, you'll make it in the end."), 0));
+                self.events.Add(new SSOracleBehavior.PebblesConversation.PauseAndWaitForStillEvent(self, self.convBehav, 4));
+                self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("Either way, you must leave now. There's a perfectly good access shaft right here."), 0));
+                if (!TryJoke())
+                    self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("I hope you find what you're looking for. Don't bother coming back."), 30));
+                
                 return;
             }
             if (self.id == ConvID.Pebbles_Red_Green_Neuron)
             {
+                self.LoadEventsFromFile(46, GetLancer(SlugName.Red), false, 0);
+                lunterStoleNeuron = false; secondEntry = true; banned = false;
+                greenNeuron = self.owner.greenNeuron;
                 return;
             }
             if (self.id == ConvID.Pebbles_Red_No_Neuron)
             {
-                return;
-            }
-            if (self.id == ConvID.Pebbles_Yellow)
-            {
+                self.LoadEventsFromFile(47, GetLancer(SlugName.Red), false, 0);
+                lunterStoleNeuron = true; secondEntry = true; banned = true;
                 return;
             }
         NoLancer: orig.Invoke(self);
+            bool TryJoke()
+            {
+                if (ModManager.MSC && self.owner.CheckSlugpupsInRoom())
+                {
+                    self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("Best of luck to you, and your family. There is nothing else I can do."), 0));
+                    self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("I must resume my work."), 0));
+                    self.owner.CreatureJokeDialog();
+                    return true;
+                }
+                if (ModManager.MMF && self.owner.CheckStrayCreatureInRoom() != CreatureTemplate.Type.StandardGroundCreature)
+                {
+                    self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("Best of luck to you, and your companion. There is nothing else I can do."), 0));
+                    self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("I must resume my work."), 0));
+                    self.owner.CreatureJokeDialog();
+                    return true;
+                }
+                return false;
+            }
         }
 
-        public static NSHSwarmer greenNeuron;
-        public static bool lunterStoleNeuron = true; public static bool secondEntry = true;
-        public static bool banned = false;
+        private static NSHSwarmer greenNeuron = null;
+        private static bool lunterStoleNeuron = true; private static bool secondEntry = true;
+        private static bool banned = false;
 
         private static void ThrowUpdatePatch(On.SSOracleBehavior.ThrowOutBehavior.orig_Update orig, SSOracleBehavior.ThrowOutBehavior self)
         {
@@ -85,7 +144,6 @@ namespace LancerRemix.Story
             if (IsLancer(basis)) basis = GetBasis(basis);
             if (basis != SlugName.Red) goto NoLancer;
 
-            /*
             Vector2 GrabPos = (self.oracle.graphicsModule == null) ? self.oracle.firstChunk.pos : (self.oracle.graphicsModule as OracleGraphics).hands[1].pos;
 
             if (self.player.room == self.oracle.room)
@@ -131,7 +189,7 @@ namespace LancerRemix.Story
                         * 0.25f * (1f - self.oracle.room.gravity) * Mathf.InverseLerp(220f, 280f, (float)self.inActionCounter);
                 }
             }
-
+            /*
             switch (self.action)
             {
                 case SSOracleBehavior.Action.ThrowOut_ThrowOut:

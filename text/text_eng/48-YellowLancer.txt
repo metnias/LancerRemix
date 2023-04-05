@@ -1,0 +1,8 @@
+﻿0Should I start leaving a cushion under my access shafts? If visits from you things<LINE>are going to be so frequent, why not make it a bit more comfortable?
+Time and time again, young and old, your kind manage to wander through<LINE>my systems and across my exterior until they end up here,<LINE>and every time I help them and they go on their way.
+Is this what has become of me? A simple a rat-attunement device?<LINE>That's all I do nowadays, after all!
+self.events.Add(new SSOracleBehavior.PebblesConversation.PauseAndWaitForStillEvent(self, self.convBehav, 4));
+It wouldn't be fair to punish you from the outset because of what your predecessors have done.<LINE>So I will give you the instructions I gave them, to use the Mark you now hold. But after that,<LINE>use whatever pheromones, metal-pounding, or guttural yowls your kind utilizes to relay a simple message.
+10 : Don't. Come. Back. This goes for you too, little one. : 0
+Now, let's get you on your way. Go west, past the Farm Arrays.<LINE>Where the land fissures, go down into the earth and search your way deeper.
+0 : Did you get all of that? Good. Leave. : 30
