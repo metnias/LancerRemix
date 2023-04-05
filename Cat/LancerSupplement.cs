@@ -95,6 +95,7 @@ namespace LancerRemix.Cat
             if (!(grasp.grabber is Lizard) && !(grasp.grabber is Vulture) && !(grasp.grabber is BigSpider) && !(grasp.grabber is DropBug)) goto NoParry;
             // Parry!
             grasp.grabber.Stun(Mathf.CeilToInt(Mathf.Lerp(80, 40, grasp.grabber.TotalMass / 10f)));
+            grasp.Release();
 
             AddParryEffect();
             if (blockTimer < 1) FlingLance();
@@ -105,11 +106,12 @@ namespace LancerRemix.Cat
 
         private void AddParryEffect()
         {
-            self.room.AddObject(new ShockWave(self.mainBodyChunk.pos, 25f, 0.8f, 4, false));
+            self.room.AddObject(new ShockWave(self.mainBodyChunk.pos, 50f, 0.2f, 4, false));
             for (int l = 0; l < 5; l++)
                 self.room.AddObject(new Spark(self.mainBodyChunk.pos, Custom.RNV() * 3f, Color.yellow, null, 25, 90));
-            self.room.PlaySound(SoundID.Spear_Damage_Creature_But_Fall_Out, self.mainBodyChunk, false, 1.5f, 0.8f);
+            self.room.PlaySound(SoundID.Spear_Bounce_Off_Wall, self.mainBodyChunk, false, 1.5f, 0.8f);
             self.room.InGameNoise(new InGameNoise(self.mainBodyChunk.pos, blockTimer < 1 ? 2000f : 1000f, self, 1f));
+            self.mushroomEffect += 0.4f;
         }
 
         public virtual void Violence(On.Creature.orig_Violence orig,
@@ -310,20 +312,23 @@ namespace LancerRemix.Cat
 
         private void SetLanceCooltime() => lanceTimer = -8;
 
-        private static float GetLanceDamage(int throwingSkill)
+        private float GetLanceDamage(int throwingSkill)
         {
+            float dmg;
             switch (throwingSkill)
             {
                 default:
                 case 1:
-                    return 0.6f; //0.3f + 0.2f * Mathf.Pow(UnityEngine.Random.value, 3f);
+                    dmg = 0.6f; break; //0.3f + 0.2f * Mathf.Pow(UnityEngine.Random.value, 3f);
 
                 case 0:
-                    return 0.2f + 0.3f * Mathf.Pow(UnityEngine.Random.value, 4f);
+                    dmg = 0.2f + 0.3f * Mathf.Pow(UnityEngine.Random.value, 4f); break;
 
                 case 2:
-                    return 0.8f; //0.4f + 0.3f * Mathf.Pow(UnityEngine.Random.value, 3f);
+                    dmg = 0.8f; break; //0.4f + 0.3f * Mathf.Pow(UnityEngine.Random.value, 3f);
             }
+            if (self.Adrenaline > 0f) dmg *= 1.5f;
+            return dmg;
         }
     }
 
