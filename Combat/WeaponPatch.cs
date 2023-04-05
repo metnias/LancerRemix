@@ -47,12 +47,13 @@ namespace LancerRemix.Combat
             GetSub<LancerSupplement>(player)?.RetrieveLanceSpear(self);
         }
 
-        private static Vector2 GetAimDir(Player lancer, float timeStacker)
+        private static Vector2 GetAimDir(Spear spear, Player lancer, float timeStacker)
         {
-            var mainPos = Vector2.Lerp(lancer.mainBodyChunk.lastPos, lancer.mainBodyChunk.pos, timeStacker);
-            var lanceDir = Custom.DirVec(mainPos, new Vector2(mainPos.x + (float)lancer.ThrowDirection, mainPos.y));
-            // turn this using block timer
-            return lanceDir;
+            float block = GetSub<LancerSupplement>(lancer)?.BlockAmount(timeStacker) ?? 0f;
+            if (block >= 0f)
+                return Vector3.Slerp(lancer.ThrowDirection >= 0f ? Vector3.right : Vector3.left, Vector3.up, block);
+            var rot = Vector3.Slerp(spear.lastRotation, spear.rotation, timeStacker);
+            return Vector3.Slerp(lancer.ThrowDirection >= 0f ? Vector3.right : Vector3.left, rot.normalized, -block);
         }
 
         private static void SpearUpdate(On.Spear.orig_Update orig, Spear self, bool eu)
@@ -61,7 +62,7 @@ namespace LancerRemix.Combat
             if (self.grabbedBy.Count <= 0 || !(self.grabbedBy[0].grabber is Player player) || !IsLancer(player))
                 return;
 
-            Vector2 aimDir = GetAimDir(player, 0f);
+            Vector2 aimDir = GetAimDir(self, player, 0f);;
 
             if (self is ExplosiveSpear)
             {
@@ -87,29 +88,29 @@ namespace LancerRemix.Combat
             }
         }
 
-        private static void SpearDrawSprites(On.Spear.orig_DrawSprites orig, Spear spear,
+        private static void SpearDrawSprites(On.Spear.orig_DrawSprites orig, Spear self,
             RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
         {
-            orig.Invoke(spear, sLeaser, rCam, timeStacker, camPos);
+            orig.Invoke(self, sLeaser, rCam, timeStacker, camPos);
             if (!sLeaser.sprites[0].isVisible) return;
-            if (spear.grabbedBy.Count <= 0 || !(spear.grabbedBy[0].grabber is Player player) || !IsLancer(player)) return;
+            if (self.grabbedBy.Count <= 0 || !(self.grabbedBy[0].grabber is Player player) || !IsLancer(player)) return;
 
-            Vector2 aimDir = GetAimDir(player, timeStacker);
-            if (spear is ExplosiveSpear)
+            Vector2 aimDir = GetAimDir(self, player, timeStacker);
+            if (self is ExplosiveSpear)
             {
-                (spear as ExplosiveSpear).rag[0, 0] = Vector2.Lerp(spear.firstChunk.lastPos, spear.firstChunk.pos, 1f) + aimDir * 15f;
-                (spear as ExplosiveSpear).rag[0, 2] *= 0f;
-                Vector2 tie = Vector2.Lerp((spear as ExplosiveSpear).rag[0, 1], (spear as ExplosiveSpear).rag[0, 0], timeStacker);
-                float vel = 2f * Vector3.Slerp((spear as ExplosiveSpear).rag[0, 4], (spear as ExplosiveSpear).rag[0, 3], timeStacker).x;
-                Vector2 normalized = ((spear as ExplosiveSpear).rag[0, 0] - tie).normalized;
+                (self as ExplosiveSpear).rag[0, 0] = Vector2.Lerp(self.firstChunk.lastPos, self.firstChunk.pos, 1f) + aimDir * 15f;
+                (self as ExplosiveSpear).rag[0, 2] *= 0f;
+                Vector2 tie = Vector2.Lerp((self as ExplosiveSpear).rag[0, 1], (self as ExplosiveSpear).rag[0, 0], timeStacker);
+                float vel = 2f * Vector3.Slerp((self as ExplosiveSpear).rag[0, 4], (self as ExplosiveSpear).rag[0, 3], timeStacker).x;
+                Vector2 normalized = ((self as ExplosiveSpear).rag[0, 0] - tie).normalized;
                 Vector2 perp = Custom.PerpendicularVector(normalized);
-                float d = Vector2.Distance((spear as ExplosiveSpear).rag[0, 0], tie) / 5f;
-                (sLeaser.sprites[2] as TriangleMesh).MoveVertice(0, (spear as ExplosiveSpear).rag[0, 0] - normalized * d - perp * vel * 0.5f - camPos);
-                (sLeaser.sprites[2] as TriangleMesh).MoveVertice(1, (spear as ExplosiveSpear).rag[0, 0] - normalized * d + perp * vel * 0.5f - camPos);
+                float d = Vector2.Distance((self as ExplosiveSpear).rag[0, 0], tie) / 5f;
+                (sLeaser.sprites[2] as TriangleMesh).MoveVertice(0, (self as ExplosiveSpear).rag[0, 0] - normalized * d - perp * vel * 0.5f - camPos);
+                (sLeaser.sprites[2] as TriangleMesh).MoveVertice(1, (self as ExplosiveSpear).rag[0, 0] - normalized * d + perp * vel * 0.5f - camPos);
                 (sLeaser.sprites[2] as TriangleMesh).MoveVertice(2, tie + normalized * d - perp * vel - camPos);
                 (sLeaser.sprites[2] as TriangleMesh).MoveVertice(3, tie + normalized * d + perp * vel - camPos);
             }
-            for (int i = (!(spear is ExplosiveSpear)) ? 0 : 1; i >= 0; i--)
+            for (int i = (!(self is ExplosiveSpear)) ? 0 : 1; i >= 0; i--)
                 sLeaser.sprites[i].rotation = Custom.AimFromOneVectorToAnother(Vector2.zero, aimDir);
         }
 

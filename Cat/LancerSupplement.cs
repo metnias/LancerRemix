@@ -1,5 +1,6 @@
 ﻿using CatSub.Cat;
 using MoreSlugcats;
+using Noise;
 using RWCustom;
 using System;
 using UnityEngine;
@@ -19,8 +20,6 @@ namespace LancerRemix.Cat
         /// grab parry will flip lizards
         ///
         /// normal stab: will never stun
-        ///
-        /// TODO: don't block when you grabbed stuff with grab key this frame
         /// </summary>
         public LancerSupplement(Player player) : base(player)
         {
@@ -75,8 +74,9 @@ namespace LancerRemix.Cat
                     if (blockTimer == 0) blockTimer = -12; // block cooltime
                 }
                 else if (blockTimer < 0) ++blockTimer;
-                else if (self.input[0].pckp && !self.input[1].pckp)
+                else if (self.wantToPickUp > 0)
                 {
+                    self.wantToPickUp = 0;
                     blockTimer = 12; // block
                     self.room.PlaySound(SoundID.Slugcat_Pick_Up_Spear, self.mainBodyChunk, false, 1.2f, 1.2f);
                 }
@@ -96,12 +96,20 @@ namespace LancerRemix.Cat
             // Parry!
             grasp.grabber.Stun(Mathf.CeilToInt(Mathf.Lerp(80, 40, grasp.grabber.TotalMass / 10f)));
 
-            // effect
-            self.room.PlaySound(SoundID.Spear_Damage_Creature_But_Fall_Out, self.mainBodyChunk, false, 1.5f, 0.8f);
+            AddParryEffect();
             if (blockTimer < 1) FlingLance();
             lanceTimer = 0; blockTimer = 0;
             return;
         NoParry: orig(self, grasp);
+        }
+
+        private void AddParryEffect()
+        {
+            self.room.AddObject(new ShockWave(self.mainBodyChunk.pos, 25f, 0.8f, 4, false));
+            for (int l = 0; l < 5; l++)
+                self.room.AddObject(new Spark(self.mainBodyChunk.pos, Custom.RNV() * 3f, Color.yellow, null, 25, 90));
+            self.room.PlaySound(SoundID.Spear_Damage_Creature_But_Fall_Out, self.mainBodyChunk, false, 1.5f, 0.8f);
+            self.room.InGameNoise(new InGameNoise(self.mainBodyChunk.pos, blockTimer < 1 ? 2000f : 1000f, self, 1f));
         }
 
         public virtual void Violence(On.Creature.orig_Violence orig,
@@ -112,7 +120,7 @@ namespace LancerRemix.Cat
                 if (OnParry < 1) goto NoParry;
                 if (source.owner is Creature) (source.owner as Creature).Stun(Mathf.CeilToInt(Mathf.Lerp(80, 40, source.owner.TotalMass / 10f)));
 
-                self.room.PlaySound(SoundID.Spear_Damage_Creature_But_Fall_Out, self.mainBodyChunk, false, 1.5f, 0.8f);
+                AddParryEffect();
                 if (blockTimer < 1) FlingLance();
                 lanceTimer = 0; blockTimer = 0;
                 return;
