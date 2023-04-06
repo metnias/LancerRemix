@@ -57,18 +57,18 @@ namespace LancerRemix.Cat
         {
         }
 
-        private static readonly bool[] isLancer = new bool[4];
+        private static readonly bool[] isPlayerLancer = new bool[4];
         public static bool IsStoryLancer { get; private set; } = false;
 
-        public static void SetIsLancer(bool story, bool[] players)
+        public static void SetIsPlayerLancer(bool story, bool[] players)
         {
             IsStoryLancer = story;
-            for (int i = 0; i < 4; ++i) isLancer[i] = players[i];
+            for (int i = 0; i < 4; ++i) isPlayerLancer[i] = players[i];
         }
 
-        public static bool IsCatLancer(Player player) => !player.isNPC && isLancer[player.playerState.playerNumber];
+        public static bool IsPlayerLancer(Player player) => !player.isNPC && isPlayerLancer[player.playerState.playerNumber];
 
-        public static bool IsCatLancer(PlayerGraphics playerGraphics) => IsCatLancer(playerGraphics.player);
+        public static bool IsPlayerLancer(PlayerGraphics playerGraphics) => IsPlayerLancer(playerGraphics.player);
 
         public static bool IsLancer(SlugName name) => LancerEnums.IsLancer(name);
 
@@ -99,7 +99,7 @@ namespace LancerRemix.Cat
         private static void PlayerCtor(On.Player.orig_ctor orig, Player self, AbstractCreature abstractCreature, World world)
         {
             orig(self, abstractCreature, world);
-            if (!IsCatLancer(self)) return;
+            if (!IsPlayerLancer(self)) return;
             catSubs.Add(self.playerState, new LancerSupplement(self));
             catDecos.Add(self.playerState, new LancerDecoration(self));
         }
@@ -107,14 +107,14 @@ namespace LancerRemix.Cat
         private static void PlayerUpdate(On.Player.orig_Update orig, Player self, bool eu)
         {
             orig(self, eu);
-            if (IsCatLancer(self))
+            if (IsPlayerLancer(self))
                 GetSub<LancerSupplement>(self)?.Update(null, eu);
         }
 
         private static void PlayerDestroy(On.Player.orig_Destroy orig, Player self)
         {
             orig(self);
-            if (IsCatLancer(self))
+            if (IsPlayerLancer(self))
                 GetSub<LancerSupplement>(self)?.Destroy(null);
         }
 
@@ -122,20 +122,20 @@ namespace LancerRemix.Cat
 
         private static void PlayerGrabbed(On.Player.orig_Grabbed orig, Player self, Creature.Grasp grasp)
         {
-            if (IsCatLancer(self))
+            if (IsPlayerLancer(self))
             { GetSub<LancerSupplement>(self)?.Grabbed(orig, grasp); return; }
             orig(self, grasp);
         }
 
         private static Color LancerShortCutColor(On.Player.orig_ShortCutColor orig, Player self)
         {
-            if (!IsCatLancer(self)) return orig(self);
+            if (!IsPlayerLancer(self)) return orig(self);
             return PlayerGraphics.SlugcatColor(GetLancer(self.playerState.slugcatCharacter));
         }
 
         private static float LancerDeathByBiteMultiplier(On.Player.orig_DeathByBiteMultiplier orig, Player self)
         {
-            if (IsCatLancer(self))
+            if (IsPlayerLancer(self))
             {
                 if (self.room?.game.IsStorySession == true)
                     return 0.2f + self.room.game.GetStorySession.difficulty / 4f;
@@ -146,14 +146,14 @@ namespace LancerRemix.Cat
 
         private static void PlayerThrowObject(On.Player.orig_ThrowObject orig, Player self, int grasp, bool eu)
         {
-            if (IsCatLancer(self))
+            if (IsPlayerLancer(self))
             { GetSub<LancerSupplement>(self)?.ThrowObject(orig, grasp, eu); return; }
             orig(self, grasp, eu);
         }
 
         private static bool PlayerCanIPickThisUp(On.Player.orig_CanIPickThisUp orig, Player self, PhysicalObject obj)
         {
-            if (IsCatLancer(self))
+            if (IsPlayerLancer(self))
             {
                 var res = GetSub<LancerSupplement>(self)?.CanIPickThisUp(orig, obj);
                 if (res.HasValue) return res.Value;
@@ -163,25 +163,25 @@ namespace LancerRemix.Cat
 
         private static void PlayerThrowToGetFree(On.Player.orig_ThrowToGetFree orig, Player self, bool eu)
         {
-            if (IsCatLancer(self)) GetSub<LancerSupplement>(self)?.ThrowToGetFree(orig, eu);
+            if (IsPlayerLancer(self)) GetSub<LancerSupplement>(self)?.ThrowToGetFree(orig, eu);
             orig(self, eu);
         }
 
         private static void PlayerStun(On.Player.orig_Stun orig, Player self, int st)
         {
             orig(self, st);
-            if (IsCatLancer(self)) GetSub<LancerSupplement>(self)?.ReleaseLanceSpear();
+            if (IsPlayerLancer(self)) GetSub<LancerSupplement>(self)?.ReleaseLanceSpear();
         }
 
         private static void PlayerDie(On.Player.orig_Die orig, Player self)
         {
             orig(self);
-            if (IsCatLancer(self)) GetSub<LancerSupplement>(self)?.ReleaseLanceSpear();
+            if (IsPlayerLancer(self)) GetSub<LancerSupplement>(self)?.ReleaseLanceSpear();
         }
 
         private static void LancerMovementUpdate(On.Player.orig_MovementUpdate orig, Player self, bool eu)
         {
-            if (IsCatLancer(self))
+            if (IsPlayerLancer(self))
             { GetSub<LancerSupplement>(self)?.MovementUpdate(orig, eu); return; }
             orig(self, eu);
         }
@@ -215,49 +215,49 @@ namespace LancerRemix.Cat
         private static void GrafInitSprite(On.PlayerGraphics.orig_InitiateSprites orig, PlayerGraphics self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam)
         {
             orig(self, sLeaser, rCam);
-            if (IsCatLancer(self))
+            if (IsPlayerLancer(self))
                 GetDeco<LancerDecoration>(self)?.InitiateSprites(null, sLeaser, rCam);
         }
 
         private static void GrafAddToContainer(On.PlayerGraphics.orig_AddToContainer orig, PlayerGraphics self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, FContainer newContatiner)
         {
             orig(self, sLeaser, rCam, newContatiner);
-            if (IsCatLancer(self))
+            if (IsPlayerLancer(self))
                 GetDeco<LancerDecoration>(self)?.AddToContainer(null, sLeaser, rCam, newContatiner);
         }
 
         private static void GrafUpdate(On.PlayerGraphics.orig_Update orig, PlayerGraphics self)
         {
             orig(self);
-            if (IsCatLancer(self))
+            if (IsPlayerLancer(self))
                 GetDeco<LancerDecoration>(self)?.Update(null);
         }
 
         private static void GrafDrawSprite(On.PlayerGraphics.orig_DrawSprites orig, PlayerGraphics self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
         {
             orig(self, sLeaser, rCam, timeStacker, camPos);
-            if (IsCatLancer(self))
+            if (IsPlayerLancer(self))
                 GetDeco<LancerDecoration>(self)?.DrawSprites(null, sLeaser, rCam, timeStacker, camPos);
         }
 
         private static void GrafApplyPalette(On.PlayerGraphics.orig_ApplyPalette orig, PlayerGraphics self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, RoomPalette palette)
         {
             orig(self, sLeaser, rCam, palette);
-            if (IsCatLancer(self))
+            if (IsPlayerLancer(self))
                 GetDeco<LancerDecoration>(self)?.ApplyPalette(null, sLeaser, rCam, palette);
         }
 
         private static void GrafSuckedIntoShortCut(On.PlayerGraphics.orig_SuckedIntoShortCut orig, PlayerGraphics self, Vector2 shortCutPosition)
         {
             orig(self, shortCutPosition);
-            if (IsCatLancer(self))
+            if (IsPlayerLancer(self))
                 GetDeco<LancerDecoration>(self)?.SuckedIntoShortCut(null, shortCutPosition);
         }
 
         private static void GrafReset(On.PlayerGraphics.orig_Reset orig, PlayerGraphics self)
         {
             orig(self);
-            if (IsCatLancer(self))
+            if (IsPlayerLancer(self))
                 GetDeco<LancerDecoration>(self)?.Reset(null);
         }
 
@@ -270,7 +270,7 @@ namespace LancerRemix.Cat
         private static SlugName LancerForColor(orig_CharacterForColor orig, PlayerGraphics self)
         {
             var res = orig(self);
-            if (IsCatLancer(self)) res = GetLancer(res);
+            if (IsPlayerLancer(self)) res = GetLancer(res);
             return res;
         }
 

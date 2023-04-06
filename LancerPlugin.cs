@@ -98,7 +98,7 @@ namespace LancerRemix
             }
             else if (ID == ProcessManager.ProcessID.SlugcatSelect)
             {
-                ModifyCat.SetIsLancer(false, new bool[4]);
+                ModifyCat.SetIsPlayerLancer(false, new bool[4]);
             }
             orig(self, ID);
         }

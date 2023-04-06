@@ -44,8 +44,8 @@ namespace LancerRemix.LancerMenu
         {
             _lancerInit = false;
             redIsDead = false;
-            ModifyCat.SetIsLancer(false, new bool[4]);
             LoadLancerPlayers(Custom.rainWorld.progression.miscProgressionData);
+            ModifyCat.SetIsPlayerLancer(false, lancerPlayers);
             orig(self, manager);
             if (TryGetCurrSlugcatLancer())
             { slugcatPageLancer = true; lancerTransition = 1f; lastLancerTransition = 1f; }
@@ -253,7 +253,7 @@ namespace LancerRemix.LancerMenu
             if (message == "START")
             {
                 if (!ModManager.JollyCoop) lancerPlayers[0] = slugcatPageLancer;
-                ModifyCat.SetIsLancer(slugcatPageLancer, lancerPlayers);
+                ModifyCat.SetIsPlayerLancer(slugcatPageLancer, lancerPlayers);
                 SaveLancerPlayers(self.manager.rainWorld.progression.miscProgressionData);
                 // StartGame(this.slugcatPages[this.slugcatPageIndex].slugcatNumber);
             }
