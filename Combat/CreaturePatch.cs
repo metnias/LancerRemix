@@ -9,8 +9,22 @@ namespace LancerRemix.Combat
     {
         internal static void Patch()
         {
+            On.Creature.Grab += CreatureGrabLancer;
             On.Creature.Violence += LancerViolencePatch;
             On.Vulture.Violence += VultureLancerDropMask;
+        }
+
+        private static bool CreatureGrabLancer(On.Creature.orig_Grab orig, Creature self, PhysicalObject obj, int graspUsed, int chunkGrabbed, Creature.Grasp.Shareability shareability, float dominance, bool overrideEquallyDominant, bool pacifying)
+        {
+            var res = orig(self, obj, graspUsed, chunkGrabbed, shareability, dominance, overrideEquallyDominant, pacifying);
+            if (!res) return res;
+            if (!(obj is Player player) || !IsPlayerLancer(player)) return res;
+            if (GetSub<LancerSupplement>(player)?.IsGrabParried == true)
+            {
+                self.ReleaseGrasp(graspUsed);
+                return false;
+            }
+            return res;
         }
 
         private static void LancerViolencePatch(On.Creature.orig_Violence orig, Creature self,

@@ -96,7 +96,6 @@ namespace LancerRemix.Cat
             grasp.grabber.Stun(Mathf.CeilToInt(Mathf.Lerp(80, 40, grasp.grabber.TotalMass / 10f)));
             Vector2 away = (grasp.grabber.mainBodyChunk.pos - self.mainBodyChunk.pos).normalized;
             grasp.grabber.mainBodyChunk.vel += away * Mathf.Lerp(20f, 10f, grasp.grabber.TotalMass / 10f);
-            grasp.grabber.ReleaseGrasp(grasp.graspUsed);
 
             AddParryEffect();
             if (lanceTimer != 0) FlingLance();
