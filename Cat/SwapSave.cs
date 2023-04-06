@@ -3,6 +3,7 @@ using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using MoreSlugcats;
 using System;
+using System.Reflection;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
@@ -21,9 +22,8 @@ namespace LancerRemix.Cat
             On.PlayerProgression.WipeSaveState += WipeSaveLancer;
 
             On.PlayerProgression.SaveToDisk += SaveToLancer;
-            //On.SaveState.SaveToString += SaveStateToLancer;
             IL.PlayerProgression.SaveDeathPersistentDataOfCurrentState += SaveLancerPersDataOfCurrentState;
-            IL.PlayerProgression.LoadMapTexture += LoadLancerMapTexture;
+            //IL.PlayerProgression.LoadMapTexture += LoadLancerMapTexture;
             //On.PlayerProgression.LoadGameState += LoadLancerStateInstead;
             IL.PlayerProgression.LoadGameState += LoadLancerState;
 
@@ -176,7 +176,7 @@ namespace LancerRemix.Cat
             lblMapUpdate.Target = cursor.Prev;
             // Add jump inside if
             if (!cursor.TryGotoPrev(MoveType.After,
-                x => x.MatchCall(typeof(PlayerProgression).GetMethod(nameof(PlayerProgression.LoadByteStringIntoMapTexture))),
+                x => x.MatchCall(typeof(PlayerProgression).GetMethod(nameof(PlayerProgression.LoadByteStringIntoMapTexture), BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance)),
                 x => x.MatchLdcI4(1),
                 x => x.MatchStloc(1))) return;
             DebugLogCursor();
@@ -307,8 +307,7 @@ namespace LancerRemix.Cat
                 x => x.MatchLdarg(0),
                 x => x.MatchLdfld(typeof(PlayerProgression).GetField(nameof(PlayerProgression.currentSaveState))),
                 x => x.MatchLdloc(3),
-                x => x.MatchLdcI4(1),
-                x => x.MatchLdarg(2))) return;
+                x => x.MatchLdcI4(1))) return;
             DebugLogCursor();
             cursor.Emit(OpCodes.Nop);
             var lblOkay = cursor.DefineLabel();

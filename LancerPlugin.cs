@@ -150,6 +150,7 @@ namespace LancerRemix
         }
 
         private static int ILhookFlags = 0;
+
         [Flags]
         internal enum ILhooks : int
         {
@@ -159,16 +160,19 @@ namespace LancerRemix
             MineForLunterData = 1 << 3,
             LoadLancerState = 1 << 4
         }
+
         internal static void ILhookTry(ILhooks flag)
         {
             LogSource.LogInfo($"{flag} Hook try");
             ILhookFlags |= (int)flag;
         }
+
         internal static void ILhookOkay(ILhooks flag)
         {
             LogSource.LogInfo($"{flag} Hook success");
             ILhookFlags &= ~(int)flag;
         }
+
         internal static bool ILhookSuccess() => ILhookFlags == 0;
     }
 }

@@ -13,9 +13,9 @@ namespace LancerRemix.Story
     {
         internal static void Patch()
         {
-
         }
 
+        /*
         public static Dictionary<string, int> swapDict = null;
 
         public static void GenDictionary()
@@ -120,5 +120,6 @@ namespace LancerRemix.Story
             }
             orig.Invoke(self, eu);
         }
+        */
     }
 }
