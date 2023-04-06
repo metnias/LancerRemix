@@ -127,6 +127,7 @@ namespace LancerRemix
                 LogSource.LogInfo("Lancer detected MSC newly enabled.");
                 ModifyCat.OnMSCEnablePatch();
                 DreamHandler.OnMSCEnablePatch();
+                WeaponPatch.OnMSCEnablePatch();
                 lastMSCEnabled = ModManager.MSC;
             }
             if (!lastJollyEnabled && ModManager.JollyCoop)
@@ -152,6 +153,7 @@ namespace LancerRemix
                 LogSource.LogInfo("Lancer detected MSC newly disabled.");
                 ModifyCat.OnMSCDisablePatch();
                 DreamHandler.OnMSCDisablePatch();
+                WeaponPatch.OnMSCDisablePatch();
                 lastMSCEnabled = ModManager.MSC;
             }
             if (lastJollyEnabled && !ModManager.JollyCoop)

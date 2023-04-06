@@ -98,7 +98,7 @@ namespace LancerRemix.Cat
             grasp.grabber.mainBodyChunk.vel += away * Mathf.Lerp(20f, 10f, grasp.grabber.TotalMass / 10f);
 
             AddParryEffect();
-            if (lanceTimer != 0) FlingLance();
+            if (lanceTimer != 0 && !slideLance) FlingLance();
             lanceTimer = 0; blockTimer = 0;
             grabParried = true;
             return;
@@ -112,7 +112,7 @@ namespace LancerRemix.Cat
                 self.room.AddObject(new Spark(self.mainBodyChunk.pos, Custom.RNV() * 5f, Color.yellow, null, 25, 90));
             self.room.PlaySound(SoundID.Spear_Bounce_Off_Wall, self.mainBodyChunk, false, 1.5f, 0.8f);
             self.room.InGameNoise(new InGameNoise(self.mainBodyChunk.pos, lanceTimer != 0 ? 2000f : 1000f, self, 1f));
-            self.mushroomEffect += lanceTimer != 0 ? 0.2f : 0.4f;
+            self.mushroomEffect += (lanceTimer != 0 && !slideLance) ? 0.2f : 0.4f;
         }
 
         public virtual void Violence(On.Creature.orig_Violence orig,
@@ -135,7 +135,7 @@ namespace LancerRemix.Cat
                 }
 
                 AddParryEffect();
-                if (lanceTimer != 0) FlingLance();
+                if (lanceTimer != 0 && !slideLance) FlingLance();
                 lanceTimer = 0; blockTimer = 0;
                 return;
             }
@@ -213,8 +213,8 @@ namespace LancerRemix.Cat
             self.dontGrabStuff = 10;
             self.bodyChunks[0].vel += lanceDir.ToVector2() * 7f;
             self.bodyChunks[1].vel -= lanceDir.ToVector2() * 4f;
-            lanceTimer = lanceDir.y == 0 ? 4 : 6;
-            blockTimer = 12;
+            lanceTimer = slideLance ? 9 : (lanceDir.y == 0 ? 4 : 6);
+            blockTimer = slideLance ? 18 : 12;
 
             IntVector2 GetLanceDir()
             {
