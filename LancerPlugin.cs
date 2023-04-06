@@ -63,6 +63,10 @@ namespace LancerRemix
             DreamHandler.Patch();
             TutorialModify.Patch();
 
+            lastMSCEnabled = ModManager.MSC;
+            lastJollyEnabled = ModManager.JollyCoop;
+            lastMMFEnabled = ModManager.MMF;
+
             instance.Logger.LogMessage("The Lancer is Intialized.");
             instance.Logger.LogMessage($"ILhooks: {Convert.ToString(ILhookFlags, 2)} ({(ILhookSuccess() ? "Success" : "Failed")})");
             if (!ILhookSuccess()) Debug.LogError($"Lancer failed some of ILhooks: {Convert.ToString(ILhookFlags, 2)}");
@@ -104,8 +108,11 @@ namespace LancerRemix
             orig(self, ID);
         }
 
+        #region ModToggleReactor
+
         private static bool lastMSCEnabled;
         private static bool lastJollyEnabled;
+        private static bool lastMMFEnabled;
 
         internal static bool AnyModChanged { get; private set; } = true;
 
@@ -128,6 +135,12 @@ namespace LancerRemix
                 MenuModifier.OnJollyEnablePatch();
                 lastJollyEnabled = ModManager.JollyCoop;
             }
+            if (!lastMMFEnabled && ModManager.MMF)
+            {
+                LogSource.LogInfo("Lancer detected MMF newly enabled.");
+                TutorialModify.OnMMFEnablePatch();
+                lastMMFEnabled = ModManager.MMF;
+            }
         }
 
         private static void OnModsDisabled(On.RainWorld.orig_OnModsDisabled orig, RainWorld rw, ModManager.Mod[] newlyDisabledMods)
@@ -147,7 +160,17 @@ namespace LancerRemix
                 MenuModifier.OnJollyDisablePatch();
                 lastJollyEnabled = ModManager.JollyCoop;
             }
+            if (lastMMFEnabled && !ModManager.MMF)
+            {
+                LogSource.LogInfo("Lancer detected MMF newly disabled.");
+                TutorialModify.OnMMFDisablePatch();
+                lastMMFEnabled = ModManager.MMF;
+            }
         }
+
+        #endregion ModToggleReactor
+
+        #region ILhookTrackers
 
         private static int ILhookFlags = 0;
 
@@ -174,5 +197,7 @@ namespace LancerRemix
         }
 
         internal static bool ILhookSuccess() => ILhookFlags == 0;
+
+        #endregion ILhookTrackers
     }
 }

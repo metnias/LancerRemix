@@ -13,9 +13,26 @@ namespace LancerRemix.Story
     {
         internal static void Patch()
         {
+            if (ModManager.MMF) OnMMFEnablePatch();
         }
 
-        /// TODO: Remove Tip screen for Lancer
+        internal static void OnMMFEnablePatch()
+        {
+            On.MoreSlugcats.TipScreen.GetCharacterTipMeta += GetLancerTipMeta;
+        }
+
+        internal static void OnMMFDisablePatch()
+        {
+            On.MoreSlugcats.TipScreen.GetCharacterTipMeta -= GetLancerTipMeta;
+        }
+
+        private static string GetLancerTipMeta(On.MoreSlugcats.TipScreen.orig_GetCharacterTipMeta orig, SlugName slugcat)
+        {
+            if (!IsStoryLancer) return orig(slugcat);
+            return "";
+        }
+
+        private static bool IsStoryLancer => ModifyCat.IsStoryLancer;
 
         /*
         public static Dictionary<string, int> swapDict = null;
@@ -30,8 +47,6 @@ namespace LancerRemix.Story
                 { "You are full", 4 }
             };
         }
-
-        private static bool IsStoryLancer => ModifyCat.IsStoryLancer;
 
         private static void LunterLurvivorTutorial(On.OverseerTutorialBehavior.orig_TutorialText orig, OverseerTutorialBehavior self, string text, int wait, int time, bool hideHud)
         {
