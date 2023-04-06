@@ -37,7 +37,7 @@ namespace LancerRemix.Cat
         private bool slideLance = false;
 
         public float BlockAmount(float timeStacker)
-            => Mathf.Lerp((float)blockTimer, blockTimer - blockTimer != 0 ? Math.Sign(blockTimer) : 0, timeStacker);
+            => lanceTimer > 0 ? 0f : Mathf.Lerp((float)blockTimer, blockTimer - blockTimer != 0 ? Math.Sign(blockTimer) : 0, timeStacker);
 
         public int HasLanceReady()
         {
@@ -92,7 +92,7 @@ namespace LancerRemix.Cat
             grasp.grabber.Stun(Mathf.CeilToInt(Mathf.Lerp(80, 40, grasp.grabber.TotalMass / 10f)));
             Vector2 away = (grasp.grabber.mainBodyChunk.pos - self.mainBodyChunk.pos).normalized;
             grasp.grabber.mainBodyChunk.vel += away * Mathf.Lerp(20f, 10f, grasp.grabber.TotalMass / 10f);
-            grasp.Release();
+            grasp.grabber.ReleaseGrasp(grasp.graspUsed);
 
             AddParryEffect();
             if (lanceTimer != 0) FlingLance();

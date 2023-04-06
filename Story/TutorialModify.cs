@@ -15,6 +15,8 @@ namespace LancerRemix.Story
         {
         }
 
+        /// TODO: Remove Tip screen for Lancer
+
         /*
         public static Dictionary<string, int> swapDict = null;
 
