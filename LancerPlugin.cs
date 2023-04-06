@@ -155,7 +155,8 @@ namespace LancerRemix
             SaveLancerPersDataOfCurrentState = 1 << 0,
             LoadLancerMapTexture = 1 << 1,
             LancerTravelScreen = 1 << 2,
-            MineForLunterData = 1 << 3
+            MineForLunterData = 1 << 3,
+            LoadLancerState = 1 << 4
         }
         internal static void ILhookTry(ILhooks flag)
         {

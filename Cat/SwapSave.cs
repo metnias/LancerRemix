@@ -24,8 +24,8 @@ namespace LancerRemix.Cat
             //On.SaveState.SaveToString += SaveStateToLancer;
             IL.PlayerProgression.SaveDeathPersistentDataOfCurrentState += SaveLancerPersDataOfCurrentState;
             IL.PlayerProgression.LoadMapTexture += LoadLancerMapTexture;
-            On.PlayerProgression.LoadGameState += LoadLancerStateInstead;
-            //IL.PlayerProgression.LoadGameState += LoadLancerState;
+            //On.PlayerProgression.LoadGameState += LoadLancerStateInstead;
+            IL.PlayerProgression.LoadGameState += LoadLancerState;
 
             On.RoomSettings.ctor += LancerRoomSettings;
             On.Region.GetRegionFullName += LancerRegionFullName;
@@ -251,6 +251,7 @@ namespace LancerRemix.Cat
                 LancerPlugin.LogSource.LogInfo($"{cursor.Prev.OpCode.Name} > Cursor < {cursor.Next.OpCode.Name}");
         }
 
+        /*
         private static SaveState LoadLancerStateInstead(On.PlayerProgression.orig_LoadGameState orig, PlayerProgression self,
             string saveFilePath, RainWorldGame game, bool saveAsDeathOrQuit)
         {
@@ -285,86 +286,61 @@ namespace LancerRemix.Cat
                 return array;
             }
         }
+        */
 
-        /*
         private static void LoadLancerState(ILContext il)
         {
             var cursor = new ILCursor(il);
-            LancerPlugin.LogSource.LogInfo("LoadLancerState Patch");
+            LancerPlugin.ILhookTry(LancerPlugin.ILhooks.LoadLancerState);
 
-            #region AddLblContinue
-
+            // Add label after if
             if (!cursor.TryGotoNext(MoveType.Before,
-                x => x.MatchLdloc(1),
+                x => x.MatchLdloc(2),
                 x => x.MatchLdcI4(1),
                 x => x.MatchAdd())) return;
-
             DebugLogCursor();
             cursor.Emit(OpCodes.Nop);
-            var lblContinue = cursor.DefineLabel();
-            lblContinue.Target = cursor.Prev;
-
-            #endregion AddLblContinue
-
-            #region AddLblOkay
+            var lblNope = cursor.DefineLabel();
+            lblNope.Target = cursor.Prev;
 
             if (!cursor.TryGotoPrev(MoveType.Before,
                 x => x.MatchLdarg(0),
                 x => x.MatchLdfld(typeof(PlayerProgression).GetField(nameof(PlayerProgression.currentSaveState))),
-                x => x.MatchLdloc(3))) return;
-
+                x => x.MatchLdloc(3),
+                x => x.MatchLdcI4(1),
+                x => x.MatchLdarg(2))) return;
             DebugLogCursor();
             cursor.Emit(OpCodes.Nop);
             var lblOkay = cursor.DefineLabel();
             lblOkay.Target = cursor.Prev;
-
-            #endregion AddLblOkay
-
-            #region AddLblNoLancer
 
             if (!cursor.TryGotoPrev(MoveType.Before,
                 x => x.MatchLdloc(3),
                 x => x.MatchLdcI4(1),
                 x => x.MatchLdelemRef(),
                 x => x.MatchCall(typeof(BackwardsCompatibilityRemix).GetMethod(nameof(BackwardsCompatibilityRemix.ParseSaveNumber))))) return;
-
             DebugLogCursor();
-
             cursor.Emit(OpCodes.Nop);
             var lblNoLancer = cursor.DefineLabel();
             lblNoLancer.Target = cursor.Prev;
             cursor.GotoLabel(lblNoLancer, MoveType.Before);
-            DebugLogCursor();
 
-            #endregion AddLblNoLancer
-
-            cursor.EmitDelegate<Func<bool>>(
-                () => IsStoryLancer
-                );
-            cursor.Emit(OpCodes.Brfalse, lblNoLancer); // if no lancer, skip
+            cursor.EmitDelegate<Func<bool>>(() => IsStoryLancer);
+            cursor.Emit(OpCodes.Brfalse, lblNoLancer);
 
             cursor.Emit(OpCodes.Ldloc, 3);
-            cursor.Emit(OpCodes.Ldc_I4, 1);
-            cursor.Emit(OpCodes.Ldelem_Ref);
-            cursor.Emit(OpCodes.Call, typeof(BackwardsCompatibilityRemix).GetMethod(nameof(BackwardsCompatibilityRemix.ParseSaveNumber)));
             cursor.Emit(OpCodes.Ldarg_0);
-            cursor.Emit(OpCodes.Ldfld, typeof(PlayerProgression).GetField(nameof(PlayerProgression.currentSaveState)));
-            cursor.Emit(OpCodes.Ldfld, typeof(SaveState).GetField(nameof(SaveState.saveStateNumber)));
-            cursor.EmitDelegate<Func<SlugName, SlugName, bool>>(
-                (basis, data) =>
-                {
-                    return GetLancer(basis) == data;
-                }
-                );
+            cursor.EmitDelegate<Func<string[], PlayerProgression, bool>>((array, self) =>
+                BackwardsCompatibilityRemix.ParseSaveNumber(array[1]) == GetLancer(self.currentSaveState.saveStateNumber)
+            );
             cursor.Emit(OpCodes.Brtrue, lblOkay);
-            cursor.Emit(OpCodes.Br, lblContinue);
+            cursor.Emit(OpCodes.Br, lblNope);
 
-            LancerPlugin.LogSource.LogInfo("LoadLancerState Done");
+            LancerPlugin.ILhookOkay(LancerPlugin.ILhooks.LoadLancerState);
 
             void DebugLogCursor() =>
                 LancerPlugin.LogSource.LogInfo($"{cursor.Prev.OpCode.Name} > Cursor < {cursor.Next.OpCode.Name}");
         }
-        */
 
         #endregion SaveState
 
