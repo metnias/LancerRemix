@@ -61,6 +61,7 @@ namespace LancerRemix
             CreaturePatch.Patch();
             WeaponPatch.Patch();
             DreamHandler.Patch();
+            TutorialModify.Patch();
 
             instance.Logger.LogMessage("The Lancer is Intialized.");
             instance.Logger.LogMessage($"ILhooks: {Convert.ToString(ILhookFlags, 2)} ({(ILhookSuccess() ? "Success" : "Failed")})");

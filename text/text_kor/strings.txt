@@ -5,6 +5,11 @@ Horn|뿔
 Feeble but cautious cub. Stranded in a harsh world and surrounded by<LINE>its creatures, your journey will be a significantly more challenging one.|연약하지만 조심스러운 아이. 혹독한 세계에 고립되어<LINE>그 생물들에게 둘러싸인, 당신의 여정은 훨씬 더 도전다울 것이다.
 To be released...|출시 예정...
 
+You are too young and weak to throw a metal rebar|철근을 들고 집어던지기에는 너무 어리고 연약하다
+Have to find an opening|빈틈을 찾아야 한다
+You have to keep up with|허기를 계속 채워야 한다
+You will now last a bit longer|이제 조금 더 오래 버틸 수 있다
+
 Lancer Interaction:|랜서 상호작용:
 
 Perform a rocket backflip by slide-boosting and backward throw with a spear|슬라이딩을 하면서 창을 반대로 꽂아 로켓 백플립을 한다
