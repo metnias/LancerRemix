@@ -90,7 +90,7 @@ namespace LancerRemix.Cat
                 SetMiscValue(self.miscProgressionData, CURRSLUGCATLANCER, true);
                 var basis = self.currentSaveState.saveStateNumber;
                 self.currentSaveState.saveStateNumber = GetLancer(basis);
-                UnityEngine.Debug.Log($"{self.currentSaveState.saveStateNumber}({basis}) redsDeath: {self.currentSaveState.deathPersistentSaveData.redsDeath}");
+                // UnityEngine.Debug.Log($"{self.currentSaveState.saveStateNumber}({basis}) redsDeath: {self.currentSaveState.deathPersistentSaveData.redsDeath}");
                 var res = orig(self, saveCurrentState, saveMaps, saveMiscProg);
                 self.currentSaveState.saveStateNumber = basis;
                 return res;
@@ -104,11 +104,19 @@ namespace LancerRemix.Cat
             var cursor = new ILCursor(il);
             LancerPlugin.ILhookTry(LancerPlugin.ILhooks.SaveLancerPersDataOfCurrentState);
 
+            if (!cursor.TryGotoNext(MoveType.After,
+                x => x.MatchLdloc(2),
+                x => x.MatchLdloc(7),
+                x => x.MatchCall(typeof(string).GetMethod(nameof(string.Concat), new Type[] { typeof(string), typeof(string) })),
+                x => x.MatchStloc(2),
+                x => x.MatchBr(out var _))) return;
+
+            /*
             if (!cursor.TryGotoNext(MoveType.Before,
                 x => x.MatchLdloc(1),
                 x => x.MatchLdloc(4),
                 x => x.MatchLdelemRef(),
-                x => x.MatchLdstr(""))) return;
+                x => x.MatchLdstr(""))) return; */
 
             DebugLogCursor();
             cursor.Emit(OpCodes.Nop);
