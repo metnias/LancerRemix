@@ -34,7 +34,6 @@ namespace LancerRemix.Cat
         private int lanceGrasp = -1;
         private int lanceTimer = 0; // throw button: makes you lose spear
         private int blockTimer = 0; // grab button
-        private int OnParry => Math.Max(lanceTimer, blockTimer);
         private bool slideLance = false;
 
         public float BlockAmount(float timeStacker)
@@ -66,22 +65,18 @@ namespace LancerRemix.Cat
                     RetrieveLanceSpear(lanceSpear);
             }
             else if (lanceTimer < 0) ++lanceTimer;
-            if (HasLanceReady() >= 0)
+            if (blockTimer > 0)
             {
-                if (blockTimer > 0)
-                {
-                    --blockTimer;
-                    if (blockTimer == 0) blockTimer = -12; // block cooltime
-                }
-                else if (blockTimer < 0) ++blockTimer;
-                else if (self.wantToPickUp > 0)
-                {
-                    self.wantToPickUp = 0;
-                    blockTimer = 12; // block
-                    self.room.PlaySound(SoundID.Slugcat_Pick_Up_Spear, self.mainBodyChunk, false, 1.2f, 1.2f);
-                }
+                --blockTimer;
+                if (blockTimer == 0) blockTimer = -12; // block cooltime
             }
-            else blockTimer = 0;
+            else if (blockTimer < 0) ++blockTimer;
+            else if (HasLanceReady() >= 0 && lanceTimer == 0 && self.wantToPickUp > 0)
+            {
+                self.wantToPickUp = 0;
+                blockTimer = 12; // block
+                self.room.PlaySound(SoundID.Slugcat_Pick_Up_Spear, self.mainBodyChunk, false, 1.2f, 1.2f);
+            }
         }
 
         public override void Destroy(On.Player.orig_Destroy orig)
@@ -91,14 +86,16 @@ namespace LancerRemix.Cat
 
         public virtual void Grabbed(On.Player.orig_Grabbed orig, Creature.Grasp grasp)
         {
-            if (OnParry < 1) goto NoParry;
+            if (blockTimer < 1) goto NoParry;
             if (!(grasp.grabber is Lizard) && !(grasp.grabber is Vulture) && !(grasp.grabber is BigSpider) && !(grasp.grabber is DropBug)) goto NoParry;
             // Parry!
             grasp.grabber.Stun(Mathf.CeilToInt(Mathf.Lerp(80, 40, grasp.grabber.TotalMass / 10f)));
+            Vector2 away = (grasp.grabber.mainBodyChunk.pos - self.mainBodyChunk.pos).normalized;
+            grasp.grabber.mainBodyChunk.vel += away * Mathf.Lerp(20f, 10f, grasp.grabber.TotalMass / 10f);
             grasp.Release();
 
             AddParryEffect();
-            if (blockTimer < 1) FlingLance();
+            if (lanceTimer != 0) FlingLance();
             lanceTimer = 0; blockTimer = 0;
             return;
         NoParry: orig(self, grasp);
@@ -106,12 +103,12 @@ namespace LancerRemix.Cat
 
         private void AddParryEffect()
         {
-            self.room.AddObject(new ShockWave(self.mainBodyChunk.pos, 50f, 0.2f, 4, false));
+            self.room.AddObject(new ShockWave(self.mainBodyChunk.pos, 50f, 0.2f, 6, false));
             for (int l = 0; l < 5; l++)
-                self.room.AddObject(new Spark(self.mainBodyChunk.pos, Custom.RNV() * 3f, Color.yellow, null, 25, 90));
+                self.room.AddObject(new Spark(self.mainBodyChunk.pos, Custom.RNV() * 5f, Color.yellow, null, 25, 90));
             self.room.PlaySound(SoundID.Spear_Bounce_Off_Wall, self.mainBodyChunk, false, 1.5f, 0.8f);
-            self.room.InGameNoise(new InGameNoise(self.mainBodyChunk.pos, blockTimer < 1 ? 2000f : 1000f, self, 1f));
-            self.mushroomEffect += 0.4f;
+            self.room.InGameNoise(new InGameNoise(self.mainBodyChunk.pos, lanceTimer != 0 ? 2000f : 1000f, self, 1f));
+            self.mushroomEffect += lanceTimer != 0 ? 0.2f : 0.4f;
         }
 
         public virtual void Violence(On.Creature.orig_Violence orig,
@@ -119,11 +116,22 @@ namespace LancerRemix.Cat
         {
             if (type == Creature.DamageType.Bite || type == Creature.DamageType.Blunt || type == Creature.DamageType.Stab)
             {
-                if (OnParry < 1) goto NoParry;
-                if (source.owner is Creature) (source.owner as Creature).Stun(Mathf.CeilToInt(Mathf.Lerp(80, 40, source.owner.TotalMass / 10f)));
+                if (blockTimer < 1) goto NoParry;
+                Vector2 away;
+                if (source.owner is Creature crit)
+                {
+                    away = (crit.mainBodyChunk.pos - self.mainBodyChunk.pos).normalized;
+                    crit.mainBodyChunk.vel += away * Mathf.Lerp(20f, 10f, crit.TotalMass / 10f);
+                    crit.Stun(Mathf.CeilToInt(Mathf.Lerp(80, 40, crit.TotalMass / 10f)));
+                }
+                else
+                {
+                    away = (source.owner.bodyChunks[0].pos - self.mainBodyChunk.pos).normalized;
+                    source.owner.bodyChunks[0].vel += away * Mathf.Lerp(40f, 15f, source.owner.TotalMass / 10f);
+                }
 
                 AddParryEffect();
-                if (blockTimer < 1) FlingLance();
+                if (lanceTimer != 0) FlingLance();
                 lanceTimer = 0; blockTimer = 0;
                 return;
             }
@@ -138,7 +146,7 @@ namespace LancerRemix.Cat
             if (ModManager.MSC && spear.bugSpear) { orig(self, grasp, eu); return; } // throw bugSpear normally
             lanceGrasp = grasp;
             var lanceDir = GetLanceDir();
-            var startPos = self.firstChunk.pos + lanceDir.ToVector2() * 10f + new Vector2(0f, 4f);
+            var startPos = self.firstChunk.pos + lanceDir.ToVector2() * 8f;
             if (self.room.GetTile(startPos).Solid) startPos = self.mainBodyChunk.pos;
             if (self.graphicsModule != null) LookAtTarget();
 
@@ -193,7 +201,7 @@ namespace LancerRemix.Cat
             }
             spear.Thrown(self, startPos, new Vector2?(self.mainBodyChunk.pos - lanceDir.ToVector2() * 5f),
                     lanceDir, pow, eu);
-            spear.firstChunk.vel.x = spear.firstChunk.vel.x * 0.85f;
+            // spear.firstChunk.vel.x *= 0.85f;
             self.Blink(5);
             (self.graphicsModule as PlayerGraphics)?.ThrowObject(grasp, spear);
             spear.Forbid();
@@ -202,7 +210,7 @@ namespace LancerRemix.Cat
             self.bodyChunks[0].vel += lanceDir.ToVector2() * 4f;
             self.bodyChunks[1].vel -= lanceDir.ToVector2() * 3f;
             lanceTimer = lanceDir.y == 0 ? 4 : 6;
-            blockTimer = 0;
+            blockTimer = 12;
 
             IntVector2 GetLanceDir()
             {

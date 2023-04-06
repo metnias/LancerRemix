@@ -1,6 +1,9 @@
-﻿using JollyCoop.JollyMenu;
+﻿#define NO_MSC
+
+using JollyCoop.JollyMenu;
 using Menu;
 using System.Globalization;
+using System.Text;
 using UnityEngine;
 
 namespace LancerRemix.LancerMenu
@@ -71,7 +74,7 @@ namespace LancerRemix.LancerMenu
         public SymbolButtonToggleLancerButton(Menu.Menu menu, MenuObject owner, string signal, Vector2 pos, Vector2 size, string symbolNameOn, string symbolNameOff, PlayerSize status, string stringLabelOn = null, string stringLabelOff = null) : base(menu, owner, signal, pos, size, symbolNameOn, symbolNameOff, status != PlayerSize.Normal, stringLabelOn, stringLabelOff)
         {
             this.status = status;
-            rawSignalText = signal;
+            if (!int.TryParse(signal.Substring(signal.Length - 2), out playerNum)) playerNum = 0;
         }
 
         public enum PlayerSize
@@ -86,7 +89,21 @@ namespace LancerRemix.LancerMenu
         /// </summary>
         public PlayerSize status;
 
-        public string rawSignalText;
+        private const string BASE_SIGNAL = "toggle_pup_";
+        private readonly int playerNum;
+        public string GetSignalText()
+        {
+            var sb = new StringBuilder();
+            sb.Append(BASE_SIGNAL);
+            sb.Append(playerNum);
+            switch (status)
+            {
+                case PlayerSize.Normal: sb.Append("_off"); break;
+                case PlayerSize.Pup: sb.Append("_on"); break;
+                case PlayerSize.Lancer: sb.Append("_lancer"); break;
+            }
+            return sb.ToString();
+        }
 
         public string symbolLancerOn = "";
 
@@ -97,10 +114,10 @@ namespace LancerRemix.LancerMenu
 
         public void ToPup()
         {
-            signalText = rawSignalText + "on";
             isToggled = false;
             if (belowLabel != null) belowLabel.label.text = labelNameOff;
             status = PlayerSize.Pup;
+            signalText = GetSignalText();
         }
 
         public override void Toggle()
@@ -115,22 +132,21 @@ namespace LancerRemix.LancerMenu
 
                 case PlayerSize.Pup: // on > lancer
                     {
-                        signalText = rawSignalText + "lancer";
                         isToggled = false;
                         //if (belowLabel != null) belowLabel.label.text = labelNameOn;
                     }
                     status = PlayerSize.Lancer;
                     break;
 
-                case PlayerSize.Lancer: // on > off
+                case PlayerSize.Lancer: // lancer > off
                     {
-                        signalText = rawSignalText + "off";
                         isToggled = true;
                         if (belowLabel != null) belowLabel.label.text = labelNameOff;
                     }
                     status = PlayerSize.Normal;
                     break;
             }
+            signalText = GetSignalText();
 
             faceSymbol.fileName = "face_" + symbol.fileName;
             LoadIcon();

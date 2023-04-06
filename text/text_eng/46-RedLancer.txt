@@ -4,7 +4,7 @@ PEBBLESWAIT : 10
 They were never one to think ahead. Their last messenger came through here not so long ago, and it also did not possess any major enhancement.
 So too did it visit my can as you have. That's just what happens<LINE>when you trust wild animals to follow basic instructions with no other precaution.
 And on top of that, a child. They sent... a child. Were they really so desperate?<LINE>It's a miracle that they didn't forget an overseer this time.
-I am... appalled, that he would even consider sending such a young thing on such a dangerous journey.
+I am... appalled, that they would even consider sending such a young thing on such a dangerous journey.
 PEBBLESWAIT : 20
 You are not well. Like the last messenger they have sent, you have something deadly festering inside you.
 You may have inherited it. Do you remember your parents? Or did they separate you when you were born?<LINE>Have... they been... breeding you? That is not a thought I can bear. I never looked upon them particularly fondly,<LINE>but this shows a side to them that I can't have imagined.

@@ -1,7 +1,7 @@
 0-47
 As I feared, here you are. Empty handed.
-They were never one to think ahead. Their last messenger came through here not so long ago. So too did it visit my can as you have.
-Though at least that one didn't lose its payload. They should have equipped you with more than an overseer.
+They were never one to think ahead. Their last messenger came through here not so long ago.
+So too did it visit my can as you have. Though at least that one didn't lose its payload. They should have equipped you with more than an overseer.
 What else to expect from a cub. What else did they think would happen?<LINE>Not only did you abandon the delivery, you managed to travel<LINE>a more treacherous path to the wrong destination.
 I'm having trouble choosing which to be more angry over, their reckless and<LINE>desperate endangerment of a child, or the fact that you came all this way for nothing...
 PEBBLESWAIT : 20

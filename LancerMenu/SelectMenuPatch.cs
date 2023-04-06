@@ -1,4 +1,6 @@
-﻿using CatSub.Story;
+﻿#define NO_MSC
+
+using CatSub.Story;
 using HUD;
 using JollyCoop.JollyMenu;
 using LancerRemix.Cat;
@@ -253,6 +255,16 @@ namespace LancerRemix.LancerMenu
             if (message == "START")
             {
                 if (!ModManager.JollyCoop) lancerPlayers[0] = slugcatPageLancer;
+#if NO_MSC
+                else
+                {
+                    for (int i = 0; i < 4; ++i)
+                    {
+                        var basis = GetBasis(Custom.rainWorld.options.jollyPlayerOptionsArray[i].playerClass);
+                        if (SlugcatStats.IsSlugcatFromMSC(basis)) lancerPlayers[i] = false;
+                    }
+                }
+#endif
                 ModifyCat.SetIsPlayerLancer(slugcatPageLancer, lancerPlayers);
                 SaveLancerPlayers(self.manager.rainWorld.progression.miscProgressionData);
                 // StartGame(this.slugcatPages[this.slugcatPageIndex].slugcatNumber);

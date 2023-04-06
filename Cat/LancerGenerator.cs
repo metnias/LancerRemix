@@ -1,4 +1,6 @@
-﻿using SlugBase;
+﻿#define NO_MSC
+
+using SlugBase;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,12 +28,15 @@ namespace LancerRemix
             On.SlugcatStats.SlugcatFoodMeter += LancerFoodMeter;
             On.SlugcatStats.SlugcatUnlocked += LancerUnlocked;
             On.SlugcatStats.NourishmentOfObjectEaten += LancerNourishmentOfObjectEaten;
+#if NO_MSC
             On.Menu.MenuScene.UseSlugcatUnlocked += UseLancerUnlocked;
+#endif
             On.SlugcatStats.HiddenOrUnplayableSlugcat += DisableLancerRegularSelect;
         }
 
         private static bool IsStoryLancer => ModifyCat.IsStoryLancer;
 
+#if NO_MSC
         private static bool LancerUnlocked(On.SlugcatStats.orig_SlugcatUnlocked orig, SlugName i, RainWorld rainWorld)
         {
             if (IsLancer(i))
@@ -41,6 +46,7 @@ namespace LancerRemix
             }
             return orig(i, rainWorld);
         }
+#endif
 
         private static bool UseLancerUnlocked(On.Menu.MenuScene.orig_UseSlugcatUnlocked orig, MenuScene self, SlugName slugcat)
         {
