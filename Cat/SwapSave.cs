@@ -1,12 +1,14 @@
 ﻿using Menu;
+using Mono.Cecil.Cil;
+using MonoMod.Cil;
+using MoreSlugcats;
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
+using static CatSub.Story.SaveManager;
 using static LancerRemix.LancerEnums;
 using SlugName = SlugcatStats.Name;
-using static CatSub.Story.SaveManager;
-using MoreSlugcats;
-using MonoMod.Cil;
-using System.Globalization;
 
 namespace LancerRemix.Cat
 {
@@ -102,6 +104,53 @@ namespace LancerRemix.Cat
             var cursor = new ILCursor(il);
             LancerPlugin.LogSource.LogInfo("SaveLancerPersDataOfCurrentState Patch");
 
+            if (!cursor.TryGotoNext(MoveType.Before,
+                x => x.MatchLdloc(1),
+                x => x.MatchLdloc(4),
+                x => x.MatchLdelemRef(),
+                x => x.MatchLdstr(""))) return;
+
+            DebugLogCursor();
+            cursor.Emit(OpCodes.Nop);
+            var lblNope = cursor.DefineLabel();
+            lblNope.Target = cursor.Prev;
+
+            if (!cursor.TryGotoPrev(MoveType.Before,
+                x => x.MatchLdstr(""),
+                x => x.MatchStloc(7),
+                x => x.MatchLdloc(1),
+                x => x.MatchLdloc(4))) return;
+
+            DebugLogCursor();
+            cursor.Emit(OpCodes.Nop);
+            var lblOkay = cursor.DefineLabel();
+            lblOkay.Target = cursor.Prev;
+
+            if (!cursor.TryGotoPrev(MoveType.Before,
+                x => x.MatchLdloc(6),
+                x => x.MatchLdcI4(1),
+                x => x.MatchLdelemRef(),
+                x => x.MatchCall(typeof(BackwardsCompatibilityRemix).GetMethod(nameof(BackwardsCompatibilityRemix.ParseSaveNumber))))) return;
+
+            DebugLogCursor();
+            cursor.Emit(OpCodes.Nop);
+            var lblNoLancer = cursor.DefineLabel();
+            lblNoLancer.Target = cursor.Prev;
+            cursor.GotoLabel(lblNoLancer, MoveType.Before);
+
+            cursor.EmitDelegate<Func<bool>>(() => IsStoryLancer);
+            cursor.Emit(OpCodes.Brfalse, lblNoLancer);
+
+            cursor.Emit(OpCodes.Ldloc, 6);
+            cursor.Emit(OpCodes.Ldc_I4, 1);
+            cursor.Emit(OpCodes.Ldelem_Ref);
+            cursor.Emit(OpCodes.Ldarg_0);
+            cursor.EmitDelegate<Func<string, PlayerProgression, bool>>((save, self) =>
+                BackwardsCompatibilityRemix.ParseSaveNumber(save) == self.currentSaveState.saveStateNumber
+                );
+            cursor.Emit(OpCodes.Brtrue, lblOkay);
+            cursor.Emit(OpCodes.Br, lblNope);
+
             LancerPlugin.LogSource.LogInfo("SaveLancerPersDataOfCurrentState Patch Done");
 
             void DebugLogCursor() =>
@@ -112,6 +161,89 @@ namespace LancerRemix.Cat
         {
             var cursor = new ILCursor(il);
             LancerPlugin.LogSource.LogInfo("LoadLancerMapTexture Patch");
+
+            // Add Jump after if
+            if (!cursor.TryGotoNext(MoveType.Before,
+                x => x.MatchLdloc(0),
+                x => x.MatchBrtrue(out var _),
+                x => x.MatchLdloc(4),
+                x => x.MatchLdcI4(0),
+                x => x.MatchLdelemRef(),
+                x => x.MatchLdstr("MAPUPDATE_"))) return;
+            DebugLogCursor();
+            cursor.Emit(OpCodes.Nop);
+            var lblMapUpdate = cursor.DefineLabel();
+            lblMapUpdate.Target = cursor.Prev;
+            // Add jump inside if
+            if (!cursor.TryGotoPrev(MoveType.After,
+                x => x.MatchCall(typeof(PlayerProgression).GetMethod(nameof(PlayerProgression.LoadByteStringIntoMapTexture))),
+                x => x.MatchLdcI4(1),
+                x => x.MatchStloc(1))) return;
+            DebugLogCursor();
+            cursor.Emit(OpCodes.Nop);
+            var lblOkay = cursor.DefineLabel();
+            lblOkay.Target = cursor.Prev;
+            // Add jump for no lancer
+            if (!cursor.TryGotoPrev(MoveType.Before,
+                x => x.MatchLdloc(4),
+                x => x.MatchLdcI4(0),
+                x => x.MatchLdelemRef(),
+                x => x.MatchLdstr("MAP_"))) return;
+            DebugLogCursor();
+            cursor.Emit(OpCodes.Nop);
+            var lblNoLancer = cursor.DefineLabel();
+            lblNoLancer.Target = cursor.Prev;
+            cursor.GotoLabel(lblNoLancer, MoveType.Before);
+            // jump forward for no lancer
+            cursor.EmitDelegate<Func<bool>>(() => IsStoryLancer);
+            cursor.Emit(OpCodes.Brfalse, lblNoLancer);
+            // lancer check instead
+            cursor.Emit(OpCodes.Ldloc, 4);
+            cursor.Emit(OpCodes.Ldarg_0);
+            cursor.Emit(OpCodes.Ldarg_1);
+            cursor.EmitDelegate<Func<string[], PlayerProgression, string, bool>>((array, self, regionName) =>
+                array[0] == "MAP_" + GetLancer(self.PlayingAsSlugcat).value
+                && array[1] == regionName
+                );
+            cursor.Emit(OpCodes.Brtrue, lblOkay);
+            cursor.Emit(OpCodes.Br, lblMapUpdate);
+
+            // add jump after if
+            if (!cursor.TryGotoNext(MoveType.Before,
+                x => x.MatchLdloc(1),
+                x => x.MatchLdloc(0),
+                x => x.MatchAnd(),
+                x => x.MatchBrfalse(out var _),
+                x => x.MatchRet())) return;
+            DebugLogCursor();
+            cursor.Emit(OpCodes.Nop);
+            var lblNope = cursor.DefineLabel();
+            lblNope.Target = cursor.Prev;
+            cursor.GotoLabel(lblNope, MoveType.Before);
+            // add jump for no lancer
+            if (!cursor.TryGotoPrev(MoveType.Before,
+                x => x.MatchLdloc(4),
+                x => x.MatchLdcI4(0),
+                x => x.MatchLdelemRef(),
+                x => x.MatchLdstr("MAPUPDATE_"))) return;
+            DebugLogCursor();
+            cursor.Emit(OpCodes.Nop);
+            lblNoLancer = cursor.DefineLabel();
+            lblNoLancer.Target = cursor.Prev;
+            cursor.GotoLabel(lblNoLancer, MoveType.Before);
+            // jump forward for no lancer
+            cursor.EmitDelegate<Func<bool>>(() => IsStoryLancer);
+            cursor.Emit(OpCodes.Brfalse, lblNoLancer);
+            // lancer check instead
+            cursor.Emit(OpCodes.Ldloc, 4);
+            cursor.Emit(OpCodes.Ldarg_0);
+            cursor.Emit(OpCodes.Ldarg_1);
+            cursor.EmitDelegate<Func<string[], PlayerProgression, string, bool>>((array, self, regionName) =>
+                array[0] == "MAPUPDATE_" + GetLancer(self.PlayingAsSlugcat).value
+                && array[1] == regionName
+                );
+            cursor.Emit(OpCodes.Brtrue, lblOkay);
+            cursor.Emit(OpCodes.Br, lblMapUpdate);
 
             LancerPlugin.LogSource.LogInfo("LoadLancerMapTexture Patch Done");
 
