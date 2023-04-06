@@ -17,7 +17,10 @@ namespace LancerRemix.Combat
             BodyChunk source, Vector2? directionAndMomentum, BodyChunk hitChunk, PhysicalObject.Appendage.Pos hitAppendage, Creature.DamageType type, float damage, float stunBonus)
         {
             if (source?.owner is Player atkPlayer && IsPlayerLancer(atkPlayer))
-                if (damage < 0.9f) stunBonus = -10000f;
+            {
+                if (GetSub<LancerSupplement>(atkPlayer)?.IsSlideLance == true) stunBonus *= 2f;
+                else stunBonus = -10000f;
+            }
             if (self is Player player && IsPlayerLancer(player))
             { GetSub<LancerSupplement>(player)?.Violence(orig, source, directionAndMomentum, hitChunk, hitAppendage, type, damage, stunBonus); return; }
             orig(self, source, directionAndMomentum, hitChunk, hitAppendage, type, damage, stunBonus);

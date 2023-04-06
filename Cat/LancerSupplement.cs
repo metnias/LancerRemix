@@ -35,13 +35,16 @@ namespace LancerRemix.Cat
         private int lanceTimer = 0; // throw button: makes you lose spear
         private int blockTimer = 0; // grab button
         private bool slideLance = false;
+        public bool IsSlideLance => slideLance;
+        private bool grabParried = false;
+        public bool IsGrabParried => grabParried;
 
         public float BlockAmount(float timeStacker)
             => lanceTimer > 0 ? 0f : Mathf.Lerp((float)blockTimer, blockTimer - blockTimer != 0 ? Math.Sign(blockTimer) : 0, timeStacker);
 
         public int HasLanceReady()
         {
-            if (lanceSpear != null) return -1;
+            if (lanceTimer != 0) return -1;
             for (int i = 0; i < self.grasps.Length; ++i)
                 if (self.grasps[i]?.grabbed is Spear) return i;
             return -1;
@@ -60,7 +63,7 @@ namespace LancerRemix.Cat
             if (lanceTimer > 0)
             {
                 --lanceTimer;
-                if (lanceTimer == 0 && !slideLance
+                if (lanceTimer == 0
                     && (lanceSpear?.mode == Weapon.Mode.Thrown || lanceSpear?.mode == Weapon.Mode.Free))
                     RetrieveLanceSpear(lanceSpear);
             }
@@ -86,6 +89,7 @@ namespace LancerRemix.Cat
 
         public virtual void Grabbed(On.Player.orig_Grabbed orig, Creature.Grasp grasp)
         {
+            grabParried = false;
             if (blockTimer < 1) goto NoParry;
             if (!(grasp.grabber is Lizard) && !(grasp.grabber is Vulture) && !(grasp.grabber is BigSpider) && !(grasp.grabber is DropBug)) goto NoParry;
             // Parry!
@@ -97,6 +101,7 @@ namespace LancerRemix.Cat
             AddParryEffect();
             if (lanceTimer != 0) FlingLance();
             lanceTimer = 0; blockTimer = 0;
+            grabParried = true;
             return;
         NoParry: orig(self, grasp);
         }
@@ -207,8 +212,8 @@ namespace LancerRemix.Cat
             spear.Forbid();
             self.ReleaseGrasp(grasp);
             self.dontGrabStuff = 10;
-            self.bodyChunks[0].vel += lanceDir.ToVector2() * 4f;
-            self.bodyChunks[1].vel -= lanceDir.ToVector2() * 3f;
+            self.bodyChunks[0].vel += lanceDir.ToVector2() * 7f;
+            self.bodyChunks[1].vel -= lanceDir.ToVector2() * 4f;
             lanceTimer = lanceDir.y == 0 ? 4 : 6;
             blockTimer = 12;
 
@@ -318,7 +323,7 @@ namespace LancerRemix.Cat
             SetLanceCooltime();
         }
 
-        private void SetLanceCooltime() => lanceTimer = -8;
+        private void SetLanceCooltime() => lanceTimer = -24;
 
         private float GetLanceDamage(int throwingSkill)
         {
