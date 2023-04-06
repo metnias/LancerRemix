@@ -2,7 +2,7 @@
 And so comes the second.
 PEBBLESWAIT : 10
 They were never one to think ahead. Their last messenger came through here not so long ago, and it also did not possess any major enhancement.
-So too did it visit my can as you have.<LINE>That's just what happens when you trust wild animals to follow basic instructions with no other precaution.
+So too did it visit my can as you have. That's just what happens<LINE>when you trust wild animals to follow basic instructions with no other precaution.
 And on top of that, a child. They sent... a child. Were they really so desperate?<LINE>It's a miracle that they didn't forget an overseer this time.
 I am... appalled, that he would even consider sending such a young thing on such a dangerous journey.
 PEBBLESWAIT : 20
@@ -11,7 +11,7 @@ You may have inherited it. Do you remember your parents? Or did they separate yo
 Listen, little creature. Abandon your mission. Even if you manage to complete it, she is too far gone...<LINE>I think it's better for her to be left as she is. There is, however, still time for you to save yourself.
 I will aid you to the extent of my ability.
 SPECEVENT : karma
-20 : Your only hope now is to go west, past the Farm Arrays, and descend below<LINE>the earth to as far as you can reach. Your only salvation lies there. : 0
-0 : I can't help you anymore than this, despite my purpose and power. I couldn't even help myself. : 10
+20 : 0 : Your only hope now is to go west, past the Farm Arrays, and descend below<LINE>the earth to as far as you can reach. Your only salvation lies there.
+0 : 10 : I can't help you anymore than this, despite my purpose and power. I couldn't even help myself.
 PEBBLESWAIT : 4
-0 : I will keep these slag keys. I guarantee I have more use for them than she would.<LINE>Please hurry, little one. I only want the best for you. : 30                
+0 : 30 : I will keep these slag keys. I guarantee I have more use for them than she would.<LINE>Please hurry, little one. I only want the best for you.               

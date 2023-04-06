@@ -4,6 +4,6 @@ Time and time again, young and old, your kind manage to wander through<LINE>my s
 Is this what has become of me? A simple a rat-attunement device?<LINE>That's all I do nowadays, after all!
 PEBBLESWAIT : 4
 It wouldn't be fair to punish you from the outset because of what your predecessors have done.<LINE>So I will give you the instructions I gave them, to use the Mark you now hold. But after that,<LINE>use whatever pheromones, metal-pounding, or guttural yowls your kind utilizes to relay a simple message.
-10 : Don't. Come. Back. This goes for you too, little one. : 0
+10 : 0 : Don't. Come. Back. This goes for you too, little one.
 Now, let's get you on your way. Go west, past the Farm Arrays.<LINE>Where the land fissures, go down into the earth and search your way deeper.
-0 : Did you get all of that? Good. Leave. : 30
+0 : 30 : Did you get all of that? Good. Leave.
