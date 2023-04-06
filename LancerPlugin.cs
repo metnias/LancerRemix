@@ -1,13 +1,9 @@
 ﻿using LancerRemix;
 using LancerRemix.Cat;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using System.Security.Permissions;
 using System.Security;
-using System.Text;
-using System.Threading.Tasks;
 using BepInEx.Logging;
 using BepInEx;
 using LancerRemix.LancerMenu;

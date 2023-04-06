@@ -29,8 +29,8 @@ namespace LancerRemix.LancerMenu
             self.subObjects.Remove(self.pupButton);
             self.pupButton = null;
 
-            int status = self.JollyOptions(index).isPup ? 1 : 0;
-            if (SelectMenuPatch.GetLancerPlayers(index)) status = 2;
+            var status = self.JollyOptions(index).isPup ? PlayerSize.Pup : PlayerSize.Normal;
+            if (SelectMenuPatch.GetLancerPlayers(index)) status = PlayerSize.Lancer;
             self.pupButton = new SymbolButtonToggleLancerButton(menu, self, "toggle_pup_" + index.ToString(), new Vector2(self.classButton.size.x + 10f, -35.5f), new Vector2(45f, 45f), "pup_on", self.GetPupButtonOffName(), status, null, null);
             self.subObjects.Add(self.pupButton);
             menu.elementDescription.Add($"toggle_lancer_{index}_on", menu.Translate("description_lancer_on").Replace("<p_n>", (index + 1).ToString()));
@@ -68,16 +68,23 @@ namespace LancerRemix.LancerMenu
 
         #endregion Patch
 
-        public SymbolButtonToggleLancerButton(Menu.Menu menu, MenuObject owner, string signal, Vector2 pos, Vector2 size, string symbolNameOn, string symbolNameOff, int status, string stringLabelOn = null, string stringLabelOff = null) : base(menu, owner, signal, pos, size, symbolNameOn, symbolNameOff, status > 0, stringLabelOn, stringLabelOff)
+        public SymbolButtonToggleLancerButton(Menu.Menu menu, MenuObject owner, string signal, Vector2 pos, Vector2 size, string symbolNameOn, string symbolNameOff, PlayerSize status, string stringLabelOn = null, string stringLabelOff = null) : base(menu, owner, signal, pos, size, symbolNameOn, symbolNameOff, status != PlayerSize.Normal, stringLabelOn, stringLabelOff)
         {
             this.status = status;
             rawSignalText = signal;
         }
 
+        public enum PlayerSize
+        {
+            Normal,
+            Pup,
+            Lancer
+        };
+
         /// <summary>
         /// 0off 1on 2lancer
         /// </summary>
-        public int status;
+        public PlayerSize status;
 
         public string rawSignalText;
 
@@ -93,35 +100,37 @@ namespace LancerRemix.LancerMenu
             signalText = rawSignalText + "on";
             isToggled = false;
             if (belowLabel != null) belowLabel.label.text = labelNameOff;
+            status = PlayerSize.Pup;
         }
 
         public override void Toggle()
         {
             switch (status)
             {
-                case 0: // off > on
+                case PlayerSize.Normal: // off > on
                     {
                         ToPup();
                     }
                     break;
 
-                case 1: // on > lancer
+                case PlayerSize.Pup: // on > lancer
                     {
                         signalText = rawSignalText + "lancer";
                         isToggled = false;
                         //if (belowLabel != null) belowLabel.label.text = labelNameOn;
                     }
+                    status = PlayerSize.Lancer;
                     break;
 
-                case 2: // on > off
+                case PlayerSize.Lancer: // on > off
                     {
                         signalText = rawSignalText + "off";
                         isToggled = true;
                         if (belowLabel != null) belowLabel.label.text = labelNameOff;
                     }
+                    status = PlayerSize.Normal;
                     break;
             }
-            status = (status + 1) % 3;
 
             faceSymbol.fileName = "face_" + symbol.fileName;
             LoadIcon();
