@@ -102,7 +102,7 @@ namespace LancerRemix.Cat
         private static void SaveLancerPersDataOfCurrentState(ILContext il)
         {
             var cursor = new ILCursor(il);
-            LancerPlugin.LogSource.LogInfo("SaveLancerPersDataOfCurrentState Patch");
+            LancerPlugin.ILhookTry(LancerPlugin.ILhooks.SaveLancerPersDataOfCurrentState);
 
             if (!cursor.TryGotoNext(MoveType.Before,
                 x => x.MatchLdloc(1),
@@ -151,7 +151,7 @@ namespace LancerRemix.Cat
             cursor.Emit(OpCodes.Brtrue, lblOkay);
             cursor.Emit(OpCodes.Br, lblNope);
 
-            LancerPlugin.LogSource.LogInfo("SaveLancerPersDataOfCurrentState Patch Done");
+            LancerPlugin.ILhookOkay(LancerPlugin.ILhooks.SaveLancerPersDataOfCurrentState);
 
             void DebugLogCursor() =>
                 LancerPlugin.LogSource.LogInfo($"{cursor.Prev.OpCode.Name} > Cursor < {cursor.Next.OpCode.Name}");
@@ -160,7 +160,7 @@ namespace LancerRemix.Cat
         private static void LoadLancerMapTexture(ILContext il)
         {
             var cursor = new ILCursor(il);
-            LancerPlugin.LogSource.LogInfo("LoadLancerMapTexture Patch");
+            LancerPlugin.ILhookTry(LancerPlugin.ILhooks.LoadLancerMapTexture);
 
             // Add Jump after if
             if (!cursor.TryGotoNext(MoveType.Before,
@@ -245,7 +245,7 @@ namespace LancerRemix.Cat
             cursor.Emit(OpCodes.Brtrue, lblOkay);
             cursor.Emit(OpCodes.Br, lblMapUpdate);
 
-            LancerPlugin.LogSource.LogInfo("LoadLancerMapTexture Patch Done");
+            LancerPlugin.ILhookOkay(LancerPlugin.ILhooks.LoadLancerMapTexture);
 
             void DebugLogCursor() =>
                 LancerPlugin.LogSource.LogInfo($"{cursor.Prev.OpCode.Name} > Cursor < {cursor.Next.OpCode.Name}");

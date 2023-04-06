@@ -67,6 +67,8 @@ namespace LancerRemix
             DreamHandler.Patch();
 
             instance.Logger.LogMessage("The Lancer is Intialized.");
+            instance.Logger.LogMessage($"ILhooks: {Convert.ToString(ILhookFlags, 2)} ({(ILhookSuccess() ? "Success" : "Failed")})");
+            if (!ILhookSuccess()) Debug.LogError($"Lancer failed some of ILhooks: {Convert.ToString(ILhookFlags, 2)}");
         }
 
         public static On.RainWorld.hook_OnModsInit WrapInit(Action<RainWorld> loadResources)
@@ -149,5 +151,26 @@ namespace LancerRemix
                 lastJollyEnabled = ModManager.JollyCoop;
             }
         }
+
+        private static int ILhookFlags = 0;
+        [Flags]
+        internal enum ILhooks : int
+        {
+            SaveLancerPersDataOfCurrentState = 1 << 0,
+            LoadLancerMapTexture = 1 << 1,
+            LancerTravelScreen = 1 << 2,
+            MineForLunterData = 1 << 3
+        }
+        internal static void ILhookTry(ILhooks flag)
+        {
+            LogSource.LogInfo($"{flag} Hook try");
+            ILhookFlags |= (int)flag;
+        }
+        internal static void ILhookOkay(ILhooks flag)
+        {
+            LogSource.LogInfo($"{flag} Hook success");
+            ILhookFlags &= ~(int)flag;
+        }
+        internal static bool ILhookSuccess() => ILhookFlags == 0;
     }
 }

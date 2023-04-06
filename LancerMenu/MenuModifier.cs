@@ -75,7 +75,7 @@ namespace LancerRemix.LancerMenu
         private static void LancerTravelScreen(ILContext il)
         {
             var cursor = new ILCursor(il);
-            LancerPlugin.LogSource.LogInfo("LancerTravelScreen Patch");
+            LancerPlugin.ILhookTry(LancerPlugin.ILhooks.LancerTravelScreen);
 
             if (!cursor.TryGotoNext(MoveType.After,
                 z => z.MatchLdcI4(-1),
@@ -117,7 +117,7 @@ namespace LancerRemix.LancerMenu
 
             #endregion SetNumToLancer
 
-            LancerPlugin.LogSource.LogInfo("LancerTravelScreen Patch Done");
+            LancerPlugin.ILhookOkay(LancerPlugin.ILhooks.LancerTravelScreen);
 
             void DebugLogCursor() =>
                 LancerPlugin.LogSource.LogInfo($"{cursor.Prev.OpCode.Name} > Cursor < {cursor.Next.OpCode.Name}");

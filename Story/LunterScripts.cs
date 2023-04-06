@@ -363,7 +363,7 @@ namespace LancerRemix.Story
         private static void MineForLunterData(ILContext il)
         {
             var cursor = new ILCursor(il);
-            LancerPlugin.LogSource.LogInfo("MineForLunterData Patch");
+            LancerPlugin.ILhookTry(LancerPlugin.ILhooks.MineForLunterData);
 
             if (!cursor.TryGotoNext(MoveType.Before,
                 x => x.MatchLdsfld(typeof(ModManager).GetField(nameof(ModManager.MSC))),
@@ -387,7 +387,7 @@ namespace LancerRemix.Story
                 }
             });
 
-            LancerPlugin.LogSource.LogInfo("MineForLunterData Patch Done");
+            LancerPlugin.ILhookOkay(LancerPlugin.ILhooks.MineForLunterData);
 
             void DebugLogCursor() =>
                 LancerPlugin.LogSource.LogInfo($"{cursor.Prev.OpCode.Name} > Cursor < {cursor.Next.OpCode.Name}");
