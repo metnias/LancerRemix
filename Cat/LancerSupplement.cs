@@ -101,7 +101,7 @@ namespace LancerRemix.Cat
 
             AddParryEffect();
             if (lanceTimer != 0 && !slideLance) FlingLance();
-            lanceTimer = 0; blockTimer = 0;
+            // lanceTimer = 0; blockTimer = 0;
             grabParried = true;
             return;
         NoParry: orig(self, grasp);
@@ -144,6 +144,8 @@ namespace LancerRemix.Cat
                 {
                     away = (crit.mainBodyChunk.pos - self.mainBodyChunk.pos).normalized;
                     away.y = 1f; away.Normalize();
+                    for (int i = 0; i < crit.grasps.Length; ++i)
+                        if (crit.grasps[i].grabbed == self) { crit.grasps[i].Release(); break; }
                     crit.Stun(Mathf.CeilToInt(Mathf.Lerp(80, 40, crit.TotalMass / 10f)));
                     if (ModManager.MSC && spear is ElectricSpear elecSpear) { elecSpear.Zap(); elecSpear.Electrocute(crit); }
                 }
@@ -157,7 +159,7 @@ namespace LancerRemix.Cat
 
                 AddParryEffect();
                 if (lanceTimer != 0 && !slideLance) FlingLance();
-                lanceTimer = 0; blockTimer = 0;
+                // lanceTimer = 0; blockTimer = 0;
                 return;
             }
         NoParry: orig(self, source, directionAndMomentum, hitChunk, hitAppendage, type, damage, stunBonus);
