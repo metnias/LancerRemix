@@ -234,7 +234,7 @@ namespace LancerRemix.Cat
             self.dontGrabStuff = 10;
             self.bodyChunks[0].vel += lanceDir.ToVector2() * 7f;
             self.bodyChunks[1].vel -= lanceDir.ToVector2() * 4f;
-            lanceTimer = slideLance ? 9 : (lanceDir.y == 0 ? 4 : 6);
+            lanceTimer = slideLance ? 6 : (lanceDir.y == 0 ? 3 : 4);
             blockTimer = slideLance ? 18 : 12;
 
             IntVector2 GetLanceDir()

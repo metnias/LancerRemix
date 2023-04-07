@@ -17,7 +17,6 @@ namespace LancerRemix.Combat
         private static bool CreatureGrabLancer(On.Creature.orig_Grab orig, Creature self, PhysicalObject obj, int graspUsed, int chunkGrabbed, Creature.Grasp.Shareability shareability, float dominance, bool overrideEquallyDominant, bool pacifying)
         {
             var res = orig(self, obj, graspUsed, chunkGrabbed, shareability, dominance, overrideEquallyDominant, pacifying);
-            if (!res) return res;
             if (!(obj is Player player) || !IsPlayerLancer(player)) return res;
             if (GetSub<LancerSupplement>(player)?.IsGrabParried == true)
             {

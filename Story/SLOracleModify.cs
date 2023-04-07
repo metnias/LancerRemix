@@ -17,7 +17,7 @@ namespace LancerRemix.Story
         internal static void SubPatch()
         {
             On.SLOrcacleState.ForceResetState += LancerMoonState;
-            // On.SLOracleBehaviorHasMark.NameForPlayer += NameForLancer;
+            On.SLOracleBehaviorHasMark.NameForPlayer += NameForLancer;
             On.SLOracleBehaviorHasMark.MoonConversation.AddEvents += AddLancerEvents;
         }
 

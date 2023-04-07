@@ -127,7 +127,7 @@
     <Content Include="slugbase\scenes\dream - lancer hunter meet\4 - BG.png" />
     <Content Include="slugbase\scenes\dream - lancer hunter meet\dream - lancer hunter meet - flat.png" />
     <Content Include="text\text_eng\255-RedLancer.txt" />
-    <Content Include="text\text_eng\48-YellowLancer.txt" />
+    <Content Include="text\text_eng\48-WhiteLancer.txt" />
     <Content Include="text\text_eng\47-RedLancer.txt" />
     <Content Include="text\text_eng\46-RedLancer.txt" />
     <Content Include="text\text_eng\51-RedLancer.txt" />
@@ -136,7 +136,7 @@
     <Content Include="text\text_eng\250-RedLancer.txt" />
     <Content Include="text\text_kor\250-RedLancer.txt" />
     <Content Include="text\text_kor\255-RedLancer.txt" />
-    <Content Include="text\text_kor\48-YellowLancer.txt" />
+    <Content Include="text\text_kor\48-WhiteLancer.txt" />
     <Content Include="text\text_kor\50-RedLancer.txt" />
     <Content Include="text\text_kor\51-RedLancer.txt" />
     <Content Include="text\text_kor\55-RedLancer.txt" />

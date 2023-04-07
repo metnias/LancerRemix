@@ -59,7 +59,7 @@ namespace LancerRemix.Story
                 if (IsTimelineInbetween(lancer, SlugName.Yellow, ModManager.MSC ? MSCName.Rivulet : null))
                 {
                     // Hidden Lonk Dialogue
-                    self.LoadEventsFromFile(48, GetLancer(SlugName.Yellow), false, 0);
+                    self.LoadEventsFromFile(48, GetLancer(SlugName.White), false, 0);
                     return;
                 }
                 bool preMove = IsTimelineInbetween(lancer, null, ModManager.MSC ? MSCName.Gourmand : SlugName.White);
