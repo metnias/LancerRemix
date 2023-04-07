@@ -1,5 +1,8 @@
 ﻿using CatSub.Cat;
+using Mono.Cecil.Cil;
+using MonoMod.Cil;
 using MonoMod.RuntimeDetour;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -24,6 +27,7 @@ namespace LancerRemix.Cat
             On.Player.Stun += PlayerStun;
             On.Player.Die += PlayerDie;
             On.Player.MovementUpdate += LancerMovementUpdate;
+            IL.Player.EatMeatUpdate += LonkEatMeatUpdate;
 
             On.PlayerGraphics.InitiateSprites += GrafInitSprite;
             On.PlayerGraphics.AddToContainer += GrafAddToContainer;
@@ -184,6 +188,39 @@ namespace LancerRemix.Cat
             if (IsPlayerLancer(self))
             { GetSub<LancerSupplement>(self)?.MovementUpdate(orig, eu); return; }
             orig(self, eu);
+        }
+
+        private static void LonkEatMeatUpdate(ILContext il)
+        {
+            var cursor = new ILCursor(il);
+
+            LancerPlugin.ILhookTry(LancerPlugin.ILhooks.LonkEatMeatUpdate);
+
+            ILLabel foodAdded = null;
+            if (!cursor.TryGotoNext(
+                x => x.MatchLdarg(0),
+                x => x.MatchCallOrCallvirt(typeof(Player).GetMethod(nameof(Player.AddQuarterFood))),
+                x => x.MatchBr(out foodAdded))) return;
+
+            if (!cursor.TryGotoNext(MoveType.AfterLabel,
+                x => x.MatchLdarg(0),
+                x => x.MatchLdcI4(1),
+                x => x.MatchCallOrCallvirt(typeof(Player).GetMethod(nameof(Player.AddFood))))) return;
+
+            cursor.Emit(OpCodes.Ldarg_0);
+            cursor.Emit(OpCodes.Ldarg_1);
+            cursor.EmitDelegate<Func<Player, int, bool>>((self, graspIndex) =>
+                {
+                    if (IsPlayerLancer(self) && GetBasis(self.SlugCatClass) == SlugName.Yellow)
+                    {
+                        self.AddQuarterFood();
+                        return true;
+                    }
+                    return false;
+                });
+            cursor.Emit(OpCodes.Brtrue, foodAdded);
+
+            LancerPlugin.ILhookOkay(LancerPlugin.ILhooks.LonkEatMeatUpdate);
         }
 
         #endregion Player
