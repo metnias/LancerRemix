@@ -71,7 +71,16 @@ namespace LancerRemix.Cat
             if (blockTimer > 0)
             {
                 --blockTimer;
-                if (blockTimer == 0) blockTimer = -12; // block cooltime
+                if (blockTimer == 0)
+                {
+                    blockTimer = -12; // block cooltime
+                    for (int i = Owner.stuckObjects.Count - 1; i >= 0; --i)
+                    {
+                        if (Owner.stuckObjects[i] is AbstractPhysicalObject.CreatureGripStick stick && stick.B == Owner
+                            && (stick.A as AbstractCreature)?.creatureTemplate.smallCreature != true)
+                            Owner.stuckObjects[i].Deactivate();
+                    }
+                }
             }
             else if (blockTimer < 0) ++blockTimer;
             else if (HasLanceReady() >= 0 && lanceTimer == 0 && self.wantToPickUp > 0)
