@@ -40,7 +40,7 @@ namespace LancerRemix.Cat
         public bool IsGrabParried => grabParried;
 
         public float BlockAmount(float timeStacker)
-            => lanceTimer > 0 ? 0f : Mathf.Lerp((float)blockTimer, blockTimer - blockTimer != 0 ? Math.Sign(blockTimer) : 0, timeStacker);
+            => lanceTimer > 0 ? 0f : Mathf.Lerp((float)blockTimer, blockTimer - (blockTimer != 0 ? Math.Sign(blockTimer) : 0), timeStacker);
 
         public int HasLanceReady()
         {
@@ -95,7 +95,9 @@ namespace LancerRemix.Cat
             // Parry!
             grasp.grabber.Stun(Mathf.CeilToInt(Mathf.Lerp(80, 40, grasp.grabber.TotalMass / 10f)));
             Vector2 away = (grasp.grabber.mainBodyChunk.pos - self.mainBodyChunk.pos).normalized;
-            grasp.grabber.mainBodyChunk.vel += away * Mathf.Lerp(20f, 10f, grasp.grabber.TotalMass / 10f);
+            away.y = 1f; away.Normalize();
+            grasp.grabber.WeightedPush(0, 2, away, 20f);
+            if (ModManager.MSC && GetParrySpear() is ElectricSpear elecSpear) { elecSpear.Zap(); elecSpear.Electrocute(grasp.grabber); }
 
             AddParryEffect();
             if (lanceTimer != 0 && !slideLance) FlingLance();
@@ -105,13 +107,28 @@ namespace LancerRemix.Cat
         NoParry: orig(self, grasp);
         }
 
+        private Spear GetParrySpear()
+        {
+            Spear spear = lanceSpear;
+            if (lanceSpear == null)
+            {
+                for (int i = 0; i < self.grasps.Length; ++i)
+                    if (self.grasps[i]?.grabbed is Spear)
+                        return self.grasps[i].grabbed as Spear;
+            }
+            return spear;
+        }
+
         private void AddParryEffect()
         {
+            var spear = GetParrySpear();
+            if (spear != null) { spear.vibrate = 20; }
+
             self.room.AddObject(new ShockWave(self.mainBodyChunk.pos, 50f, 0.2f, 6, false));
             for (int l = 0; l < 5; l++)
                 self.room.AddObject(new Spark(self.mainBodyChunk.pos, Custom.RNV() * 5f, Color.yellow, null, 25, 90));
             self.room.PlaySound(SoundID.Spear_Bounce_Off_Wall, self.mainBodyChunk, false, 1.5f, 0.8f);
-            self.room.InGameNoise(new InGameNoise(self.mainBodyChunk.pos, lanceTimer != 0 ? 2000f : 1000f, self, 1f));
+            self.room.InGameNoise(new InGameNoise(self.mainBodyChunk.pos, lanceTimer != 0 ? 700f : 200f, self, 1f));
             self.mushroomEffect += (lanceTimer != 0 && !slideLance) ? 0.2f : 0.4f;
         }
 
@@ -122,17 +139,21 @@ namespace LancerRemix.Cat
             {
                 if (blockTimer < 1) goto NoParry;
                 Vector2 away;
+                var spear = GetParrySpear();
                 if (source.owner is Creature crit)
                 {
                     away = (crit.mainBodyChunk.pos - self.mainBodyChunk.pos).normalized;
-                    crit.mainBodyChunk.vel += away * Mathf.Lerp(20f, 10f, crit.TotalMass / 10f);
+                    away.y = 1f; away.Normalize();
                     crit.Stun(Mathf.CeilToInt(Mathf.Lerp(80, 40, crit.TotalMass / 10f)));
+                    if (ModManager.MSC && spear is ElectricSpear elecSpear) { elecSpear.Zap(); elecSpear.Electrocute(crit); }
                 }
                 else
                 {
                     away = (source.owner.bodyChunks[0].pos - self.mainBodyChunk.pos).normalized;
-                    source.owner.bodyChunks[0].vel += away * Mathf.Lerp(40f, 15f, source.owner.TotalMass / 10f);
+                    away.y = 1f; away.Normalize();
+                    if (ModManager.MSC && spear is ElectricSpear elecSpear) elecSpear.Zap();
                 }
+                source.owner.WeightedPush(0, 2, away, 20f);
 
                 AddParryEffect();
                 if (lanceTimer != 0 && !slideLance) FlingLance();
@@ -301,6 +322,8 @@ namespace LancerRemix.Cat
                 spearChunk.vel = Vector2.Lerp(spearChunk.vel * 0.35f, self.mainBodyChunk.vel, Custom.LerpMap(spear.TotalMass, 0.2f, 0.5f, 0.6f, 0.3f));
                 spearChunk.vel += Custom.DegToVec(angleDeg * dir) * Mathf.Clamp(vel / (Mathf.Lerp(spear.TotalMass, 0.4f, 0.2f) * spear.bodyChunks.Length), 4f, 14f);
             }
+            spear.vibrate = 20;
+            spear.SetRandomSpin();
             SetLanceCooltime();
         }
 
