@@ -199,10 +199,16 @@ namespace LancerRemix.Combat
             vel = 0f;
         }
 
-        public void DropMask()
+        public void DropMask(bool fling = false)
         {
             if (Mask == null) return;
-            Mask.firstChunk.vel = player.mainBodyChunk.vel + Custom.RNV() * 3f * Random.value;
+            if (fling)
+            {
+                Vector2 dir = Custom.RNV(); if (dir.y < 0f) dir.y = -dir.y;
+                Mask.firstChunk.vel = player.mainBodyChunk.vel + dir * (9f * Random.value + 6f);
+            }
+            else
+                Mask.firstChunk.vel = player.mainBodyChunk.vel + Custom.RNV() * (3f * Random.value);
             Mask = null;
             abstractStick?.Deactivate();
             abstractStick = null;

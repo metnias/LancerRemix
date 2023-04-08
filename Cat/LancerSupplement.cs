@@ -113,7 +113,13 @@ namespace LancerRemix.Cat
         public virtual void Grabbed(On.Player.orig_Grabbed orig, Creature.Grasp grasp)
         {
             grabParried = false;
-            if (blockTimer < 1) goto NoParry;
+            bool guarded = true;
+            if (blockTimer < 1)
+            {
+                if (this is LunterSupplement lunterSub && lunterSub.maskOnHorn.HasAMask) lunterSub.maskOnHorn.DropMask(true);
+                else goto NoParry;
+                guarded = false;
+            }
             if (grasp.grabber == null || (!(grasp.grabber is Lizard) && !(grasp.grabber is Vulture) && !(grasp.grabber is BigSpider) && !(grasp.grabber is DropBug))) goto NoParry;
             // Parry!
             grasp.grabber.Stun(Mathf.CeilToInt(Mathf.Lerp(80, 40, grasp.grabber.TotalMass / 10f)));
@@ -122,8 +128,9 @@ namespace LancerRemix.Cat
             grasp.grabber.WeightedPush(0, 2, away, 20f);
             if (ModManager.MSC && GetParrySpear() is ElectricSpear elecSpear) { elecSpear.Zap(); elecSpear.Electrocute(grasp.grabber); }
 
-            AddParryEffect();
-            if (lanceTimer != 0 && !slideLance) FlingLance();
+            guarded &= lanceTimer == 0;
+            AddParryEffect(guarded);
+            if (!guarded && !slideLance) FlingLance();
             // lanceTimer = 0; blockTimer = 0;
             grabParried = true;
             return;
@@ -142,17 +149,17 @@ namespace LancerRemix.Cat
             return spear;
         }
 
-        protected void AddParryEffect()
+        protected void AddParryEffect(bool guarded)
         {
             var spear = GetParrySpear();
-            if (spear != null) { spear.vibrate = 20; }
+            if (spear != null) spear.vibrate = 20;
 
             self.room.AddObject(new ShockWave(self.mainBodyChunk.pos, 50f, 0.2f, 6, false));
             for (int l = 0; l < 5; l++)
                 self.room.AddObject(new Spark(self.mainBodyChunk.pos, Custom.RNV() * 5f, Color.yellow, null, 25, 90));
             self.room.PlaySound(SoundID.Spear_Bounce_Off_Wall, self.mainBodyChunk, false, 1.5f, 0.8f);
-            self.room.InGameNoise(new InGameNoise(self.mainBodyChunk.pos, lanceTimer != 0 ? 700f : 200f, self, 1f));
-            self.mushroomEffect += (lanceTimer != 0 && !slideLance) ? 0.2f : 0.4f;
+            self.room.InGameNoise(new InGameNoise(self.mainBodyChunk.pos, guarded ? 200f : 700f, self, 1f));
+            self.mushroomEffect += guarded ? 0.4f : 0.2f;
         }
 
         public virtual void Violence(On.Creature.orig_Violence orig,
@@ -160,7 +167,13 @@ namespace LancerRemix.Cat
         {
             if (type == Creature.DamageType.Bite || type == Creature.DamageType.Blunt || type == Creature.DamageType.Stab)
             {
-                if (blockTimer < 1) goto NoParry;
+                bool guarded = true;
+                if (blockTimer < 1)
+                {
+                    if (this is LunterSupplement lunterSub && lunterSub.maskOnHorn.HasAMask) lunterSub.maskOnHorn.DropMask(true);
+                    else goto NoParry;
+                    guarded = false;
+                }
                 Vector2 away;
                 var spear = GetParrySpear();
                 if (source.owner != null)
@@ -183,8 +196,9 @@ namespace LancerRemix.Cat
                     source.owner.WeightedPush(0, 2, away, 20f);
                 }
 
-                AddParryEffect();
-                if (lanceTimer != 0 && !slideLance) FlingLance();
+                guarded &= lanceTimer == 0;
+                AddParryEffect(guarded);
+                if (!guarded && !slideLance) FlingLance();
                 // lanceTimer = 0; blockTimer = 0;
                 return;
             }
@@ -264,6 +278,7 @@ namespace LancerRemix.Cat
             self.bodyChunks[1].vel -= lanceDir.ToVector2() * 4f;
             lanceTimer = slideLance ? 6 : (lanceDir.y == 0 ? 3 : 4);
             blockTimer = slideLance ? Mathf.CeilToInt(blockTime * 1.5f) : blockTime;
+            if (!slideLance && this is LunterSupplement lunterSub) lunterSub.maskOnHorn.DropMask();
 
             IntVector2 GetLanceDir()
             {
