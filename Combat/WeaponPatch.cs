@@ -10,6 +10,7 @@ namespace LancerRemix.Combat
     {
         internal static void Patch()
         {
+            On.Weapon.Thrown += LancerThrownWeapon;
             On.Spear.HitSomething += SpearHit;
             On.Spear.LodgeInCreature += SpearLodgeCreature;
             On.Spear.Update += SpearUpdate;
@@ -32,6 +33,16 @@ namespace LancerRemix.Combat
         internal static void OnMSCDisablePatch()
         {
             On.MoreSlugcats.ElectricSpear.DrawSprites -= ElecSpearDrawSprites;
+        }
+
+        private static void LancerThrownWeapon(On.Weapon.orig_Thrown orig, Weapon self, Creature thrownBy, Vector2 thrownPos, Vector2? firstFrameTraceFromPos, IntVector2 throwDir, float frc, bool eu)
+        {
+            if (thrownBy != null && thrownBy is Player player && IsPlayerLancer(player) && !(self is Spear))
+            {
+                if (self is Rock) frc = Mathf.Lerp(0.8f, 1.2f, player.Adrenaline);
+                else frc = Mathf.Lerp(0.6f, 0.9f, player.Adrenaline);
+            }
+            orig(self, thrownBy, thrownPos, firstFrameTraceFromPos, throwDir, frc, eu);
         }
 
         #region Spear

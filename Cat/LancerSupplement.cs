@@ -101,7 +101,7 @@ namespace LancerRemix.Cat
         {
             grabParried = false;
             if (blockTimer < 1) goto NoParry;
-            if (!(grasp.grabber is Lizard) && !(grasp.grabber is Vulture) && !(grasp.grabber is BigSpider) && !(grasp.grabber is DropBug)) goto NoParry;
+            if (grasp.grabber == null || (!(grasp.grabber is Lizard) && !(grasp.grabber is Vulture) && !(grasp.grabber is BigSpider) && !(grasp.grabber is DropBug))) goto NoParry;
             // Parry!
             grasp.grabber.Stun(Mathf.CeilToInt(Mathf.Lerp(80, 40, grasp.grabber.TotalMass / 10f)));
             Vector2 away = (grasp.grabber.mainBodyChunk.pos - self.mainBodyChunk.pos).normalized;
@@ -150,22 +150,25 @@ namespace LancerRemix.Cat
                 if (blockTimer < 1) goto NoParry;
                 Vector2 away;
                 var spear = GetParrySpear();
-                if (source.owner is Creature crit)
+                if (source.owner != null)
                 {
-                    away = (crit.mainBodyChunk.pos - self.mainBodyChunk.pos).normalized;
-                    away.y = 1f; away.Normalize();
-                    for (int i = 0; i < crit.grasps.Length; ++i)
-                        if (crit.grasps[i].grabbed == self) { crit.grasps[i].Release(); break; }
-                    crit.Stun(Mathf.CeilToInt(Mathf.Lerp(80, 40, crit.TotalMass / 10f)));
-                    if (ModManager.MSC && spear is ElectricSpear elecSpear) { elecSpear.Zap(); elecSpear.Electrocute(crit); }
+                    if (source.owner is Creature crit)
+                    {
+                        away = (crit.mainBodyChunk.pos - self.mainBodyChunk.pos).normalized;
+                        away.y = 1f; away.Normalize();
+                        for (int i = 0; i < crit.grasps.Length; ++i)
+                            if (crit.grasps[i].grabbed == self) { crit.grasps[i].Release(); break; }
+                        crit.Stun(Mathf.CeilToInt(Mathf.Lerp(80, 40, crit.TotalMass / 10f)));
+                        if (ModManager.MSC && spear is ElectricSpear elecSpear) { elecSpear.Zap(); elecSpear.Electrocute(crit); }
+                    }
+                    else
+                    {
+                        away = (source.owner.bodyChunks[0].pos - self.mainBodyChunk.pos).normalized;
+                        away.y = 1f; away.Normalize();
+                        if (ModManager.MSC && spear is ElectricSpear elecSpear) elecSpear.Zap();
+                    }
+                    source.owner.WeightedPush(0, 2, away, 20f);
                 }
-                else
-                {
-                    away = (source.owner.bodyChunks[0].pos - self.mainBodyChunk.pos).normalized;
-                    away.y = 1f; away.Normalize();
-                    if (ModManager.MSC && spear is ElectricSpear elecSpear) elecSpear.Zap();
-                }
-                source.owner.WeightedPush(0, 2, away, 20f);
 
                 AddParryEffect();
                 if (lanceTimer != 0 && !slideLance) FlingLance();
@@ -187,7 +190,7 @@ namespace LancerRemix.Cat
             if (self.room.GetTile(startPos).Solid) startPos = self.mainBodyChunk.pos;
             if (self.graphicsModule != null) LookAtTarget();
 
-            self.AerobicIncrease(0.5f);
+            self.AerobicIncrease(0.6f);
             lanceSpear = spear;
             slideLance = false;
             spear.spearDamageBonus = GetLanceDamage(self.slugcatStats.throwingSkill);
