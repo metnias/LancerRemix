@@ -108,6 +108,10 @@ namespace LancerRemix.Cat
             switch (self.slugcatStats.throwingSkill)
             {
                 case 0:
+                    catSubs.Add(self.playerState, new LonkSupplement(self));
+                    catDecos.Add(self.playerState, new LancerDecoration(self));
+                    break;
+
                 default:
                 case 1:
                     catSubs.Add(self.playerState, new LancerSupplement(self));

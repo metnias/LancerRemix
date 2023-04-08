@@ -388,7 +388,7 @@ namespace LancerRemix.Cat
             SetLanceCooltime();
         }
 
-        protected void SetLanceCooltime() => lanceTimer = -24;
+        protected virtual void SetLanceCooltime() => lanceTimer = -24;
 
         protected float GetLanceDamage(int throwingSkill)
         {
