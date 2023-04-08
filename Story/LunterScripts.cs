@@ -413,6 +413,7 @@ namespace LancerRemix.Story
             {
                 var basis = GetBasis(self.world.game.StoryCharacter);
                 if (basis == SlugName.Red) ownerOverride = 2;
+                else if (basis == SlugName.Yellow) { self.isPlayerGuide = false; return; }
             }
             orig(self, ownerOverride);
         }
@@ -424,6 +425,7 @@ namespace LancerRemix.Story
             {
                 var basis = GetBasis(world.game.StoryCharacter);
                 if (basis == SlugName.Red && (world.game.session as StoryGameSession).saveState.miscWorldSaveData.EverMetMoon) self.destroy = true;
+                else if (basis == SlugName.Yellow) self.destroy = true;
             }
         }
 
