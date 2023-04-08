@@ -90,6 +90,7 @@
     <Compile Include="Story\DreamHandler.cs" />
     <Compile Include="Story\LunterScripts.cs" />
     <Compile Include="Story\LunterDummyDecoration.cs" />
+    <Compile Include="Story\LurvivorScripts.cs" />
     <Compile Include="Story\TutorialModify.cs" />
     <Compile Include="Story\SLOracleModify.cs" />
     <Compile Include="Story\SSOracleModify.cs" />

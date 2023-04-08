@@ -20,6 +20,7 @@ namespace LancerRemix.Story
             LunterScripts.SubPatch();
             SLOracleModify.SubPatch();
             SSOracleModify.SubPatch();
+            LurvivorScripts.SubPatch();
 
             if (ModManager.MSC) OnMSCEnablePatch();
         }
@@ -27,11 +28,13 @@ namespace LancerRemix.Story
         internal static void OnMSCEnablePatch()
         {
             LunterScripts.OnMSCEnableSubPatch();
+            LurvivorScripts.OnMSCEnableSubPatch();
         }
 
         internal static void OnMSCDisablePatch()
         {
             LunterScripts.OnMSCDisableSubPatch();
+            LurvivorScripts.OnMSCDisableSubPatch();
         }
 
         internal const string COORDNULL = "COORDNULL";
