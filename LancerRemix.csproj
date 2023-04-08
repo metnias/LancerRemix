@@ -104,28 +104,13 @@
     <AdditionalFiles Include="slugbase\scenes\dream - lancer hunter meet.json" />
   </ItemGroup>
   <ItemGroup>
-    <AdditionalFiles Include="scenes\sleep screen - lancer\lancer - 2 - white.png" />
-    <AdditionalFiles Include="scenes\sleep screen - lancer\sleep lancer - white - flat.png" />
-    <AdditionalFiles Include="scenes\slugcat - lancer\red lancer - 1 - dark.png" />
-    <AdditionalFiles Include="scenes\slugcat - lancer\red lancer - 1.png" />
-    <AdditionalFiles Include="scenes\slugcat - lancer\yellow lancer - 1.png" />
-    <AdditionalFiles Include="scenes\slugcat - lancer\white lancer - 2.png" />
-    <AdditionalFiles Include="scenes\slugcat - lancer\lancer - red dark - flat.png" />
     <AdditionalFiles Include="text\text_kor\strings.txt" />
-    <AdditionalFiles Include="scenes\sleep screen - lancer\lancer - 2 - yellow.png" />
-    <AdditionalFiles Include="scenes\sleep screen - lancer\lancer - 2 - red.png" />
-    <AdditionalFiles Include="scenes\sleep screen - lancer\sleep lancer - yellow - flat.png" />
     <Content Include="illustrations\lancer_off.png" />
     <Content Include="illustrations\lancer_on.png" />
-    <AdditionalFiles Include="scenes\slugcat - lancer\lancer - red - flat.png" />
-    <AdditionalFiles Include="scenes\slugcat - lancer\lancer - yellow - flat.png" />
-    <AdditionalFiles Include="scenes\slugcat - lancer\lancer - white - flat.png" />
-    <AdditionalFiles Include="scenes\sleep screen - lancer\sleep lancer - red - flat.png" />
     <AdditionalFiles Include="slugbase\scenes\dream - lancer hunter meet\1 - FG.png" />
     <AdditionalFiles Include="slugbase\scenes\dream - lancer hunter meet\2 - HLL.png" />
     <AdditionalFiles Include="slugbase\scenes\dream - lancer hunter meet\3 - HLancer.png" />
     <AdditionalFiles Include="slugbase\scenes\dream - lancer hunter meet\4 - BG.png" />
-    <AdditionalFiles Include="slugbase\scenes\dream - lancer hunter meet\dream - lancer hunter meet - flat.png" />
     <AdditionalFiles Include="text\text_eng\255-RedLancer.txt" />
     <AdditionalFiles Include="text\text_eng\48-WhiteLancer.txt" />
     <AdditionalFiles Include="text\text_eng\47-RedLancer.txt" />
@@ -140,6 +125,21 @@
     <AdditionalFiles Include="text\text_kor\50-RedLancer.txt" />
     <AdditionalFiles Include="text\text_kor\51-RedLancer.txt" />
     <AdditionalFiles Include="text\text_kor\55-RedLancer.txt" />
+    <Content Include="scenes\sleep screen - lancer\lancer - 2 - red.png" />
+    <Content Include="scenes\sleep screen - lancer\lancer - 2 - yellow.png" />
+    <Content Include="scenes\sleep screen - lancer\lancer - 2 - white.png" />
+    <Content Include="scenes\sleep screen - lancer\sleep lancer - red - flat.png" />
+    <Content Include="scenes\sleep screen - lancer\sleep lancer - yellow - flat.png" />
+    <Content Include="scenes\sleep screen - lancer\sleep lancer - white - flat.png" />
+    <Content Include="scenes\slugcat - lancer\white lancer - 2.png" />
+    <Content Include="scenes\slugcat - lancer\yellow lancer - 1.png" />
+    <Content Include="scenes\slugcat - lancer\red lancer - 1 - dark.png" />
+    <Content Include="scenes\slugcat - lancer\red lancer - 1.png" />
+    <Content Include="scenes\slugcat - lancer\lancer - red - flat.png" />
+    <Content Include="scenes\slugcat - lancer\lancer - red dark - flat.png" />
+    <Content Include="scenes\slugcat - lancer\lancer - yellow - flat.png" />
+    <Content Include="scenes\slugcat - lancer\lancer - white - flat.png" />
+    <Content Include="slugbase\scenes\dream - lancer hunter meet\dream - lancer hunter meet - flat.png" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
