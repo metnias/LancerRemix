@@ -28,6 +28,7 @@ namespace LancerRemix.Cat
             On.Player.Die += PlayerDie;
             On.Player.MovementUpdate += LancerMovementUpdate;
             IL.Player.EatMeatUpdate += LonkEatMeatUpdate;
+            On.Player.GraphicsModuleUpdated += LunterGrafModuleUpdated;
 
             On.PlayerGraphics.InitiateSprites += GrafInitSprite;
             On.PlayerGraphics.AddToContainer += GrafAddToContainer;
@@ -104,8 +105,20 @@ namespace LancerRemix.Cat
         {
             orig(self, abstractCreature, world);
             if (!IsPlayerLancer(self)) return;
-            catSubs.Add(self.playerState, new LancerSupplement(self));
-            catDecos.Add(self.playerState, new LancerDecoration(self));
+            switch (self.slugcatStats.throwingSkill)
+            {
+                case 0:
+                default:
+                case 1:
+                    catSubs.Add(self.playerState, new LancerSupplement(self));
+                    catDecos.Add(self.playerState, new LancerDecoration(self));
+                    break;
+
+                case 2:
+                    catSubs.Add(self.playerState, new LunterSupplement(self));
+                    catDecos.Add(self.playerState, new LunterDecoration(self));
+                    break;
+            }
         }
 
         private static void PlayerUpdate(On.Player.orig_Update orig, Player self, bool eu)
@@ -173,14 +186,16 @@ namespace LancerRemix.Cat
 
         private static void PlayerStun(On.Player.orig_Stun orig, Player self, int st)
         {
+            if (IsPlayerLancer(self))
+            { GetSub<LancerSupplement>(self)?.Stun(orig, st); return; }
             orig(self, st);
-            if (IsPlayerLancer(self)) GetSub<LancerSupplement>(self)?.ReleaseLanceSpear();
         }
 
         private static void PlayerDie(On.Player.orig_Die orig, Player self)
         {
+            if (IsPlayerLancer(self))
+            { GetSub<LancerSupplement>(self)?.Die(orig); return; }
             orig(self);
-            if (IsPlayerLancer(self)) GetSub<LancerSupplement>(self)?.ReleaseLanceSpear();
         }
 
         private static void LancerMovementUpdate(On.Player.orig_MovementUpdate orig, Player self, bool eu)
@@ -221,6 +236,12 @@ namespace LancerRemix.Cat
             cursor.Emit(OpCodes.Brtrue, foodAdded);
 
             LancerPlugin.ILhookOkay(LancerPlugin.ILhooks.LonkEatMeatUpdate);
+        }
+
+        private static void LunterGrafModuleUpdated(On.Player.orig_GraphicsModuleUpdated orig, Player self, bool actuallyViewed, bool eu)
+        {
+            if (IsPlayerLancer(self)) GetSub<LunterSupplement>(self)?.maskOnHorn.GraphicsModuleUpdated(actuallyViewed, eu);
+            orig(self, actuallyViewed, eu);
         }
 
         #endregion Player

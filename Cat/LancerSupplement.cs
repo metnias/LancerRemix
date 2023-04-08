@@ -1,4 +1,5 @@
 ﻿using CatSub.Cat;
+using LancerRemix.Combat;
 using MoreSlugcats;
 using Noise;
 using RWCustom;
@@ -30,14 +31,14 @@ namespace LancerRemix.Cat
         {
         }
 
-        private Spear lanceSpear = null;
-        private int lanceGrasp = -1;
-        private int lanceTimer = 0; // throw button: makes you lose spear
-        private int blockTimer = 0; // grab button
-        private readonly int blockTime = 12;
-        private bool slideLance = false;
+        protected Spear lanceSpear = null;
+        protected int lanceGrasp = -1;
+        protected int lanceTimer = 0; // throw button: makes you lose spear
+        protected int blockTimer = 0; // grab button
+        protected readonly int blockTime = 12;
+        protected bool slideLance = false;
         public bool IsSlideLance => slideLance;
-        private bool grabParried = false;
+        protected bool grabParried = false;
         public bool IsGrabParried => grabParried;
 
         public float BlockAmount(float timeStacker)
@@ -92,6 +93,18 @@ namespace LancerRemix.Cat
             }
         }
 
+        public virtual void Stun(On.Player.orig_Stun orig, int st)
+        {
+            orig(self, st);
+            ReleaseLanceSpear();
+        }
+
+        public virtual void Die(On.Player.orig_Die orig)
+        {
+            orig(self);
+            ReleaseLanceSpear();
+        }
+
         public override void Destroy(On.Player.orig_Destroy orig)
         {
             base.Destroy(null);
@@ -117,7 +130,7 @@ namespace LancerRemix.Cat
         NoParry: orig(self, grasp);
         }
 
-        private Spear GetParrySpear()
+        protected Spear GetParrySpear()
         {
             Spear spear = lanceSpear;
             if (lanceSpear == null)
@@ -129,7 +142,7 @@ namespace LancerRemix.Cat
             return spear;
         }
 
-        private void AddParryEffect()
+        protected void AddParryEffect()
         {
             var spear = GetParrySpear();
             if (spear != null) { spear.vibrate = 20; }
@@ -304,7 +317,7 @@ namespace LancerRemix.Cat
             orig.Invoke(self, eu);
         }
 
-        internal void FlingLance()
+        protected internal void FlingLance()
         {
             Spear spear = lanceSpear;
             if (lanceSpear != null) ReleaseLanceSpear();
@@ -342,7 +355,7 @@ namespace LancerRemix.Cat
             SetLanceCooltime();
         }
 
-        internal void ReleaseLanceSpear()
+        protected internal void ReleaseLanceSpear()
         {
             if (lanceSpear != null)
             {
@@ -352,7 +365,7 @@ namespace LancerRemix.Cat
             lanceTimer = 0;
         }
 
-        internal void RetrieveLanceSpear(Spear spear = null)
+        protected internal void RetrieveLanceSpear(Spear spear = null)
         {
             if (spear == null) spear = lanceSpear;
             self.SlugcatGrab(spear, lanceGrasp); // retrieve
@@ -360,9 +373,9 @@ namespace LancerRemix.Cat
             SetLanceCooltime();
         }
 
-        private void SetLanceCooltime() => lanceTimer = -24;
+        protected void SetLanceCooltime() => lanceTimer = -24;
 
-        private float GetLanceDamage(int throwingSkill)
+        protected float GetLanceDamage(int throwingSkill)
         {
             float dmg;
             switch (throwingSkill)
@@ -382,7 +395,7 @@ namespace LancerRemix.Cat
         }
     }
 
-    internal interface IAmLancer
+    public interface IAmLancer
     {
     }
 }
