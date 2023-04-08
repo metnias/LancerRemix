@@ -34,13 +34,14 @@ namespace LancerRemix.Cat
         private int lanceGrasp = -1;
         private int lanceTimer = 0; // throw button: makes you lose spear
         private int blockTimer = 0; // grab button
+        private readonly int blockTime = 12;
         private bool slideLance = false;
         public bool IsSlideLance => slideLance;
         private bool grabParried = false;
         public bool IsGrabParried => grabParried;
 
         public float BlockAmount(float timeStacker)
-            => lanceTimer > 0 ? 0f : Mathf.Lerp((float)blockTimer, blockTimer - (blockTimer != 0 ? Math.Sign(blockTimer) : 0), timeStacker);
+            => lanceTimer > 0 ? 0f : Mathf.Clamp(Mathf.Lerp((float)blockTimer, blockTimer - (blockTimer != 0 ? Math.Sign(blockTimer) : 0), timeStacker) / blockTime, -1f, 1f);
 
         public int HasLanceReady()
         {
@@ -73,7 +74,7 @@ namespace LancerRemix.Cat
                 --blockTimer;
                 if (blockTimer == 0)
                 {
-                    blockTimer = -12; // block cooltime
+                    blockTimer = -blockTime; // block cooltime
                     for (int i = Owner.stuckObjects.Count - 1; i >= 0; --i)
                     {
                         if (Owner.stuckObjects[i] is AbstractPhysicalObject.CreatureGripStick stick && stick.B == Owner
@@ -86,7 +87,7 @@ namespace LancerRemix.Cat
             else if (HasLanceReady() >= 0 && lanceTimer == 0 && self.wantToPickUp > 0)
             {
                 self.wantToPickUp = 0;
-                blockTimer = 12; // block
+                blockTimer = blockTime; // block
                 self.room.PlaySound(SoundID.Slugcat_Pick_Up_Spear, self.mainBodyChunk, false, 1.2f, 1.2f);
             }
         }
@@ -246,7 +247,7 @@ namespace LancerRemix.Cat
             self.bodyChunks[0].vel += lanceDir.ToVector2() * 7f;
             self.bodyChunks[1].vel -= lanceDir.ToVector2() * 4f;
             lanceTimer = slideLance ? 6 : (lanceDir.y == 0 ? 3 : 4);
-            blockTimer = slideLance ? 18 : 12;
+            blockTimer = slideLance ? Mathf.CeilToInt(blockTime * 1.5f) : blockTime;
 
             IntVector2 GetLanceDir()
             {

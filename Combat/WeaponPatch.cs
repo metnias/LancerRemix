@@ -40,9 +40,9 @@ namespace LancerRemix.Combat
         {
             float block = GetSub<LancerSupplement>(lancer)?.BlockAmount(timeStacker) ?? 0f;
             if (block >= 0f)
-                return Vector3.Slerp(lancer.ThrowDirection >= 0f ? Vector3.right : Vector3.left, Vector3.up, block);
-            var rot = Vector3.Slerp(spear.lastRotation, spear.rotation, timeStacker);
-            return Vector3.Slerp(lancer.ThrowDirection >= 0f ? Vector3.right : Vector3.left, rot.normalized, -block);
+                return Vector3.Slerp(lancer.ThrowDirection >= 0f ? Vector3.right : Vector3.left, Vector3.up, Custom.LerpCircEaseOut(0.0f, 1.0f, block));
+            //var rot = Vector3.Slerp(spear.lastRotation, spear.rotation, timeStacker);
+            return Vector3.Slerp(lancer.ThrowDirection >= 0f ? Vector3.right : Vector3.left, Vector2.down, Custom.LerpCircEaseIn(0.0f, 0.3f, -block));
         }
 
         private static bool SpearHit(On.Spear.orig_HitSomething orig, Spear self, SharedPhysics.CollisionResult result, bool eu)
