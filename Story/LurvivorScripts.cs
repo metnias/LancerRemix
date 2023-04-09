@@ -1,10 +1,13 @@
 ﻿using LancerRemix.Cat;
+using LancerRemix.LancerMenu;
 using Menu;
+using RWCustom;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using UnityEngine;
 using SlugName = SlugcatStats.Name;
@@ -29,6 +32,9 @@ namespace LancerRemix.Story
 
         private static bool IsStoryLancer => ModifyCat.IsStoryLancer;
 
+        private static void ReplaceIllust(MenuScene scene, string sceneFolder, string flatImage, string layerImageOrig, string layerImage, Vector2 layerPos, bool basic = true)
+            => SelectMenuPatch.ReplaceIllust(scene, sceneFolder, flatImage, layerImageOrig, layerImage, layerPos, basic);
+
         private static bool yellowHasLancer = false;
 
         private static void BuildLancerOEEnd(On.Menu.MenuScene.orig_BuildVanillaAltEnd orig, MenuScene self,
@@ -36,12 +42,11 @@ namespace LancerRemix.Story
         {
             // TODO: edit this for Lancer Surv & normal Monk
             if (character == null) character = SlugName.White;
-            if (!IsStoryLancer && character != SlugName.Yellow) { orig(self, sceneID, character, slugpups); return; }
+            orig(self, sceneID, character, slugpups);
+            if (!IsStoryLancer && character != SlugName.Yellow) return;
             bool yellow = !IsStoryLancer && character == SlugName.Yellow;
-            if (yellow && sceneID == 1)
-            {
-                // get yellowHasLancer;
-            }
+            if (yellow && sceneID == 1) yellowHasLancer = GetLurvivorOEEnd();
+            if (yellow && !yellowHasLancer) return;
 
             string sceneName;
             switch (sceneID)
@@ -51,6 +56,7 @@ namespace LancerRemix.Story
                 case 3: sceneName = "Outro 3_B - Return"; break;
                 case 4: sceneName = "Outro 4_B - Home"; break;
             }
+
             int pupNum = Mathf.Min(slugpups, 2);
             if (character != SlugName.White) pupNum = 0;
             self.sceneFolder = "Scenes" + Path.DirectorySeparatorChar + sceneName;
@@ -103,6 +109,27 @@ namespace LancerRemix.Story
                 self.AddIllustration(new MenuDepthIllustration(self.menu, self, self.sceneFolder, "Outro 4_B - Home - 2 - " + character.ToString(), new Vector2(71f, 49f), 2.4f, MenuDepthIllustration.MenuShader.LightEdges));
                 self.AddIllustration(new MenuDepthIllustration(self.menu, self, self.sceneFolder, "Outro 4_B - Home - 1", new Vector2(71f, 49f), 1.8f, MenuDepthIllustration.MenuShader.LightEdges));
                 self.AddIllustration(new MenuDepthIllustration(self.menu, self, self.sceneFolder, "Outro 4_B - Home - 0 - " + character.ToString(), new Vector2(71f, 49f), 1.5f, MenuDepthIllustration.MenuShader.LightEdges));
+            }
+
+            bool GetLurvivorOEEnd()
+            {
+                var progLines = Custom.rainWorld.progression?.GetProgLinesFromMemory();
+                if (progLines == null || progLines.Length == 0) return false;
+                var whiteLancer = LancerEnums.GetLancer(SlugName.White);
+                for (int i = 0; i < progLines.Length; ++i)
+                {
+                    var array = Regex.Split(progLines[i], "<progDivB>");
+                    if (array.Length != 2 || array[0] != "SAVE STATE"
+                        || BackwardsCompatibilityRemix.ParseSaveNumber(array[1]) != whiteLancer) continue;
+
+                    const string ALTEND = ">ALTENDING";
+                    var mineTarget = new List<SaveStateMiner.Target>()
+                    { new SaveStateMiner.Target(ALTEND, null, "<dpA>", 20) };
+                    var mineResult = SaveStateMiner.Mine(Custom.rainWorld, array[1], mineTarget);
+                    if (mineResult.Count > 0 && mineResult[0].name == ALTEND) return true;
+                    return false;
+                }
+                return false;
             }
         }
     }
