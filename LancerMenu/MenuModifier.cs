@@ -36,7 +36,7 @@ namespace LancerRemix.LancerMenu
         private static bool IsStoryLancer => ModifyCat.IsStoryLancer;
 
         private static void ReplaceIllust(MenuScene scene, string sceneFolder, string flatImage, string layerImageOrig, string layerImage, Vector2 layerPos)
-            => SelectMenuPatch.ReplaceIllust(scene, sceneFolder, flatImage, layerImageOrig, layerImage, layerPos, false);
+            => SelectMenuPatch.ReplaceIllust(scene, sceneFolder, flatImage, layerImageOrig, layerImage, layerPos, MenuDepthIllustration.MenuShader.Normal);
 
         private static void LancerSleepScene(MenuScene scene)
         {
@@ -66,10 +66,7 @@ namespace LancerRemix.LancerMenu
         private static void LancerSceneSwap(On.Menu.MenuScene.orig_ctor orig, MenuScene self, Menu.Menu menu, MenuObject owner, MenueSceneID sceneID)
         {
             orig(self, menu, owner, sceneID);
-            if (sceneID == MenueSceneID.SleepScreen)
-            {
-                LancerSleepScene(self);
-            }
+            if (IsStoryLancer && sceneID == MenueSceneID.SleepScreen) LancerSleepScene(self);
         }
 
         private static void LancerTravelScreen(ILContext il)

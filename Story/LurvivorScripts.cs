@@ -32,8 +32,8 @@ namespace LancerRemix.Story
 
         private static bool IsStoryLancer => ModifyCat.IsStoryLancer;
 
-        private static void ReplaceIllust(MenuScene scene, string sceneFolder, string flatImage, string layerImageOrig, string layerImage, Vector2 layerPos, bool basic = true)
-            => SelectMenuPatch.ReplaceIllust(scene, sceneFolder, flatImage, layerImageOrig, layerImage, layerPos, basic);
+        private static void ReplaceIllust(MenuScene scene, string sceneFolder, string flatImage, string layerImageOrig, string layerImage, Vector2 layerPos, MenuDepthIllustration.MenuShader shader = null)
+            => SelectMenuPatch.ReplaceIllust(scene, sceneFolder, flatImage, layerImageOrig, layerImage, layerPos, shader ?? MenuDepthIllustration.MenuShader.LightEdges);
 
         private static bool yellowHasLancer = false;
 
@@ -41,8 +41,7 @@ namespace LancerRemix.Story
             int sceneID, SlugName character, int slugpups)
         {
             bool yellow = !IsStoryLancer && character == SlugName.Yellow;
-            if (character == null) character = SlugName.White;
-            else if (IsStoryLancer)
+            if (IsStoryLancer)
             {
                 character = SlugName.Yellow; slugpups = 0;
                 if (sceneID == 2) sceneID = 3;
@@ -59,7 +58,7 @@ namespace LancerRemix.Story
                 case 1:
                     if (!yellow)
                         ReplaceIllust(self, LANCERFOLDER,
-                            "Outro 1_B - Clearing - LWhite - Flat", "Outro 1_B - Clearing - 0_LWhite", "Outro 1_B - Clearing - 0_" + SlugName.Yellow.ToString() + "_0",
+                            "Outro 1_B - Clearing - LWhite - Flat", "Outro 1_B - Clearing - 0_Yellow_0", "Outro 1_B - Clearing - 0_LWhite",
                             new Vector2(406f, -115f));
                     break;
 
@@ -71,13 +70,13 @@ namespace LancerRemix.Story
                     if (!yellow)
                     {
                         ReplaceIllust(self, LANCERFOLDER,
-                            "Outro 3_B - Return - LWhite - Flat", "Outro 3_B - Return - LWhite 1", "outro 3_b - return - 1", new Vector2(-62f, -29f));
+                            "Outro 3_B - Return - LWhite - Flat", "Outro 3_B - Return - 1", "Outro 3_B - Return - LWhite 1", new Vector2(-62f, -29f));
                         ReplaceIllust(self, LANCERFOLDER,
-                            string.Empty, "Outro 3_B - Return - LWhite 0", "outro 3_b - return - 0", new Vector2(812f, -46f));
+                            string.Empty, "outro 3_B - Return - 0", "Outro 3_B - Return - LWhite 0", new Vector2(812f, -46f));
                     }
                     else
                         ReplaceIllust(self, LANCERFOLDER,
-                            "Outro 3_B - Return - YellowL - Flat", "Outro 3_B - Return - YellowL 1", "outro 3_b - return - 1",
+                            "Outro 3_B - Return - YellowL - Flat", "Outro 3_B - Return - 1", "Outro 3_B - Return - YellowL 1",
                             new Vector2(406f, -115f));
                     break;
 
@@ -85,14 +84,16 @@ namespace LancerRemix.Story
                     if (!yellow)
                     {
                         ReplaceIllust(self, LANCERFOLDER,
-                            "Outro 4_B - Home - LWhite - Flat", "Outro 4_B - Home - LWhite 4", "Outro 4_B - Home - 4_" + character.ToString() + "_0", new Vector2(574f, -21f));
+                            "Outro 4_B - Home - LWhite - Flat", "Outro 4_B - Home - 4_Yellow_0", "Outro 4_B - Home - LWhite 4", new Vector2(574f, -21f));
+                        ReplaceIllust(self, self.sceneFolder,
+                            string.Empty, "outro 4_b - home - 2 - yellow", "outro 4_b - home - 2 - white", new Vector2(351f, 386f));
                         ReplaceIllust(self, LANCERFOLDER,
-                            string.Empty, "Outro 4_B - Home - LWhite 0", "Outro 4_B - Home - 0 - " + character.ToString(), new Vector2(812f, -46f));
+                            string.Empty, "Outro 4_B - Home - 0 - Yellow", "Outro 4_B - Home - LWhite 0", new Vector2(200f, -55f));
                     }
                     else
                         ReplaceIllust(self, LANCERFOLDER,
-                            "Outro 4_B - Home - YellowL - Flat", "Outro 4_B - Home - YellowL 0", "Outro 4_B - Home - 0 - " + character.ToString(),
-                            new Vector2(406f, -115f));
+                            "Outro 4_B - Home - YellowL - Flat", "outro 4_b - home - 0 - yellow", "Outro 4_B - Home - YellowL 0",
+                            new Vector2(200f, -55f));
                     break;
             }
 

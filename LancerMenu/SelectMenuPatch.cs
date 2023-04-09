@@ -437,7 +437,7 @@ namespace LancerRemix.LancerMenu
             }
         }
 
-        internal static void ReplaceIllust(MenuScene scene, string sceneFolder, string flatImage, string layerImageOrig, string layerImage, Vector2 layerPos, bool basic = true)
+        internal static void ReplaceIllust(MenuScene scene, string sceneFolder, string flatImage, string layerImageOrig, string layerImage, Vector2 layerPos, MenuDepthIllustration.MenuShader shader = null)
         {
             if (scene.flatMode)
             {
@@ -450,13 +450,21 @@ namespace LancerRemix.LancerMenu
             {
                 int i = 0;
                 for (; i < scene.depthIllustrations.Count; ++i)
-                    if (string.Compare(scene.depthIllustrations[i].fileName, layerImageOrig, true) == 0) break;
+                    if (string.Equals(scene.depthIllustrations[i].fileName, layerImageOrig, StringComparison.InvariantCultureIgnoreCase)) break;
+                if (i >= scene.depthIllustrations.Count)
+                {
+                    var B = new System.Text.StringBuilder();
+                    B.AppendLine($"layerImage [{layerImageOrig}] is not in these ({i}/{scene.depthIllustrations.Count}):");
+                    for (i = 0; i < scene.depthIllustrations.Count; ++i)
+                        B.AppendLine($"{i}: [{scene.depthIllustrations[i].fileName}] == [{layerImageOrig}] ? {string.Equals(scene.depthIllustrations[i].fileName, layerImageOrig, StringComparison.InvariantCultureIgnoreCase)}");
+                    throw new ArgumentOutOfRangeException(B.ToString());
+                }
                 float depth = scene.depthIllustrations[i].depth;
                 scene.depthIllustrations[i].RemoveSprites();
                 scene.depthIllustrations[i] = null;
                 // LancerPlugin.LogSource.LogMessage($"({i}/{scene.depthIllustrations.Count}) replaced to {layerImage}");
                 scene.depthIllustrations[i] =
-                    new MenuDepthIllustration(scene.page.menu, scene, sceneFolder, layerImage, layerPos, depth, basic ? MenuDepthIllustration.MenuShader.Basic : MenuDepthIllustration.MenuShader.Normal);
+                    new MenuDepthIllustration(scene.page.menu, scene, sceneFolder, layerImage, layerPos, depth, shader ?? MenuDepthIllustration.MenuShader.Basic);
                 if (i < scene.depthIllustrations.Count - 1)
                     scene.depthIllustrations[i].sprite.MoveBehindOtherNode(scene.depthIllustrations[i + 1].sprite);
                 scene.subObjects.Add(scene.depthIllustrations[i]);
