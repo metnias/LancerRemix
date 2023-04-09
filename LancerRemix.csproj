@@ -145,6 +145,18 @@
     <AdditionalFiles Include="scenes\slugcat - lancer\lancer - yellow - flat.png" />
     <AdditionalFiles Include="scenes\slugcat - lancer\lancer - white - flat.png" />
     <AdditionalFiles Include="slugbase\scenes\dream - lancer hunter meet\dream - lancer hunter meet - flat.png" />
+    <Content Include="scenes\Outro L_B\Outro 1_B - Clearing - 0_LWhite.png" />
+    <Content Include="scenes\Outro L_B\Outro 1_B - Clearing - LWhite - Flat.png" />
+    <Content Include="scenes\Outro L_B\Outro 3_B - Return - YellowL 1.png" />
+    <Content Include="scenes\Outro L_B\Outro 3_B - Return - YellowL - Flat.png" />
+    <Content Include="scenes\Outro L_B\Outro 3_B - Return - LWhite 0.png" />
+    <Content Include="scenes\Outro L_B\Outro 3_B - Return - LWhite 1.png" />
+    <Content Include="scenes\Outro L_B\Outro 3_B - Return - LWhite - Flat.png" />
+    <Content Include="scenes\Outro L_B\Outro 4_B - Home - YellowL 0.png" />
+    <Content Include="scenes\Outro L_B\Outro 4_B - Home - YellowL - Flat.png" />
+    <Content Include="scenes\Outro L_B\Outro 4_B - Home - LWhite 0.png" />
+    <Content Include="scenes\Outro L_B\Outro 4_B - Home - LWhite 4.png" />
+    <Content Include="scenes\Outro L_B\Outro 4_B - Home - LWhite - Flat.png" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -40,75 +40,60 @@ namespace LancerRemix.Story
         private static void BuildLancerOEEnd(On.Menu.MenuScene.orig_BuildVanillaAltEnd orig, MenuScene self,
             int sceneID, SlugName character, int slugpups)
         {
-            // TODO: edit this for Lancer Surv & normal Monk
-            if (character == null) character = SlugName.White;
-            orig(self, sceneID, character, slugpups);
-            if (!IsStoryLancer && character != SlugName.Yellow) return;
             bool yellow = !IsStoryLancer && character == SlugName.Yellow;
+            if (character == null) character = SlugName.White;
+            else if (IsStoryLancer)
+            {
+                character = SlugName.Yellow; slugpups = 0;
+                if (sceneID == 2) sceneID = 3;
+            }
+            orig(self, sceneID, character, slugpups);
+            if (!IsStoryLancer && !yellow) return;
             if (yellow && sceneID == 1) yellowHasLancer = GetLurvivorOEEnd();
             if (yellow && !yellowHasLancer) return;
 
-            string sceneName;
+            string LANCERFOLDER = $"Scenes{Path.DirectorySeparatorChar}Outro L_B";
+
             switch (sceneID)
             {
-                default: sceneName = "Outro 1_B - Clearing"; break;
-                case 2: sceneName = "Outro 2_B - Peek"; break;
-                case 3: sceneName = "Outro 3_B - Return"; break;
-                case 4: sceneName = "Outro 4_B - Home"; break;
-            }
+                case 1:
+                    if (!yellow)
+                        ReplaceIllust(self, LANCERFOLDER,
+                            "Outro 1_B - Clearing - LWhite - Flat", "Outro 1_B - Clearing - 0_LWhite", "Outro 1_B - Clearing - 0_" + SlugName.Yellow.ToString() + "_0",
+                            new Vector2(406f, -115f));
+                    break;
 
-            int pupNum = Mathf.Min(slugpups, 2);
-            if (character != SlugName.White) pupNum = 0;
-            self.sceneFolder = "Scenes" + Path.DirectorySeparatorChar + sceneName;
-            if (self.flatMode)
-            {
-                self.AddIllustration(new MenuIllustration(self.menu, self, self.sceneFolder, string.Concat(new string[]
-                {
-                    sceneName,
-                    " - Flat_",
-                    character.ToString(),
-                    "_",
-                    pupNum.ToString()
-                }), new Vector2(683f, 384f), false, true));
-                return;
-            }
-            if (sceneID == 1)
-            {
-                self.AddIllustration(new MenuDepthIllustration(self.menu, self, self.sceneFolder, "Outro 1_B - Clearing - 3", new Vector2(71f, 49f), 10f, MenuDepthIllustration.MenuShader.LightEdges));
-                self.AddIllustration(new MenuDepthIllustration(self.menu, self, self.sceneFolder, "Outro 1_B - Clearing - 2", new Vector2(71f, 49f), 4.5f, MenuDepthIllustration.MenuShader.LightEdges));
-                self.AddIllustration(new MenuDepthIllustration(self.menu, self, self.sceneFolder, "Outro 1_B - Clearing - 1", new Vector2(71f, 49f), 1.9f, MenuDepthIllustration.MenuShader.LightEdges));
-                self.AddIllustration(new MenuDepthIllustration(self.menu, self, self.sceneFolder, "Outro 1_B - Clearing - 0_" + character.ToString() + "_" + pupNum.ToString(), new Vector2(71f, 49f), 1.5f, MenuDepthIllustration.MenuShader.LightEdges));
-                return;
-            }
-            if (sceneID == 2)
-            {
-                self.AddIllustration(new MenuDepthIllustration(self.menu, self, self.sceneFolder, "Outro 2_B - Peek - 3", new Vector2(71f, 49f), 12f, MenuDepthIllustration.MenuShader.LightEdges));
-                self.AddIllustration(new MenuDepthIllustration(self.menu, self, self.sceneFolder, "Outro 2_B - Peek - 2_" + character.ToString() + "_" + pupNum.ToString(), new Vector2(71f, 49f), 10f, MenuDepthIllustration.MenuShader.LightEdges));
-                self.AddIllustration(new MenuDepthIllustration(self.menu, self, self.sceneFolder, "Outro 2_B - Peek - 1", new Vector2(71f, 49f), 6.5f, MenuDepthIllustration.MenuShader.Basic));
-                self.AddIllustration(new MenuDepthIllustration(self.menu, self, self.sceneFolder, "Outro 2_B - Peek - 0", new Vector2(71f, 49f), 3.2f, MenuDepthIllustration.MenuShader.LightEdges));
-                return;
-            }
-            if (sceneID == 3)
-            {
-                self.AddIllustration(new MenuDepthIllustration(self.menu, self, self.sceneFolder, "Outro 3_B - Return - 3", new Vector2(71f, 49f), 8f, MenuDepthIllustration.MenuShader.LightEdges));
-                self.AddIllustration(new MenuDepthIllustration(self.menu, self, self.sceneFolder, "Outro 3_B - Return - 2", new Vector2(71f, 49f), 4.5f, MenuDepthIllustration.MenuShader.LightEdges));
-                self.AddIllustration(new MenuDepthIllustration(self.menu, self, self.sceneFolder, "Outro 3_B - Return - 1", new Vector2(71f, 49f), 3.8f, MenuDepthIllustration.MenuShader.LightEdges));
-                self.AddIllustration(new MenuDepthIllustration(self.menu, self, self.sceneFolder, "Outro 3_B - Return - 0", new Vector2(71f, 49f), 1.5f, MenuDepthIllustration.MenuShader.LightEdges));
-                return;
-            }
-            if (sceneID == 4)
-            {
-                self.AddIllustration(new MenuDepthIllustration(self.menu, self, self.sceneFolder, "Outro 4_B - Home - 10", new Vector2(71f, 49f), 10f, MenuDepthIllustration.MenuShader.LightEdges));
-                self.AddIllustration(new MenuDepthIllustration(self.menu, self, self.sceneFolder, "Outro 4_B - Home - 9", new Vector2(71f, 49f), 6.2f, MenuDepthIllustration.MenuShader.LightEdges));
-                self.AddIllustration(new MenuDepthIllustration(self.menu, self, self.sceneFolder, "Outro 4_B - Home - 8", new Vector2(71f, 49f), 4.8f, MenuDepthIllustration.MenuShader.LightEdges));
-                self.AddIllustration(new MenuDepthIllustration(self.menu, self, self.sceneFolder, "Outro 4_B - Home - 7", new Vector2(71f, 49f), 3.8f, MenuDepthIllustration.MenuShader.LightEdges));
-                self.AddIllustration(new MenuDepthIllustration(self.menu, self, self.sceneFolder, "Outro 4_B - Home - 6", new Vector2(71f, 49f), 3.2f, MenuDepthIllustration.MenuShader.LightEdges));
-                self.AddIllustration(new MenuDepthIllustration(self.menu, self, self.sceneFolder, "Outro 4_B - Home - 5_" + character.ToString() + "_" + ((pupNum > 0) ? "1" : "0"), new Vector2(71f, 49f), 3.2f, MenuDepthIllustration.MenuShader.Multiply));
-                self.AddIllustration(new MenuDepthIllustration(self.menu, self, self.sceneFolder, "Outro 4_B - Home - 4_" + character.ToString() + "_" + ((pupNum > 0) ? "1" : "0"), new Vector2(71f, 49f), 3.2f, MenuDepthIllustration.MenuShader.LightEdges));
-                self.AddIllustration(new MenuDepthIllustration(self.menu, self, self.sceneFolder, "Outro 4_B - Home - 3_" + ((pupNum > 1) ? "1" : "0"), new Vector2(71f, 49f), 2.4f, MenuDepthIllustration.MenuShader.LightEdges));
-                self.AddIllustration(new MenuDepthIllustration(self.menu, self, self.sceneFolder, "Outro 4_B - Home - 2 - " + character.ToString(), new Vector2(71f, 49f), 2.4f, MenuDepthIllustration.MenuShader.LightEdges));
-                self.AddIllustration(new MenuDepthIllustration(self.menu, self, self.sceneFolder, "Outro 4_B - Home - 1", new Vector2(71f, 49f), 1.8f, MenuDepthIllustration.MenuShader.LightEdges));
-                self.AddIllustration(new MenuDepthIllustration(self.menu, self, self.sceneFolder, "Outro 4_B - Home - 0 - " + character.ToString(), new Vector2(71f, 49f), 1.5f, MenuDepthIllustration.MenuShader.LightEdges));
+                default:
+                case 2:
+                    break;
+
+                case 3:
+                    if (!yellow)
+                    {
+                        ReplaceIllust(self, LANCERFOLDER,
+                            "Outro 3_B - Return - LWhite - Flat", "Outro 3_B - Return - LWhite 1", "outro 3_b - return - 1", new Vector2(-62f, -29f));
+                        ReplaceIllust(self, LANCERFOLDER,
+                            string.Empty, "Outro 3_B - Return - LWhite 0", "outro 3_b - return - 0", new Vector2(812f, -46f));
+                    }
+                    else
+                        ReplaceIllust(self, LANCERFOLDER,
+                            "Outro 3_B - Return - YellowL - Flat", "Outro 3_B - Return - YellowL 1", "outro 3_b - return - 1",
+                            new Vector2(406f, -115f));
+                    break;
+
+                case 4:
+                    if (!yellow)
+                    {
+                        ReplaceIllust(self, LANCERFOLDER,
+                            "Outro 4_B - Home - LWhite - Flat", "Outro 4_B - Home - LWhite 4", "Outro 4_B - Home - 4_" + character.ToString() + "_0", new Vector2(574f, -21f));
+                        ReplaceIllust(self, LANCERFOLDER,
+                            string.Empty, "Outro 4_B - Home - LWhite 0", "Outro 4_B - Home - 0 - " + character.ToString(), new Vector2(812f, -46f));
+                    }
+                    else
+                        ReplaceIllust(self, LANCERFOLDER,
+                            "Outro 4_B - Home - YellowL - Flat", "Outro 4_B - Home - YellowL 0", "Outro 4_B - Home - 0 - " + character.ToString(),
+                            new Vector2(406f, -115f));
+                    break;
             }
 
             bool GetLurvivorOEEnd()

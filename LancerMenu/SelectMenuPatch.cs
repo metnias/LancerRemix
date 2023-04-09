@@ -441,6 +441,7 @@ namespace LancerRemix.LancerMenu
         {
             if (scene.flatMode)
             {
+                if (string.IsNullOrEmpty(flatImage)) return;
                 scene.flatIllustrations[0].RemoveSprites();
                 scene.flatIllustrations.Clear();
                 scene.AddIllustration(new MenuIllustration(scene.page.menu, scene, sceneFolder, flatImage, new Vector2(683f, 384f), false, true));
