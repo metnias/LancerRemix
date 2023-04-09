@@ -47,13 +47,25 @@ namespace LancerRemix.Combat
 
         #region Spear
 
-        private static Vector2 GetAimDir(Spear spear, Player lancer, float timeStacker)
+        private static bool GetLancerAimDir(Spear self, float timeStacker, out Vector2 aimDir)
         {
-            float block = GetSub<LancerSupplement>(lancer)?.BlockAmount(timeStacker) ?? 0f;
-            if (block >= 0f)
-                return Vector3.Slerp(lancer.ThrowDirection >= 0f ? Vector3.right : Vector3.left, Vector3.up, Custom.LerpCircEaseOut(0.0f, 1.0f, block));
-            //var rot = Vector3.Slerp(spear.lastRotation, spear.rotation, timeStacker);
-            return Vector3.Slerp(lancer.ThrowDirection >= 0f ? Vector3.right : Vector3.left, Vector2.down, Custom.LerpCircEaseIn(0.0f, 0.3f, -block));
+            if (self.grabbedBy.Count > 0 && self.grabbedBy[0].grabber is Player grabPlayer && IsPlayerLancer(grabPlayer))
+            {
+                float block = GetSub<LancerSupplement>(grabPlayer)?.BlockAmount(timeStacker) ?? 0f;
+                if (block >= 0f)
+                    aimDir = Vector3.Slerp(grabPlayer.ThrowDirection >= 0f ? Vector3.right : Vector3.left, Vector3.up, Custom.LerpCircEaseOut(0.0f, 1.0f, block));
+                else
+                    aimDir = Vector3.Slerp(grabPlayer.ThrowDirection >= 0f ? Vector3.right : Vector3.left, Vector2.down, Custom.LerpCircEaseIn(0.0f, 0.3f, -block));
+                return true;
+            }
+            else if (self.thrownBy != null && self.thrownBy is Player thrwPlayer && IsPlayerLancer(thrwPlayer))
+            {
+                //var rot = Vector3.Slerp(spear.lastRotation, spear.rotation, timeStacker);
+                aimDir = self.throwDir.ToVector2();
+                return true;
+            }
+            aimDir = Vector2.zero;
+            return false;
         }
 
         private static bool SpearHit(On.Spear.orig_HitSomething orig, Spear self, SharedPhysics.CollisionResult result, bool eu)
@@ -83,10 +95,7 @@ namespace LancerRemix.Combat
         private static void SpearUpdate(On.Spear.orig_Update orig, Spear self, bool eu)
         {
             orig(self, eu);
-            if (self.grabbedBy.Count <= 0 || !(self.grabbedBy[0].grabber is Player player) || !IsPlayerLancer(player))
-                return;
-
-            Vector2 aimDir = GetAimDir(self, player, 0f); ;
+            if (!GetLancerAimDir(self, 0f, out var aimDir)) return;
 
             if (self is ExplosiveSpear)
             {
@@ -117,9 +126,8 @@ namespace LancerRemix.Combat
         {
             orig.Invoke(self, sLeaser, rCam, timeStacker, camPos);
             if (!sLeaser.sprites[0].isVisible) return;
-            if (self.grabbedBy.Count <= 0 || !(self.grabbedBy[0].grabber is Player player) || !IsPlayerLancer(player)) return;
+            if (!GetLancerAimDir(self, 0f, out var aimDir)) return;
 
-            Vector2 aimDir = GetAimDir(self, player, timeStacker);
             if (self is ExplosiveSpear)
             {
                 (self as ExplosiveSpear).rag[0, 0] = Vector2.Lerp(self.firstChunk.lastPos, self.firstChunk.pos, 1f) + aimDir * 15f;
@@ -143,8 +151,7 @@ namespace LancerRemix.Combat
             RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
         {
             orig(self, sLeaser, rCam, timeStacker, camPos);
-            if (self.grabbedBy.Count <= 0 || !(self.grabbedBy[0].grabber is Player player) || !IsPlayerLancer(player)) return;
-            Vector2 aimDir = GetAimDir(self, player, timeStacker);
+            if (!GetLancerAimDir(self, 0f, out var aimDir)) return;
             float aimRot = Custom.AimFromOneVectorToAnother(Vector2.zero, aimDir);
 
             for (int i = 0; i < self.segments; i++)

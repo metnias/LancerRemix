@@ -42,7 +42,7 @@ namespace LancerRemix.Cat
         public bool IsGrabParried => grabParried;
 
         public float BlockAmount(float timeStacker)
-            => lanceTimer > 0 ? 0f : Mathf.Clamp(Mathf.Lerp((float)blockTimer, blockTimer - (blockTimer != 0 ? Math.Sign(blockTimer) : 0), timeStacker) / blockTime, -1f, 1f);
+            => lanceTimer != 0 ? 0f : Mathf.Clamp(Mathf.Lerp((float)blockTimer, blockTimer - (blockTimer != 0 ? Math.Sign(blockTimer) : 0), timeStacker) / blockTime, -1f, 1f);
 
         public int HasLanceReady()
         {

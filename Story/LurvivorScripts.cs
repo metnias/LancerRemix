@@ -29,13 +29,19 @@ namespace LancerRemix.Story
 
         private static bool IsStoryLancer => ModifyCat.IsStoryLancer;
 
+        private static bool yellowHasLancer = false;
+
         private static void BuildLancerOEEnd(On.Menu.MenuScene.orig_BuildVanillaAltEnd orig, MenuScene self,
             int sceneID, SlugName character, int slugpups)
         {
             // TODO: edit this for Lancer Surv & normal Monk
             if (character == null) character = SlugName.White;
             if (!IsStoryLancer && character != SlugName.Yellow) { orig(self, sceneID, character, slugpups); return; }
-            //bool isLancer = IsStoryLancer;
+            bool yellow = !IsStoryLancer && character == SlugName.Yellow;
+            if (yellow && sceneID == 1)
+            {
+                // get yellowHasLancer;
+            }
 
             string sceneName;
             switch (sceneID)
