@@ -29,12 +29,14 @@ namespace LancerRemix.Story
         {
             LunterScripts.OnMSCEnableSubPatch();
             LurvivorScripts.OnMSCEnableSubPatch();
+            On.RoomSettings.ctor += SLOracleModify.LonkInvSLRoomSettings;
         }
 
         internal static void OnMSCDisablePatch()
         {
             LunterScripts.OnMSCDisableSubPatch();
             LurvivorScripts.OnMSCDisableSubPatch();
+            On.RoomSettings.ctor -= SLOracleModify.LonkInvSLRoomSettings;
         }
 
         internal const string COORDNULL = "COORDNULL";

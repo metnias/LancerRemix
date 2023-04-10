@@ -46,12 +46,14 @@ namespace LancerRemix
 
         internal static SlugName GetLancer(SlugName basis)
         {
+            if (basis == null || basis.Index < 0) return basis;
             if (NameLancer.TryGetValue(basis, out var lancer)) return lancer;
             return basis;
         }
 
         internal static SlugName GetBasis(SlugName lancer)
         {
+            if (lancer == null || lancer.Index < 0) return lancer;
             if (NameBasis.TryGetValue(lancer, out var basis)) return basis;
             return lancer;
         }

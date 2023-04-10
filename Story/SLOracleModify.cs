@@ -19,6 +19,8 @@ namespace LancerRemix.Story
             On.SLOrcacleState.ForceResetState += LancerMoonState;
             On.SLOracleBehaviorHasMark.NameForPlayer += NameForLancer;
             On.SLOracleBehaviorHasMark.MoonConversation.AddEvents += AddLancerEvents;
+            On.Oracle.OracleArm.BaseDir += LonkSLOracleArmDir;
+            On.Oracle.OracleArm.OnFramePos += LonkSLOracleArmPos;
         }
 
         private static bool IsStoryLancer => ModifyCat.IsStoryLancer;
@@ -325,5 +327,33 @@ namespace LancerRemix.Story
             return;
         NoLancer: orig.Invoke(self);
         }
+
+        #region Lonk
+
+        private static bool IsMoonComatose(SlugName storyCharacter)
+            => IsStoryLancer && IsTimelineInbetween(GetLancer(storyCharacter), ModManager.MSC ? MSCName.Spear : null, SlugName.Red);
+
+        private static Vector2 LonkSLOracleArmDir(On.Oracle.OracleArm.orig_BaseDir orig, Oracle.OracleArm self, float timeStacker)
+        {
+            if (self.oracle.room.game.IsStorySession && IsMoonComatose(self.oracle.room.game.StoryCharacter))
+                return Vector2.down;
+            return orig(self, timeStacker);
+        }
+
+        private static Vector2 LonkSLOracleArmPos(On.Oracle.OracleArm.orig_OnFramePos orig, Oracle.OracleArm self, float timeStacker)
+        {
+            if (self.oracle.room.game.IsStorySession && IsMoonComatose(self.oracle.room.game.StoryCharacter))
+                return new Vector2(1670f, 605f);
+            return orig(self, timeStacker);
+        }
+
+        internal static void LonkInvSLRoomSettings(On.RoomSettings.orig_ctor orig, RoomSettings self,
+            string name, Region region, bool template, bool firstTemplate, SlugName playerChar)
+        {
+            if (ModManager.MSC && IsMoonComatose(playerChar) && region.name == "SL") playerChar = MSCName.Sofanthiel;
+            orig(self, name, region, template, firstTemplate, playerChar);
+        }
+
+        #endregion Lonk
     }
 }
