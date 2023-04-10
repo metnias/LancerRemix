@@ -8,14 +8,15 @@ To be released...|출시 예정...
 You are too young and weak to throw a metal rebar|철근을 들고 집어던지기에는 너무 어리고 연약하다
 But stabbing does not stun foes|하지만 찌르는 걸로는 적을 멈출 수 없다
 Have to find an opening|빈틈을 찾아야 한다
-Press GRAB while holding a spear to block beforehand|창을 들고 잡기 버튼을 미리 눌러 방어한다
+Press PICK UP while holding a spear to block beforehand|창을 들고 줍기 버튼을 미리 눌러 방어한다
 
 May you overcome this world of violence|이 폭력이 가득한 세계에서 살아남기를
 
 Stab / Throw|찌르기/투척
 Lancer Interaction:|랜서 상호작용:
-
-Perform a rocket backflip by slide-boosting and backward throw with a spear|슬라이딩을 하면서 창을 반대로 꽂아 로켓 백플립을 한다
+Press THROW to stab|투척 버튼을 눌러 찌르기
+Press PICK UP to defend|줍기 버튼을 눌러 방어
+Hold PICK UP with a mask to hang it onto your horn|가면을 들고 줍기 버튼을 길게 눌러 뿔에 걸치기
 
 // SLOracle
 lancersl-tiny|자그만

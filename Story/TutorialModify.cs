@@ -1,5 +1,4 @@
-﻿using CatSub.Cat;
-using LancerRemix.Cat;
+﻿using LancerRemix.Cat;
 using Menu;
 using RWCustom;
 using System.Text;
@@ -60,7 +59,7 @@ namespace LancerRemix.Story
                 }
                 if (!extraTuto && self.room.abstractRoom.name == "SU_A25")
                 {
-                    self.room.game.cameras[0].hud.textPrompt.AddMessage(Translate("Press GRAB while holding a spear to block beforehand"), 0, 300, true, true);
+                    self.room.game.cameras[0].hud.textPrompt.AddMessage(Translate("Press PICK UP while holding a spear to block beforehand"), 0, 300, true, true);
                     extraTuto = true;
                 }
             }
@@ -91,14 +90,17 @@ namespace LancerRemix.Story
         {
             orig.Invoke(map, menu, owner, pos, preset, showPickupInstructions);
             if (!showPickupInstructions) return;
-            if (!(Custom.rainWorld.processManager.currentMainLoop is RainWorldGame)) return;
+            if (!(Custom.rainWorld.processManager.currentMainLoop is RainWorldGame rwg)) return;
             if (!IsStoryLancer) return;
             map.controlLabels[5].text = $"{Menu.Remix.OptionalText.GetButtonName_Throw()} - {Translate("Stab / Throw")}";
 
             var S = new StringBuilder();
-            S.AppendLine(Translate("Lancer Interaction:"));
+            S.AppendLine(Translate("Lancer Interaction while holding a spear:"));
             S.AppendLine();
-            S.Append("- "); S.AppendLine(Translate(""));
+            S.Append("- "); S.AppendLine(Translate("Press THROW to stab"));
+            S.Append("- "); S.AppendLine(Translate("Press PICK UP to defend"));
+            if (GetBasis(rwg.StoryCharacter) == SlugName.Red)
+            { S.Append("- "); S.AppendLine(Translate("Hold PICK UP with a mask to hang it onto your horn")); }
 
             map.pickupButtonInstructions.text = S.ToString();
         }
