@@ -12,6 +12,7 @@ Press GRAB while holding a spear to block beforehand|창을 들고 잡기 버튼
 
 May you overcome this world of violence|이 폭력이 가득한 세계에서 살아남기를
 
+Stab / Throw|찌르기/투척
 Lancer Interaction:|랜서 상호작용:
 
 Perform a rocket backflip by slide-boosting and backward throw with a spear|슬라이딩을 하면서 창을 반대로 꽂아 로켓 백플립을 한다

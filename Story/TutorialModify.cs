@@ -1,5 +1,9 @@
-﻿using LancerRemix.Cat;
+﻿using CatSub.Cat;
+using LancerRemix.Cat;
+using Menu;
 using RWCustom;
+using System.Text;
+using UnityEngine;
 using static LancerRemix.LancerEnums;
 using SlugName = SlugcatStats.Name;
 
@@ -11,6 +15,7 @@ namespace LancerRemix.Story
         {
             On.OverseerTutorialBehavior.PickupObjectInputInstructionController.Update += LancerPickupInstruction;
             On.RoomSpecificScript.SU_A23FirstCycleMessage.Update += LancerSU_A23;
+            On.Menu.ControlMap.ctor += LancerControlMap;
 
             if (ModManager.MMF) OnMMFEnablePatch();
         }
@@ -82,5 +87,20 @@ namespace LancerRemix.Story
             orig(self, eu);
         }
 
+        private static void LancerControlMap(On.Menu.ControlMap.orig_ctor orig, ControlMap map, Menu.Menu menu, MenuObject owner, Vector2 pos, Options.ControlSetup.Preset preset, bool showPickupInstructions)
+        {
+            orig.Invoke(map, menu, owner, pos, preset, showPickupInstructions);
+            if (!showPickupInstructions) return;
+            if (!(Custom.rainWorld.processManager.currentMainLoop is RainWorldGame)) return;
+            if (!IsStoryLancer) return;
+            map.controlLabels[5].text = $"{Menu.Remix.OptionalText.GetButtonName_Throw()} - {Translate("Stab / Throw")}";
+
+            var S = new StringBuilder();
+            S.AppendLine(Translate("Lancer Interaction:"));
+            S.AppendLine();
+            S.Append("- "); S.AppendLine(Translate(""));
+
+            map.pickupButtonInstructions.text = S.ToString();
+        }
     }
 }
