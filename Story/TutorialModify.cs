@@ -1,5 +1,6 @@
 ﻿using LancerRemix.Cat;
 using Menu;
+using MoreSlugcats;
 using RWCustom;
 using System.Text;
 using UnityEngine;
@@ -37,7 +38,7 @@ namespace LancerRemix.Story
 
         private static bool IsStoryLancer => ModifyCat.IsStoryLancer;
 
-        private static bool extraTuto = false;
+        private static bool extraTutoShown = false;
 
         private static string Translate(string text) => Custom.rainWorld.inGameTranslator.Translate(text);
 
@@ -46,7 +47,7 @@ namespace LancerRemix.Story
             if (IsStoryLancer && self.overseer.AI.communication != null && self.overseer.AI.communication.inputInstruction != null
                 && !self.overseer.AI.communication.inputInstruction.slatedForDeletetion && self.overseer.AI.communication.inputInstruction is PickupObjectInstruction)
             {
-                if (self.room.abstractRoom.name == "SU_A23")
+                if ((!ModManager.MMF || MMF.cfgExtraTutorials.Value) && self.room.abstractRoom.name == "SU_A23")
                 {
                     if (!self.textShown)
                     {
@@ -54,13 +55,13 @@ namespace LancerRemix.Story
                         self.room.game.cameras[0].hud.textPrompt.AddMessage(Translate("But stabbing does not stun foes"), 20, 240, true, true);
                         self.room.game.cameras[0].hud.textPrompt.AddMessage(Translate("Have to find an opening"), 20, 240, true, true);
                         self.textShown = true;
-                        extraTuto = false;
+                        extraTutoShown = false;
                     }
                 }
-                if (!extraTuto && self.room.abstractRoom.name == "SU_A25")
+                if ((!ModManager.MMF || MMF.cfgExtraTutorials.Value) && !extraTutoShown && self.room.abstractRoom.name == "SU_A25")
                 {
                     self.room.game.cameras[0].hud.textPrompt.AddMessage(Translate("Press PICK UP while holding a spear to block beforehand"), 0, 300, true, true);
-                    extraTuto = true;
+                    extraTutoShown = true;
                 }
             }
             orig(self);
@@ -95,10 +96,10 @@ namespace LancerRemix.Story
             map.controlLabels[5].text = $"{Menu.Remix.OptionalText.GetButtonName_Throw()} - {Translate("Stab / Throw")}";
 
             var S = new StringBuilder();
-            S.AppendLine(Translate("Lancer Interaction while holding a spear:"));
+            S.AppendLine(Translate("Lancer Interactions:"));
             S.AppendLine();
-            S.Append("- "); S.AppendLine(Translate("Press THROW to stab"));
-            S.Append("- "); S.AppendLine(Translate("Press PICK UP to defend"));
+            S.Append("- "); S.AppendLine(Translate("Press THROW to stab with a spear"));
+            S.Append("- "); S.AppendLine(Translate("Press PICK UP to defend with a spear"));
             if (GetBasis(rwg.StoryCharacter) == SlugName.Red)
             { S.Append("- "); S.AppendLine(Translate("Hold PICK UP with a mask to hang it onto your horn")); }
 

@@ -13,9 +13,9 @@ Press PICK UP while holding a spear to block beforehand|창을 들고 줍기 버
 May you overcome this world of violence|이 폭력이 가득한 세계에서 살아남기를
 
 Stab / Throw|찌르기/투척
-Lancer Interaction:|랜서 상호작용:
-Press THROW to stab|투척 버튼을 눌러 찌르기
-Press PICK UP to defend|줍기 버튼을 눌러 방어
+Lancer Interactions:|랜서 상호작용:
+Press THROW to stab with a spear|창을 들고 투척 버튼을 눌러 찌르기
+Press PICK UP to defend with a spear|창을 들고 줍기 버튼을 눌러 방어
 Hold PICK UP with a mask to hang it onto your horn|가면을 들고 줍기 버튼을 길게 눌러 뿔에 걸치기
 
 // SLOracle

@@ -283,10 +283,11 @@ namespace LancerRemix.Cat
             lanceGrasp = grasp;
             var lanceDir = GetLanceDir();
             var startPos = self.firstChunk.pos + lanceDir.ToVector2() * 8f;
+            if (self.standing && self.animation != AnimIndex.Flip) startPos.y -= 10f;
             if (self.room.GetTile(startPos).Solid) startPos = self.mainBodyChunk.pos;
             if (self.graphicsModule != null) LookAtTarget();
 
-            self.AerobicIncrease(0.5f);
+            self.AerobicIncrease(0.7f);
             lanceSpear = spear;
             slideLance = false;
             spear.spearDamageBonus = GetLanceDamage(self.slugcatStats.throwingSkill);
