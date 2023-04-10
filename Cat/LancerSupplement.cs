@@ -1,5 +1,4 @@
 ﻿using CatSub.Cat;
-using LancerRemix.Combat;
 using MoreSlugcats;
 using Noise;
 using RWCustom;
@@ -35,11 +34,9 @@ namespace LancerRemix.Cat
 
         protected readonly bool isLonk = false;
         protected bool hasExhaustion = false;
-        protected ExhaustModule exhaust = null;
         private void UpdateHasExhaustion()
         {
             hasExhaustion = self.Malnourished || isLonk;
-            if (hasExhaustion && exhaust == null) exhaust = new ExhaustModule(this);
         }
 
         protected Spear lanceSpear = null;
@@ -68,6 +65,17 @@ namespace LancerRemix.Cat
         public override void Update(On.Player.orig_Update orig, bool eu)
         {
             base.Update(null, eu);
+            if (hasExhaustion)
+            {
+                if (self.slugcatStats.malnourished || (ModManager.MSC && (self.saintWeakness > 0 || self.Wounded)))
+                    return; // already handled by vanilla
+                if (self.aerobicLevel == 1f) self.exhausted = true;
+                else if (self.aerobicLevel < 0.4f) self.exhausted = false;
+                if (self.exhausted)
+                    self.slowMovementStun = Math.Max(self.slowMovementStun, (int)Custom.LerpMap(self.aerobicLevel, 0.7f, 0.4f, 6f, 0f));
+                else
+                    self.slowMovementStun = Math.Max(self.slowMovementStun, (int)Custom.LerpMap(self.aerobicLevel, 1f, 0.4f, 2f, 0f, 2f));
+            }
         }
 
         public virtual void MovementUpdate(On.Player.orig_MovementUpdate orig, bool eu)
@@ -277,10 +285,11 @@ namespace LancerRemix.Cat
             if (self.room.GetTile(startPos).Solid) startPos = self.mainBodyChunk.pos;
             if (self.graphicsModule != null) LookAtTarget();
 
-            self.AerobicIncrease(0.6f);
+            self.AerobicIncrease(0.5f);
             lanceSpear = spear;
             slideLance = false;
             spear.spearDamageBonus = GetLanceDamage(self.slugcatStats.throwingSkill);
+            if (self.exhausted) spear.spearDamageBonus *= 0.4f;
             float pow = Mathf.Lerp(1f, 1.5f, self.Adrenaline);
             if (self.animation == AnimIndex.BellySlide
                 && self.rollCounter > 8 && self.rollCounter < 15 && lanceDir.x == self.rollDirection)
@@ -451,8 +460,7 @@ namespace LancerRemix.Cat
         protected virtual void SetLanceCooltime()
         {
             lanceTimer = isLonk ? -16 : -24;
-            if (hasExhaustion) lanceTimer -= exhaust.GetLanceExtraCoolTime();
-            else if (self.lungsExhausted) lanceTimer -= 12;
+            if (self.exhausted) lanceTimer -= 12;
         }
 
         protected float GetLanceDamage(int throwingSkill)
@@ -474,27 +482,6 @@ namespace LancerRemix.Cat
             return dmg;
         }
 
-        protected class ExhaustModule
-        {
-            public ExhaustModule(LancerSupplement owner)
-            {
-                this.owner = owner;
-            }
-
-            public readonly LancerSupplement owner;
-            private Player self => owner.self;
-
-            public void Update()
-            {
-
-            }
-
-            public int GetLanceExtraCoolTime()
-            {
-                return 0;
-            }
-
-        }
     }
 
     public interface IAmLancer
