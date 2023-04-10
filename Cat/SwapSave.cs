@@ -114,6 +114,7 @@ namespace LancerRemix.Cat
             orig(self, saveAsIfPlayerDied, saveAsIfPlayerQuit);
         }
 
+        /*
         private static void SaveLancerPersDataOfCurrentState(ILContext il)
         {
             var cursor = new ILCursor(il);
@@ -125,13 +126,6 @@ namespace LancerRemix.Cat
                 x => x.MatchCall(typeof(string).GetMethod(nameof(string.Concat), new Type[] { typeof(string), typeof(string) })),
                 x => x.MatchStloc(2),
                 x => x.MatchBr(out var _))) return;
-
-            /*
-            if (!cursor.TryGotoNext(MoveType.Before,
-                x => x.MatchLdloc(1),
-                x => x.MatchLdloc(4),
-                x => x.MatchLdelemRef(),
-                x => x.MatchLdstr(""))) return; */
 
             DebugLogCursor();
             cursor.Emit(OpCodes.Nop);

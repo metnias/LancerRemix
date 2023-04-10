@@ -34,6 +34,7 @@ namespace LancerRemix.Cat
 
         protected readonly bool isLonk = false;
         protected bool hasExhaustion = false;
+
         private void UpdateHasExhaustion()
         {
             hasExhaustion = self.Malnourished || isLonk;
@@ -348,6 +349,7 @@ namespace LancerRemix.Cat
             lanceTimer = slideLance ? 6 : (lanceDir.y == 0 ? 3 : 4);
             blockTimer = slideLance ? Mathf.CeilToInt(blockTime * 1.5f) : blockTime;
             if (!slideLance && this is LunterSupplement lunterSub) lunterSub.maskOnHorn.DropMask();
+            if (spear.bugSpear) ReleaseLanceSpear();
 
             IntVector2 GetLanceDir()
             {
@@ -446,7 +448,7 @@ namespace LancerRemix.Cat
                 lanceSpear.firstChunk.vel *= 0f;
                 lanceSpear = null;
             }
-            lanceTimer = 0;
+            SetLanceCooltime();
         }
 
         protected internal void RetrieveLanceSpear(Spear spear = null)
@@ -481,7 +483,6 @@ namespace LancerRemix.Cat
             if (self.Adrenaline > 0f) dmg *= 1.5f;
             return dmg;
         }
-
     }
 
     public interface IAmLancer

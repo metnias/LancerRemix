@@ -143,7 +143,7 @@ namespace LancerRemix.Combat
                 (sLeaser.sprites[2] as TriangleMesh).MoveVertice(3, tie + normalized * d + perp * vel - camPos);
             }
             float aimRot = Custom.AimFromOneVectorToAnother(Vector2.zero, aimDir);
-            for (int i = (!(self is ExplosiveSpear)) ? 0 : 1; i >= 0; i--)
+            for (int i = (self is ExplosiveSpear || self.bugSpear) ? 1 : 0; i >= 0; i--)
                 sLeaser.sprites[i].rotation = aimRot;
         }
 
