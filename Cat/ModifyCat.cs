@@ -2,6 +2,7 @@
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using MonoMod.RuntimeDetour;
+using RWCustom;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -29,6 +30,8 @@ namespace LancerRemix.Cat
             On.Player.MovementUpdate += LancerMovementUpdate;
             IL.Player.EatMeatUpdate += LonkEatMeatUpdate;
             On.Player.GraphicsModuleUpdated += LunterGrafModuleUpdated;
+            On.Player.SetMalnourished += LancerSetMalnourished;
+            On.Player.TerrainImpact += LancerTerrainImpact;
 
             On.PlayerGraphics.InitiateSprites += GrafInitSprite;
             On.PlayerGraphics.AddToContainer += GrafAddToContainer;
@@ -105,23 +108,16 @@ namespace LancerRemix.Cat
         {
             orig(self, abstractCreature, world);
             if (!IsPlayerLancer(self)) return;
-            switch (self.slugcatStats.throwingSkill)
+            var basis = GetBasis(self.SlugCatClass);
+            if (basis == SlugName.Red)
             {
-                case 0:
-                    catSubs.Add(self.playerState, new LonkSupplement(self));
-                    catDecos.Add(self.playerState, new LancerDecoration(self));
-                    break;
-
-                default:
-                case 1:
-                    catSubs.Add(self.playerState, new LancerSupplement(self));
-                    catDecos.Add(self.playerState, new LancerDecoration(self));
-                    break;
-
-                case 2:
-                    catSubs.Add(self.playerState, new LunterSupplement(self));
-                    catDecos.Add(self.playerState, new LunterDecoration(self));
-                    break;
+                catSubs.Add(self.playerState, new LunterSupplement(self));
+                catDecos.Add(self.playerState, new LunterDecoration(self));
+            }
+            else
+            {
+                catSubs.Add(self.playerState, new LancerSupplement(self));
+                catDecos.Add(self.playerState, new LancerDecoration(self));
             }
         }
 
@@ -246,6 +242,20 @@ namespace LancerRemix.Cat
         {
             if (IsPlayerLancer(self)) GetSub<LunterSupplement>(self)?.maskOnHorn.GraphicsModuleUpdated(actuallyViewed, eu);
             orig(self, actuallyViewed, eu);
+        }
+
+        private static void LancerSetMalnourished(On.Player.orig_SetMalnourished orig, Player self, bool m)
+        {
+            if (IsPlayerLancer(self))
+            { GetSub<LancerSupplement>(self)?.SetMalnourished(orig, m); return; }
+            orig(self, m);
+        }
+
+        private static void LancerTerrainImpact(On.Player.orig_TerrainImpact orig, Player self, int chunk, IntVector2 direction, float speed, bool firstContact)
+        {
+            if (IsPlayerLancer(self))
+            { GetSub<LancerSupplement>(self)?.TerrainImpact(orig, chunk, direction, speed, firstContact); return; }
+            orig(self, chunk, direction, speed, firstContact);
         }
 
         #endregion Player

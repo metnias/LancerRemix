@@ -25,10 +25,21 @@ namespace LancerRemix.Cat
         public LancerSupplement(Player player) : base(player)
         {
             player.playerState.isPup = true;
+            isLonk = LancerEnums.GetBasis(player.SlugCatClass) == SlugcatStats.Name.Yellow;
+            UpdateHasExhaustion();
         }
 
         public LancerSupplement() : base()
         {
+        }
+
+        protected readonly bool isLonk = false;
+        protected bool hasExhaustion = false;
+        protected ExhaustModule exhaust = null;
+        private void UpdateHasExhaustion()
+        {
+            hasExhaustion = self.Malnourished || isLonk;
+            if (hasExhaustion && exhaust == null) exhaust = new ExhaustModule(this);
         }
 
         protected Spear lanceSpear = null;
@@ -41,7 +52,7 @@ namespace LancerRemix.Cat
         protected bool grabParried = false;
         public bool IsGrabParried => grabParried;
 
-        public float BlockAmount(float timeStacker)
+        public float BlockVisualAmount(float timeStacker)
             => lanceTimer != 0 ? 0f : Mathf.Clamp(Mathf.Lerp((float)blockTimer, blockTimer - (blockTimer != 0 ? Math.Sign(blockTimer) : 0), timeStacker) / blockTime, -1f, 1f);
 
         public int HasLanceReady()
@@ -91,6 +102,55 @@ namespace LancerRemix.Cat
                 blockTimer = blockTime; // block
                 self.room.PlaySound(SoundID.Slugcat_Pick_Up_Spear, self.mainBodyChunk, false, 1.2f, 1.2f);
             }
+        }
+
+        public void TerrainImpact(On.Player.orig_TerrainImpact orig, int chunk, IntVector2 direction, float speed, bool firstContact)
+        {
+            if (speed > 9f)
+            {
+                self.Blink(Custom.IntClamp((int)speed, 9, 60) / 2);
+            }
+            if (self.input[0].downDiagonal != 0 && self.animation != AnimIndex.Roll
+                && ((speed > 9f && speed < 12f) || self.animation == AnimIndex.Flip ||
+                (self.animation == AnimIndex.RocketJump && self.rocketJumpFromBellySlide))
+                && direction.y < 0 && self.allowRoll > 0 && self.consistentDownDiagonal > ((speed <= 24f) ? 6 : 1))
+            { //roll easier
+                if (self.animation == AnimIndex.RocketJump && self.rocketJumpFromBellySlide)
+                {
+                    self.bodyChunks[1].vel.y += 3f;
+                    self.bodyChunks[1].pos.y += 3f;
+                    self.bodyChunks[0].vel.y -= 3f;
+                    self.bodyChunks[0].pos.y -= 3f;
+                }
+                self.room.PlaySound(SoundID.Slugcat_Roll_Init, self.mainBodyChunk.pos, 1f, 1f);
+                self.animation = AnimIndex.Roll;
+                self.rollDirection = self.input[0].downDiagonal;
+                self.rollCounter = 0;
+                self.bodyChunks[0].vel.x = Mathf.Lerp(self.bodyChunks[0].vel.x, 9f * (float)self.input[0].x, 0.7f);
+                self.bodyChunks[1].vel.x = Mathf.Lerp(self.bodyChunks[1].vel.x, 9f * (float)self.input[0].x, 0.7f);
+                self.standing = false;
+            }
+            else if (firstContact)
+            {
+                if (speed > 40f && speed <= 60f && direction.y < 0)
+                {
+                    self.room.PlaySound(SoundID.Slugcat_Terrain_Impact_Death, self.mainBodyChunk);
+                    Debug.Log("Lancer Fall damage death");
+                    self.Die();
+                }
+                else if (speed > 28f && speed <= 40f)
+                {
+                    self.room.PlaySound(SoundID.Slugcat_Terrain_Impact_Hard, self.mainBodyChunk);
+                    self.Stun((int)Custom.LerpMap(speed, 28f, 40f, 40f, 140f, 2.5f));
+                }
+            }
+            orig.Invoke(self, chunk, direction, speed, firstContact);
+        }
+
+        public void SetMalnourished(On.Player.orig_SetMalnourished orig, bool m)
+        {
+            orig(self, m);
+            UpdateHasExhaustion();
         }
 
         public virtual void Stun(On.Player.orig_Stun orig, int st)
@@ -388,7 +448,12 @@ namespace LancerRemix.Cat
             SetLanceCooltime();
         }
 
-        protected virtual void SetLanceCooltime() => lanceTimer = -24;
+        protected virtual void SetLanceCooltime()
+        {
+            lanceTimer = isLonk ? -16 : -24;
+            if (hasExhaustion) lanceTimer -= exhaust.GetLanceExtraCoolTime();
+            else if (self.lungsExhausted) lanceTimer -= 12;
+        }
 
         protected float GetLanceDamage(int throwingSkill)
         {
@@ -397,16 +462,38 @@ namespace LancerRemix.Cat
             {
                 default:
                 case 1:
-                    dmg = 0.6f; break; //0.3f + 0.2f * Mathf.Pow(UnityEngine.Random.value, 3f);
+                    dmg = 0.5f; break; //0.3f + 0.2f * Mathf.Pow(UnityEngine.Random.value, 3f);
 
                 case 0:
-                    dmg = 0.2f + 0.3f * Mathf.Pow(UnityEngine.Random.value, 4f); break;
+                    dmg = 0.1f + 0.2f * Mathf.Pow(UnityEngine.Random.value, 4f); break;
 
                 case 2:
-                    dmg = 0.8f; break; //0.4f + 0.3f * Mathf.Pow(UnityEngine.Random.value, 3f);
+                    dmg = 0.7f; break; //0.4f + 0.3f * Mathf.Pow(UnityEngine.Random.value, 3f);
             }
             if (self.Adrenaline > 0f) dmg *= 1.5f;
             return dmg;
+        }
+
+        protected class ExhaustModule
+        {
+            public ExhaustModule(LancerSupplement owner)
+            {
+                this.owner = owner;
+            }
+
+            public readonly LancerSupplement owner;
+            private Player self => owner.self;
+
+            public void Update()
+            {
+
+            }
+
+            public int GetLanceExtraCoolTime()
+            {
+                return 0;
+            }
+
         }
     }
 

@@ -51,7 +51,7 @@ namespace LancerRemix.Combat
         {
             if (self.grabbedBy.Count > 0 && self.grabbedBy[0].grabber is Player grabPlayer && IsPlayerLancer(grabPlayer))
             {
-                float block = GetSub<LancerSupplement>(grabPlayer)?.BlockAmount(timeStacker) ?? 0f;
+                float block = GetSub<LancerSupplement>(grabPlayer)?.BlockVisualAmount(timeStacker) ?? 0f;
                 if (block >= 0f)
                     aimDir = Vector3.Slerp(grabPlayer.ThrowDirection >= 0f ? Vector3.right : Vector3.left, Vector3.up, Custom.LerpCircEaseOut(0.0f, 1.0f, block));
                 else
