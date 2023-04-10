@@ -184,7 +184,8 @@ namespace LancerRemix
             LancerTravelScreen = 1 << 2,
             MineForLunterData = 1 << 3,
             LoadLancerState = 1 << 4,
-            LonkEatMeatUpdate = 1 << 5
+            LonkEatMeatUpdate = 1 << 5,
+            LancerSkipIntro = 1 << 6
         }
 
         internal static void ILhookTry(ILhooks flag)

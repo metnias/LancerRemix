@@ -5,6 +5,8 @@ using HUD;
 using JollyCoop.JollyMenu;
 using LancerRemix.Cat;
 using Menu;
+using Mono.Cecil.Cil;
+using MonoMod.Cil;
 using MonoMod.RuntimeDetour;
 using RWCustom;
 using SlugBase;
@@ -35,6 +37,7 @@ namespace LancerRemix.LancerMenu
             On.Menu.SlugcatSelectMenu.UpdateSelectedSlugcatInMiscProg += UpdateSelectedLancerInMiscProg;
             On.Menu.SlugcatSelectMenu.CommunicateWithUpcomingProcess += CommWithNextProcess;
             On.Menu.SlugcatSelectMenu.Singal += SignalPatch;
+            IL.Menu.SlugcatSelectMenu.StartGame += LancerSkipIntro;
             On.Menu.SlugcatSelectMenu.ContinueStartedGame += ContinueLancerStartedGame;
             On.Menu.SlugcatSelectMenu.SlugcatPage.GrafUpdate += PageGrafUpdatePatch;
             On.Menu.SlugcatSelectMenu.SlugcatPageContinue.Update += LancerPageContinue.PageContinueUpdatePatch;
@@ -270,6 +273,48 @@ namespace LancerRemix.LancerMenu
                 // StartGame(this.slugcatPages[this.slugcatPageIndex].slugcatNumber);
             }
             orig(self, sender, message);
+        }
+
+        private static void LancerSkipIntro(ILContext il)
+        {
+            var cursor = new ILCursor(il);
+            LancerPlugin.ILhookTry(LancerPlugin.ILhooks.LancerSkipIntro);
+
+            if (!cursor.TryGotoNext(MoveType.Before,
+                x => x.MatchLdarg(0),
+                x => x.MatchLdfld(typeof(MainLoopProcess).GetField(nameof(MainLoopProcess.manager))),
+                x => x.MatchLdsfld(typeof(ProcessManager.ProcessID).GetField(nameof(ProcessManager.ProcessID.Game))),
+                x => x.MatchCallOrCallvirt(typeof(ProcessManager).GetMethod(nameof(ProcessManager.RequestMainProcessSwitch), new Type[] { typeof(ProcessManager.ProcessID) }))
+                )) return;
+
+            DebugLogCursor();
+            cursor.Emit(OpCodes.Nop);
+            var lblOkay = cursor.DefineLabel();
+            lblOkay.Target = cursor.Prev;
+
+            if (!cursor.TryGotoPrev(MoveType.Before,
+                x => x.MatchLdcI4(0),
+                x => x.MatchLdcI4(11),
+                x => x.MatchLdarg(0),
+                x => x.MatchLdfld(typeof(MainLoopProcess).GetField(nameof(MainLoopProcess.manager))),
+                x => x.MatchLdfld(typeof(ProcessManager).GetField(nameof(ProcessManager.rainWorld)))
+                )) return;
+
+            DebugLogCursor();
+            cursor.Emit(OpCodes.Ldarg_1);
+            cursor.EmitDelegate<Func<SlugName, bool>>((storyGameCharacter) =>
+            {
+                if (!slugcatPageLancer) return false;
+                var basis = GetBasis(storyGameCharacter);
+                return basis == SlugName.White || basis == SlugName.Yellow;
+            }
+                );
+            cursor.Emit(OpCodes.Brtrue, lblOkay);
+
+            LancerPlugin.ILhookOkay(LancerPlugin.ILhooks.LancerSkipIntro);
+
+            void DebugLogCursor() =>
+                LancerPlugin.LogSource.LogInfo($"{cursor.Prev.OpCode.Name} > Cursor < {cursor.Next.OpCode.Name}");
         }
 
         private static void ContinueLancerStartedGame(On.Menu.SlugcatSelectMenu.orig_ContinueStartedGame orig, SlugcatSelectMenu self, SlugName storyGameCharacter)
