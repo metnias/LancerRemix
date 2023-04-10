@@ -58,7 +58,7 @@ namespace LancerRemix.Combat
                     aimDir = Vector3.Slerp(grabPlayer.ThrowDirection >= 0f ? Vector3.right : Vector3.left, Vector2.down, Custom.LerpCircEaseIn(0.0f, 0.3f, -block));
                 return true;
             }
-            else if (self.thrownBy != null && self.thrownBy is Player thrwPlayer && IsPlayerLancer(thrwPlayer))
+            else if (self.mode == Weapon.Mode.Thrown && self.thrownBy != null && self.thrownBy is Player thrwPlayer && IsPlayerLancer(thrwPlayer))
             {
                 //var rot = Vector3.Slerp(spear.lastRotation, spear.rotation, timeStacker);
                 aimDir = self.throwDir.ToVector2();
