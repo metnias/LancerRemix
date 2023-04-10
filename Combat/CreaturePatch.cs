@@ -33,7 +33,7 @@ namespace LancerRemix.Combat
         private static void LancerViolencePatch(On.Creature.orig_Violence orig, Creature self,
             BodyChunk source, Vector2? directionAndMomentum, BodyChunk hitChunk, PhysicalObject.Appendage.Pos hitAppendage, Creature.DamageType type, float damage, float stunBonus)
         {
-            if (source?.owner is Player atkPlayer && IsPlayerLancer(atkPlayer))
+            if (source?.owner is Spear spear && spear.thrownBy is Player atkPlayer && IsPlayerLancer(atkPlayer))
             {
                 if (GetSub<LancerSupplement>(atkPlayer)?.IsSlideLance == true) stunBonus *= 2f;
                 else stunBonus = -10000f;

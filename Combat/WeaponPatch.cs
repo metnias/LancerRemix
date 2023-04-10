@@ -70,13 +70,13 @@ namespace LancerRemix.Combat
 
         private static bool SpearHit(On.Spear.orig_HitSomething orig, Spear self, SharedPhysics.CollisionResult result, bool eu)
         {
-            if (self.thrownBy is Player atkPlayer && IsPlayerLancer(atkPlayer))
+            var res = orig(self, result, eu);
+            if (res && self.thrownBy is Player atkPlayer && IsPlayerLancer(atkPlayer))
             { // Retrieve spear
+                if (self is ExplosiveSpear) GetSub<LancerSupplement>(atkPlayer)?.ReleaseLanceSpear();
+                else GetSub<LancerSupplement>(atkPlayer)?.RetrieveLanceSpear(self);
             }
-            else if (result.obj is Player defPlayer && IsPlayerLancer(defPlayer))
-            { // Parry check
-            }
-            return orig(self, result, eu);
+            return res;
         }
 
         private static void SpearLodgeCreature(On.Spear.orig_LodgeInCreature orig, Spear self, SharedPhysics.CollisionResult result, bool eu)
