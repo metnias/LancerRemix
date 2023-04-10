@@ -22,7 +22,8 @@ namespace LancerRemix.Cat
             On.PlayerProgression.WipeSaveState += WipeSaveLancer;
 
             On.PlayerProgression.SaveToDisk += SaveToLancer;
-            IL.PlayerProgression.SaveDeathPersistentDataOfCurrentState += SaveLancerPersDataOfCurrentState;
+            On.PlayerProgression.SaveDeathPersistentDataOfCurrentState += SaveLancerPersDataOfCurrentState;
+            //IL.PlayerProgression.SaveDeathPersistentDataOfCurrentState += SaveLancerPersDataOfCurrentState;
             //IL.PlayerProgression.LoadMapTexture += LoadLancerMapTexture;
             //On.PlayerProgression.LoadGameState += LoadLancerStateInstead;
             IL.PlayerProgression.LoadGameState += LoadLancerState;
@@ -97,6 +98,20 @@ namespace LancerRemix.Cat
             }
             SetMiscValue(self.miscProgressionData, CURRSLUGCATLANCER, false);
             return orig(self, saveCurrentState, saveMaps, saveMiscProg);
+        }
+
+        private static void SaveLancerPersDataOfCurrentState(On.PlayerProgression.orig_SaveDeathPersistentDataOfCurrentState orig,
+            PlayerProgression self, bool saveAsIfPlayerDied, bool saveAsIfPlayerQuit)
+        {
+            if (IsStoryLancer && self.currentSaveState != null)
+            {
+                var basis = self.currentSaveState.saveStateNumber;
+                self.currentSaveState.saveStateNumber = GetLancer(basis);
+                orig(self, saveAsIfPlayerDied, saveAsIfPlayerQuit);
+                self.currentSaveState.saveStateNumber = basis;
+                return;
+            }
+            orig(self, saveAsIfPlayerDied, saveAsIfPlayerQuit);
         }
 
         private static void SaveLancerPersDataOfCurrentState(ILContext il)
