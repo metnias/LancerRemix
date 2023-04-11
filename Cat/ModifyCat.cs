@@ -1,4 +1,7 @@
-﻿using CatSub.Cat;
+﻿#define NO_MSC
+
+using CatSub.Cat;
+using LancerRemix.LancerMenu;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using MonoMod.RuntimeDetour;
@@ -109,6 +112,15 @@ namespace LancerRemix.Cat
             orig(self, abstractCreature, world);
             if (!IsPlayerLancer(self)) return;
             var basis = GetBasis(self.SlugCatClass);
+#if NO_MSC
+            if (SlugcatStats.IsSlugcatFromMSC(basis))
+            {
+                isPlayerLancer[self.playerState.playerNumber] = false;
+                SelectMenuPatch.SetLancerPlayers(self.playerState.playerNumber, false);
+                SelectMenuPatch.SaveLancerPlayers(world.game.rainWorld.progression.miscProgressionData);
+                return;
+            }
+#endif
             if (basis == SlugName.Red)
             {
                 catSubs.Add(self.playerState, new LunterSupplement(self));
