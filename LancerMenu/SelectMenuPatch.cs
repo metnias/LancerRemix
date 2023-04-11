@@ -217,9 +217,12 @@ namespace LancerRemix.LancerMenu
 
         internal static bool GetLancerPlayers(int num) => lancerPlayers[num];
 
+        internal static void UpdateIsPlayerLancer(bool story)
+            => ModifyCat.SetIsPlayerLancer(story, lancerPlayers);
+
         private const string LANCERPLAYERS = "LancerPlayers";
 
-        private static void SaveLancerPlayers(PlayerProgression.MiscProgressionData miscData)
+        internal static void SaveLancerPlayers(PlayerProgression.MiscProgressionData miscData)
         {
             int res = 0;
             for (int i = 0; i < lancerPlayers.Length; ++i)
@@ -268,7 +271,7 @@ namespace LancerRemix.LancerMenu
                     }
                 }
 #endif
-                ModifyCat.SetIsPlayerLancer(slugcatPageLancer, lancerPlayers);
+                UpdateIsPlayerLancer(slugcatPageLancer);
                 SaveLancerPlayers(self.manager.rainWorld.progression.miscProgressionData);
                 // StartGame(this.slugcatPages[this.slugcatPageIndex].slugcatNumber);
             }

@@ -89,6 +89,7 @@
     <Compile Include="Cat\LancerSupplement.cs" />
     <Compile Include="Cat\ModifyCat.cs" />
     <Compile Include="Cat\LancerDecoration.cs" />
+    <Compile Include="LancerMenu\MultiplayerPatch.cs" />
     <Compile Include="LancerMenu\SymbolButtonToggleLancerButton.cs" />
     <Compile Include="Story\DreamHandler.cs" />
     <Compile Include="Story\LunterScripts.cs" />

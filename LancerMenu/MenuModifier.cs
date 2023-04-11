@@ -20,18 +20,14 @@ namespace LancerRemix.LancerMenu
             IL.Menu.FastTravelScreen.ctor += LancerTravelScreen;
 
             SelectMenuPatch.SubPatch();
+            MultiplayerPatch.SubPatch();
+
             if (ModManager.JollyCoop) OnJollyEnablePatch();
         }
 
-        internal static void OnJollyEnablePatch()
-        {
-            SymbolButtonToggleLancerButton.SubPatch();
-        }
+        internal static void OnJollyEnablePatch() => MultiplayerPatch.OnJollyEnablePatch();
 
-        internal static void OnJollyDisablePatch()
-        {
-            SymbolButtonToggleLancerButton.SubUnpatch();
-        }
+        internal static void OnJollyDisablePatch() => MultiplayerPatch.OnJollyDisablePatch();
 
         private static bool IsStoryLancer => ModifyCat.IsStoryLancer;
 
