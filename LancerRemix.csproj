@@ -107,6 +107,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </AdditionalFiles>
     <AdditionalFiles Include="slugbase\scenes\dream - lancer hunter meet.json" />
+    <None Include="slugbase\scenes\red ghost lancer.json" />
+    <None Include="slugbase\scenes\white ghost lancer.json" />
+    <None Include="slugbase\scenes\yellow ghost lancer.json" />
   </ItemGroup>
   <ItemGroup>
     <AdditionalFiles Include="text\text_kor\strings.txt" />
@@ -157,6 +160,18 @@
     <Content Include="scenes\Outro L_B\Outro 4_B - Home - LWhite 0.png" />
     <Content Include="scenes\Outro L_B\Outro 4_B - Home - LWhite 4.png" />
     <Content Include="scenes\Outro L_B\Outro 4_B - Home - LWhite - Flat.png" />
+    <Content Include="slugbase\scenes\red ghost lancer\Lhunt ghost a.png" />
+    <Content Include="slugbase\scenes\red ghost lancer\Lhunt ghost b.png" />
+    <Content Include="slugbase\scenes\red ghost lancer\Lhunt ghost bkg.png" />
+    <Content Include="slugbase\scenes\red ghost lancer\Lhunt ghost slugcat - flat.png" />
+    <Content Include="slugbase\scenes\white ghost lancer\Lsurv ghost a.png" />
+    <Content Include="slugbase\scenes\white ghost lancer\Lsurv ghost b.png" />
+    <Content Include="slugbase\scenes\white ghost lancer\Lsurv ghost bkg.png" />
+    <Content Include="slugbase\scenes\white ghost lancer\Lsurv ghost slugcat - flat.png" />
+    <Content Include="slugbase\scenes\yellow ghost lancer\Lmonk ghost a.png" />
+    <Content Include="slugbase\scenes\yellow ghost lancer\Lmonk ghost b.png" />
+    <Content Include="slugbase\scenes\yellow ghost lancer\Lmonk ghost bkg.png" />
+    <Content Include="slugbase\scenes\yellow ghost lancer\Lmonk ghost slugcat - flat.png" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

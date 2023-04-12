@@ -17,17 +17,26 @@ namespace LancerRemix
         #region Enums
 
         internal static MenuSceneID SceneHunterMeet;
+        internal static MenuSceneID SceneGhostLancerWhite;
+        internal static MenuSceneID SceneGhostLancerYellow;
+        internal static MenuSceneID SceneGhostLancerRed;
         internal static DreamID DreamHunterMeet;
 
         internal static void RegisterExtEnum()
         {
             SceneHunterMeet = new MenuSceneID("dream - lancer hunter meet", false);
+            SceneGhostLancerWhite = new MenuSceneID("white ghost lancer", false);
+            SceneGhostLancerYellow = new MenuSceneID("yellow ghost lancer", false);
+            SceneGhostLancerRed = new MenuSceneID("red ghost lancer", false);
             DreamHunterMeet = new DreamID(nameof(DreamHunterMeet), true);
         }
 
         internal static void UnregisterExtEnum()
         {
             SceneHunterMeet = null;
+            SceneGhostLancerWhite = null;
+            SceneGhostLancerYellow = null;
+            SceneGhostLancerRed = null;
             DreamHunterMeet?.Unregister(); DreamHunterMeet = null;
         }
 

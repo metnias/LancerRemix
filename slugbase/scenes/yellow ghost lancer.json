@@ -1,0 +1,31 @@
+{
+  "id": "yellow ghost lancer",
+  "scene_folder": "slugbase/scenes/yellow ghost lancer",
+  "images": [
+    {
+      "name": "Lmonk ghost slugcat - flat",
+      "pos": [ 0, 0 ],
+      "depth": -1.0,
+      "flatmode": true
+    },
+    {
+      "name": "Lmonk ghost bkg",
+      "pos": [ 343, 12 ],
+      "depth": 4.5
+    },
+    {
+      "name": "Lmonk ghost a",
+      "pos": [ 560, 145 ],
+      "depth": 2.85
+    },
+    {
+      "name": "Lmonk ghost b",
+      "pos": [ 548, 104 ],
+      "depth": 2.7,
+      "shader": "Overlay"
+    }
+  ],
+  "idle_depths": [ 2.8, 3.1 ],
+  "select_menu_pos": [ 183, 0 ],
+  "slugcat_depth": 2.7
+}

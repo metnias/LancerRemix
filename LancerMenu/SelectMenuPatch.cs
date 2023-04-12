@@ -8,6 +8,7 @@ using Menu;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using MonoMod.RuntimeDetour;
+using MoreSlugcats;
 using RWCustom;
 using SlugBase;
 using SlugBase.Assets;
@@ -383,25 +384,26 @@ namespace LancerRemix.LancerMenu
         {
             var basis = GetBasis(page.slugcatNumber);
             bool ascended = page is SlugcatPageContinue pageCont && pageCont.saveGameData.ascended;
+            // ascended = true; // test
             UpdateEffectColor();
             ReloadScene();
             MoveBehindGUIs();
 
+            if (ascended) return;
+
             if (basis == SlugName.White)
             {
-                if (!ascended)
-                    ReplaceIllust(page.slugcatImage, $"scenes{Path.DirectorySeparatorChar}slugcat - lancer",
-                        "lancer - white - flat", "white slugcat - 2", "white lancer - 2", new Vector2(503f, 178f));
+                ReplaceIllust(page.slugcatImage, $"scenes{Path.DirectorySeparatorChar}slugcat - lancer",
+                    "lancer - white - flat", "white slugcat - 2", "white lancer - 2", new Vector2(503f, 178f));
             }
             else if (basis == SlugName.Yellow)
             {
-                if (!ascended)
-                    ReplaceIllust(page.slugcatImage, $"scenes{Path.DirectorySeparatorChar}slugcat - lancer",
-                    "lancer - yellow - flat", "yellow slugcat - 1", "yellow lancer - 1", new Vector2(528f, 211f));
+                ReplaceIllust(page.slugcatImage, $"scenes{Path.DirectorySeparatorChar}slugcat - lancer",
+                "lancer - yellow - flat", "yellow slugcat - 1", "yellow lancer - 1", new Vector2(528f, 211f));
             }
             else if (basis == SlugName.Red)
             {
-                if (page.slugcatImage.sceneID != SceneID.Slugcat_Dead_Red && !ascended)
+                if (page.slugcatImage.sceneID != SceneID.Slugcat_Dead_Red)
                 {
                     if (page.menu.manager.rainWorld.progression.miscProgressionData.redUnlocked)
                         ReplaceIllust(page.slugcatImage, $"scenes{Path.DirectorySeparatorChar}slugcat - lancer",
@@ -436,17 +438,18 @@ namespace LancerRemix.LancerMenu
                     var res = page.slugcatImage.sceneID;
                     if (basis == SlugName.White)
                     {
-                        if (ascended) res = SceneID.Ghost_White;
+                        if (ascended) res = SceneGhostLancerWhite;
+                        else if (page is LancerPageContinue lpc && lpc.saveGameData.altEnding) res = MoreSlugcatsEnums.MenuSceneID.AltEnd_Monk;
                         else res = SceneID.Slugcat_White;
                     }
                     else if (basis == SlugName.Yellow)
                     {
-                        if (ascended) res = SceneID.Ghost_Yellow;
+                        if (ascended) res = SceneGhostLancerYellow;
                         else res = SceneID.Slugcat_Yellow;
                     }
                     else if (basis == SlugName.Red)
                     {
-                        if (ascended) res = SceneID.Ghost_Red;
+                        if (ascended) res = SceneGhostLancerRed;
                         else if (page is LancerPageContinue && redIsDead) res = SceneID.Slugcat_Dead_Red;
                         else res = SceneID.Slugcat_Red;
                     }
