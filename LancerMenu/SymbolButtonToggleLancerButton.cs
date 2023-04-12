@@ -28,7 +28,8 @@ namespace LancerRemix.LancerMenu
             JollySetupDialog menu, MenuObject owner, Vector2 pos, int index)
         {
             orig(self, menu, owner, pos, index);
-            self.subObjects.Remove(self.pupButton);
+            int i = self.subObjects.IndexOf(self.pupButton);
+            //self.subObjects.Remove(self.pupButton);
             self.pupButton.RemoveSprites();
             self.pupButton = null;
 
@@ -36,7 +37,7 @@ namespace LancerRemix.LancerMenu
             if (SelectMenuPatch.GetLancerPlayers(index)) status = PlayerSize.Lancer;
             //self.pupButton = new SymbolButtonTogglePupButton(menu, self, "toggle_pup_" + index.ToString(), new Vector2(self.classButton.size.x + 10f, -35.5f), new Vector2(45f, 45f), "pup_on", self.GetPupButtonOffName(), self.JollyOptions(index).isPup, null, null);
             self.pupButton = new SymbolButtonToggleLancerButton(menu, self, "toggle_pup_" + index.ToString(), new Vector2(self.classButton.size.x + 10f, -35.5f), new Vector2(45f, 45f), "pup_on", self.GetPupButtonOffName(), status, null, null);
-            self.subObjects.Add(self.pupButton);
+            self.subObjects[i] = self.pupButton;
             menu.elementDescription.Add($"toggle_lancer_{index}_on", menu.Translate("Player <p_n> will be Lancer").Replace("<p_n>", (index + 1).ToString()));
             self.dirty = true;
         }
