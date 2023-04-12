@@ -23,11 +23,16 @@ namespace LancerRemix.LancerMenu
             MultiplayerPatch.SubPatch();
 
             if (ModManager.JollyCoop) OnJollyEnablePatch();
+            if (ModManager.MSC) OnMSCEnablePatch();
         }
 
-        internal static void OnJollyEnablePatch() => MultiplayerPatch.OnJollyEnablePatch();
+        internal static void OnJollyEnablePatch() => MultiplayerPatch.OnJollyEnableSubPatch();
 
-        internal static void OnJollyDisablePatch() => MultiplayerPatch.OnJollyDisablePatch();
+        internal static void OnJollyDisablePatch() => MultiplayerPatch.OnJollyDisableSubPatch();
+
+        internal static void OnMSCEnablePatch() => MultiplayerPatch.OnMSCEnableSubPatch();
+
+        internal static void OnMSCDisablePatch() => MultiplayerPatch.OnMSCDisableSubPatch();
 
         private static bool IsStoryLancer => ModifyCat.IsStoryLancer;
 

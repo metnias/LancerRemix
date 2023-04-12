@@ -18,6 +18,10 @@ Press THROW to stab with a spear|창을 들고 투척 버튼을 눌러 찌르기
 Press PICK UP to defend with a spear|창을 들고 줍기 버튼을 눌러 방어
 Hold PICK UP with a mask to hang it onto your horn|가면을 들고 줍기 버튼을 길게 눌러 뿔에 걸치기
 
+// Arena
+Left click to change class, right click to toggle lancer for Player <X>|왼쪽 클릭으로 플레이어 <X> 클래스 변경, 오른쪽 클릭으로 랜서 토글
+<A> to change class, <B> to toggle lancer for Player <X>|<A>(으)로 플레이어 <X> 클래스 변경, <B>(으)로 랜서 토글
+
 // SLOracle
 lancersl-tiny|자그만
 lancersl-student|학생

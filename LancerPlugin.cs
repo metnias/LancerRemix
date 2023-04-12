@@ -128,6 +128,7 @@ namespace LancerRemix
                 ModifyCat.OnMSCEnablePatch();
                 DreamHandler.OnMSCEnablePatch();
                 WeaponPatch.OnMSCEnablePatch();
+                MenuModifier.OnMSCEnablePatch();
                 lastMSCEnabled = ModManager.MSC;
             }
             if (!lastJollyEnabled && ModManager.JollyCoop)
@@ -154,6 +155,7 @@ namespace LancerRemix
                 ModifyCat.OnMSCDisablePatch();
                 DreamHandler.OnMSCDisablePatch();
                 WeaponPatch.OnMSCDisablePatch();
+                MenuModifier.OnMSCDisablePatch();
                 lastMSCEnabled = ModManager.MSC;
             }
             if (lastJollyEnabled && !ModManager.JollyCoop)
