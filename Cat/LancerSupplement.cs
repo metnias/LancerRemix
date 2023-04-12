@@ -1,4 +1,5 @@
 ﻿using CatSub.Cat;
+using Mono.Cecil;
 using MoreSlugcats;
 using Noise;
 using RWCustom;
@@ -194,7 +195,7 @@ namespace LancerRemix.Cat
             grasp.grabber.Stun(Mathf.CeilToInt(Mathf.Lerp(80, 40, grasp.grabber.TotalMass / 10f)));
             Vector2 away = (grasp.grabber.mainBodyChunk.pos - self.mainBodyChunk.pos).normalized;
             away.y = 1f; away.Normalize();
-            grasp.grabber.WeightedPush(0, 2, away, 20f);
+            grasp.grabber.WeightedPush(0, grasp.grabber.bodyChunks.Length - 1, away, 20f);
             if (ModManager.MSC && GetParrySpear() is ElectricSpear elecSpear) { elecSpear.Zap(); elecSpear.Electrocute(grasp.grabber); }
 
             guarded &= lanceTimer == 0;
@@ -262,7 +263,7 @@ namespace LancerRemix.Cat
                         away.y = 1f; away.Normalize();
                         if (ModManager.MSC && spear is ElectricSpear elecSpear) elecSpear.Zap();
                     }
-                    source.owner.WeightedPush(0, 2, away, 20f);
+                    source.owner.WeightedPush(0, source.owner.bodyChunks.Length - 1, away, 20f);
                 }
 
                 guarded &= lanceTimer == 0;

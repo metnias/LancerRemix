@@ -35,6 +35,9 @@ namespace LancerRemix.LancerMenu
 
         internal static void OnMSCEnableSubPatch()
         {
+            On.Menu.MultiplayerMenu.InitiateGameTypeSpecificButtons += InitArenaLancerIcons;
+            On.Menu.MultiplayerMenu.GrafUpdate += GrafUpdateArenaLancerIcons;
+            On.Menu.MultiplayerMenu.ShutDownProcess += ClearArenaLancerIcons;
             On.Menu.MultiplayerMenu.Update += ArenaClassLancerToggle;
             On.Menu.MultiplayerMenu.CustomUpdateInfoText += ArenaClassLancerDesc;
             On.Menu.MultiplayerMenu.ArenaImage += LancerArenaImage;
@@ -42,9 +45,49 @@ namespace LancerRemix.LancerMenu
 
         internal static void OnMSCDisableSubPatch()
         {
+            On.Menu.MultiplayerMenu.InitiateGameTypeSpecificButtons -= InitArenaLancerIcons;
+            On.Menu.MultiplayerMenu.GrafUpdate -= GrafUpdateArenaLancerIcons;
+            On.Menu.MultiplayerMenu.ShutDownProcess -= ClearArenaLancerIcons;
             On.Menu.MultiplayerMenu.Update -= ArenaClassLancerToggle;
             On.Menu.MultiplayerMenu.CustomUpdateInfoText -= ArenaClassLancerDesc;
             On.Menu.MultiplayerMenu.ArenaImage -= LancerArenaImage;
+        }
+
+        private static FSprite[] spearIcons;
+
+        private static void InitArenaLancerIcons(On.Menu.MultiplayerMenu.orig_InitiateGameTypeSpecificButtons orig, MultiplayerMenu self)
+        {
+            orig(self);
+            if (self.playerClassButtons == null) return;
+            spearIcons = new FSprite[self.playerClassButtons.Length];
+            for (int i = 0; i < self.playerClassButtons.Length; ++i)
+            {
+                spearIcons[i] = new FSprite("Symbol_Spear", true) { scale = 0.5f };
+                self.playerClassButtons[i].Container.AddChild(spearIcons[i]);
+                spearIcons[i].x = self.playerClassButtons[i].DrawX(0f) + self.playerClassButtons[i].size.x - 12f;
+                spearIcons[i].y = self.playerClassButtons[i].DrawY(0f) + self.playerClassButtons[i].size.y * 0.5f;
+            }
+        }
+
+        private static void GrafUpdateArenaLancerIcons(On.Menu.MultiplayerMenu.orig_GrafUpdate orig, MultiplayerMenu self, float timeStacker)
+        {
+            orig(self, timeStacker);
+            if (self.playerClassButtons == null) return;
+            for (int i = 0; i < self.playerClassButtons.Length; ++i)
+            {
+                spearIcons[i].isVisible = GetLancerPlayers(i);
+                spearIcons[i].color = self.playerClassButtons[i].MyColor(timeStacker);
+            }
+        }
+
+        private static void ClearArenaLancerIcons(On.Menu.MultiplayerMenu.orig_ShutDownProcess orig, MultiplayerMenu self)
+        {
+            if (self.playerClassButtons != null)
+            {
+                for (int i = 0; i < self.playerClassButtons.Length; ++i) spearIcons[i].RemoveFromContainer();
+                spearIcons = null;
+            }
+            orig(self);
         }
 
         private static void ArenaClassLancerToggle(On.Menu.MultiplayerMenu.orig_Update orig, MultiplayerMenu self)
@@ -64,9 +107,9 @@ namespace LancerRemix.LancerMenu
                     classBtnHeld = false;
                 }
             }
-            else // thrw btn to lancer toggle
+            else // pckp btn to lancer toggle
             {
-                if (self.input.thrw)
+                if (self.input.pckp)
                 {
                     if (!classBtnHeld) self.PlaySound(SoundID.MENU_Button_Press_Init);
                     classBtnHeld = true;
@@ -88,6 +131,7 @@ namespace LancerRemix.LancerMenu
                 self.PlaySound(SoundID.MENU_Button_Standard_Button_Pressed);
             }
         }
+
         private static bool classBtnHeld = false;
 
         private static string LancerArenaImage(On.Menu.MultiplayerMenu.orig_ArenaImage orig, MultiplayerMenu self, SlugName classID, int color)
@@ -114,7 +158,7 @@ namespace LancerRemix.LancerMenu
                 {
                     res = self.Translate("<A> to change class, <B> to toggle lancer for Player <X>");
                     res = res.Replace("<A>", OptionalText.GetButtonName_Jump());
-                    res = res.Replace("<B>", OptionalText.GetButtonName_Throw());
+                    res = res.Replace("<B>", OptionalText.GetButtonName_PickUp());
                 }
                 string replacement = ((char)(btn.signalText[btn.signalText.Length - 1] + 1)).ToString();
                 return Regex.Replace(res, @"<X>", replacement);
@@ -134,7 +178,7 @@ namespace LancerRemix.LancerMenu
                 else
                 {
                     for (int i = 0; i < 4; ++i)
-                        if (SlugcatStats.IsSlugcatFromMSC(self.GetArenaSetup.playerClass[i]))
+                        if (self.GetArenaSetup.playerClass[i] != null && SlugcatStats.IsSlugcatFromMSC(self.GetArenaSetup.playerClass[i]))
                             SetLancerPlayers(i, false);
                 }
 #endif
