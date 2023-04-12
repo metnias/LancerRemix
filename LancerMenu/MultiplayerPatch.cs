@@ -22,11 +22,19 @@ namespace LancerRemix.LancerMenu
         internal static void OnJollyEnableSubPatch()
         {
             SymbolButtonToggleLancerButton.SubPatch();
+            On.JollyCoop.JollyCustom.SlugClassMenu += JollyClassMenuAvoidLancer;
         }
 
         internal static void OnJollyDisableSubPatch()
         {
             SymbolButtonToggleLancerButton.SubUnpatch();
+            On.JollyCoop.JollyCustom.SlugClassMenu -= JollyClassMenuAvoidLancer;
+        }
+
+        private static SlugName JollyClassMenuAvoidLancer(On.JollyCoop.JollyCustom.orig_SlugClassMenu orig, int playerNumber, SlugName fallBack)
+        {
+            var res = orig(playerNumber, fallBack);
+            return LancerEnums.GetBasis(res);
         }
 
         #endregion Jolly
