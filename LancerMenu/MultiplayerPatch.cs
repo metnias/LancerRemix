@@ -3,6 +3,7 @@
 using Menu;
 using Menu.Remix;
 using Menu.Remix.MixedUI;
+using MoreSlugcats;
 using System.IO;
 using System.Text.RegularExpressions;
 using UnityEngine;
@@ -184,7 +185,7 @@ namespace LancerRemix.LancerMenu
             if (message == "PLAY!" || message == "RESUME")
             {
                 UpdateIsPlayerLancer(false);
-                if (!ModManager.MSC)
+                if (!ModManager.MSC || self.currentGameType == MoreSlugcatsEnums.GameTypeID.Challenge)
                     for (int i = 0; i < 4; ++i) SetLancerPlayers(i, false);
 #if NO_MSC
                 else
