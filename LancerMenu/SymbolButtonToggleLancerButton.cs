@@ -1,8 +1,6 @@
-﻿#define NO_MSC
-
-using JollyCoop.JollyMenu;
+﻿using JollyCoop.JollyMenu;
 using Menu;
-using System.Globalization;
+using RWCustom;
 using System.Text;
 using UnityEngine;
 
@@ -35,7 +33,6 @@ namespace LancerRemix.LancerMenu
 
             var status = self.JollyOptions(index).isPup ? PlayerSize.Pup : PlayerSize.Normal;
             if (SelectMenuPatch.GetLancerPlayers(index)) status = PlayerSize.Lancer;
-            //self.pupButton = new SymbolButtonTogglePupButton(menu, self, "toggle_pup_" + index.ToString(), new Vector2(self.classButton.size.x + 10f, -35.5f), new Vector2(45f, 45f), "pup_on", self.GetPupButtonOffName(), self.JollyOptions(index).isPup, null, null);
             self.pupButton = new SymbolButtonToggleLancerButton(menu, self, "toggle_pup_" + index.ToString(), new Vector2(self.classButton.size.x + 10f, -35.5f), new Vector2(45f, 45f), "pup_on", self.GetPupButtonOffName(), status, null, null);
             self.subObjects.Add(self.pupButton);
             menu.elementDescription.Add($"toggle_pup_{index}_lancer", menu.Translate("Player <p_n> will be lancer").Replace("<p_n>", (index + 1).ToString()));
@@ -45,37 +42,25 @@ namespace LancerRemix.LancerMenu
         private static void LancerButtonSignal(On.JollyCoop.JollyMenu.JollySlidingMenu.orig_Singal orig, JollySlidingMenu self,
             MenuObject sender, string message)
         {
-            if (message.Contains("toggle_pup"))
+            if (sender is SymbolButtonToggleLancerButton lancerBtn)
             {
-                LancerPlugin.LogSource.LogMessage($"Toggle pup: {message}");
-                // off > on > lancer
-                bool isLancer;
-                if (message.Contains("off"))
+                int num = lancerBtn.playerNum;
+                switch (lancerBtn.status)
                 {
-                    isLancer = false;
-                    message = message.Replace("_off", "");
-                }
-                else
-                {
-                    if (message.Contains("lancer"))
-                    {
-#if NO_MSC
-                        if (!(sender as SymbolButtonToggleLancerButton).IsLancerAllowed()) goto NoLancer;
-#endif
-                        isLancer = true;
-                        message = message.Replace("_lancer", "");
-                    }
-#if NO_MSC
-                NoLancer:
-#endif
-                    isLancer = false;
-                    message = message.Replace("_on", "");
-                }
-                if (int.TryParse(char.ToString(message[message.Length - 1]), NumberStyles.Any, CultureInfo.InvariantCulture, out int num)
-                    && num < self.playerSelector.Length)
-                {
-                    self.JollyOptions(num).isPup = !isLancer;
-                    SelectMenuPatch.SetLancerPlayers(num, isLancer);
+                    case PlayerSize.Normal: // off > on
+                        self.JollyOptions(num).isPup = true;
+                        SelectMenuPatch.SetLancerPlayers(num, false);
+                        break;
+
+                    case PlayerSize.Pup: // on > lancer
+                        self.JollyOptions(num).isPup = true;
+                        SelectMenuPatch.SetLancerPlayers(num, true);
+                        break;
+
+                    case PlayerSize.Lancer: // lancer > off
+                        self.JollyOptions(num).isPup = false;
+                        SelectMenuPatch.SetLancerPlayers(num, false);
+                        break;
                 }
                 return;
             }
@@ -89,6 +74,7 @@ namespace LancerRemix.LancerMenu
         {
             this.status = status;
             playerNum = signal[signal.Length - 1] - '0';
+            playerNum = Custom.IntClamp(playerNum, 0, 3);
             signalText = GetSignalText();
         }
 
@@ -121,28 +107,16 @@ namespace LancerRemix.LancerMenu
             return sb.ToString();
         }
 
-        public string symbolLancerOn = "";
+        private const string SYMBOL_LANCER_ON = "lancer_on";
 
         public override void LoadIcon()
         {
             base.LoadIcon();
-            LancerPlugin.LogSource.LogInfo($"LancerBtn LoadIcon) player {playerNum}: {status} (greyedOut: {GetButtonBehavior.greyedOut})");
-        }
+            if (status != PlayerSize.Lancer) return;
 
-        public void ToPup()
-        {
-            isToggled = false;
-            if (belowLabel != null) belowLabel.label.text = labelNameOff;
-            status = PlayerSize.Pup;
-            signalText = GetSignalText();
-        }
-
-        private void ToNormal()
-        {
-            isToggled = true;
-            if (belowLabel != null) belowLabel.label.text = labelNameOff;
-            status = PlayerSize.Normal;
-            signalText = GetSignalText();
+            symbol.fileName = SYMBOL_LANCER_ON;
+            symbol.LoadFile();
+            symbol.sprite.SetElementByName(SYMBOL_LANCER_ON);
         }
 
         public override void Toggle()
@@ -150,37 +124,32 @@ namespace LancerRemix.LancerMenu
             switch (status)
             {
                 case PlayerSize.Normal: // off > on
-                    ToPup();
+                    {
+                        isToggled = false;
+                        status = PlayerSize.Pup;
+                        symbol.fileName = symbolNameOff;
+                    }
                     break;
 
                 case PlayerSize.Pup: // on > lancer
-                    if (IsLancerAllowed())
                     {
                         isToggled = false;
-                        //if (belowLabel != null) belowLabel.label.text = labelNameOn;
                         status = PlayerSize.Lancer;
+                        symbol.fileName = symbolNameOff;
                     }
-                    else ToNormal(); // on > off
                     break;
 
                 case PlayerSize.Lancer: // lancer > off
-                    ToNormal();
+                    {
+                        isToggled = true;
+                        status = PlayerSize.Normal;
+                        symbol.fileName = symbolNameOn;
+                    }
                     break;
             }
             signalText = GetSignalText();
-
             faceSymbol.fileName = "face_" + symbol.fileName;
             LoadIcon();
-            LancerPlugin.LogSource.LogInfo($"player {playerNum}: {status}");
-        }
-
-        internal bool IsLancerAllowed()
-        {
-#if NO_MSC
-            return true; // todo: add MSC checker
-#else
-            return true;
-#endif
         }
 
         public override void Update()
