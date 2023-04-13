@@ -2,6 +2,7 @@
 
 using Menu;
 using Menu.Remix;
+using Menu.Remix.MixedUI;
 using System.IO;
 using System.Text.RegularExpressions;
 using UnityEngine;
@@ -15,6 +16,9 @@ namespace LancerRemix.LancerMenu
         internal static void SubPatch()
         {
             On.Menu.MultiplayerMenu.Singal += ArenaMenuSingal;
+#if NO_MSC
+            On.Menu.ChallengeSelectPage.StartButton_OnPressDone += ExpeditionDisableMSCLancers;
+#endif
         }
 
         #region Jolly
@@ -196,5 +200,30 @@ namespace LancerRemix.LancerMenu
         }
 
         #endregion Arena
+
+        #if NO_MSC
+
+        private static void ExpeditionDisableMSCLancers(On.Menu.ChallengeSelectPage.orig_StartButton_OnPressDone orig,
+            ChallengeSelectPage self, UIfocusable trigger)
+        {
+            UpdateIsPlayerLancer(false);
+            if (!ModManager.JollyCoop || !ModManager.CoopAvailable)
+                for (int i = 0; i < 4; ++i) SetLancerPlayers(i, false);
+#if NO_MSC
+            else
+            {
+                for (int i = 0; i < self.menu.manager.rainWorld.options.JollyPlayerCount; ++i)
+                {
+                    var character = self.menu.manager.rainWorld.options.jollyPlayerOptionsArray[i].playerClass;
+                    if (character != null && SlugcatStats.IsSlugcatFromMSC(LancerEnums.GetBasis(character)))
+                        SetLancerPlayers(i, false);
+                }
+            }
+#endif
+            SaveLancerPlayers(self.menu.manager.rainWorld.progression.miscProgressionData);
+            orig(self, trigger);
+        }
+
+        #endif
     }
 }
