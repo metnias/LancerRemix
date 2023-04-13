@@ -1,14 +1,8 @@
-﻿using Menu;
-using SlugBase.DataTypes;
-using MenuSceneID = Menu.MenuScene.SceneID;
+﻿using MenuSceneID = Menu.MenuScene.SceneID;
 using DreamID = DreamsState.DreamID;
 using System.Collections.Generic;
 using SlugName = SlugcatStats.Name;
 using MSCName = MoreSlugcats.MoreSlugcatsEnums.SlugcatStatsName;
-using SlugBase;
-using System.Linq;
-using LancerRemix.Cat;
-using CatSub.Cat;
 
 namespace LancerRemix
 {
@@ -69,7 +63,7 @@ namespace LancerRemix
 
         internal static void RegisterLancers()
         {
-            if (CheckModState()) return;
+            if (CheckModChanged()) return;
             ClearLancers();
             var slugs = ExtEnumBase.GetNames(typeof(SlugName));
             foreach (var name in slugs)
@@ -106,7 +100,7 @@ namespace LancerRemix
 
         private static int slugNameVersion = -1;
 
-        private static bool CheckModState()
+        private static bool CheckModChanged()
         {
             if (slugNameVersion != ExtEnumBase.GetExtEnumType(typeof(SlugName)).version) return false;
             if (!LancerPlugin.AnyModChanged) return true; // skip checking

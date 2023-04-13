@@ -43,7 +43,6 @@ namespace LancerRemix.Cat
             On.PlayerGraphics.ApplyPalette += GrafApplyPalette;
             On.PlayerGraphics.SuckedIntoShortCut += GrafSuckedIntoShortCut;
             On.PlayerGraphics.Reset += GrafReset;
-            On.PlayerGraphics.ColoredBodyPartList += ColoredLancerPartList;
 
             var characterForColor = new Hook(
                 typeof(PlayerGraphics).GetProperty(nameof(PlayerGraphics.CharacterForColor), BindingFlags.Instance | BindingFlags.Public).GetGetMethod(),
@@ -390,14 +389,6 @@ namespace LancerRemix.Cat
                 { SlugName.Night, new Color(0.8f, 0.1f, 0.3f) }
             };
 
-        private static List<string> ColoredLancerPartList(On.PlayerGraphics.orig_ColoredBodyPartList orig, SlugName slugcatID)
-        {
-            if (!IsLancer(slugcatID)) return orig(slugcatID);
-            var basis = GetBasis(slugcatID);
-            var list = orig(basis);
-            list.Add("Horn");
-            return list;
-        }
 
         #endregion PlayerGraphics
     }

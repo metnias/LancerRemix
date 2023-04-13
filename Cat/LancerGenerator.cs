@@ -1,18 +1,12 @@
 ﻿#define NO_MSC
 
 using SlugBase;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using SlugName = SlugcatStats.Name;
 using MSCName = MoreSlugcats.MoreSlugcatsEnums.SlugcatStatsName;
 using UnityEngine;
 using static LancerRemix.LancerEnums;
-using CatSub.Cat;
 using CatSub.Story;
-using System.IO;
 using Menu;
 using LancerRemix.LancerMenu;
 using LancerRemix.Cat;

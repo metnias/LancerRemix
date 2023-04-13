@@ -1,5 +1,4 @@
 ﻿using CatSub.Cat;
-using Mono.Cecil;
 using MoreSlugcats;
 using Noise;
 using RWCustom;
