@@ -1,6 +1,7 @@
 ﻿using JollyCoop.JollyMenu;
 using Menu;
 using RWCustom;
+using System;
 using System.IO;
 using System.Text;
 using UnityEngine;
@@ -17,6 +18,7 @@ namespace LancerRemix.LancerMenu
             On.JollyCoop.JollyMenu.JollyPlayerSelector.ctor += JollyLancerSelector;
             On.JollyCoop.JollyMenu.JollySlidingMenu.Singal += LancerButtonSignal;
             On.JollyCoop.JollyMenu.JollyPlayerSelector.JollyPortraitName += JollyLancerPortraitName;
+            On.JollyCoop.JollyMenu.SymbolButtonTogglePupButton.HasUniqueSprite += LancerHasNoUniqueSprite;
         }
 
         internal static void SubUnpatch()
@@ -24,6 +26,7 @@ namespace LancerRemix.LancerMenu
             On.JollyCoop.JollyMenu.JollyPlayerSelector.ctor -= JollyLancerSelector;
             On.JollyCoop.JollyMenu.JollySlidingMenu.Singal -= LancerButtonSignal;
             On.JollyCoop.JollyMenu.JollyPlayerSelector.JollyPortraitName -= JollyLancerPortraitName;
+            On.JollyCoop.JollyMenu.SymbolButtonTogglePupButton.HasUniqueSprite -= LancerHasNoUniqueSprite;
         }
 
         private static void JollyLancerSelector(On.JollyCoop.JollyMenu.JollyPlayerSelector.orig_ctor orig, JollyPlayerSelector self,
@@ -39,7 +42,9 @@ namespace LancerRemix.LancerMenu
             if (SelectMenuPatch.GetLancerPlayers(index)) status = PlayerSize.Lancer;
             self.pupButton = new SymbolButtonToggleLancerButton(menu, self, "toggle_pup_" + index.ToString(), new Vector2(self.classButton.size.x + 10f, -35.5f), new Vector2(45f, 45f), "pup_on", self.GetPupButtonOffName(), status, null, null);
             self.subObjects.Add(self.pupButton);
-            menu.elementDescription.Add($"toggle_pup_{index}_lancer", menu.Translate("Player <p_n> will be lancer").Replace("<p_n>", (index + 1).ToString()));
+            menu.elementDescription.Remove($"toggle_pup_{index}_off");
+            menu.elementDescription.Add($"toggle_pup_{index}_off", menu.Translate("Player <p_n> will be lancer").Replace("<p_n>", (index + 1).ToString()));
+            menu.elementDescription.Add($"toggle_pup_{index}_lancer", menu.Translate("description_pup_on").Replace("<p_n>", (index + 1).ToString()));
             self.dirty = true;
         }
 
@@ -74,7 +79,7 @@ namespace LancerRemix.LancerMenu
 
         private static string JollyLancerPortraitName(On.JollyCoop.JollyMenu.JollyPlayerSelector.orig_JollyPortraitName orig, JollyPlayerSelector self, SlugcatStats.Name classID, int colorIndexFile)
         {
-            if (GetLancerPlayers(colorIndexFile))
+            if (GetLancerPlayers(self.index))
             {
                 var res = orig(self, classID, colorIndexFile);
                 var lancer = res + "-lancer";
@@ -83,6 +88,12 @@ namespace LancerRemix.LancerMenu
                 return res;
             }
             return orig(self, classID, colorIndexFile);
+        }
+
+        private static bool LancerHasNoUniqueSprite(On.JollyCoop.JollyMenu.SymbolButtonTogglePupButton.orig_HasUniqueSprite orig, SymbolButtonTogglePupButton self)
+        {
+            if (self is SymbolButtonToggleLancerButton lancerBtn && lancerBtn.status == PlayerSize.Lancer) return false;
+            return orig(self);
         }
 
         #endregion Patch
@@ -94,6 +105,7 @@ namespace LancerRemix.LancerMenu
             playerNum = signal[signal.Length - 1] - '0';
             playerNum = Custom.IntClamp(playerNum, 0, 3);
             signalText = GetSignalText();
+            origSymbolPos = size * 0.5f;
         }
 
         public enum PlayerSize
@@ -110,6 +122,7 @@ namespace LancerRemix.LancerMenu
 
         private const string BASE_SIGNAL = "toggle_pup_";
         private readonly int playerNum;
+        private readonly Vector2 origSymbolPos;
 
         public string GetSignalText()
         {
@@ -131,11 +144,23 @@ namespace LancerRemix.LancerMenu
         public override void LoadIcon()
         {
             base.LoadIcon();
-            if (status != PlayerSize.Lancer) return;
+
+            if (status != PlayerSize.Lancer)
+            {
+                symbol.pos = origSymbolPos;
+                symbol.lastPos = symbol.pos;
+                return;
+            }
 
             symbol.fileName = SYMBOL_LANCER_ON;
             symbol.LoadFile();
             symbol.sprite.SetElementByName(SYMBOL_LANCER_ON);
+            symbol.pos = origSymbolPos + new Vector2(-0.5f, 4f);
+            symbol.lastPos = symbol.pos;
+
+            faceSymbol.fileName = "face_" + symbolNameOn;
+            faceSymbol.LoadFile();
+            faceSymbol.sprite.SetElementByName(faceSymbol.fileName);
         }
 
         public override void Toggle()
@@ -145,7 +170,7 @@ namespace LancerRemix.LancerMenu
                 default:
                 case PlayerSize.Normal: // off > on
                     {
-                        isToggled = false;
+                        isToggled = true;
                         status = PlayerSize.Pup;
                         symbol.fileName = symbolNameOff;
                     }
@@ -155,13 +180,13 @@ namespace LancerRemix.LancerMenu
                     {
                         isToggled = false;
                         status = PlayerSize.Lancer;
-                        symbol.fileName = symbolNameOff;
+                        symbol.fileName = symbolNameOn;
                     }
                     break;
 
                 case PlayerSize.Lancer: // lancer > off
                     {
-                        isToggled = true;
+                        isToggled = false;
                         status = PlayerSize.Normal;
                         symbol.fileName = symbolNameOn;
                     }
