@@ -80,13 +80,13 @@ namespace LancerRemix.Cat
 
         public Color GetHornColor()
         {
-            if (self.useJollyColor)
-                return PlayerGraphics.JollyColor(self.player.playerState.playerNumber, HornIndex());
-            if (PlayerGraphics.CustomColorsEnabled())
-                return PlayerGraphics.CustomColorSafety(HornIndex());
+            //if (self.useJollyColor)
+            //    return PlayerGraphics.JollyColor(self.player.playerState.playerNumber, HornIndex());
+            //if (PlayerGraphics.CustomColorsEnabled())
+            //    return PlayerGraphics.CustomColorSafety(HornIndex());
             return DefaultHornColor(state.slugcatCharacter);
 
-            int HornIndex() => PlayerGraphics.customColors.Count - 1;
+            //int HornIndex() => PlayerGraphics.customColors.Count - 1;
         }
 
         public static Color DefaultHornColor(SlugName basis)
