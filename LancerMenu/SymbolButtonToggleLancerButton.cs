@@ -1,8 +1,10 @@
 ﻿using JollyCoop.JollyMenu;
 using Menu;
 using RWCustom;
+using System.IO;
 using System.Text;
 using UnityEngine;
+using static LancerRemix.LancerMenu.SelectMenuPatch;
 
 namespace LancerRemix.LancerMenu
 {
@@ -14,12 +16,14 @@ namespace LancerRemix.LancerMenu
         {
             On.JollyCoop.JollyMenu.JollyPlayerSelector.ctor += JollyLancerSelector;
             On.JollyCoop.JollyMenu.JollySlidingMenu.Singal += LancerButtonSignal;
+            On.JollyCoop.JollyMenu.JollyPlayerSelector.JollyPortraitName += JollyLancerPortraitName;
         }
 
         internal static void SubUnpatch()
         {
             On.JollyCoop.JollyMenu.JollyPlayerSelector.ctor -= JollyLancerSelector;
             On.JollyCoop.JollyMenu.JollySlidingMenu.Singal -= LancerButtonSignal;
+            On.JollyCoop.JollyMenu.JollyPlayerSelector.JollyPortraitName -= JollyLancerPortraitName;
         }
 
         private static void JollyLancerSelector(On.JollyCoop.JollyMenu.JollyPlayerSelector.orig_ctor orig, JollyPlayerSelector self,
@@ -49,22 +53,35 @@ namespace LancerRemix.LancerMenu
                 {
                     case PlayerSize.Normal: // off > on
                         self.JollyOptions(num).isPup = true;
-                        SelectMenuPatch.SetLancerPlayers(num, false);
+                        SetLancerPlayers(num, false);
                         break;
 
                     case PlayerSize.Pup: // on > lancer
                         self.JollyOptions(num).isPup = true;
-                        SelectMenuPatch.SetLancerPlayers(num, true);
+                        SetLancerPlayers(num, true);
                         break;
 
                     case PlayerSize.Lancer: // lancer > off
                         self.JollyOptions(num).isPup = false;
-                        SelectMenuPatch.SetLancerPlayers(num, false);
+                        SetLancerPlayers(num, false);
                         break;
                 }
                 return;
             }
             orig(self, sender, message);
+        }
+
+        private static string JollyLancerPortraitName(On.JollyCoop.JollyMenu.JollyPlayerSelector.orig_JollyPortraitName orig, JollyPlayerSelector self, SlugcatStats.Name classID, int colorIndexFile)
+        {
+            if (GetLancerPlayers(colorIndexFile))
+            {
+                var res = orig(self, classID, colorIndexFile);
+                var lancer = res + "-lancer";
+                string path = "Illustrations" + Path.DirectorySeparatorChar.ToString() + lancer + ".png";
+                if (File.Exists(AssetManager.ResolveFilePath(path))) return lancer;
+                return res;
+            }
+            return orig(self, classID, colorIndexFile);
         }
 
         #endregion Patch

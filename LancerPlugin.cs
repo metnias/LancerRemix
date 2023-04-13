@@ -10,6 +10,7 @@ using LancerRemix.LancerMenu;
 using UnityEngine;
 using LancerRemix.Combat;
 using LancerRemix.Story;
+using Menu.Remix;
 
 #region Assembly attributes
 
@@ -41,6 +42,8 @@ namespace LancerRemix
 
         public static LancerPlugin instance;
 
+        public static OptionInterface oi;
+
         public void OnEnable()
         {
             instance = this;
@@ -66,6 +69,9 @@ namespace LancerRemix
             lastMSCEnabled = ModManager.MSC;
             lastJollyEnabled = ModManager.JollyCoop;
             lastMMFEnabled = ModManager.MMF;
+
+            oi = MachineConnector.GetRegisteredOI("topicular.lancer");
+            if (oi is InternalOI_Auto) (oi as InternalOI_Auto).automated = false;
 
             instance.Logger.LogMessage("The Lancer is Intialized.");
             instance.Logger.LogMessage($"ILhooks: {Convert.ToString(ILhookFlags, 2)} ({(ILhookSuccess() ? "Success" : "Failed")})");
