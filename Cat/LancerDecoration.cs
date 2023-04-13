@@ -4,6 +4,7 @@ using SlugName = SlugcatStats.Name;
 using static LancerRemix.LancerEnums;
 using RWCustom;
 using System.Collections.Generic;
+using LancerRemix.LancerMenu;
 
 namespace LancerRemix.Cat
 {
@@ -99,15 +100,10 @@ namespace LancerRemix.Cat
                 }
             }
 
+            if (self.useJollyColor || PlayerGraphics.CustomColorsEnabled())
+                return HornColorPick.GetHornColor(self.player.playerState.playerNumber);
 
-
-            //if (self.useJollyColor)
-            //    return PlayerGraphics.JollyColor(self.player.playerState.playerNumber, HornIndex());
-            //if (PlayerGraphics.CustomColorsEnabled())
-            //    return PlayerGraphics.CustomColorSafety(HornIndex());
             return DefaultHornColor(state.slugcatCharacter);
-
-            //int HornIndex() => PlayerGraphics.customColors.Count - 1;
         }
 
         public static Color DefaultHornColor(SlugName basis)

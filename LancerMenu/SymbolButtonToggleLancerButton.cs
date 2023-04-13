@@ -51,6 +51,7 @@ namespace LancerRemix.LancerMenu
                 int num = lancerBtn.playerNum;
                 switch (lancerBtn.status)
                 {
+                    default:
                     case PlayerSize.Normal: // off > on
                         self.JollyOptions(num).isPup = true;
                         SetLancerPlayers(num, false);
@@ -117,6 +118,7 @@ namespace LancerRemix.LancerMenu
             sb.Append(playerNum);
             switch (status)
             {
+                default:
                 case PlayerSize.Normal: sb.Append("_on"); break;
                 case PlayerSize.Pup: sb.Append("_lancer"); break;
                 case PlayerSize.Lancer: sb.Append("_off"); break;
@@ -140,6 +142,7 @@ namespace LancerRemix.LancerMenu
         {
             switch (status)
             {
+                default:
                 case PlayerSize.Normal: // off > on
                     {
                         isToggled = false;

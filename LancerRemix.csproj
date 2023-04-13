@@ -85,6 +85,7 @@
     <Compile Include="Combat\CreaturePatch.cs" />
     <Compile Include="Combat\MaskOnHorn.cs" />
     <Compile Include="Combat\WeaponPatch.cs" />
+    <Compile Include="LancerMenu\HornColorPick.cs" />
     <Compile Include="LancerMenu\MenuModifier.cs" />
     <Compile Include="Cat\LancerSupplement.cs" />
     <Compile Include="Cat\ModifyCat.cs" />

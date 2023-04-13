@@ -1,14 +1,13 @@
 ﻿using LancerRemix.Cat;
 using Menu;
+using Mono.Cecil.Cil;
+using MonoMod.Cil;
+using System;
 using System.IO;
 using UnityEngine;
-using SlugName = SlugcatStats.Name;
 using static LancerRemix.LancerEnums;
 using MenueSceneID = Menu.MenuScene.SceneID;
-using MonoMod.Cil;
-using Mono.Cecil.Cil;
-using System;
-using LancerRemix.Story;
+using SlugName = SlugcatStats.Name;
 
 namespace LancerRemix.LancerMenu
 {
@@ -26,13 +25,27 @@ namespace LancerRemix.LancerMenu
             if (ModManager.MSC) OnMSCEnablePatch();
         }
 
-        internal static void OnJollyEnablePatch() => MultiplayerPatch.OnJollyEnableSubPatch();
+        internal static void OnJollyEnablePatch()
+        {
+            MultiplayerPatch.OnJollyEnableSubPatch();
+            HornColorPick.OnJollyEnableSubPatch();
+        }
 
-        internal static void OnJollyDisablePatch() => MultiplayerPatch.OnJollyDisableSubPatch();
+        internal static void OnJollyDisablePatch()
+        {
+            MultiplayerPatch.OnJollyDisableSubPatch();
+            HornColorPick.OnJollyDisableSubPatch();
+        }
 
-        internal static void OnMSCEnablePatch() => MultiplayerPatch.OnMSCEnableSubPatch();
+        internal static void OnMSCEnablePatch()
+        {
+            MultiplayerPatch.OnMSCEnableSubPatch();
+        }
 
-        internal static void OnMSCDisablePatch() => MultiplayerPatch.OnMSCDisableSubPatch();
+        internal static void OnMSCDisablePatch()
+        {
+            MultiplayerPatch.OnMSCDisableSubPatch();
+        }
 
         private static bool IsStoryLancer => ModifyCat.IsStoryLancer;
 

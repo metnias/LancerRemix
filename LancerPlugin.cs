@@ -57,7 +57,12 @@ namespace LancerRemix
 
         private static void Init(RainWorld rw)
         {
+            oi = MachineConnector.GetRegisteredOI("topicular.lancer");
+            if (oi is InternalOI_Auto) (oi as InternalOI_Auto).automated = false;
+
             LancerEnums.RegisterExtEnum();
+            HornColorPick.Initalize();
+
             ModifyCat.Patch();
             MenuModifier.Patch();
             LancerGenerator.Patch();
@@ -69,9 +74,6 @@ namespace LancerRemix
             lastMSCEnabled = ModManager.MSC;
             lastJollyEnabled = ModManager.JollyCoop;
             lastMMFEnabled = ModManager.MMF;
-
-            oi = MachineConnector.GetRegisteredOI("topicular.lancer");
-            if (oi is InternalOI_Auto) (oi as InternalOI_Auto).automated = false;
 
             instance.Logger.LogMessage("The Lancer is Intialized.");
             instance.Logger.LogMessage($"ILhooks: {Convert.ToString(ILhookFlags, 2)} ({(ILhookSuccess() ? "Success" : "Failed")})");
@@ -147,6 +149,7 @@ namespace LancerRemix
             {
                 LogSource.LogInfo("Lancer detected MMF newly enabled.");
                 TutorialModify.OnMMFEnablePatch();
+                HornColorPick.OnMMFEnablePatch();
                 lastMMFEnabled = ModManager.MMF;
             }
         }
@@ -174,6 +177,7 @@ namespace LancerRemix
             {
                 LogSource.LogInfo("Lancer detected MMF newly disabled.");
                 TutorialModify.OnMMFDisablePatch();
+                HornColorPick.OnMMFDisablePatch();
                 lastMMFEnabled = ModManager.MMF;
             }
         }
