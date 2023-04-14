@@ -11,6 +11,10 @@ namespace LancerRemix.LancerMenu
 {
     internal class SymbolButtonToggleLancerButton : SymbolButtonTogglePupButton
     {
+        /// TO FIX:
+        /// Toggling LancerButton updates portrait
+        /// When using default color, use lancer colour for button sprite
+
         #region Patch
 
         internal static void SubPatch()
@@ -81,11 +85,11 @@ namespace LancerRemix.LancerMenu
         {
             if (GetLancerPlayers(self.index))
             {
-                var res = orig(self, classID, colorIndexFile);
+                int lancerIndexFile = self.portraitTint ? colorIndexFile : 4;
+                var res = orig(self, classID, lancerIndexFile);
                 var lancer = res + "-lancer";
                 string path = "Illustrations" + Path.DirectorySeparatorChar.ToString() + lancer + ".png";
                 if (File.Exists(AssetManager.ResolveFilePath(path))) return lancer;
-                return res;
             }
             return orig(self, classID, colorIndexFile);
         }
