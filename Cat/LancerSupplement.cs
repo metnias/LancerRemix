@@ -63,20 +63,49 @@ namespace LancerRemix.Cat
 
         public override string TargetSubVersion => "1.0";
 
+        private float aerobicCache;
+
         public override void Update(On.Player.orig_Update orig, bool eu)
         {
+            aerobicCache = self.aerobicLevel;
             base.Update(null, eu);
             if (hasExhaustion)
             {
-                if (self.slugcatStats.malnourished || (ModManager.MSC && (self.saintWeakness > 0 || self.Wounded)))
-                    return; // already handled by vanilla
-                if (self.aerobicLevel == 1f) self.exhausted = true;
-                else if (self.aerobicLevel < 0.4f) self.exhausted = false;
-                if (self.exhausted)
+                if (self.aerobicLevel >= 0.95f) self.gourmandExhausted = true;
+                else if (self.aerobicLevel < 0.4f) self.gourmandExhausted = false;
+                if (self.gourmandExhausted)
+                {
                     self.slowMovementStun = Math.Max(self.slowMovementStun, (int)Custom.LerpMap(self.aerobicLevel, 0.7f, 0.4f, 6f, 0f));
+                    self.lungsExhausted = true;
+                }
                 else
                     self.slowMovementStun = Math.Max(self.slowMovementStun, (int)Custom.LerpMap(self.aerobicLevel, 1f, 0.4f, 2f, 0f, 2f));
             }
+        }
+
+        public virtual void UpdateMSC(On.Player.orig_UpdateMSC orig)
+        {
+            if (hasExhaustion)
+            {
+                if (self.lungsExhausted && !self.gourmandExhausted)
+                {
+                    aerobicCache = 1f;
+                }
+                else
+                {
+                    float moveExhaust = 400f;
+                    float stillExhaust = 1100f;
+                    if (self.gourmandExhausted)
+                    {
+                        moveExhaust = self.bodyMode == BodyIndex.Crawl ? 400f : 800f;
+                        stillExhaust = self.bodyMode == BodyIndex.Crawl ? 125f : 200f;
+                    }
+                    aerobicCache = Mathf.Max(1f - self.airInLungs, aerobicCache - ((!self.slugcatStats.malnourished) ? 1f : 1.2f) / (((self.input[0].x != 0 || self.input[0].y != 0) ? moveExhaust : stillExhaust) * (1f + 3f * Mathf.InverseLerp(0.9f, 1f, self.aerobicLevel))));
+                }
+                if (ModManager.MSC && self.Wounded && aerobicCache > 0.98f) aerobicCache = 0.35f;
+                self.aerobicLevel = aerobicCache;
+            }
+            orig(self);
         }
 
         public virtual void MovementUpdate(On.Player.orig_MovementUpdate orig, bool eu)
@@ -287,11 +316,11 @@ namespace LancerRemix.Cat
             if (self.room.GetTile(startPos).Solid) startPos = self.mainBodyChunk.pos;
             if (self.graphicsModule != null) LookAtTarget();
 
-            self.AerobicIncrease(0.7f);
+            self.AerobicIncrease(0.9f);
             lanceSpear = spear;
             slideLance = false;
             spear.spearDamageBonus = GetLanceDamage(self.slugcatStats.throwingSkill);
-            if (self.exhausted) spear.spearDamageBonus *= 0.4f;
+            if (self.exhausted || self.gourmandExhausted) spear.spearDamageBonus *= 0.4f;
             float pow = Mathf.Lerp(1f, 1.5f, self.Adrenaline);
             if (self.animation == AnimIndex.BellySlide
                 && self.rollCounter > 8 && self.rollCounter < 15 && lanceDir.x == self.rollDirection)
@@ -466,7 +495,7 @@ namespace LancerRemix.Cat
         protected virtual void SetLanceCooltime()
         {
             lanceTimer = isLonk ? -16 : -24;
-            if (self.exhausted) lanceTimer -= 12;
+            if (self.exhausted || self.gourmandExhausted) lanceTimer -= 12;
         }
 
         protected float GetLanceDamage(int throwingSkill)

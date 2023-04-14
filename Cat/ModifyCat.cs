@@ -30,6 +30,7 @@ namespace LancerRemix.Cat
             On.Player.CanIPickThisUp += PlayerCanIPickThisUp;
             On.Player.Stun += PlayerStun;
             On.Player.Die += PlayerDie;
+            On.Player.UpdateMSC += PlayerUpdateMSC;
             On.Player.MovementUpdate += LancerMovementUpdate;
             IL.Player.EatMeatUpdate += LonkEatMeatUpdate;
             On.Player.GraphicsModuleUpdated += LunterGrafModuleUpdated;
@@ -206,6 +207,13 @@ namespace LancerRemix.Cat
         {
             if (IsPlayerLancer(self))
             { GetSub<LancerSupplement>(self)?.Die(orig); return; }
+            orig(self);
+        }
+
+        private static void PlayerUpdateMSC(On.Player.orig_UpdateMSC orig, Player self)
+        {
+            if (IsPlayerLancer(self))
+            { GetSub<LancerSupplement>(self)?.UpdateMSC(orig); return; }
             orig(self);
         }
 
@@ -388,7 +396,6 @@ namespace LancerRemix.Cat
                 { SlugName.Red, new Color(0.3f, 0.5f, 1.0f) },
                 { SlugName.Night, new Color(0.8f, 0.1f, 0.3f) }
             };
-
 
         #endregion PlayerGraphics
     }

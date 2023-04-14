@@ -40,6 +40,7 @@ namespace LancerRemix.Combat
             {
                 if (self is Rock) frc = Mathf.Lerp(0.8f, 1.2f, player.Adrenaline);
                 else frc = Mathf.Lerp(0.6f, 0.9f, player.Adrenaline);
+                if (player.gourmandExhausted) frc *= 0.5f;
             }
             orig(self, thrownBy, thrownPos, firstFrameTraceFromPos, throwDir, frc, eu);
         }
