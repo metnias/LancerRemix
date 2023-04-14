@@ -455,6 +455,8 @@ namespace LancerRemix.Cat
         protected internal void RetrieveLanceSpear(Spear spear = null)
         {
             if (spear == null) spear = lanceSpear;
+            if (spear == null || spear.grabbedBy.Count > 0 || spear.room != self.room || self.grasps[lanceGrasp] != null)
+            { ReleaseLanceSpear(); return; }
             self.SlugcatGrab(spear, lanceGrasp); // retrieve
             lanceSpear = null;
             SetLanceCooltime();
