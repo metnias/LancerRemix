@@ -1,6 +1,7 @@
 ﻿using LancerRemix.Cat;
 using MoreSlugcats;
 using RWCustom;
+using System;
 using UnityEngine;
 using static LancerRemix.Cat.ModifyCat;
 
@@ -72,9 +73,45 @@ namespace LancerRemix.Combat
         {
             var res = orig(self, result, eu);
             if (res && self.thrownBy is Player atkPlayer && IsPlayerLancer(atkPlayer))
-            { // Retrieve spear
-                if (self is ExplosiveSpear) GetSub<LancerSupplement>(atkPlayer)?.ReleaseLanceSpear();
-                else GetSub<LancerSupplement>(atkPlayer)?.RetrieveLanceSpear(self);
+            {
+                var sub = GetSub<LancerSupplement>(atkPlayer);
+                if (sub != null)
+                {
+                    if (self is ExplosiveSpear) sub.ReleaseLanceSpear();
+                    else if (!sub.IsSlideLance || !(result.obj is Creature crit)) sub.RetrieveLanceSpear(self); // Retrieve spear
+                    else
+                    {
+                        Debug.Log($"LancerSlide!");
+                        float damage = self.spearDamageBonus;
+                        if (!crit.dead)
+                        {
+                            if (!crit.abstractCreature.creatureTemplate.smallCreature)
+                                atkPlayer.room.ScreenMovement(new Vector2?(atkPlayer.bodyChunks[0].pos), atkPlayer.mainBodyChunk.vel * damage * atkPlayer.bodyChunks[0].mass * 0.3f, Mathf.Max((damage * atkPlayer.bodyChunks[0].mass - 30f) / 50f, 0f));
+                            crit.SetKillTag(atkPlayer.abstractCreature);
+                            crit.Violence(atkPlayer.mainBodyChunk, new Vector2?(atkPlayer.mainBodyChunk.vel), crit.firstChunk, null, Creature.DamageType.Stab, damage, 50f);
+                        }
+                        atkPlayer.room.PlaySound(SoundID.Big_Needle_Worm_Impale_Terrain, atkPlayer.mainBodyChunk, false, 1.2f, 1.2f);
+
+                        // WhiplastJump
+                        atkPlayer.animation = Player.AnimationIndex.Flip;
+                        atkPlayer.standing = true;
+                        atkPlayer.room.AddObject(new ExplosionSpikes(atkPlayer.room, atkPlayer.bodyChunks[1].pos + new Vector2(0f, -atkPlayer.bodyChunks[1].rad), 8, 7f, 5f, 5.5f, 40f, new Color(1f, 1f, 1f, 0.5f)));
+                        int back = 1, backCheck = 1;
+                        while (backCheck < 4 && !atkPlayer.room.GetTile(atkPlayer.bodyChunks[0].pos + new Vector2((float)(backCheck * -(float)atkPlayer.rollDirection) * 15f, 0f)).Solid && !atkPlayer.room.GetTile(atkPlayer.bodyChunks[0].pos + new Vector2((float)(backCheck * -(float)atkPlayer.rollDirection) * 15f, 20f)).Solid)
+                        { back = backCheck; ++backCheck; }
+                        atkPlayer.bodyChunks[0].pos += new Vector2(atkPlayer.rollDirection * -(back * 15f + 8f), 14f);
+                        atkPlayer.bodyChunks[1].pos += new Vector2(atkPlayer.rollDirection * -(back * 15f + 2f), 0f);
+                        atkPlayer.bodyChunks[0].vel = new Vector2(atkPlayer.rollDirection * -8f, 10f);
+                        atkPlayer.bodyChunks[1].vel = new Vector2(atkPlayer.rollDirection * -8f, 11f);
+                        atkPlayer.rollDirection = -atkPlayer.rollDirection;
+                        atkPlayer.flipFromSlide = true;
+                        atkPlayer.whiplashJump = false;
+                        atkPlayer.jumpBoost = 0f;
+                        atkPlayer.room.PlaySound(SoundID.Slugcat_Sectret_Super_Wall_Jump, atkPlayer.mainBodyChunk, false, 1f, 1f);
+
+                        sub.ReleaseLanceSpear();
+                    }
+                }
             }
             return res;
         }
@@ -84,12 +121,12 @@ namespace LancerRemix.Combat
             orig(self, result, eu);
             if (!(self.thrownBy is Player player) || !IsPlayerLancer(player)) return;
 
-            if (self is ExplosiveSpear)
-            {
-                GetSub<LancerSupplement>(player)?.ReleaseLanceSpear();
-                return;
-            }
-            GetSub<LancerSupplement>(player)?.RetrieveLanceSpear(self);
+            var sub = GetSub<LancerSupplement>(player);
+            if (sub == null) return;
+
+            if (self is ExplosiveSpear || sub.IsSlideLance)
+            { sub.ReleaseLanceSpear(); return; }
+            sub.RetrieveLanceSpear(self);
         }
 
         private static void SpearUpdate(On.Spear.orig_Update orig, Spear self, bool eu)

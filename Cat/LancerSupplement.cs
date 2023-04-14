@@ -343,7 +343,7 @@ namespace LancerRemix.Cat
                     //instance.room.PlaySound(SoundID.Slugcat_Belly_Slide_Init, instance.mainBodyChunk, false, 1f, 1f);
                     self.exitBellySlideCounter = 0;
                     self.longBellySlide = true;
-                    spear.spearDamageBonus *= 2f;
+                    //spear.spearDamageBonus *= 2f;
                     slideLance = true;
                 }
                 else if (lanceDir.x == -self.rollDirection && !self.longBellySlide)
@@ -360,10 +360,11 @@ namespace LancerRemix.Cat
                     self.bodyChunks[0].vel = new Vector2((float)self.rollDirection * 6f, 15f) * pow * ((!self.longBellySlide) ? 1f : 1.5f);
                     self.animation = AnimIndex.Flip; //RocketJump
                     self.rocketJumpFromBellySlide = true;
-                    self.room.PlaySound(SoundID.Slugcat_Rocket_Jump, self.mainBodyChunk, false, 1f, 1f);
+                    self.room.PlaySound(SoundID.Slugcat_Sectret_Super_Wall_Jump, self.mainBodyChunk, false, 1f, 1f);
                     self.rollDirection = 0;
                     //typeof(Player).GetField("exitBellySlideCounter", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance).SetValue(instance, 0);
                     self.AerobicIncrease(0.6f);
+                    Debug.Log("Slide Flip");
                 }
             }
             spear.Thrown(self, startPos, new Vector2?(self.mainBodyChunk.pos - lanceDir.ToVector2() * 5f),
@@ -376,7 +377,7 @@ namespace LancerRemix.Cat
             self.dontGrabStuff = 10;
             self.bodyChunks[0].vel += lanceDir.ToVector2() * 7f;
             self.bodyChunks[1].vel -= lanceDir.ToVector2() * 4f;
-            lanceTimer = slideLance ? 6 : (lanceDir.y == 0 ? 3 : 4);
+            lanceTimer = slideLance ? 5 : (lanceDir.y == 0 ? 3 : 4);
             blockTimer = slideLance ? Mathf.CeilToInt(blockTime * 1.5f) : blockTime;
             if (!slideLance && this is LunterSupplement lunterSub) lunterSub.maskOnHorn.DropMask();
             if (spear.bugSpear) ReleaseLanceSpear();
