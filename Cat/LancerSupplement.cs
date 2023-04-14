@@ -16,7 +16,7 @@ namespace LancerRemix.Cat
         /// forward: hard hit & stun, but loses spear
         /// cannot pull spear from wall/alive creatures
         ///
-        /// parry: grab / throw. throw parry will fling your spear. (12 ticks for now)
+        /// parry: grab / throw. throw parry will fling your spear. (24 ticks for now)
         /// grab parry will flip lizards
         ///
         /// normal stab: will never stun
@@ -447,6 +447,7 @@ namespace LancerRemix.Cat
             if (lanceSpear != null)
             {
                 lanceSpear.firstChunk.vel *= 0f;
+                lanceSpear.Forbid();
                 lanceSpear = null;
             }
             SetLanceCooltime();
@@ -455,7 +456,7 @@ namespace LancerRemix.Cat
         protected internal void RetrieveLanceSpear(Spear spear = null)
         {
             if (spear == null) spear = lanceSpear;
-            if (spear == null || spear.grabbedBy.Count > 0 || spear.room != self.room || self.grasps[lanceGrasp] != null)
+            if (lanceTimer < 0 || spear == null || spear.grabbedBy.Count > 0 || spear.room != self.room || self.grasps[lanceGrasp] != null)
             { ReleaseLanceSpear(); return; }
             self.SlugcatGrab(spear, lanceGrasp); // retrieve
             lanceSpear = null;

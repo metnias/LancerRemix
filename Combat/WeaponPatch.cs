@@ -19,8 +19,7 @@ namespace LancerRemix.Combat
             /// TODO:
             /// monk difficulty adjust
             /// story patch
-            /// jolly & custom color ui support
-            /// expedition support
+            /// custom color ui support
 
             if (ModManager.MSC) OnMSCEnablePatch();
         }
