@@ -81,29 +81,10 @@ namespace LancerRemix.Cat
 
         public Color GetHornColor()
         {
-            // Arena Color
-            if (!Owner.Room.world.game.setupValues.arenaDefaultColors && !ModManager.CoopAvailable)
-            {
-                switch (player.playerState.playerNumber)
-                {
-                    default:
-                    case 0:
-                        if (Owner.Room.world.game.IsArenaSession)
-                            return DefaultHornColor(SlugName.White);
-                        break;
-                    case 1:
-                        return DefaultHornColor(SlugName.Yellow);
-                    case 2:
-                        return DefaultHornColor(SlugName.Red);
-                    case 3:
-                        return DefaultHornColor(SlugName.Night);
-                }
-            }
-
             if (self.useJollyColor || PlayerGraphics.CustomColorsEnabled())
                 return HornColorPick.GetHornColor(self.player.playerState.playerNumber);
 
-            return DefaultHornColor(state.slugcatCharacter);
+            return DefaultHornColor(self.player.SlugCatClass);
         }
 
         public static Color DefaultHornColor(SlugName basis)

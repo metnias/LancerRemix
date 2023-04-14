@@ -158,7 +158,7 @@ namespace LancerRemix.Cat
 
         private static Color LancerShortCutColor(On.Player.orig_ShortCutColor orig, Player self)
         {
-            if (!IsPlayerLancer(self)) return orig(self);
+            if (!IsPlayerLancer(self) || self.abstractCreature.world.game.IsArenaSession) return orig(self);
             return PlayerGraphics.SlugcatColor(GetLancer(self.playerState.slugcatCharacter));
         }
 
@@ -166,8 +166,8 @@ namespace LancerRemix.Cat
         {
             if (IsPlayerLancer(self))
             {
-                if (self.room?.game.IsStorySession == true)
-                    return 0.2f + self.room.game.GetStorySession.difficulty / 4f;
+                if (self.abstractCreature.world.game.IsStorySession)
+                    return 0.2f + self.abstractCreature.world.game.GetStorySession.difficulty / 4f;
                 return 0.3f;
             }
             return orig(self);
@@ -361,7 +361,7 @@ namespace LancerRemix.Cat
         private static SlugName LancerForColor(orig_CharacterForColor orig, PlayerGraphics self)
         {
             var res = orig(self);
-            if (IsPlayerLancer(self)) res = GetLancer(res);
+            if (IsPlayerLancer(self) && !self.owner.abstractPhysicalObject.world.game.IsArenaSession) res = GetLancer(res);
             return res;
         }
 
