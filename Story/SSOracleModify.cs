@@ -3,6 +3,7 @@ using RWCustom;
 using UnityEngine;
 using static LancerRemix.LancerEnums;
 using static LancerRemix.LancerGenerator;
+using static Conversation;
 using ConvID = Conversation.ID;
 using MSCName = MoreSlugcats.MoreSlugcatsEnums.SlugcatStatsName;
 using SlugName = SlugcatStats.Name;
@@ -65,33 +66,33 @@ namespace LancerRemix.Story
                 bool preMove = IsTimelineInbetween(lancer, null, ModManager.MSC ? MSCName.Gourmand : SlugName.White);
                 if (!self.owner.playerEnteredWithMark)
                 {
-                    self.events.Add(new Conversation.TextEvent(self, 0, ".  .  .", 0));
-                    self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("...is this reaching you?"), 0));
+                    self.events.Add(new TextEvent(self, 0, ".  .  .", 0));
+                    self.events.Add(new TextEvent(self, 0, self.Translate("...is this reaching you?"), 0));
                     self.events.Add(new SSOracleBehavior.PebblesConversation.PauseAndWaitForStillEvent(self, self.convBehav, 4));
                 }
                 else
                 {
                     self.events.Add(new SSOracleBehavior.PebblesConversation.PauseAndWaitForStillEvent(self, self.convBehav, 210));
                 }
-                self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("A tiny animal. A young one, too. Your journey has taken you deep into my chamber,<LINE>but I doubt you came here on purpose."), 0));
-                self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("I'm afraid I can't assist you in the way you would have hoped for.<LINE> I do not know what would drive you to come all the way here in search for your family... Or how you managed it."), 0));
+                self.events.Add(new TextEvent(self, 0, self.Translate("A tiny animal. A young one, too. Your journey has taken you deep into my chamber,<LINE>but I doubt you came here on purpose."), 0));
+                self.events.Add(new TextEvent(self, 0, self.Translate("I'm afraid I can't assist you in the way you would have hoped for.<LINE> I do not know what would drive you to come all the way here in search for your family... Or how you managed it."), 0));
                 if (preMove) // Yellow
                 {
-                    self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("I can assure you they are nowhere in my premises, your kind don't seem to take well to this place.<LINE>My overseers would take great delight in reporting an entire group of you, seeing how they react to just one."), 0));
+                    self.events.Add(new TextEvent(self, 0, self.Translate("I can assure you they are nowhere in my premises, your kind don't seem to take well to this place.<LINE>My overseers would take great delight in reporting an entire group of you, seeing how they react to just one."), 0));
                 }
                 else // White
                 {
-                    self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("Your family may be long gone by now... I can assure you they are nowhere in my premises,<LINE>your kind don't seem to take well to this place. My overseers would take great delight<LINE>in reporting an entire group of you, seeing how they react to just one."), 0));
+                    self.events.Add(new TextEvent(self, 0, self.Translate("Your family may be long gone by now... I can assure you they are nowhere in my premises,<LINE>your kind don't seem to take well to this place. My overseers would take great delight<LINE>in reporting an entire group of you, seeing how they react to just one."), 0));
                 }
                 self.events.Add(new SSOracleBehavior.PebblesConversation.PauseAndWaitForStillEvent(self, self.convBehav, 20));
-                self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("However, if it's any consolation, I will give you an opportunity.<LINE>To go the way of my creators. Eternal bliss, how does that sound?"), 0));
-                self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("From here, go west past the Farm Arrays and find the place where the land fissures.<LINE>Clamber down into the earth, as deep as you can reach, and then go further."), 0));
-                self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("Saying you'll need luck is an understatement... but I admit I feel<LINE>a pang of sympathy for you, and it feels wrong to leave you empty handed."), 0));
-                self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("At the end of time none of this will matter, I suppose. Even if you fail<LINE>you'll live an eternity of lives more, and maybe eventually, you'll make it in the end."), 0));
+                self.events.Add(new TextEvent(self, 0, self.Translate("However, if it's any consolation, I will give you an opportunity.<LINE>To go the way of my creators. Eternal bliss, how does that sound?"), 0));
+                self.events.Add(new TextEvent(self, 0, self.Translate("From here, go west past the Farm Arrays and find the place where the land fissures.<LINE>Clamber down into the earth, as deep as you can reach, and then go further."), 0));
+                self.events.Add(new TextEvent(self, 0, self.Translate("Saying you'll need luck is an understatement... but I admit I feel<LINE>a pang of sympathy for you, and it feels wrong to leave you empty handed."), 0));
+                self.events.Add(new TextEvent(self, 0, self.Translate("At the end of time none of this will matter, I suppose. Even if you fail<LINE>you'll live an eternity of lives more, and maybe eventually, you'll make it in the end."), 0));
                 self.events.Add(new SSOracleBehavior.PebblesConversation.PauseAndWaitForStillEvent(self, self.convBehav, 4));
-                self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("Either way, you must leave now. There's a perfectly good access shaft right here."), 0));
+                self.events.Add(new TextEvent(self, 0, self.Translate("Either way, you must leave now. There's a perfectly good access shaft right here."), 0));
                 if (!TryJoke())
-                    self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("I hope you find what you're looking for. Don't bother coming back."), 30));
+                    self.events.Add(new TextEvent(self, 0, self.Translate("I hope you find what you're looking for. Don't bother coming back."), 30));
 
                 return;
             }
@@ -115,15 +116,15 @@ namespace LancerRemix.Story
             {
                 if (ModManager.MSC && self.owner.CheckSlugpupsInRoom())
                 {
-                    self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("Best of luck to you, and your family. There is nothing else I can do."), 0));
-                    self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("I must resume my work."), 0));
+                    self.events.Add(new TextEvent(self, 0, self.Translate("Best of luck to you, and your family. There is nothing else I can do."), 0));
+                    self.events.Add(new TextEvent(self, 0, self.Translate("I must resume my work."), 0));
                     self.owner.CreatureJokeDialog();
                     return true;
                 }
                 if (ModManager.MMF && self.owner.CheckStrayCreatureInRoom() != CreatureTemplate.Type.StandardGroundCreature)
                 {
-                    self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("Best of luck to you, and your companion. There is nothing else I can do."), 0));
-                    self.events.Add(new Conversation.TextEvent(self, 0, self.Translate("I must resume my work."), 0));
+                    self.events.Add(new TextEvent(self, 0, self.Translate("Best of luck to you, and your companion. There is nothing else I can do."), 0));
+                    self.events.Add(new TextEvent(self, 0, self.Translate("I must resume my work."), 0));
                     self.owner.CreatureJokeDialog();
                     return true;
                 }
