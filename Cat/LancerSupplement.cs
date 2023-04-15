@@ -207,7 +207,7 @@ namespace LancerRemix.Cat
 
         public static bool BiteParriable(Creature crit)
         {
-            return crit is Lizard || crit is Vulture || crit is BigSpider || crit is DropBug;
+            return crit is Lizard || crit is BigSpider || crit is DropBug || (crit is Vulture v && !v.IsMiros);
         }
 
         public virtual void Grabbed(On.Player.orig_Grabbed orig, Creature.Grasp grasp)
