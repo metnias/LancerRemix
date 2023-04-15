@@ -78,7 +78,7 @@ namespace LancerRemix.Combat
                 if (sub != null)
                 {
                     if (self is ExplosiveSpear) sub.ReleaseLanceSpear();
-                    else if (!sub.IsSlideLance || !(result.obj is Creature crit)) sub.RetrieveLanceSpear(self); // Retrieve spear
+                    else if (!sub.SpendSpear || !(result.obj is Creature crit)) sub.RetrieveLanceSpear(self); // Retrieve spear
                     else
                     {
                         Debug.Log($"LancerSlide!");
@@ -90,7 +90,7 @@ namespace LancerRemix.Combat
                             crit.SetKillTag(atkPlayer.abstractCreature);
                             crit.Violence(atkPlayer.mainBodyChunk, new Vector2?(atkPlayer.mainBodyChunk.vel), crit.firstChunk, null, Creature.DamageType.Stab, damage, 50f);
                         }
-                        atkPlayer.room.PlaySound(SoundID.Big_Needle_Worm_Impale_Terrain, atkPlayer.mainBodyChunk, false, 1.2f, 1.2f);
+                        atkPlayer.room.PlaySound(SoundID.Big_Needle_Worm_Impale_Terrain, atkPlayer.mainBodyChunk, false, 1.2f, 1.0f);
 
                         // WhiplastJump
                         atkPlayer.animation = Player.AnimationIndex.Flip;
@@ -124,7 +124,7 @@ namespace LancerRemix.Combat
             var sub = GetSub<LancerSupplement>(player);
             if (sub == null) return;
 
-            if (self is ExplosiveSpear || sub.IsSlideLance)
+            if (self is ExplosiveSpear || sub.SpendSpear)
             { sub.ReleaseLanceSpear(); return; }
             sub.RetrieveLanceSpear(self);
         }

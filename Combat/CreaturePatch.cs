@@ -35,7 +35,7 @@ namespace LancerRemix.Combat
         {
             if (source?.owner is Spear spear && spear.thrownBy is Player atkPlayer && IsPlayerLancer(atkPlayer))
             {
-                if (GetSub<LancerSupplement>(atkPlayer)?.IsSlideLance == true) stunBonus *= 2f;
+                if (GetSub<LancerSupplement>(atkPlayer)?.SpendSpear == true) stunBonus *= 2f;
                 else stunBonus = -10000f;
             }
             if (self is Player player && IsPlayerLancer(player))
@@ -54,7 +54,7 @@ namespace LancerRemix.Combat
                 damage *= 1.5f;
                 //force stuck
                 source.owner.room.AddObject(new ExplosionSpikes(source.owner.room, source.owner.firstChunk.pos, 5, 4f, 6f, 4.5f, 30f, new Color(1f, 1f, 1f, 0.5f)));
-                source.owner.room.PlaySound(SoundID.Spear_Fragment_Bounce, source.owner.firstChunk.pos, 1.2f, 0.8f);
+                source.owner.room.PlaySound(SoundID.Big_Needle_Worm_Impale_Terrain, source.owner.firstChunk, false, 1.2f, 1.0f);
                 GetSub<LancerSupplement>((source.owner as Spear).thrownBy as Player)?.ReleaseLanceSpear();
             }
             float disencouraged = vulture.AI.disencouraged;

@@ -45,8 +45,8 @@ namespace LancerRemix.Cat
         protected int lanceTimer = 0; // throw button: makes you lose spear
         protected int blockTimer = 0; // grab button
         protected readonly int blockTime = 12;
-        protected bool slideLance = false;
-        public bool IsSlideLance => slideLance;
+        protected bool spendSpear = false;
+        public bool SpendSpear => spendSpear;
         protected bool grabParried = false;
         public bool IsGrabParried => grabParried;
 
@@ -208,6 +208,11 @@ namespace LancerRemix.Cat
             base.Destroy(null);
         }
 
+        public static bool BiteParriable(Creature crit)
+        {
+            return crit is Lizard || crit is Vulture || crit is BigSpider || crit is DropBug;
+        }
+
         public virtual void Grabbed(On.Player.orig_Grabbed orig, Creature.Grasp grasp)
         {
             grabParried = false;
@@ -218,7 +223,7 @@ namespace LancerRemix.Cat
                 else goto NoParry;
                 guarded = false;
             }
-            if (grasp.grabber == null || (!(grasp.grabber is Lizard) && !(grasp.grabber is Vulture) && !(grasp.grabber is BigSpider) && !(grasp.grabber is DropBug))) goto NoParry;
+            if (grasp.grabber == null || !BiteParriable(grasp.grabber)) goto NoParry;
             // Parry!
             grasp.grabber.Stun(Mathf.CeilToInt(Mathf.Lerp(80, 40, grasp.grabber.TotalMass / 10f)));
             Vector2 away = (grasp.grabber.mainBodyChunk.pos - self.mainBodyChunk.pos).normalized;
@@ -228,7 +233,7 @@ namespace LancerRemix.Cat
 
             guarded &= lanceTimer == 0;
             AddParryEffect(guarded);
-            if (!guarded && !slideLance) FlingLance();
+            if (!guarded && !spendSpear) FlingLance();
             // lanceTimer = 0; blockTimer = 0;
             grabParried = true;
             return;
@@ -265,6 +270,9 @@ namespace LancerRemix.Cat
         {
             if (type == Creature.DamageType.Bite || type == Creature.DamageType.Blunt || type == Creature.DamageType.Stab)
             {
+                if (type == Creature.DamageType.Bite)
+                    if (!(source.owner is Creature crit) || !BiteParriable(crit)) goto NoParry;
+
                 bool guarded = true;
                 if (blockTimer < 1)
                 {
@@ -296,7 +304,7 @@ namespace LancerRemix.Cat
 
                 guarded &= lanceTimer == 0;
                 AddParryEffect(guarded);
-                if (!guarded && !slideLance) FlingLance();
+                if (!guarded && !spendSpear) FlingLance();
                 // lanceTimer = 0; blockTimer = 0;
                 return;
             }
@@ -318,7 +326,7 @@ namespace LancerRemix.Cat
 
             self.AerobicIncrease(0.9f);
             lanceSpear = spear;
-            slideLance = false;
+            spendSpear = false;
             spear.spearDamageBonus = GetLanceDamage(self.slugcatStats.throwingSkill);
             if (self.exhausted || self.gourmandExhausted) spear.spearDamageBonus *= 0.4f;
             float pow = Mathf.Lerp(1f, 1.5f, self.Adrenaline);
@@ -344,7 +352,7 @@ namespace LancerRemix.Cat
                     self.exitBellySlideCounter = 0;
                     self.longBellySlide = true;
                     //spear.spearDamageBonus *= 2f;
-                    slideLance = true;
+                    spendSpear = true;
                 }
                 else if (lanceDir.x == -self.rollDirection && !self.longBellySlide)
                 { //reverse
@@ -362,7 +370,7 @@ namespace LancerRemix.Cat
                     self.rocketJumpFromBellySlide = true;
                     self.room.PlaySound(SoundID.Slugcat_Sectret_Super_Wall_Jump, self.mainBodyChunk, false, 1f, 1f);
                     self.rollDirection = 0;
-                    //typeof(Player).GetField("exitBellySlideCounter", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance).SetValue(instance, 0);
+                    self.exitBellySlideCounter = 0;
                     self.AerobicIncrease(0.6f);
                     Debug.Log("Slide Flip");
                 }
@@ -377,9 +385,9 @@ namespace LancerRemix.Cat
             self.dontGrabStuff = 10;
             self.bodyChunks[0].vel += lanceDir.ToVector2() * 7f;
             self.bodyChunks[1].vel -= lanceDir.ToVector2() * 4f;
-            lanceTimer = slideLance ? 5 : (lanceDir.y == 0 ? 3 : 4);
-            blockTimer = slideLance ? Mathf.CeilToInt(blockTime * 1.5f) : blockTime;
-            if (!slideLance && this is LunterSupplement lunterSub) lunterSub.maskOnHorn.DropMask();
+            lanceTimer = lanceDir.y == 0 ? 3 : 4;
+            blockTimer = spendSpear ? Mathf.CeilToInt(blockTime * 1.5f) : blockTime;
+            if (!spendSpear && this is LunterSupplement lunterSub) lunterSub.maskOnHorn.DropMask();
             if (spear.bugSpear) ReleaseLanceSpear();
 
             IntVector2 GetLanceDir()
@@ -428,9 +436,9 @@ namespace LancerRemix.Cat
 
         public virtual void ThrowToGetFree(On.Player.orig_ThrowToGetFree orig, bool eu)
         {
-            int lance = HasLanceReady();
-            if (lance >= 0)
-            { lanceSpear = self.grasps[lance].grabbed as Spear; lanceTimer = 4; lanceGrasp = lance; }
+            //int lance = HasLanceReady();
+            //if (lance >= 0)
+            //{ lanceSpear = self.grasps[lance].grabbed as Spear; lanceTimer = 4; lanceGrasp = lance; }
             orig.Invoke(self, eu);
         }
 
