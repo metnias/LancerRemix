@@ -79,18 +79,15 @@ namespace LancerRemix.Combat
                 {
                     if (self is ExplosiveSpear) sub.ReleaseLanceSpear();
                     else if (!sub.SpendSpear || !(result.obj is Creature crit)) sub.RetrieveLanceSpear(self); // Retrieve spear
+                    //else if (self.throwDir.y != 0)
+                    //{
+                    //    Debug.Log($"LancerDrop!");
+                    //    SpendSpearAttack(crit);
+                    //}
                     else
                     {
-                        Debug.Log($"LancerSlide!");
-                        float damage = self.spearDamageBonus;
-                        if (!crit.dead)
-                        {
-                            if (!crit.abstractCreature.creatureTemplate.smallCreature)
-                                atkPlayer.room.ScreenMovement(new Vector2?(atkPlayer.bodyChunks[0].pos), atkPlayer.mainBodyChunk.vel * damage * atkPlayer.bodyChunks[0].mass * 0.3f, Mathf.Max((damage * atkPlayer.bodyChunks[0].mass - 30f) / 50f, 0f));
-                            crit.SetKillTag(atkPlayer.abstractCreature);
-                            crit.Violence(atkPlayer.mainBodyChunk, new Vector2?(atkPlayer.mainBodyChunk.vel), crit.firstChunk, null, Creature.DamageType.Stab, damage, 50f);
-                        }
-                        atkPlayer.room.PlaySound(SoundID.Big_Needle_Worm_Impale_Terrain, atkPlayer.mainBodyChunk, false, 1.2f, 1.0f);
+                        Debug.Log($"LancerSuperAttack!");
+                        SpendSpearAttack(crit);
 
                         // WhiplastJump
                         atkPlayer.animation = Player.AnimationIndex.Flip;
@@ -108,6 +105,19 @@ namespace LancerRemix.Combat
                         atkPlayer.whiplashJump = false;
                         atkPlayer.jumpBoost = 0f;
                         atkPlayer.room.PlaySound(SoundID.Slugcat_Sectret_Super_Wall_Jump, atkPlayer.mainBodyChunk, false, 1f, 1f);
+                    }
+
+                    void SpendSpearAttack(Creature crit)
+                    {
+                        float damage = self.spearDamageBonus;
+                        if (!crit.dead)
+                        {
+                            if (!crit.abstractCreature.creatureTemplate.smallCreature)
+                                atkPlayer.room.ScreenMovement(new Vector2?(atkPlayer.bodyChunks[0].pos), atkPlayer.mainBodyChunk.vel * damage * atkPlayer.bodyChunks[0].mass * 0.3f, Mathf.Max((damage * atkPlayer.bodyChunks[0].mass - 30f) / 50f, 0f));
+                            crit.SetKillTag(atkPlayer.abstractCreature);
+                            crit.Violence(atkPlayer.mainBodyChunk, new Vector2?(atkPlayer.mainBodyChunk.vel), crit.firstChunk, null, Creature.DamageType.Stab, damage, 50f);
+                        }
+                        atkPlayer.room.PlaySound(SoundID.Big_Needle_Worm_Impale_Terrain, atkPlayer.mainBodyChunk, false, 1.2f, 1.0f);
 
                         sub.ReleaseLanceSpear();
                     }

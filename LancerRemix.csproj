@@ -169,6 +169,16 @@
     <AdditionalFiles Include="illustrations\multiplayerportrait40-yellow-lancer.png" />
     <AdditionalFiles Include="illustrations\multiplayerportrait41-white-lancer.png" />
     <AdditionalFiles Include="illustrations\multiplayerportrait41-yellow-lancer.png" />
+    <AdditionalFiles Include="illustrations\multiplayerportrait00-red-lancer.png" />
+    <AdditionalFiles Include="illustrations\multiplayerportrait01-red-lancer.png" />
+    <AdditionalFiles Include="illustrations\multiplayerportrait10-red-lancer.png" />
+    <AdditionalFiles Include="illustrations\multiplayerportrait11-red-lancer.png" />
+    <AdditionalFiles Include="illustrations\multiplayerportrait20-red-lancer.png" />
+    <AdditionalFiles Include="illustrations\multiplayerportrait21-red-lancer.png" />
+    <AdditionalFiles Include="illustrations\multiplayerportrait30-red-lancer.png" />
+    <AdditionalFiles Include="illustrations\multiplayerportrait31-red-lancer.png" />
+    <AdditionalFiles Include="illustrations\multiplayerportrait40-red-lancer.png" />
+    <AdditionalFiles Include="illustrations\multiplayerportrait41-red-lancer.png" />
     <Content Include="scenes\Outro L_B\Outro 1_B - Clearing - 0_LWhite.png" />
     <Content Include="scenes\Outro L_B\Outro 1_B - Clearing - LWhite - Flat.png" />
     <Content Include="scenes\Outro L_B\Outro 3_B - Return - YellowL 1.png" />

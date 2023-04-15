@@ -145,9 +145,7 @@ namespace LancerRemix.Cat
         public void TerrainImpact(On.Player.orig_TerrainImpact orig, int chunk, IntVector2 direction, float speed, bool firstContact)
         {
             if (speed > 9f)
-            {
                 self.Blink(Custom.IntClamp((int)speed, 9, 60) / 2);
-            }
             if (self.input[0].downDiagonal != 0 && self.animation != AnimIndex.Roll
                 && ((speed > 9f && speed < 12f) || self.animation == AnimIndex.Flip ||
                 (self.animation == AnimIndex.RocketJump && self.rocketJumpFromBellySlide))
@@ -318,6 +316,7 @@ namespace LancerRemix.Cat
             if (lanceTimer != 0) return;
             if (ModManager.MSC && spear.bugSpear) { orig(self, grasp, eu); return; } // throw bugSpear normally
             lanceGrasp = grasp;
+            spendSpear = false;
             var lanceDir = GetLanceDir();
             var startPos = self.firstChunk.pos + lanceDir.ToVector2() * 8f;
             if (self.standing && self.animation != AnimIndex.Flip) startPos.y -= 10f;
@@ -326,11 +325,10 @@ namespace LancerRemix.Cat
 
             self.AerobicIncrease(0.9f);
             lanceSpear = spear;
-            spendSpear = false;
             spear.spearDamageBonus = GetLanceDamage(self.slugcatStats.throwingSkill);
             if (self.exhausted || self.gourmandExhausted) spear.spearDamageBonus *= 0.4f;
             float pow = Mathf.Lerp(1f, 1.5f, self.Adrenaline);
-            if (self.animation == AnimIndex.BellySlide
+            if (!spendSpear && self.animation == AnimIndex.BellySlide
                 && self.rollCounter > 8 && self.rollCounter < 15 && lanceDir.x == self.rollDirection)
             { // slide
                 if (lanceDir.x == self.rollDirection && self.slugcatStats.throwingSkill > 0)
@@ -372,6 +370,7 @@ namespace LancerRemix.Cat
                     self.rollDirection = 0;
                     self.exitBellySlideCounter = 0;
                     self.AerobicIncrease(0.6f);
+                    spendSpear = true;
                     Debug.Log("Slide Flip");
                 }
             }
@@ -393,11 +392,15 @@ namespace LancerRemix.Cat
             IntVector2 GetLanceDir()
             {
                 var res = new IntVector2(self.ThrowDirection, 0);
-                if (self.animation == AnimIndex.Flip && self.input[0].y != 0 && self.input[0].x == 0)
-                    res = new IntVector2(0, (ModManager.MMF && MMF.cfgUpwardsSpearThrow.Value) ? self.input[0].y : -1);
-                if (ModManager.MMF && self.bodyMode == BodyIndex.ZeroG && MMF.cfgUpwardsSpearThrow.Value)
-                    if (self.input[0].y != 0)
+                if (self.input[0].y != 0 && self.input[0].x == 0)
+                {
+                    if (self.animation == AnimIndex.Flip || self.bodyMode == BodyIndex.ZeroG)
                         res = new IntVector2(0, self.input[0].y);
+                    else if (self.bodyMode == BodyIndex.Stand && self.input[0].y > 0)
+                        res = new IntVector2(0, 1);
+                    else if (self.mainBodyChunk.vel.y < -10f && self.input[0].y < 0)
+                    { res = new IntVector2(0, -1); spendSpear = true; }
+                }
                 return res;
             }
 
