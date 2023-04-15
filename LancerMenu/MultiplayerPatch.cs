@@ -9,6 +9,9 @@ using System.Text.RegularExpressions;
 using UnityEngine;
 using static LancerRemix.LancerMenu.SelectMenuPatch;
 using SlugName = SlugcatStats.Name;
+using JollyName = JollyCoop.JollyEnums.Name;
+using RWCustom;
+using LancerRemix.Cat;
 
 namespace LancerRemix.LancerMenu
 {
@@ -28,18 +31,36 @@ namespace LancerRemix.LancerMenu
         {
             SymbolButtonToggleLancerButton.SubPatch();
             On.JollyCoop.JollyCustom.SlugClassMenu += JollyClassMenuAvoidLancer;
+            On.PlayerGraphics.SlugcatColor += CoopLancerColor;
         }
 
         internal static void OnJollyDisableSubPatch()
         {
             SymbolButtonToggleLancerButton.SubUnpatch();
             On.JollyCoop.JollyCustom.SlugClassMenu -= JollyClassMenuAvoidLancer;
+            On.PlayerGraphics.SlugcatColor -= CoopLancerColor;
         }
 
         private static SlugName JollyClassMenuAvoidLancer(On.JollyCoop.JollyCustom.orig_SlugClassMenu orig, int playerNumber, SlugName fallBack)
         {
             var res = orig(playerNumber, fallBack);
             return LancerEnums.GetBasis(res);
+        }
+
+        private static Color CoopLancerColor(On.PlayerGraphics.orig_SlugcatColor orig, SlugName i)
+        {
+            if (ModManager.CoopAvailable && Custom.rainWorld.options.jollyColorMode == Options.JollyColorMode.DEFAULT)
+            {
+                int num = 0;
+                if (i == JollyName.JollyPlayer2) num = 1;
+                if (i == JollyName.JollyPlayer3) num = 2;
+                if (i == JollyName.JollyPlayer4) num = 3;
+
+                i = Custom.rainWorld.options.jollyPlayerOptionsArray[num].playerClass ?? i;
+                if (ModifyCat.IsPlayerLancer(num)) i = LancerEnums.GetLancer(i);
+                return PlayerGraphics.DefaultSlugcatColor(i);
+            }
+            return orig(i);
         }
 
         #endregion Jolly
@@ -202,7 +223,7 @@ namespace LancerRemix.LancerMenu
 
         #endregion Arena
 
-        #if NO_MSC
+#if NO_MSC
 
         private static void ExpeditionDisableMSCLancers(On.Menu.ChallengeSelectPage.orig_StartButton_OnPressDone orig,
             ChallengeSelectPage self, UIfocusable trigger)
@@ -225,6 +246,6 @@ namespace LancerRemix.LancerMenu
             orig(self, trigger);
         }
 
-        #endif
+#endif
     }
 }

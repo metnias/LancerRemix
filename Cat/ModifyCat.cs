@@ -77,7 +77,9 @@ namespace LancerRemix.Cat
             for (int i = 0; i < 4; ++i) isPlayerLancer[i] = players[i];
         }
 
-        public static bool IsPlayerLancer(Player player) => !player.isNPC && isPlayerLancer[player.playerState.playerNumber];
+        public static bool IsPlayerLancer(int playerNumber) => isPlayerLancer[playerNumber];
+
+        public static bool IsPlayerLancer(Player player) => !player.isNPC && IsPlayerLancer(player.playerState.playerNumber);
 
         public static bool IsPlayerLancer(PlayerGraphics playerGraphics) => IsPlayerLancer(playerGraphics.player);
 

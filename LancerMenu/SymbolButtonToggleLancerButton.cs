@@ -1,5 +1,6 @@
 ﻿using JollyCoop;
 using JollyCoop.JollyMenu;
+using LancerRemix.Cat;
 using Menu;
 using RWCustom;
 using System;
@@ -78,6 +79,7 @@ namespace LancerRemix.LancerMenu
                         SetLancerPlayers(num, false);
                         break;
                 }
+                UpdateIsPlayerLancer(false);
                 self.playerSelector[num].dirty = true;
                 return;
             }
@@ -165,11 +167,14 @@ namespace LancerRemix.LancerMenu
             symbol.pos = origSymbolPos + new Vector2(-0.5f, 4f);
             symbol.lastPos = symbol.pos;
 
-            var color = PlayerGraphics.JollyBodyColorMenu(new SlugcatStats.Name("JollyPlayer" + (playerNum + 1).ToString(), false),
-                LancerEnums.GetLancer((owner as JollyPlayerSelector).JollyOptions(playerNum).playerClass));
-            color = JollyCustom.ColorClamp(color, 0.01f, 360f, -1f, 360f, 0.25f, 360f);
-            LancerPlugin.LogSource.LogInfo($"P{playerNum + 1} {(owner as JollyPlayerSelector).JollyOptions(playerNum).playerClass}: {Custom.colorToHex((owner as JollyPlayerSelector).bodyTintColor)}>{Custom.colorToHex(color)}");
-            (owner as JollyPlayerSelector).bodyTintColor = color;
+            /*
+            if (Custom.rainWorld.options.jollyColorMode == Options.JollyColorMode.DEFAULT)
+            {
+                var color = PlayerGraphics.DefaultSlugcatColor(LancerEnums.GetLancer((owner as JollyPlayerSelector).JollyOptions(playerNum).playerClass));
+                color = JollyCustom.ColorClamp(color, 0.01f, 360f, -1f, 360f, 0.25f, 360f);
+                (owner as JollyPlayerSelector).bodyTintColor = color;
+            }
+            */
 
             faceSymbol.fileName = "face_" + symbolNameOn;
             faceSymbol.LoadFile();
