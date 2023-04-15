@@ -13,11 +13,6 @@ namespace LancerRemix.LancerMenu
 {
     internal class SymbolButtonToggleLancerButton : SymbolButtonTogglePupButton
     {
-        /// TO FIX:
-        /// When using default color, use lancer colour for button sprite <summary>
-        ///  (default color using Jolly is wrong)
-        ///
-
         #region Patch
 
         internal static void SubPatch()
