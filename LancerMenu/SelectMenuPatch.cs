@@ -395,19 +395,24 @@ namespace LancerRemix.LancerMenu
             {
                 ReplaceIllust(page.slugcatImage, $"scenes{Path.DirectorySeparatorChar}slugcat - lancer",
                     "lancer - white - flat", "white slugcat - 2", "white lancer - 2", new Vector2(503f, 178f));
+                MoveGlow("white lancer - 2");
             }
             else if (basis == SlugName.Yellow)
             {
                 ReplaceIllust(page.slugcatImage, $"scenes{Path.DirectorySeparatorChar}slugcat - lancer",
                 "lancer - yellow - flat", "yellow slugcat - 1", "yellow lancer - 1", new Vector2(528f, 211f));
+                MoveGlow("yellow lancer - 1");
             }
             else if (basis == SlugName.Red)
             {
                 if (page.slugcatImage.sceneID != SceneID.Slugcat_Dead_Red)
                 {
                     if (page.menu.manager.rainWorld.progression.miscProgressionData.redUnlocked)
+                    {
                         ReplaceIllust(page.slugcatImage, $"scenes{Path.DirectorySeparatorChar}slugcat - lancer",
                             "lancer - red - flat", "red slugcat - 1", "red lancer - 1", new Vector2(462f, 225f));
+                        MoveGlow("red lancer - 1");
+                    }
                     else
                         ReplaceIllust(page.slugcatImage, $"scenes{Path.DirectorySeparatorChar}slugcat - lancer",
                         "lancer - red dark - flat", "red slugcat - 1 - dark", "red lancer - 1 - dark", new Vector2(462f, 225f));
@@ -485,6 +490,18 @@ namespace LancerRemix.LancerMenu
                     illust.sprite.MoveBehindOtherNode(relSprite);
                 foreach (var illust in page.slugcatImage.flatIllustrations)
                     illust.sprite.MoveBehindOtherNode(relSprite);
+            }
+            void MoveGlow(string slugIllust)
+            {
+                var scene = page.slugcatImage;
+                if (!page.HasGlow || scene.flatMode) return;
+                if (page.glowSpriteA == null || page.glowSpriteB == null) return;
+                int i = 0;
+                for (; i < scene.depthIllustrations.Count; ++i)
+                    if (string.Equals(scene.depthIllustrations[i].fileName, slugIllust, StringComparison.InvariantCultureIgnoreCase)) break;
+                if (i >= scene.depthIllustrations.Count) return;
+                page.glowSpriteA.MoveBehindOtherNode(scene.depthIllustrations[i].sprite);
+                page.glowSpriteB.MoveBehindOtherNode(page.glowSpriteA);
             }
         }
 
