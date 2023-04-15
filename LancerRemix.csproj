@@ -179,6 +179,7 @@
     <AdditionalFiles Include="illustrations\multiplayerportrait31-red-lancer.png" />
     <AdditionalFiles Include="illustrations\multiplayerportrait40-red-lancer.png" />
     <AdditionalFiles Include="illustrations\multiplayerportrait41-red-lancer.png" />
+    <AdditionalFiles Include="thumbnail.png" />
     <Content Include="scenes\Outro L_B\Outro 1_B - Clearing - 0_LWhite.png" />
     <Content Include="scenes\Outro L_B\Outro 1_B - Clearing - LWhite - Flat.png" />
     <Content Include="scenes\Outro L_B\Outro 3_B - Return - YellowL 1.png" />
