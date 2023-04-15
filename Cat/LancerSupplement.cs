@@ -55,7 +55,6 @@ namespace LancerRemix.Cat
 
         public int HasLanceReady()
         {
-            if (lanceTimer != 0) return -1;
             for (int i = 0; i < self.grasps.Length; ++i)
                 if (self.grasps[i]?.grabbed is Spear) return i;
             return -1;
@@ -122,7 +121,7 @@ namespace LancerRemix.Cat
             if (blockTimer > 0)
             {
                 --blockTimer;
-                if (blockTimer == 0)
+                if (blockTimer == 0 || (lanceTimer <= 0 && HasLanceReady() < 0))
                 {
                     blockTimer = -blockTime; // block cooltime
                     for (int i = Owner.stuckObjects.Count - 1; i >= 0; --i)
@@ -280,7 +279,7 @@ namespace LancerRemix.Cat
                 }
                 Vector2 away;
                 var spear = GetParrySpear();
-                if (source.owner != null)
+                if (source?.owner == null) goto NoParry;
                 {
                     if (source.owner is Creature crit)
                     {
@@ -359,12 +358,12 @@ namespace LancerRemix.Cat
                     spear.firstChunk.goThroughFloors = false;
                     spear.firstChunk.pos.y = spear.firstChunk.pos.y + 5f;
                     spear.changeDirCounter = 0;
-                    self.room.AddObject(new ExplosionSpikes(self.room, self.bodyChunks[1].pos + new Vector2((float)self.rollDirection * -40f, 0f), 6, 5.5f, 4f, 4.5f, 21f, new Color(1f, 1f, 1f, 0.25f)));
-                    self.bodyChunks[1].pos += new Vector2(5f * (float)self.rollDirection, 5f);
-                    self.bodyChunks[0].pos = self.bodyChunks[1].pos + new Vector2(5f * (float)self.rollDirection, 5f);
-                    self.bodyChunks[1].vel = new Vector2((float)self.rollDirection * 6f, 15f) * pow * ((!self.longBellySlide) ? 1f : 1.5f);
-                    self.bodyChunks[0].vel = new Vector2((float)self.rollDirection * 6f, 15f) * pow * ((!self.longBellySlide) ? 1f : 1.5f);
-                    self.animation = AnimIndex.Flip; //RocketJump
+                    self.room.AddObject(new ExplosionSpikes(self.room, self.bodyChunks[1].pos + new Vector2(self.rollDirection * -40f, 0f), 6, 5.5f, 4f, 4.5f, 21f, new Color(1f, 1f, 1f, 0.25f)));
+                    self.bodyChunks[1].pos += new Vector2(5f * self.rollDirection, 5f);
+                    self.bodyChunks[0].pos = self.bodyChunks[1].pos + new Vector2(5f * self.rollDirection, 5f);
+                    self.bodyChunks[1].vel = new Vector2(self.rollDirection * 6f, 15f) * pow * ((!self.longBellySlide) ? 1f : 1.5f);
+                    self.bodyChunks[0].vel = new Vector2(self.rollDirection * 6f, 15f) * pow * ((!self.longBellySlide) ? 1f : 1.5f);
+                    self.animation = AnimIndex.RocketJump; //RocketJump
                     self.rocketJumpFromBellySlide = true;
                     self.room.PlaySound(SoundID.Slugcat_Sectret_Super_Wall_Jump, self.mainBodyChunk, false, 1f, 1f);
                     self.rollDirection = 0;
@@ -439,9 +438,10 @@ namespace LancerRemix.Cat
 
         public virtual void ThrowToGetFree(On.Player.orig_ThrowToGetFree orig, bool eu)
         {
-            //int lance = HasLanceReady();
-            //if (lance >= 0)
-            //{ lanceSpear = self.grasps[lance].grabbed as Spear; lanceTimer = 4; lanceGrasp = lance; }
+            spendSpear = true;
+            int lance = HasLanceReady();
+            if (lanceTimer == 0 && lance >= 0)
+            { lanceSpear = self.grasps[lance].grabbed as Spear; lanceTimer = 4; lanceGrasp = lance; }
             orig.Invoke(self, eu);
         }
 
