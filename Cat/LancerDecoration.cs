@@ -1,10 +1,10 @@
 ﻿using CatSub.Cat;
-using UnityEngine;
-using SlugName = SlugcatStats.Name;
-using static LancerRemix.LancerEnums;
+using LancerRemix.LancerMenu;
 using RWCustom;
 using System.Collections.Generic;
-using LancerRemix.LancerMenu;
+using UnityEngine;
+using static LancerRemix.LancerEnums;
+using SlugName = SlugcatStats.Name;
 
 namespace LancerRemix.Cat
 {

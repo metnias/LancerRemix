@@ -1,17 +1,17 @@
 ﻿#define NO_MSC
 
+using LancerRemix.Cat;
 using Menu;
 using Menu.Remix;
 using Menu.Remix.MixedUI;
 using MoreSlugcats;
+using RWCustom;
 using System.IO;
 using System.Text.RegularExpressions;
 using UnityEngine;
 using static LancerRemix.LancerMenu.SelectMenuPatch;
-using SlugName = SlugcatStats.Name;
 using JollyName = JollyCoop.JollyEnums.Name;
-using RWCustom;
-using LancerRemix.Cat;
+using SlugName = SlugcatStats.Name;
 
 namespace LancerRemix.LancerMenu
 {

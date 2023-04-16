@@ -258,6 +258,7 @@ namespace LancerRemix.LancerMenu
                 //LancerPlugin.LogSource.LogMessage($"slugcatPageLancer: {slugcatPageLancer}");
                 self.PlaySound(SoundID.MENU_Next_Slugcat);
                 self.UpdateStartButtonText();
+                self.UpdateSelectedSlugcatInMiscProg();
                 return;
             }
             if (message == "START")

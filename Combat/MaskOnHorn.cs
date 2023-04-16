@@ -1,8 +1,8 @@
 ﻿using LancerRemix.Cat;
 using RWCustom;
 using UnityEngine;
-using BodyModeIndex = Player.BodyModeIndex;
 using AnimationIndex = Player.AnimationIndex;
+using BodyModeIndex = Player.BodyModeIndex;
 
 namespace LancerRemix.Combat
 {

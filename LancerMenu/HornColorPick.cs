@@ -1,18 +1,15 @@
-﻿using JollyCoop.JollyMenu;
+﻿#define NO_MSC
+
+using JollyCoop.JollyMenu;
 using LancerRemix.Cat;
 using Menu;
 using Menu.Remix;
 using Menu.Remix.MixedUI;
 using RWCustom;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
-using SlugName = SlugcatStats.Name;
 using static LancerRemix.LancerMenu.SelectMenuPatch;
-using System.Globalization;
+using SlugName = SlugcatStats.Name;
 
 namespace LancerRemix.LancerMenu
 {
@@ -161,13 +158,15 @@ namespace LancerRemix.LancerMenu
 
         internal static void OnMMFEnablePatch()
         {
-            On.Menu.SlugcatSelectMenu.CustomColorInterface.ctor += LancerCustomColorInterfaceCtor;
+            //On.Menu.SlugcatSelectMenu.CustomColorInterface.ctor += LancerCustomColorInterfaceCtor;
         }
 
         internal static void OnMMFDisablePatch()
         {
-            On.Menu.SlugcatSelectMenu.CustomColorInterface.ctor -= LancerCustomColorInterfaceCtor;
+            //On.Menu.SlugcatSelectMenu.CustomColorInterface.ctor -= LancerCustomColorInterfaceCtor;
         }
+
+#if !NO_MSC
 
         private static void LancerCustomColorInterfaceCtor(On.Menu.SlugcatSelectMenu.CustomColorInterface.orig_ctor orig, SlugcatSelectMenu.CustomColorInterface self,
             Menu.Menu menu, MenuObject owner, Vector2 pos, SlugName slugcatID, List<string> names, List<string> defaultColors)
@@ -175,6 +174,8 @@ namespace LancerRemix.LancerMenu
             orig(self, menu, owner, pos, slugcatID, names, defaultColors);
             if (!SlugcatPageLancer) return;
         }
+
+#endif
 
         #endregion MMF
     }

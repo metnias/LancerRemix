@@ -1,13 +1,13 @@
 ﻿using LancerRemix.Cat;
 using RWCustom;
 using UnityEngine;
+using static CatSub.Story.SaveManager;
+using static Conversation;
 using static LancerRemix.LancerEnums;
 using static LancerRemix.LancerGenerator;
-using static Conversation;
 using ConvID = Conversation.ID;
 using MSCName = MoreSlugcats.MoreSlugcatsEnums.SlugcatStatsName;
 using SlugName = SlugcatStats.Name;
-using static CatSub.Story.SaveManager;
 using SSAction = SSOracleBehavior.Action;
 
 namespace LancerRemix.Story

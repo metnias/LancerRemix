@@ -1,16 +1,16 @@
-﻿using LancerRemix;
-using LancerRemix.Cat;
-using System;
-using System.Reflection;
-using System.Security.Permissions;
-using System.Security;
+﻿using BepInEx;
 using BepInEx.Logging;
-using BepInEx;
-using LancerRemix.LancerMenu;
-using UnityEngine;
+using LancerRemix;
+using LancerRemix.Cat;
 using LancerRemix.Combat;
+using LancerRemix.LancerMenu;
 using LancerRemix.Story;
 using Menu.Remix;
+using System;
+using System.Reflection;
+using System.Security;
+using System.Security.Permissions;
+using UnityEngine;
 
 #region Assembly attributes
 
@@ -35,7 +35,7 @@ namespace LancerRemix
     {
         public const string PLUGIN_ID = "com.rainworldgame.topicular.lancer.plugin";
         public const string PLUGIN_NAME = "Lancer";
-        public const string PLUGIN_VERSION = "1.0.0.8";
+        public const string PLUGIN_VERSION = "1.0.1.0";
 
         private static bool init = false;
         internal static ManualLogSource LogSource;

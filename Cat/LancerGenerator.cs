@@ -1,16 +1,14 @@
 ﻿#define NO_MSC
 
+using CatSub.Story;
+using LancerRemix.Cat;
+using LancerRemix.LancerMenu;
+using Menu;
+using RWCustom;
 using SlugBase;
 using System.Collections.Generic;
-using SlugName = SlugcatStats.Name;
-using MSCName = MoreSlugcats.MoreSlugcatsEnums.SlugcatStatsName;
-using UnityEngine;
 using static LancerRemix.LancerEnums;
-using CatSub.Story;
-using Menu;
-using LancerRemix.LancerMenu;
-using LancerRemix.Cat;
-using RWCustom;
+using SlugName = SlugcatStats.Name;
 
 namespace LancerRemix
 {
@@ -31,6 +29,7 @@ namespace LancerRemix
         private static bool IsStoryLancer => ModifyCat.IsStoryLancer;
 
 #if NO_MSC
+
         private static bool LancerUnlocked(On.SlugcatStats.orig_SlugcatUnlocked orig, SlugName i, RainWorld rainWorld)
         {
             if (IsLancer(i))
@@ -40,6 +39,7 @@ namespace LancerRemix
             }
             return orig(i, rainWorld);
         }
+
 #endif
 
         private static bool UseLancerUnlocked(On.Menu.MenuScene.orig_UseSlugcatUnlocked orig, MenuScene self, SlugName slugcat)

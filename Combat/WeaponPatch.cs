@@ -1,7 +1,6 @@
 ﻿using LancerRemix.Cat;
 using MoreSlugcats;
 using RWCustom;
-using System;
 using UnityEngine;
 using static LancerRemix.Cat.ModifyCat;
 

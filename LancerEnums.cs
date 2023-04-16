@@ -1,8 +1,8 @@
-﻿using MenuSceneID = Menu.MenuScene.SceneID;
+﻿using System.Collections.Generic;
 using DreamID = DreamsState.DreamID;
-using System.Collections.Generic;
-using SlugName = SlugcatStats.Name;
+using MenuSceneID = Menu.MenuScene.SceneID;
 using MSCName = MoreSlugcats.MoreSlugcatsEnums.SlugcatStatsName;
+using SlugName = SlugcatStats.Name;
 
 namespace LancerRemix
 {

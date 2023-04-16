@@ -1,10 +1,10 @@
-﻿using MenuSceneID = Menu.MenuScene.SceneID;
-using DreamID = DreamsState.DreamID;
-using SlugName = SlugcatStats.Name;
-using static LancerRemix.LancerEnums;
-using static CatSub.Story.SaveManager;
+﻿using LancerRemix.Cat;
 using Menu;
-using LancerRemix.Cat;
+using static CatSub.Story.SaveManager;
+using static LancerRemix.LancerEnums;
+using DreamID = DreamsState.DreamID;
+using MenuSceneID = Menu.MenuScene.SceneID;
+using SlugName = SlugcatStats.Name;
 
 namespace LancerRemix.Story
 {
