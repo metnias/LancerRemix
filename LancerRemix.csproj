@@ -192,6 +192,8 @@
     <Content Include="scenes\Outro L_B\Outro 4_B - Home - LWhite 0.png" />
     <Content Include="scenes\Outro L_B\Outro 4_B - Home - LWhite 4.png" />
     <Content Include="scenes\Outro L_B\Outro 4_B - Home - LWhite - Flat.png" />
+    <AdditionalFiles Include="scenes\Outro L_B\slugcat end_b - Lwhite - slugcat f.png" />
+    <AdditionalFiles Include="scenes\Outro L_B\slugcat end_b - Lwhite - flat.png" />
     <Content Include="slugbase\scenes\red ghost lancer\Lhunt ghost a.png" />
     <Content Include="slugbase\scenes\red ghost lancer\Lhunt ghost b.png" />
     <Content Include="slugbase\scenes\red ghost lancer\Lhunt ghost bkg.png" />

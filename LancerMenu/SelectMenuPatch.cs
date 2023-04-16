@@ -393,9 +393,15 @@ namespace LancerRemix.LancerMenu
 
             if (basis == SlugName.White)
             {
-                ReplaceIllust(page.slugcatImage, $"scenes{Path.DirectorySeparatorChar}slugcat - lancer",
-                    "lancer - white - flat", "white slugcat - 2", "white lancer - 2", new Vector2(503f, 178f));
-                MoveGlow("white lancer - 2");
+                if (page is LancerPageContinue lpc && lpc.saveGameData.altEnding)
+                    ReplaceIllust(page.slugcatImage, $"scenes{Path.DirectorySeparatorChar}Outro L_B",
+                        "slugcat end_b - Lwhite - flat", "slugcat end_b - yellow - slugcat f", "slugcat end_b - Lwhite - slugcat f", new Vector2(546f, 211f));
+                else
+                {
+                    ReplaceIllust(page.slugcatImage, $"scenes{Path.DirectorySeparatorChar}slugcat - lancer",
+                        "lancer - white - flat", "white slugcat - 2", "white lancer - 2", new Vector2(503f, 178f));
+                    MoveGlow("white lancer - 2");
+                }
             }
             else if (basis == SlugName.Yellow)
             {
