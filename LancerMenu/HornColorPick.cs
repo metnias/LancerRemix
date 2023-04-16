@@ -1,4 +1,5 @@
-﻿using LancerRemix.Cat;
+﻿using JollyCoop.JollyMenu;
+using LancerRemix.Cat;
 using Menu;
 using Menu.Remix;
 using Menu.Remix.MixedUI;
@@ -44,57 +45,90 @@ namespace LancerRemix.LancerMenu
         public static Color GetHornColor(int playerNumber)
             => hornColors[playerNumber].Value;
 
+        #region Wrappers
+
         private static MenuTabWrapper tabWrapper;
-        private static UIelementWrapper cpkWrapper;
         private static OpColorPicker cpk;
 
-        private static void InitializeWrapper(MenuObject owner, Vector2 pos, int player)
+        private static void InitializeWrapper(MenuObject owner, Vector2 pos, int player, bool hasBox)
         {
             if (tabWrapper != null) DestroyWrappers();
             tabWrapper = new MenuTabWrapper(owner.menu, owner);
+            owner.subObjects.Add(tabWrapper);
             Vector2 size = new Vector2(270f, 240f);
-            var rect = new OpRect(pos, size);
-            new UIelementWrapper(tabWrapper, rect);
-            var label = new OpLabel(pos + new Vector2(100f, 180f), new Vector2(140f, 40f), Translate("Horns"), bigText: true);
+            if (hasBox)
+            {
+                var rect = new OpRect(pos, size) { colorEdge = MenuColorEffect.rgbWhite };
+                new UIelementWrapper(tabWrapper, rect);
+            }
+            var label = new OpLabel(pos + new Vector2(100f, 180f), new Vector2(140f, 40f), Translate("Horn"), bigText: true) { color = MenuColorEffect.rgbWhite };
             new UIelementWrapper(tabWrapper, label);
-            var cView = new OpImage(pos + new Vector2(30f, 180f), "square");
+            var cView = new OpImage(pos + new Vector2(32f, 182f), "square");
             new UIelementWrapper(tabWrapper, cView);
-            var cViewRect = new OpRect(pos + new Vector2(30f, 180f), new Vector2(40f, 40f), 0f);
+            var cViewRect = new OpRect(pos + new Vector2(30f, 180f), new Vector2(40f, 40f), 0f) { colorEdge = MenuColorEffect.rgbWhite };
             new UIelementWrapper(tabWrapper, cViewRect);
             cpk = new OpColorPicker(hornColors[player], pos + new Vector2(60f, 20f));
             new UIelementWrapper(tabWrapper, cpk);
             cpk.OnValueUpdate += (config, value, oldValue) => { cView.color = cpk.valueColor; };
             cpk.wrapper.ReloadConfig();
+            cView.color = cpk.valueColor;
 
             string Translate(string text)
                 => Custom.rainWorld.inGameTranslator.Translate(text);
         }
 
-        private static void SaveColor() => cpk.wrapper.SaveConfig();
+        private static void SaveColor() => cpk?.wrapper.SaveConfig();
 
-        private static void ResetColor() => cpk.wrapper.ResetConfig();
+        private static void ResetColor() => cpk?.wrapper.ResetConfig();
 
         private static void DestroyWrappers()
         {
-            if (cpkWrapper != null)
+            if (cpk != null)
             {
-                cpk.Unload();
+                cpk?.Unload();
                 cpk = null;
-                cpkWrapper.RemoveSprites();
-                cpkWrapper = null;
             }
-            tabWrapper.RemoveSprites();
+            tabWrapper?.RemoveSprites();
             tabWrapper = null;
         }
+
+        #endregion Wrappers
 
         #region Jolly
 
         internal static void OnJollyEnableSubPatch()
         {
+            On.JollyCoop.JollyMenu.ColorChangeDialog.ctor += JollyHornChangeDialogCtor;
+            On.JollyCoop.JollyMenu.ColorChangeDialog.SaveColorChange += JollySaveHornColorChange;
+            On.JollyCoop.JollyMenu.ColorChangeDialog.Singal += JollyResetHornColor;
         }
 
         internal static void OnJollyDisableSubPatch()
         {
+            On.JollyCoop.JollyMenu.ColorChangeDialog.ctor -= JollyHornChangeDialogCtor;
+            On.JollyCoop.JollyMenu.ColorChangeDialog.SaveColorChange -= JollySaveHornColorChange;
+            On.JollyCoop.JollyMenu.ColorChangeDialog.Singal -= JollyResetHornColor;
+        }
+
+        private static void JollyHornChangeDialogCtor(On.JollyCoop.JollyMenu.ColorChangeDialog.orig_ctor orig, ColorChangeDialog self,
+            JollySetupDialog jollyDialog, SlugName playerClass, int playerNumber, ProcessManager manager, List<string> names)
+        {
+            orig(self, jollyDialog, playerClass, playerNumber, manager, names);
+            InitializeWrapper(self.pages[0], self.body.litSlider.pos + new Vector2(0f, -120f), playerNumber, true);
+            self.MutualVerticalButtonBind(cpk.wrapper, self.body.litSlider);
+        }
+
+        private static void JollySaveHornColorChange(On.JollyCoop.JollyMenu.ColorChangeDialog.orig_SaveColorChange orig)
+        {
+            orig();
+            SaveColor();
+            DestroyWrappers();
+        }
+
+        private static void JollyResetHornColor(On.JollyCoop.JollyMenu.ColorChangeDialog.orig_Singal orig, ColorChangeDialog self, MenuObject sender, string message)
+        {
+            orig(self, sender, message);
+            if (message.StartsWith("RESET_COLOR_DIALOG_")) ResetColor();
         }
 
         #endregion Jolly
