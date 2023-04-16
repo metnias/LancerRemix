@@ -47,20 +47,33 @@ namespace LancerRemix.LancerMenu
         private static MenuTabWrapper tabWrapper;
         private static UIelementWrapper cpkWrapper;
         private static OpColorPicker cpk;
+        private static OpImage cView;
 
-        private static void InitializeWrapper(MenuObject owner, Vector2 pos)
+        private static void InitializeWrapper(MenuObject owner, Vector2 pos, int player)
         {
             if (tabWrapper != null) DestroyWrappers();
             tabWrapper = new MenuTabWrapper(owner.menu, owner);
-            Vector2 size = new Vector2(350f, 250f);
+            Vector2 size = new Vector2(270f, 240f);
             var rect = new OpRect(pos, size);
             new UIelementWrapper(tabWrapper, rect);
-            var label = new OpLabel(pos + new Vector2(50f, 200f), new Vector2(250f, 40f), Translate("Horns"), bigText: true);
+            var label = new OpLabel(pos + new Vector2(100f, 180f), new Vector2(140f, 40f), Translate("Horns"), bigText: true);
             new UIelementWrapper(tabWrapper, label);
+            cView = new OpImage(pos + new Vector2(30f, 180f), "square");
+            new UIelementWrapper(tabWrapper, cView);
+            var cViewRect = new OpRect(pos + new Vector2(30f, 180f), new Vector2(40f, 40f), 0f);
+            new UIelementWrapper(tabWrapper, cViewRect);
+            cpk = new OpColorPicker(hornColors[player], pos + new Vector2(60f, 20f));
+            new UIelementWrapper(tabWrapper, cpk);
+            cpk.wrapper.ReloadConfig();
+            cView.color = cpk.valueColor;
 
             string Translate(string text)
                 => Custom.rainWorld.inGameTranslator.Translate(text);
         }
+
+        private static void SaveColor() => cpk.wrapper.SaveConfig();
+
+        private static void ResetColor() => cpk.wrapper.ResetConfig();
 
         private static void DestroyWrappers()
         {
