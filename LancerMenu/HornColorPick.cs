@@ -47,7 +47,6 @@ namespace LancerRemix.LancerMenu
         private static MenuTabWrapper tabWrapper;
         private static UIelementWrapper cpkWrapper;
         private static OpColorPicker cpk;
-        private static OpImage cView;
 
         private static void InitializeWrapper(MenuObject owner, Vector2 pos, int player)
         {
@@ -58,14 +57,14 @@ namespace LancerRemix.LancerMenu
             new UIelementWrapper(tabWrapper, rect);
             var label = new OpLabel(pos + new Vector2(100f, 180f), new Vector2(140f, 40f), Translate("Horns"), bigText: true);
             new UIelementWrapper(tabWrapper, label);
-            cView = new OpImage(pos + new Vector2(30f, 180f), "square");
+            var cView = new OpImage(pos + new Vector2(30f, 180f), "square");
             new UIelementWrapper(tabWrapper, cView);
             var cViewRect = new OpRect(pos + new Vector2(30f, 180f), new Vector2(40f, 40f), 0f);
             new UIelementWrapper(tabWrapper, cViewRect);
             cpk = new OpColorPicker(hornColors[player], pos + new Vector2(60f, 20f));
             new UIelementWrapper(tabWrapper, cpk);
+            cpk.OnValueUpdate += (config, value, oldValue) => { cView.color = cpk.valueColor; };
             cpk.wrapper.ReloadConfig();
-            cView.color = cpk.valueColor;
 
             string Translate(string text)
                 => Custom.rainWorld.inGameTranslator.Translate(text);

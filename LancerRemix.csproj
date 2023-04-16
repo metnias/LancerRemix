@@ -53,11 +53,11 @@
     <Reference Include="MonoMod.Utils">
       <HintPath>debug\MonoMod.Utils.dll</HintPath>
     </Reference>
-    <Reference Include="PUBLIC-Assembly-CSharp">
-      <HintPath>debug\PUBLIC-Assembly-CSharp.dll</HintPath>
-    </Reference>
     <Reference Include="SlugBase">
       <HintPath>debug\SlugBase.dll</HintPath>
+    </Reference>
+    <Reference Include="STRIPPED-Assembly-CSharp">
+      <HintPath>..\References\RWDownpour\STRIPPED-Assembly-CSharp.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
