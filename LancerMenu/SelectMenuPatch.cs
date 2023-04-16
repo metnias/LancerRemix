@@ -111,6 +111,7 @@ namespace LancerRemix.LancerMenu
         private static SymbolButtonToggle lancerButton;
         private static float lancerTransition = 0f;
         private static float lastLancerTransition = 0f;
+        internal static bool SlugcatPageLancer => slugcatPageLancer;
 
         private static bool IsLancerPage(SlugcatPage page)
             => page is LancerPageNewGame || page is LancerPageContinue;

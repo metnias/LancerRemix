@@ -11,6 +11,8 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using SlugName = SlugcatStats.Name;
+using static LancerRemix.LancerMenu.SelectMenuPatch;
+using System.Globalization;
 
 namespace LancerRemix.LancerMenu
 {
@@ -55,19 +57,19 @@ namespace LancerRemix.LancerMenu
             if (tabWrapper != null) DestroyWrappers();
             tabWrapper = new MenuTabWrapper(owner.menu, owner);
             owner.subObjects.Add(tabWrapper);
-            Vector2 size = new Vector2(270f, 240f);
+            Vector2 size = new Vector2(280f, 180f);
             if (hasBox)
             {
                 var rect = new OpRect(pos, size) { colorEdge = MenuColorEffect.rgbWhite };
                 new UIelementWrapper(tabWrapper, rect);
             }
-            var label = new OpLabel(pos + new Vector2(100f, 180f), new Vector2(140f, 40f), Translate("Horn"), bigText: true) { color = MenuColorEffect.rgbWhite };
+            var label = new OpLabel(pos + new Vector2(15f, 75f), new Vector2(90f, 40f), Translate("Horn"), bigText: true) { color = MenuColorEffect.rgbWhite };
             new UIelementWrapper(tabWrapper, label);
-            var cView = new OpImage(pos + new Vector2(32f, 182f), "square");
+            var cView = new OpImage(pos + new Vector2(42f, 127f), "square");
             new UIelementWrapper(tabWrapper, cView);
-            var cViewRect = new OpRect(pos + new Vector2(30f, 180f), new Vector2(40f, 40f), 0f) { colorEdge = MenuColorEffect.rgbWhite };
+            var cViewRect = new OpRect(pos + new Vector2(40f, 125f), new Vector2(40f, 40f), 0f) { colorEdge = MenuColorEffect.rgbWhite };
             new UIelementWrapper(tabWrapper, cViewRect);
-            cpk = new OpColorPicker(hornColors[player], pos + new Vector2(60f, 20f));
+            cpk = new OpColorPicker(hornColors[player], pos + new Vector2(115f, 15f));
             new UIelementWrapper(tabWrapper, cpk);
             cpk.OnValueUpdate += (config, value, oldValue) => { cView.color = cpk.valueColor; };
             cpk.wrapper.ReloadConfig();
@@ -79,7 +81,12 @@ namespace LancerRemix.LancerMenu
 
         private static void SaveColor() => cpk?.wrapper.SaveConfig();
 
-        private static void ResetColor() => cpk?.wrapper.ResetConfig();
+        private static void ResetColor(SlugName playerClass)
+        {
+            if (cpk == null) return;
+            var basis = LancerEnums.GetBasis(playerClass);
+            cpk.valueColor = LancerDecoration.DefaultHornColor(basis);
+        }
 
         private static void DestroyWrappers()
         {
@@ -114,7 +121,8 @@ namespace LancerRemix.LancerMenu
             JollySetupDialog jollyDialog, SlugName playerClass, int playerNumber, ProcessManager manager, List<string> names)
         {
             orig(self, jollyDialog, playerClass, playerNumber, manager, names);
-            InitializeWrapper(self.pages[0], self.body.litSlider.pos + new Vector2(0f, -120f), playerNumber, true);
+            if (!GetLancerPlayers(playerNumber)) return;
+            InitializeWrapper(self.pages[0], self.body.litSlider.pos + new Vector2(0f, -80f), playerNumber, true);
             self.MutualVerticalButtonBind(cpk.wrapper, self.body.litSlider);
         }
 
@@ -127,8 +135,24 @@ namespace LancerRemix.LancerMenu
 
         private static void JollyResetHornColor(On.JollyCoop.JollyMenu.ColorChangeDialog.orig_Singal orig, ColorChangeDialog self, MenuObject sender, string message)
         {
+            if (message.StartsWith("RESET_COLOR_DIALOG_")
+                && GetLancerPlayers(self.playerNumber))
+            {
+                self.PlaySound(SoundID.MENU_Remove_Level);
+                self.JollyOptions.SetColorsToDefault(LancerEnums.GetLancer(self.playerClass));
+                self.body.color = self.JollyOptions.GetBodyColor();
+                self.body.RGB2HSL();
+                self.face.color = self.JollyOptions.GetFaceColor();
+                self.face.RGB2HSL();
+                if (self.unique != null)
+                {
+                    self.unique.color = self.JollyOptions.GetUniqueColor();
+                    self.unique.RGB2HSL();
+                }
+                ResetColor(self.playerClass);
+                return;
+            }
             orig(self, sender, message);
-            if (message.StartsWith("RESET_COLOR_DIALOG_")) ResetColor();
         }
 
         #endregion Jolly
@@ -137,10 +161,19 @@ namespace LancerRemix.LancerMenu
 
         internal static void OnMMFEnablePatch()
         {
+            On.Menu.SlugcatSelectMenu.CustomColorInterface.ctor += LancerCustomColorInterfaceCtor;
         }
 
         internal static void OnMMFDisablePatch()
         {
+            On.Menu.SlugcatSelectMenu.CustomColorInterface.ctor -= LancerCustomColorInterfaceCtor;
+        }
+
+        private static void LancerCustomColorInterfaceCtor(On.Menu.SlugcatSelectMenu.CustomColorInterface.orig_ctor orig, SlugcatSelectMenu.CustomColorInterface self,
+            Menu.Menu menu, MenuObject owner, Vector2 pos, SlugName slugcatID, List<string> names, List<string> defaultColors)
+        {
+            orig(self, menu, owner, pos, slugcatID, names, defaultColors);
+            if (!SlugcatPageLancer) return;
         }
 
         #endregion MMF
