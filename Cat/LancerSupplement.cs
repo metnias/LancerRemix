@@ -230,7 +230,7 @@ namespace LancerRemix.Cat
 
             guarded &= lanceTimer == 0;
             AddParryEffect(guarded);
-            if (!guarded && !spendSpear) FlingLance();
+            if (hasExhaustion || (!guarded && !spendSpear)) FlingLance();
             // lanceTimer = 0; blockTimer = 0;
             grabParried = true;
             return;
@@ -301,7 +301,7 @@ namespace LancerRemix.Cat
 
                 guarded &= lanceTimer == 0;
                 AddParryEffect(guarded);
-                if (!guarded && !spendSpear) FlingLance();
+                if (hasExhaustion || (!guarded && !spendSpear)) FlingLance();
                 // lanceTimer = 0; blockTimer = 0;
                 return;
             }
@@ -456,6 +456,7 @@ namespace LancerRemix.Cat
                     { spear = self.grasps[i].grabbed as Spear; self.ReleaseGrasp(i); break; }
             }
             if (spear == null) return;
+            blockTimer = -blockTime;
 
             float angleDeg = 50f;
             float vel = 10f;
