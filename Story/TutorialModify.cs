@@ -91,11 +91,12 @@ namespace LancerRemix.Story
         private static void LancerControlMap(On.Menu.ControlMap.orig_ctor orig, ControlMap self, Menu.Menu menu, MenuObject owner, Vector2 pos, Options.ControlSetup.Preset preset, bool showPickupInstructions)
         {
             orig.Invoke(self, menu, owner, pos, preset, showPickupInstructions);
-            if (!showPickupInstructions || self.pickupButtonInstructions == null) return;
             if (!(menu.manager?.currentMainLoop is RainWorldGame rwg)) return;
             if (!IsStoryLancer) return;
-            self.controlLabels[5].text = $"{Menu.Remix.OptionalText.GetButtonName_Throw()} - {Translate("Stab / Throw")}";
+            if (self.controlLabels[5] != null)
+                self.controlLabels[5].text = $"{Menu.Remix.OptionalText.GetButtonName_Throw()} - {Translate("Stab / Throw")}";
 
+            if (!showPickupInstructions || self.pickupButtonInstructions == null) return;
             var S = new StringBuilder();
             S.AppendLine(Translate("Lancer Interactions:"));
             S.AppendLine();
