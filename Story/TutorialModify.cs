@@ -5,6 +5,7 @@ using RWCustom;
 using System.Text;
 using UnityEngine;
 using static LancerRemix.LancerEnums;
+using static MonoMod.InlineRT.MonoModRule;
 using SlugName = SlugcatStats.Name;
 
 namespace LancerRemix.Story
@@ -87,13 +88,13 @@ namespace LancerRemix.Story
             orig(self, eu);
         }
 
-        private static void LancerControlMap(On.Menu.ControlMap.orig_ctor orig, ControlMap map, Menu.Menu menu, MenuObject owner, Vector2 pos, Options.ControlSetup.Preset preset, bool showPickupInstructions)
+        private static void LancerControlMap(On.Menu.ControlMap.orig_ctor orig, ControlMap self, Menu.Menu menu, MenuObject owner, Vector2 pos, Options.ControlSetup.Preset preset, bool showPickupInstructions)
         {
-            orig.Invoke(map, menu, owner, pos, preset, showPickupInstructions);
-            if (!showPickupInstructions) return;
+            orig.Invoke(self, menu, owner, pos, preset, showPickupInstructions);
+            if (!showPickupInstructions || self.pickupButtonInstructions == null) return;
             if (!(menu.manager?.currentMainLoop is RainWorldGame rwg)) return;
             if (!IsStoryLancer) return;
-            map.controlLabels[5].text = $"{Menu.Remix.OptionalText.GetButtonName_Throw()} - {Translate("Stab / Throw")}";
+            self.controlLabels[5].text = $"{Menu.Remix.OptionalText.GetButtonName_Throw()} - {Translate("Stab / Throw")}";
 
             var S = new StringBuilder();
             S.AppendLine(Translate("Lancer Interactions:"));
@@ -103,7 +104,7 @@ namespace LancerRemix.Story
             if (rwg.IsStorySession && rwg.StoryCharacter != null && GetBasis(rwg.StoryCharacter) == SlugName.Red)
             { S.Append("- "); S.AppendLine(Translate("Hold PICK UP with a mask to hang it onto your horn")); }
 
-            map.pickupButtonInstructions.text = S.ToString();
+            self.pickupButtonInstructions.text = S.ToString();
         }
     }
 }
