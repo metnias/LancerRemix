@@ -91,7 +91,7 @@ namespace LancerRemix.Story
         {
             orig.Invoke(map, menu, owner, pos, preset, showPickupInstructions);
             if (!showPickupInstructions) return;
-            if (!(menu.manager.currentMainLoop is RainWorldGame rwg)) return;
+            if (!(menu.manager?.currentMainLoop is RainWorldGame rwg)) return;
             if (!IsStoryLancer) return;
             map.controlLabels[5].text = $"{Menu.Remix.OptionalText.GetButtonName_Throw()} - {Translate("Stab / Throw")}";
 
@@ -100,7 +100,7 @@ namespace LancerRemix.Story
             S.AppendLine();
             S.Append("- "); S.AppendLine(Translate("Press THROW to stab with a spear"));
             S.Append("- "); S.AppendLine(Translate("Press PICK UP to defend with a spear"));
-            if (rwg.IsStorySession && GetBasis(rwg.StoryCharacter) == SlugName.Red)
+            if (rwg.IsStorySession && rwg.StoryCharacter != null && GetBasis(rwg.StoryCharacter) == SlugName.Red)
             { S.Append("- "); S.AppendLine(Translate("Hold PICK UP with a mask to hang it onto your horn")); }
 
             map.pickupButtonInstructions.text = S.ToString();
