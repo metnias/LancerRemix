@@ -270,7 +270,7 @@ namespace LancerRemix.LancerMenu
                     for (int i = 0; i < 4; ++i)
                     {
                         var basis = GetBasis(Custom.rainWorld.options.jollyPlayerOptionsArray[i].playerClass);
-                        if (SlugcatStats.IsSlugcatFromMSC(basis)) SetLancerPlayers(i, false);
+                        if (basis?.Index >= 0 && SlugcatStats.IsSlugcatFromMSC(basis)) SetLancerPlayers(i, false);
                     }
                 }
 #endif
