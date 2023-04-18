@@ -20,7 +20,12 @@ namespace LancerRemix.Story
             On.SLOrcacleState.ForceResetState += LancerMoonState;
             On.SLOracleBehaviorHasMark.NameForPlayer += NameForLancer;
             On.SLOracleBehaviorHasMark.MoonConversation.AddEvents += AddLancerEvents;
-            On.SLOracleBehaviorHasMark.Update += LunterLookOverseer;
+
+            On.OverseerAbstractAI.PlayerGuideUpdate += LunterRemoveDupeOverseer;
+            On.OverseerAbstractAI.Roam += LunterOverseerStayNearMoon;
+            On.OverseerAI.Update += LunterOverseerLookAtMoon;
+            On.SLOracleBehavior.Update += LunterLookOverseer;
+
             On.Oracle.OracleArm.BaseDir += LonkSLOracleArmDir;
             On.Oracle.OracleArm.OnFramePos += LonkSLOracleArmPos;
         }
@@ -282,6 +287,9 @@ namespace LancerRemix.Story
                     self.LoadEventsFromFile(250, GetLancer(basis), false, 0);
                 else
                     self.LoadEventsFromFile(50, GetLancer(basis), false, 0);
+
+                Custom.rainWorld.progression.currentSaveState.miscWorldSaveData.playerGuideState.InfluenceLike(-6000f, false);
+                Custom.rainWorld.progression.currentSaveState.miscWorldSaveData.playerGuideState.increaseLikeOnSave = false;
                 return;
             }
             if (self.id == ConvID.Moon_Red_Second_Conversation)
@@ -312,18 +320,92 @@ namespace LancerRemix.Story
         NoLancer: orig.Invoke(self);
         }
 
-        private static void LunterLookOverseer(On.SLOracleBehaviorHasMark.orig_Update orig, SLOracleBehaviorHasMark self, bool eu)
+        #region Lunter
+
+        private static AbstractCreature lockedOverseer = null;
+
+        private static void LunterRemoveDupeOverseer(On.OverseerAbstractAI.orig_PlayerGuideUpdate orig, OverseerAbstractAI self, int time)
+        {
+            if (IsStoryLancer && self.world.game.IsStorySession && GetBasis(self.world.game.StoryCharacter) == SlugName.Red)
+            {
+                if (!self.spearmasterLockedOverseer &&
+                    (self.RelevantPlayer?.Room.name == "SL_AI" || self.world.game.GetStorySession.saveState.miscWorldSaveData.EverMetMoon))
+                {
+                    self.PlayerGuideGoAway(40);
+                    self.parent.Die();
+                    return;
+                }
+            }
+            orig(self, time);
+        }
+
+        private static void LunterOverseerStayNearMoon(On.OverseerAbstractAI.orig_Roam orig, OverseerAbstractAI self, int time, float chance)
+        {
+            if (IsStoryLancer && self.world.game.IsStorySession && GetBasis(self.world.game.StoryCharacter) == SlugName.Red
+                && self.spearmasterLockedOverseer && self.RelevantPlayer?.Room.name == "SL_AI")
+            {
+                if (self.freezeStandardRoamingOnTheseFrames > 0) return;
+
+                var worldCoordinate = new WorldCoordinate(self.world.GetAbstractRoom("SL_AI").index, Random.Range(57, 62), Random.Range(9, 32), -1);
+                self.SetDestinationNoPathing(worldCoordinate, true);
+                if (self.parent.realizedCreature != null)
+                    (self.parent.realizedCreature as Overseer).ZipToPosition(new Vector2((float)worldCoordinate.x * 20f, (float)worldCoordinate.y * 20f));
+
+                Debug.Log($"Lunter NSHOverseer stay near moon: {worldCoordinate}");
+
+                self.freezeStandardRoamingOnTheseFrames = 10000;
+                return;
+            }
+            orig(self, time, chance);
+        }
+
+        private static void LunterOverseerLookAtMoon(On.OverseerAI.orig_Update orig, OverseerAI self)
+        {
+            orig(self);
+            if (IsStoryLancer && self.worldAI.world.game.IsStorySession && GetBasis(self.worldAI.world.game.StoryCharacter) == SlugName.Red
+                && (self.creature.abstractAI as OverseerAbstractAI).spearmasterLockedOverseer && self.creature.Room.name == "SL_AI")
+            {
+                for (int i = 0; i < self.overseer.room.physicalObjects.Length; i++)
+                {
+                    for (int j = 0; j < self.overseer.room.physicalObjects[i].Count; j++)
+                    {
+                        if (self.overseer.room.physicalObjects[i][j] is Oracle)
+                        {
+                            self.lookAt = self.overseer.room.physicalObjects[i][j].firstChunk.pos;
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+
+        private static void LunterLookOverseer(On.SLOracleBehavior.orig_Update orig, SLOracleBehavior self, bool eu)
         {
             orig(self, eu);
             if (!IsStoryLancer || !self.hasNoticedPlayer) return;
             if (!self.oracle.room.game.IsStorySession || GetBasis(self.oracle.room.game.StoryCharacter) != SlugName.Red) return;
-            AbstractCreature NSHoverseer = null;
-            foreach (var crit in self.oracle.room.abstractRoom.creatures)
-                if (crit.creatureTemplate.type == CreatureTemplate.Type.Overseer && (crit.abstractAI as OverseerAbstractAI).ownerIterator == 2)
-                { NSHoverseer = crit; break; }
-            if (NSHoverseer == null) return;
-            self.lookPoint = NSHoverseer.realizedCreature.DangerPos;
+            if (self.oracle.room.game.GetStorySession.saveState.miscWorldSaveData.EverMetMoon && lockedOverseer == null) return;
+
+            if (self.player == null || self.player.room != self.oracle.room) return;
+            while (lockedOverseer == null)
+            {
+                Debug.Log("Lunter Moon try summoning NSH overseer");
+                var worldCoordinate = new WorldCoordinate(self.oracle.room.world.offScreenDen.index, -1, -1, 0);
+                lockedOverseer = new AbstractCreature(self.oracle.room.world, StaticWorld.GetCreatureTemplate(CreatureTemplate.Type.Overseer), null, worldCoordinate, new EntityID(-1, 5));
+                if (self.oracle.room.world.GetAbstractRoom(worldCoordinate).offScreenDen)
+                    self.oracle.room.world.GetAbstractRoom(worldCoordinate).entitiesInDens.Add(lockedOverseer);
+                else
+                    self.oracle.room.world.GetAbstractRoom(worldCoordinate).AddEntity(lockedOverseer);
+                lockedOverseer.ignoreCycle = true;
+                (lockedOverseer.abstractAI as OverseerAbstractAI).spearmasterLockedOverseer = true;
+                (lockedOverseer.abstractAI as OverseerAbstractAI).SetAsPlayerGuide(2);
+                (lockedOverseer.abstractAI as OverseerAbstractAI).BringToRoomAndGuidePlayer(self.oracle.room.abstractRoom.index);
+            }
+
+            if (lockedOverseer.realizedCreature != null) self.lookPoint = lockedOverseer.realizedCreature.DangerPos;
         }
+
+        #endregion Lunter
 
         #region Lonk
 
