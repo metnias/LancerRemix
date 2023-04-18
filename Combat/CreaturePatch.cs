@@ -1,6 +1,7 @@
 ﻿using LancerRemix.Cat;
 using MoreSlugcats;
 using RWCustom;
+using System.Collections.Generic;
 using UnityEngine;
 using static LancerRemix.Cat.ModifyCat;
 
@@ -12,6 +13,8 @@ namespace LancerRemix.Combat
         {
             On.Creature.Grab += CreatureGrabLancer;
             On.Creature.Violence += LancerViolencePatch;
+            On.Lizard.Violence += LancerLizardViolencePatch;
+            On.Creature.Stun += StunPatch;
             On.Vulture.Violence += VultureLancerDropMask;
             On.MoreSlugcats.VultureMaskGraphics.DrawSprites += MaskDrawPatch;
             On.ScavengerAI.CollectScore_PhysicalObject_bool += ScavHornMaskNoPickUp;
@@ -36,11 +39,33 @@ namespace LancerRemix.Combat
             if (source?.owner is Spear spear && spear.thrownBy is Player atkPlayer && IsPlayerLancer(atkPlayer))
             {
                 if (GetSub<LancerSupplement>(atkPlayer)?.SpendSpear == true) stunBonus *= 2f;
-                else stunBonus = -10000f;
+                else { stunBonus = -10000f; StunIgnores.Add(self.abstractCreature); }
             }
             if (self is Player player && IsPlayerLancer(player))
             { GetSub<LancerSupplement>(player)?.Violence(orig, source, directionAndMomentum, hitChunk, hitAppendage, type, damage, stunBonus); return; }
             orig(self, source, directionAndMomentum, hitChunk, hitAppendage, type, damage, stunBonus);
+            StunIgnores.Remove(self.abstractCreature);
+        }
+
+        private static void LancerLizardViolencePatch(On.Lizard.orig_Violence orig, Lizard self,
+            BodyChunk source, Vector2? directionAndMomentum, BodyChunk hitChunk, PhysicalObject.Appendage.Pos hitAppendage, Creature.DamageType type, float damage, float stunBonus)
+        {
+            if (source?.owner is Spear spear && spear.thrownBy is Player atkPlayer && IsPlayerLancer(atkPlayer))
+            {
+                if (GetSub<LancerSupplement>(atkPlayer)?.SpendSpear == true) stunBonus *= 2f;
+                else { stunBonus = -10000f; StunIgnores.Add(self.abstractCreature); }
+            }
+            orig(self, source, directionAndMomentum, hitChunk, hitAppendage, type, damage, stunBonus);
+            StunIgnores.Remove(self.abstractCreature);
+        }
+
+        private static readonly HashSet<AbstractCreature> StunIgnores = new HashSet<AbstractCreature>();
+
+        private static void StunPatch(On.Creature.orig_Stun orig, Creature self, int st)
+        {
+            if (StunIgnores.Contains(self.abstractCreature)) st = 0;
+            int s = self.stun;
+            orig(self, st);
         }
 
         private static void VultureLancerDropMask(On.Vulture.orig_Violence orig, Vulture vulture, BodyChunk source, Vector2? directionAndMomentum, BodyChunk hitChunk, PhysicalObject.Appendage.Pos onAppendagePos, Creature.DamageType type, float damage, float stunBonus)
