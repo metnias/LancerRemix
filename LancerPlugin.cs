@@ -35,7 +35,7 @@ namespace LancerRemix
     {
         public const string PLUGIN_ID = "com.rainworldgame.topicular.lancer.plugin";
         public const string PLUGIN_NAME = "Lancer";
-        public const string PLUGIN_VERSION = "1.0.1.3";
+        public const string PLUGIN_VERSION = "1.0.1.4";
 
         private static bool init = false;
         internal static ManualLogSource LogSource;
