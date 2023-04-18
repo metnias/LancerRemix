@@ -20,6 +20,7 @@ namespace LancerRemix.Story
             On.SLOrcacleState.ForceResetState += LancerMoonState;
             On.SLOracleBehaviorHasMark.NameForPlayer += NameForLancer;
             On.SLOracleBehaviorHasMark.MoonConversation.AddEvents += AddLancerEvents;
+            On.SLOracleBehaviorHasMark.Update += LunterLookOverseer;
             On.Oracle.OracleArm.BaseDir += LonkSLOracleArmDir;
             On.Oracle.OracleArm.OnFramePos += LonkSLOracleArmPos;
         }
@@ -309,6 +310,19 @@ namespace LancerRemix.Story
 
             return;
         NoLancer: orig.Invoke(self);
+        }
+
+        private static void LunterLookOverseer(On.SLOracleBehaviorHasMark.orig_Update orig, SLOracleBehaviorHasMark self, bool eu)
+        {
+            orig(self, eu);
+            if (!IsStoryLancer || !self.hasNoticedPlayer) return;
+            if (!self.oracle.room.game.IsStorySession || GetBasis(self.oracle.room.game.StoryCharacter) != SlugName.Red) return;
+            AbstractCreature NSHoverseer = null;
+            foreach (var crit in self.oracle.room.abstractRoom.creatures)
+                if (crit.creatureTemplate.type == CreatureTemplate.Type.Overseer && (crit.abstractAI as OverseerAbstractAI).ownerIterator == 2)
+                { NSHoverseer = crit; break; }
+            if (NSHoverseer == null) return;
+            self.lookPoint = NSHoverseer.realizedCreature.DangerPos;
         }
 
         #region Lonk
