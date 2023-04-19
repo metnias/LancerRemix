@@ -468,13 +468,6 @@ namespace LancerRemix.Story
             }
         }
 
-        private static SLOracleBehaviorHasMark.MiscItemType LunterTypeOfMiscItem(On.SLOracleBehaviorHasMark.orig_TypeOfMiscItem orig,
-            SLOracleBehaviorHasMark self, PhysicalObject testItem)
-        {
-            if (testItem is NSHSwarmer) return LancerEnums.NSHSwarmer;
-            return orig(self, testItem);
-        }
-
 
         #endregion Lunter
 
