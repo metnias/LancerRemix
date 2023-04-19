@@ -1,8 +1,10 @@
 0-50
+SPECEVENT : lunterlook
 He... hello
 90 : 20 : Hello tiny... creature. You... you did this?
 One moment. My memory isn't responding. I... I have no idea...
 ...must have been gone for...
+SPECEVENT : lunterlook
 0 : 40 : ...
 40 : 40 : Oh.
 NSH, is that you?
@@ -11,8 +13,10 @@ If only we could speak. I have so many questions.
 If things are as they seem... thank you.
 40 : 0 : But, your friend... Even in my state, I can tell they're not well.
 I am so sorry to say, but they do not have much time left. You need to get them back to your chamber at once.<LINE>If you believed I could help them once they arrived, I'm sorry.
+SPECEVENT : lunterlook
 And you, courier... I have known very few beings who could aspire to such a noble thing as you.<LINE>You really are... an amazing tiny creature.
 10 : 20 : I wish I could say I will always remember what you two have done for me.
 0 : 40 : ...
 20 : 0 : Tiny friend. Perhaps you already know this, and I don't know what consolation it might bring, but if this sickness takes you...
 40 : 0 : You will wake right back up again.
+SPECEVENT : lunterlook

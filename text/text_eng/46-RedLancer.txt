@@ -3,14 +3,14 @@ And so comes the second.
 PEBBLESWAIT : 10
 He was never one to think ahead. His last messenger came through here not so long ago. So too did it visit my can as you have.<LINE>That's just what happens when you trust wild animals to follow basic instructions. Even sending an overseer this time could not guide you in the right direction.
 And on top of that, a child. He sent... a child. Was he really so desperate?
-I am... appalled, that they would even consider sending such a young thing on such a dangerous journey. Though apparently you're not totally helpless.
+I am... appalled, that he would even consider sending such a young thing on such a dangerous journey. Though apparently you're not totally helpless.
 PEBBLESWAIT : 20
 You are not well. Like the last messenger he sent, you have something deadly festering inside you.
-You may have inherited it. Did he lure you in from out there, or did he separate you when you were born?<LINE>Has... he been... breeding you? That is not a thought I can bear. I never looked upon gim particularly fondly,<LINE>but this shows a side to him that I can't have imagined.
+You may have inherited it. Did he lure you in from out there, or did he separate you when you were born?<LINE>Has... he been... breeding you? That is not a thought I can bear. I never looked upon him particularly fondly,<LINE>but this shows a side to him that I can't have imagined.
 Listen, little creature. Abandon your mission. Even if you manage to complete it, she is too far gone...<LINE>I think it's better for her to be left as she is. There is, however, still time for you to save yourself.
 Free yourself from this role you've been forced into. I will aid you to the best of my ability.
 SPECEVENT : karma
 20 : 0 : Your only hope now is to go west, past the Farm Arrays, down through the gash in the earth and then deeper<LINE>beyond the old infrastructure. Your only salvation lies there.
 0 : 10 : I can't provide any more than this, despite my purpose and power. I couldn't even help myself.
 PEBBLESWAIT : 4
-0 : 30 : I will keep these slag keys. I guarantee I have more use for them than she would.<LINE>Please hurry, little one. I only want the best for you.               
+0 : 30 : I will keep these slag keys. I guarantee I have more use for them than she would.<LINE>Please hurry, little one. I only want the best for you.

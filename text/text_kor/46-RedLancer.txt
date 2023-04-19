@@ -1,16 +1,16 @@
 0-46
-And so comes the second.
+그리고 두 번째가 왔군.
 PEBBLESWAIT : 10
-He was never one to think ahead. His last messenger came through here not so long ago. So too did it visit my can as you have.<LINE>That's just what happens when you trust wild animals to follow basic instructions. Even sending an overseer this time could not guide you in the right direction.
-And on top of that, a child. He sent... a child. Was he really so desperate?
-I am... appalled, that they would even consider sending such a young thing on such a dangerous journey. Though apparently you're not totally helpless.
+그 녀석은 뒤의 일을 생각할 줄 몰랐지. 걔가 보낸 지난 전령도 얼마 전에 왔었어. 너처럼 그것도 내 통에 들어왔고.<LINE>야생동물이 간단한 지시를 따르리라 믿으면 이렇게 되는 법이지. 이번에는 감시자도 딸려 보냈지만 널 올바른 방향으로 인도하지 못했고.
+게다가, 아이. 그 녀석이... 아이를 보냈어. 그렇게나 절박한 건가?
+참... 오싹하군, 이렇게 어린 것을 이토록 위험한 여정에 보낼 발상을 했다는 게. 완전히 도움이 없었던 건 아닌 모양이지만.
 PEBBLESWAIT : 20
-You are not well. Like the last messenger he sent, you have something deadly festering inside you.
-You may have inherited it. Did he lure you in from out there, or did he separate you when you were born?<LINE>Has... he been... breeding you? That is not a thought I can bear. I never looked upon gim particularly fondly,<LINE>but this shows a side to him that I can't have imagined.
-Listen, little creature. Abandon your mission. Even if you manage to complete it, she is too far gone...<LINE>I think it's better for her to be left as she is. There is, however, still time for you to save yourself.
-Free yourself from this role you've been forced into. I will aid you to the best of my ability.
+네 상태는 좋지 못해. 그 녀석이 보냈던 지난 배달부처럼, 네 속에 치명적인 무언가가 곪아있어.
+아마도 물려받은 걸지도 몰라. 걔가 널 거기서 유인해서 꺼낸 걸까, 아니면 네가 태어났을 때 떼어놓은 건가?<LINE>걔가... 너희를... 사육하고 있어? 나로서는 하지도 못할 생각이야. 그 녀석한테 딱히 애착을 가진 적은 절대 없었지만,<LINE>내가 상상도 못 한 괴롭힘의 단면을 보여주는군.
+잘 들어, 작은 생물아. 네 임무를 버려. 네가 혹시나 해낸다고 해도, 달은 너무 망가져 버렸어...<LINE>달은 지금 그대로 두는 게 더 나을 거야. 하지만 아직은, 너를 구할 시간이 남아있다.
+네가 강제로 맡게 된 이 역할에서 벗어나라. 내 능력을 다해 널 도와주도록 하지.
 SPECEVENT : karma
-20 : 0 : Your only hope now is to go west, past the Farm Arrays, down through the gash in the earth and then deeper<LINE>beyond the old infrastructure. Your only salvation lies there.
-0 : 10 : I can't provide any more than this, despite my purpose and power. I couldn't even help myself.
+20 : 0 : 지금 남은 네 유일한 희망은 서쪽으로 향해, 농장 배열지를 지나, 대지의 틈새로 내려가<LINE>오래된 기간 시설 아래로 깊이 들어가는 거야. 네 하나뿐인 구원이 거기 있지.
+0 : 10 : 내 목적과 능력에도 불구하고, 너에게 이보다 더 많은 걸 제공할 순 없어. 나 자신도 도울 수 없으니.
 PEBBLESWAIT : 4
-0 : 30 : I will keep these slag keys. I guarantee I have more use for them than she would.<LINE>Please hurry, little one. I only want the best for you.               
+0 : 30 : 이 슬래그 키는 내가 가지고 있겠어. 분명 달보다는 나에게 더 쓸모가 있을 거야.<LINE>서둘러, 자그만 생물. 난 네가 괜찮기만을 바라.

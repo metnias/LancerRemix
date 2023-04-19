@@ -6,10 +6,12 @@ If only you could communicate through it... I have so many questions. What does 
 Tell them that I am fine. Tell them my communication equipment was damaged by Five Pebbles, but I managed to calm him,<LINE>and that I am still diligently working toward our goal. I want them to hold on to hope for as long as possible.
 40 : 40 : Relay this for me and I will be at peace. It is my final wish.
 0 : 40 : ...
+SPECEVENT : lunterlook
 40 : 0 : Oh.
 Tiny creature... I almost forgot you were there.
 I can see that you are not well.
 I am so sorry to say, but you do not have much time left, just like the last messenger. I wonder why...
 Surely my friend here has a plan to help you. NSH, would you please guide them back to your can when you're done?
+SPECEVENT : lunterlook
 Thank you, my friends. What you've done for me is beyond extraordinary.
 0 : 60 : I will cherish this memory for as long as I can.

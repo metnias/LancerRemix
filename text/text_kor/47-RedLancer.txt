@@ -1,14 +1,14 @@
 0-47
-As I feared, here you are. Empty handed.
-He was never one to think ahead. His last messenger came through here not so long ago.
-So too did it visit my can as you have. Though at least that one didn't lose its payload.<LINE>He should have at least equipped you with more than an overseer.
-What else to expect from a cub. What else did they think would happen?<LINE>Not only did you abandon the delivery, you managed to travel<LINE>a more treacherous path to the wrong destination.
-I am furious with him. Does he not see the irony? Or does he just not care, like our creators?<LINE>The more bugs in the maze the better, after all. Doomed with purpose from the start. We never stood a chance.
+우려했던 대로 네가 왔군. 빈손으로.
+그 녀석은 뒤의 일을 생각할 줄 몰랐지. 걔가 보낸 지난 전령도 얼마 전에 왔었어.
+너처럼 그것도 내 통에 들어왔고. 적어도 그건 자기 배달물을 잃어버리진 않았어.<LINE>너한테 감시자보다는 더 많이 챙겨줬어야지.
+새끼 짐승한테 달리 뭘 기대하겠어. 대체 무슨 일이 벌어질 거로 생각했던 거지?<LINE>배달물을 잃어버린 것으로 모자라, 훨씬 위험한 길을 들어 잘못된 도착지에 도달했잖아.
+그 녀석한테 화가 나. 이 모순을 보지 못하는 거야? 아니면 우리 창조자들처럼 그냥 신경 쓰지 않는 건가?<LINE>결국 미로에 벌레가 더 많을수록 더 나은 법일 테니까. 시작부터 목적에 묶인 운명이었으니. 우리에게 기회 따윈 없었어.
 PEBBLESWAIT : 20
-Tiny creature, you are not healthy. We are alike not only in our burdens, but in our condition too.
-It is an injustice that you have to deal with this sickness at such a young age. I would not feel right if I didn't try to help in any way I can.
+자그만 생물, 넌 건강하지 못하다. 안고 있는 짐도, 우리의 상태도 비슷하지.
+그렇게 어린 나이에 이런 질환을 앓아야 한다는 것은 부당해. 내가 어떻게든 돕지 않는다면 아니 되겠지.
 SPECEVENT : karma
-I hope I have repaid what little time you have that was spent coming here.
-You can use your remaining time for a greater purpose. There is still a chance for your salvation, little one.<LINE>Far west, beyond the Farm Arrays, there is a fissure, through which you can begin your descent.<LINE>Slip deeper and deeper until the roiling void seeps into the very soil. There lies your freedom.
-Your only purpose is to save yourself now. No more burdens. No more tasks. No more problems.
-0 : 30 : Please stay safe, child. This may be your best shot at ascension in one thousand thousand lifetimes. It'd be a shame to waste it.
+여기 오는 데 써버린 얼마 남지 않은 네 시간이 채워졌으면 해.
+남은 시간을 더 위대한 목적에 사용할 수 있어. 아직 네 구원의 기회가 남아있으니까, 자그만 생물.<LINE>저 멀리 서쪽으로, 농장 배열지를 지나 갈라지는 곳이 있다. 거기서부터 내려가도록 해.<LINE>휘젓는 공허가 흙에 스며드는 곳까지 깊이 더 깊이 빠져들어 가. 거기에 네 자유가 있어.
+너의 유일한 목적은 이제 너 자신을 구원하는 거야. 더 이상의 짐도, 더 이상의 일도, 더 이상의 문제도 없이.
+0 : 30 : 무사해, 아이야. 일천천번의 생애 중에 이것이 유일하게 승천할 기회일지 모르니까. 낭비해선 안 되겠지.
