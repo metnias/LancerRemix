@@ -149,6 +149,7 @@ namespace LancerRemix
             {
                 LogSource.LogInfo("Lancer detected MMF newly enabled.");
                 TutorialModify.OnMMFEnablePatch();
+                SelectMenuPatch.OnMMFEnablePatch();
                 HornColorPick.OnMMFEnablePatch();
                 lastMMFEnabled = ModManager.MMF;
             }
@@ -177,6 +178,7 @@ namespace LancerRemix
             {
                 LogSource.LogInfo("Lancer detected MMF newly disabled.");
                 TutorialModify.OnMMFDisablePatch();
+                SelectMenuPatch.OnMMFDisablePatch();
                 HornColorPick.OnMMFDisablePatch();
                 lastMMFEnabled = ModManager.MMF;
             }
@@ -197,7 +199,7 @@ namespace LancerRemix
             MineForLunterData = 1 << 3,
             LoadLancerState = 1 << 4,
             LonkEatMeatUpdate = 1 << 5,
-            LancerSkipIntro = 1 << 6
+            LancerStartGamePatch = 1 << 6
         }
 
         internal static void ILhookTry(ILhooks flag)

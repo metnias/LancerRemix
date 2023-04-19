@@ -38,12 +38,14 @@ namespace LancerRemix.LancerMenu
             On.Menu.SlugcatSelectMenu.UpdateSelectedSlugcatInMiscProg += UpdateSelectedLancerInMiscProg;
             On.Menu.SlugcatSelectMenu.CommunicateWithUpcomingProcess += CommWithNextProcess;
             On.Menu.SlugcatSelectMenu.Singal += SignalPatch;
-            IL.Menu.SlugcatSelectMenu.StartGame += LancerSkipIntro;
+            IL.Menu.SlugcatSelectMenu.StartGame += LancerStartGamePatch;
             On.Menu.SlugcatSelectMenu.ContinueStartedGame += ContinueLancerStartedGame;
             On.Menu.SlugcatSelectMenu.SlugcatPage.GrafUpdate += PageGrafUpdatePatch;
             On.Menu.SlugcatSelectMenu.SlugcatPageContinue.Update += LancerPageContinue.PageContinueUpdatePatch;
 
             LancerPageContinue.SubPatch();
+
+            if (ModManager.MMF) OnMMFEnablePatch();
         }
 
         private static void CtorPatch(On.Menu.SlugcatSelectMenu.orig_ctor orig, SlugcatSelectMenu self, ProcessManager manager)
@@ -278,17 +280,33 @@ namespace LancerRemix.LancerMenu
                 SaveLancerPlayers(self.manager.rainWorld.progression.miscProgressionData);
                 // StartGame(this.slugcatPages[this.slugcatPageIndex].slugcatNumber);
             }
-            if (message == "DEFAULTCOL")
+            if (message == "DEFAULTCOL" && slugcatPageLancer)
             {
-                HornColorPick.ResetColor(self.slugcatColorOrder[self.slugcatPageIndex]);
+                var name = self.slugcatColorOrder[self.slugcatPageIndex];
+                HornColorPick.ResetColor(name);
+
+                int num = self.activeColorChooser;
+                self.manager.rainWorld.progression.miscProgressionData.colorChoices[GetLancer(name).value][num] = self.colorInterface.defaultColors[self.activeColorChooser];
+                float f = self.ValueOfSlider(self.hueSlider);
+                float f2 = self.ValueOfSlider(self.satSlider);
+                float f3 = self.ValueOfSlider(self.litSlider);
+                self.SliderSetValue(self.hueSlider, f);
+                self.SliderSetValue(self.satSlider, f2);
+                self.SliderSetValue(self.litSlider, f3);
+                self.PlaySound(SoundID.MENU_Remove_Level);
+                return;
             }
             orig(self, sender, message);
         }
 
-        private static void LancerSkipIntro(ILContext il)
+        private static void LancerStartGamePatch(ILContext il)
         {
             var cursor = new ILCursor(il);
-            LancerPlugin.ILhookTry(LancerPlugin.ILhooks.LancerSkipIntro);
+            LancerPlugin.ILhookTry(LancerPlugin.ILhooks.LancerStartGamePatch);
+
+            // TODO: Add CustomColorSupport
+
+            #region SkipIntro
 
             if (!cursor.TryGotoNext(MoveType.Before,
                 x => x.MatchLdarg(0),
@@ -321,7 +339,9 @@ namespace LancerRemix.LancerMenu
                 );
             cursor.Emit(OpCodes.Brtrue, lblOkay);
 
-            LancerPlugin.ILhookOkay(LancerPlugin.ILhooks.LancerSkipIntro);
+            #endregion SkipIntro
+
+            LancerPlugin.ILhookOkay(LancerPlugin.ILhooks.LancerStartGamePatch);
 
             void DebugLogCursor() =>
                 LancerPlugin.LogSource.LogInfo($"{cursor.Prev.OpCode.Name} > Cursor < {cursor.Next.OpCode.Name}");
@@ -653,5 +673,18 @@ namespace LancerRemix.LancerMenu
                 }
             }
         }
+
+        #region MMFCustomColor
+
+        internal static void OnMMFEnablePatch()
+        {
+            // TODO: Hook SSM SliderSetValue, ValueOfSlider; edit StartGame
+        }
+
+        internal static void OnMMFDisablePatch()
+        {
+        }
+
+        #endregion MMFCustomColor
     }
 }

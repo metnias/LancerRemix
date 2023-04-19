@@ -23,6 +23,7 @@ namespace LancerRemix.LancerMenu
 
             if (ModManager.JollyCoop) OnJollyEnablePatch();
             if (ModManager.MSC) OnMSCEnablePatch();
+            if (ModManager.MMF) HornColorPick.OnMMFEnablePatch();
         }
 
         internal static void OnJollyEnablePatch()
