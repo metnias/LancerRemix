@@ -321,7 +321,6 @@ namespace LancerRemix.Story
             #endregion Lunter
 
             orig.Invoke(self);
-
             return;
         NoLancer: orig.Invoke(self);
         }
@@ -340,7 +339,7 @@ namespace LancerRemix.Story
 
         private static AbstractCreature lockedOverseer = null;
 
-        private static bool lookOverseer = true;
+        private static bool lookOverseer = false;
 
         private static NSHSwarmer reelInSwarmer = null;
         private static float swarmerReelIn = 0f;
@@ -403,10 +402,15 @@ namespace LancerRemix.Story
             if (!self.oracle.room.game.IsStorySession || GetBasis(self.oracle.room.game.StoryCharacter) != SlugName.Red) return;
 
             if (self.player == null || self.player.room != self.oracle.room) return;
-            ReelInNSHSwarmer();
-            ConvertingNSHSwarmer();
 
-            if (!self.oracle.room.game.GetStorySession.saveState.miscWorldSaveData.EverMetMoon) SummonNSHOverseer();
+            ReelInNSHSwarmer();
+
+            if (self.holdingObject != null && self.holdingObject is NSHSwarmer)
+                ConvertingNSHSwarmer();
+
+            if (!self.oracle.room.game.GetStorySession.saveState.miscWorldSaveData.EverMetMoon)
+                SummonNSHOverseer();
+
             if (lookOverseer && lockedOverseer?.realizedCreature != null)
                 self.lookPoint = lockedOverseer.realizedCreature.DangerPos;
 
@@ -437,24 +441,21 @@ namespace LancerRemix.Story
 
             void ConvertingNSHSwarmer()
             {
-                if (self.holdingObject != null && self.holdingObject is NSHSwarmer)
+                if (self.oracle.room.game.cameras[0].hud.dialogBox == null || self.oracle.room.game.cameras[0].hud.dialogBox.messages.Count < 1)
                 {
-                    if (self.oracle.room.game.cameras[0].hud.dialogBox == null || self.oracle.room.game.cameras[0].hud.dialogBox.messages.Count < 1)
+                    ++self.convertSwarmerCounter;
+                    if (self.convertSwarmerCounter > 40)
                     {
-                        self.convertSwarmerCounter++;
-                        if (self.convertSwarmerCounter > 40)
-                        {
-                            Vector2 pos = self.holdingObject.firstChunk.pos;
-                            self.holdingObject.Destroy();
-                            self.holdingObject = null;
-                            SLOracleSwarmer sloracleSwarmer = new SLOracleSwarmer(new AbstractPhysicalObject(self.oracle.room.world, AbstractPhysicalObject.AbstractObjectType.SLOracleSwarmer, null, self.oracle.room.GetWorldCoordinate(pos), self.oracle.room.game.GetNewID()), self.oracle.room.world);
-                            self.oracle.room.abstractRoom.entities.Add(sloracleSwarmer.abstractPhysicalObject);
-                            sloracleSwarmer.firstChunk.HardSetPosition(pos);
-                            self.oracle.room.AddObject(sloracleSwarmer);
-                            self.ConvertingSSSwarmer();
-                            if (self is SLOracleBehaviorHasMark behavior && behavior.currentConversation.id == ConvID.MoonRecieveSwarmer)
-                                behavior.currentConversation = new SLOracleBehaviorHasMark.MoonConversation(MoonRecieveNSHSwarmer, behavior, SLOracleBehaviorHasMark.MiscItemType.NA);
-                        }
+                        Vector2 pos = self.holdingObject.firstChunk.pos;
+                        self.holdingObject.Destroy();
+                        self.holdingObject = null;
+                        SLOracleSwarmer sloracleSwarmer = new SLOracleSwarmer(new AbstractPhysicalObject(self.oracle.room.world, AbstractPhysicalObject.AbstractObjectType.SLOracleSwarmer, null, self.oracle.room.GetWorldCoordinate(pos), self.oracle.room.game.GetNewID()), self.oracle.room.world);
+                        self.oracle.room.abstractRoom.entities.Add(sloracleSwarmer.abstractPhysicalObject);
+                        sloracleSwarmer.firstChunk.HardSetPosition(pos);
+                        self.oracle.room.AddObject(sloracleSwarmer);
+                        self.ConvertingSSSwarmer();
+                        if (self is SLOracleBehaviorHasMark behavior && behavior.currentConversation.id == ConvID.MoonRecieveSwarmer)
+                            behavior.currentConversation = new SLOracleBehaviorHasMark.MoonConversation(MoonRecieveNSHSwarmer, behavior, SLOracleBehaviorHasMark.MiscItemType.NA);
                     }
                 }
             }
