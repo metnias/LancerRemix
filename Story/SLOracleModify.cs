@@ -18,6 +18,7 @@ namespace LancerRemix.Story
         internal static void SubPatch()
         {
             On.SLOrcacleState.ForceResetState += LancerMoonState;
+            On.SLOracleBehavior.Update += LancerMoonUpdatePatch;
             On.SLOracleBehaviorHasMark.NameForPlayer += NameForLancer;
             On.SLOracleBehaviorHasMark.MoonConversation.AddEvents += AddLancerEvents;
             On.SLOracleBehaviorHasMark.SpecialEvent += LancerSpecEvents;
@@ -25,7 +26,6 @@ namespace LancerRemix.Story
             On.OverseerAbstractAI.PlayerGuideUpdate += LunterRemoveDupeOverseer;
             On.OverseerAbstractAI.Roam += LunterOverseerStayNearMoon;
             On.OverseerAI.Update += LunterOverseerLookAtMoon;
-            On.SLOracleBehavior.Update += LancerMoonUpdatePatch;
             On.SLOracleBehaviorHasMark.Update += LunterMoonLookHandler;
 
             On.Oracle.OracleArm.BaseDir += LonkSLOracleArmDir;
@@ -76,6 +76,17 @@ namespace LancerRemix.Story
                 }
                 return 0;
             }
+        }
+
+        private static void LancerMoonUpdatePatch(On.SLOracleBehavior.orig_Update orig, SLOracleBehavior self, bool eu)
+        {
+            orig(self, eu);
+            if (!self.oracle.room.game.IsStorySession || !IsStoryLancer) return;
+            if (self.player?.room != self.oracle.room || !self.hasNoticedPlayer) return;
+
+            var basis = GetBasis(self.oracle.room.game.StoryCharacter);
+            if (basis == SlugName.Red)
+                LunterMoonBehaviourUpdate(self);
         }
 
         private static string NameForLancer(On.SLOracleBehaviorHasMark.orig_NameForPlayer orig, SLOracleBehaviorHasMark self, bool capitalized)
@@ -395,17 +406,6 @@ namespace LancerRemix.Story
                             return;
                         }
             }
-        }
-
-        private static void LancerMoonUpdatePatch(On.SLOracleBehavior.orig_Update orig, SLOracleBehavior self, bool eu)
-        {
-            orig(self, eu);
-            if (!self.oracle.room.game.IsStorySession || !IsStoryLancer) return;
-            if (self.player?.room != self.oracle.room || !self.hasNoticedPlayer) return;
-
-            var basis = GetBasis(self.oracle.room.game.StoryCharacter);
-            if (basis == SlugName.Red)
-                LunterMoonBehaviourUpdate(self);
         }
 
         private static void LunterMoonBehaviourUpdate(SLOracleBehavior self)
