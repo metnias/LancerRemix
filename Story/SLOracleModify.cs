@@ -25,7 +25,8 @@ namespace LancerRemix.Story
             On.OverseerAbstractAI.PlayerGuideUpdate += LunterRemoveDupeOverseer;
             On.OverseerAbstractAI.Roam += LunterOverseerStayNearMoon;
             On.OverseerAI.Update += LunterOverseerLookAtMoon;
-            On.SLOracleBehavior.Update += LunterMoonHandler;
+            On.SLOracleBehavior.Update += LancerMoonUpdatePatch;
+            On.SLOracleBehaviorHasMark.Update += LunterMoonLookHandler;
 
             On.Oracle.OracleArm.BaseDir += LonkSLOracleArmDir;
             On.Oracle.OracleArm.OnFramePos += LonkSLOracleArmPos;
@@ -330,6 +331,7 @@ namespace LancerRemix.Story
             if (eventName.Equals("lunterlook", System.StringComparison.InvariantCultureIgnoreCase))
             {
                 lookOverseer = !lookOverseer;
+                Debug.Log($"Lunter Moon look at {(lookOverseer ? "overseer" : "player")} (LockOverseer: {lockedOverseer?.realizedCreature != null})");
                 return;
             }
             orig(self, eventName);
@@ -395,14 +397,19 @@ namespace LancerRemix.Story
             }
         }
 
-        private static void LunterMoonHandler(On.SLOracleBehavior.orig_Update orig, SLOracleBehavior self, bool eu)
+        private static void LancerMoonUpdatePatch(On.SLOracleBehavior.orig_Update orig, SLOracleBehavior self, bool eu)
         {
             orig(self, eu);
-            if (!IsStoryLancer || !self.hasNoticedPlayer) return;
-            if (!self.oracle.room.game.IsStorySession || GetBasis(self.oracle.room.game.StoryCharacter) != SlugName.Red) return;
+            if (!self.oracle.room.game.IsStorySession || !IsStoryLancer) return;
+            if (self.player?.room != self.oracle.room || !self.hasNoticedPlayer) return;
 
-            if (self.player == null || self.player.room != self.oracle.room) return;
+            var basis = GetBasis(self.oracle.room.game.StoryCharacter);
+            if (basis == SlugName.Red)
+                LunterMoonBehaviourUpdate(self);
+        }
 
+        private static void LunterMoonBehaviourUpdate(SLOracleBehavior self)
+        {
             ReelInNSHSwarmer();
 
             if (self.holdingObject != null && self.holdingObject is NSHSwarmer)
@@ -410,9 +417,6 @@ namespace LancerRemix.Story
 
             if (!self.oracle.room.game.GetStorySession.saveState.miscWorldSaveData.EverMetMoon)
                 SummonNSHOverseer();
-
-            if (lookOverseer && lockedOverseer?.realizedCreature != null)
-                self.lookPoint = lockedOverseer.realizedCreature.DangerPos;
 
             void ReelInNSHSwarmer()
             {
@@ -480,6 +484,18 @@ namespace LancerRemix.Story
             }
         }
 
+        private static void LunterMoonLookHandler(On.SLOracleBehaviorHasMark.orig_Update orig, SLOracleBehaviorHasMark self, bool eu)
+        {
+            orig(self, eu);
+
+            if (!self.oracle.room.game.IsStorySession || !IsStoryLancer) return;
+            if (self.player?.room != self.oracle.room || !self.hasNoticedPlayer) return;
+
+            if (GetBasis(self.oracle.room.game.StoryCharacter) != SlugName.Red) return;
+
+            if (lookOverseer && lockedOverseer?.realizedCreature != null)
+                self.lookPoint = lockedOverseer.realizedCreature.DangerPos;
+        }
 
         #endregion Lunter
 
