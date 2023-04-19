@@ -44,6 +44,8 @@ namespace LancerRemix.LancerMenu
             On.Menu.SlugcatSelectMenu.SlugcatPageContinue.Update += LancerPageContinue.PageContinueUpdatePatch;
 
             LancerPageContinue.SubPatch();
+
+            if (ModManager.MMF) OnMMFEnablePatch();
         }
 
         private static void CtorPatch(On.Menu.SlugcatSelectMenu.orig_ctor orig, SlugcatSelectMenu self, ProcessManager manager)
@@ -653,5 +655,18 @@ namespace LancerRemix.LancerMenu
                 }
             }
         }
+
+        #region MMFCustomColor
+
+        internal static void OnMMFEnablePatch()
+        {
+            // TODO: Hook SSM Signal, SliderSetValue, StartGame, ValueOfSlider
+        }
+
+        internal static void OnMMFDisablePatch()
+        {
+        }
+
+        #endregion MMFCustomColor
     }
 }

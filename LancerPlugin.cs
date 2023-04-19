@@ -149,6 +149,7 @@ namespace LancerRemix
             {
                 LogSource.LogInfo("Lancer detected MMF newly enabled.");
                 TutorialModify.OnMMFEnablePatch();
+                SelectMenuPatch.OnMMFEnablePatch();
                 HornColorPick.OnMMFEnablePatch();
                 lastMMFEnabled = ModManager.MMF;
             }
@@ -177,6 +178,7 @@ namespace LancerRemix
             {
                 LogSource.LogInfo("Lancer detected MMF newly disabled.");
                 TutorialModify.OnMMFDisablePatch();
+                SelectMenuPatch.OnMMFDisablePatch();
                 HornColorPick.OnMMFDisablePatch();
                 lastMMFEnabled = ModManager.MMF;
             }

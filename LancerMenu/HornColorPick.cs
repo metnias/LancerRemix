@@ -171,11 +171,21 @@ namespace LancerRemix.LancerMenu
         private static void LancerCustomColorInterfaceCtor(On.Menu.SlugcatSelectMenu.CustomColorInterface.orig_ctor orig, SlugcatSelectMenu.CustomColorInterface self,
             Menu.Menu menu, MenuObject owner, Vector2 pos, SlugName slugcatID, List<string> names, List<string> defaultColors)
         {
+            if (SlugcatPageLancer)
+            {
+                slugcatID = LancerEnums.GetLancer(slugcatID);
+                defaultColors = PlayerGraphics.DefaultBodyPartColorHex(slugcatID);
+                for (int i = 0; i < defaultColors.Count; i++)
+                {
+                    Vector3 hsl = Custom.RGB2HSL(Custom.hexToColor(defaultColors[i]));
+                    defaultColors[i] = $"{hsl[0]},{hsl[1]},{hsl[2]}";
+                }
+            }
             orig(self, menu, owner, pos, slugcatID, names, defaultColors);
             if (!SlugcatPageLancer) return;
             var offset = pos;
-            offset.y -= (self.bodyColors.Length + 3) * 40f ;
-            InitializeWrapper(self, offset + new Vector2(0f, -180f), 0, false);
+            offset.y -= (self.bodyColors.Length + 3) * 40f;
+            InitializeWrapper(self, offset + new Vector2(-80f, -180f), 0, false);
         }
 
         private static void LancerCustomColorInterfaceRemove(On.Menu.SlugcatSelectMenu.CustomColorInterface.orig_RemoveSprites orig, SlugcatSelectMenu.CustomColorInterface self)
