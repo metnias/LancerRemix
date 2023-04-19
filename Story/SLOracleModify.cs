@@ -306,10 +306,10 @@ namespace LancerRemix.Story
                 self.PearlIntro();
                 self.LoadEventsFromFile(51, GetLancer(basis), false, 0);
                 if (already)
-                    self.events.Add(new TextEvent(self, 0, self.Translate("Thank you, No Significant Harassment, for trying so hard."), 20));
+                    self.events.Add(new TextEvent(self, 0, self.Translate("This much effort, just to help me... It means more than you could ever know."), 20));
                 else
-                    self.events.Add(new TextEvent(self, 0, self.Translate("I see now. Again, thank you, No Significant Harassment."), 20));
-                self.events.Add(new TextEvent(self, 0, self.Translate("I am happy to not be alone."), 20));
+                    self.events.Add(new TextEvent(self, 0, self.Translate("All of this trouble just to save me... You are more generous than anyone I've known."), 20));
+                self.events.Add(new TextEvent(self, 0, self.Translate("I am happy that I'm not alone."), 20));
                 return;
             }
             if (self.id == MoonRecieveNSHSwarmer)
