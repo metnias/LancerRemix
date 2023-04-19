@@ -400,7 +400,11 @@ namespace LancerRemix.Story
             if (IsStoryLancer)
             {
                 var basis = GetBasis(character);
-                if (basis == SlugName.Red) return self.game.session is StoryGameSession session && !session.saveState.miscWorldSaveData.EverMetMoon;
+                if (basis == SlugName.Red)
+                {
+                    var check = self.game.session is StoryGameSession session && !session.saveState.miscWorldSaveData.EverMetMoon;
+                    return check && self.world.region.name != "SS" && self.world.region.name != "MS";
+                }
                 if (basis == SlugName.Yellow) return false;
                 return orig(self, basis);
             }
