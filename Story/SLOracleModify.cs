@@ -20,6 +20,7 @@ namespace LancerRemix.Story
             On.SLOrcacleState.ForceResetState += LancerMoonState;
             On.SLOracleBehaviorHasMark.NameForPlayer += NameForLancer;
             On.SLOracleBehaviorHasMark.MoonConversation.AddEvents += AddLancerEvents;
+            On.SLOracleBehaviorHasMark.SpecialEvent += LancerSpecEvents;
 
             On.OverseerAbstractAI.PlayerGuideUpdate += LunterRemoveDupeOverseer;
             On.OverseerAbstractAI.Roam += LunterOverseerStayNearMoon;
@@ -325,11 +326,21 @@ namespace LancerRemix.Story
         NoLancer: orig.Invoke(self);
         }
 
+        private static void LancerSpecEvents(On.SLOracleBehaviorHasMark.orig_SpecialEvent orig, SLOracleBehaviorHasMark self, string eventName)
+        {
+            if (eventName.Equals("lunterlook", System.StringComparison.InvariantCultureIgnoreCase))
+            {
+                lookOverseer = !lookOverseer;
+                return;
+            }
+            orig(self, eventName);
+        }
+
         #region Lunter
 
         private static AbstractCreature lockedOverseer = null;
 
-        private static bool LookOverseer = true;
+        private static bool lookOverseer = true;
 
         private static NSHSwarmer reelInSwarmer = null;
         private static float swarmerReelIn = 0f;
@@ -396,7 +407,7 @@ namespace LancerRemix.Story
             ConvertingNSHSwarmer();
 
             if (!self.oracle.room.game.GetStorySession.saveState.miscWorldSaveData.EverMetMoon) SummonNSHOverseer();
-            if (LookOverseer && lockedOverseer?.realizedCreature != null)
+            if (lookOverseer && lockedOverseer?.realizedCreature != null)
                 self.lookPoint = lockedOverseer.realizedCreature.DangerPos;
 
             void ReelInNSHSwarmer()
@@ -464,7 +475,7 @@ namespace LancerRemix.Story
                     (lockedOverseer.abstractAI as OverseerAbstractAI).SetAsPlayerGuide(2);
                     (lockedOverseer.abstractAI as OverseerAbstractAI).BringToRoomAndGuidePlayer(self.oracle.room.abstractRoom.index);
                 }
-                LookOverseer = true;
+                lookOverseer = true;
             }
         }
 
