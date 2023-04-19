@@ -412,7 +412,15 @@ namespace LancerRemix.Story
             if (IsStoryLancer)
             {
                 var basis = GetBasis(self.world.game.StoryCharacter);
-                if (basis == SlugName.Red) ownerOverride = 2;
+                if (basis == SlugName.Red)
+                {
+                    ownerOverride = 2;
+                    if (!self.spearmasterLockedOverseer)
+                    {
+                        if (self.RelevantPlayer?.Room.name == "SL_AI" || self.world.regionState.saveState.miscWorldSaveData.EverMetMoon)
+                        { self.isPlayerGuide = false; return; }
+                    }
+                }
                 else if (basis == SlugName.Yellow) { self.isPlayerGuide = false; return; }
             }
             orig(self, ownerOverride);
