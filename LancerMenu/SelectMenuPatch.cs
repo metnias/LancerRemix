@@ -684,5 +684,7 @@ namespace LancerRemix.LancerMenu
         internal static void OnMMFDisablePatch()
         {
         }
+
+        #endregion MMFCustomColor
     }
 }
