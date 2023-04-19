@@ -57,7 +57,7 @@
       <HintPath>debug\SlugBase.dll</HintPath>
     </Reference>
     <Reference Include="STRIPPED-Assembly-CSharp">
-      <HintPath>..\References\RWDownpour\STRIPPED-Assembly-CSharp.dll</HintPath>
+      <HintPath>debug\STRIPPED-Assembly-CSharp.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -210,6 +210,10 @@
     <Content Include="slugbase\scenes\yellow ghost lancer\Lmonk ghost b.png" />
     <Content Include="slugbase\scenes\yellow ghost lancer\Lmonk ghost bkg.png" />
     <Content Include="slugbase\scenes\yellow ghost lancer\Lmonk ghost slugcat - flat.png" />
+    <Content Include="text\text_eng\251-RedLancer.txt" />
+    <Content Include="text\text_kor\251-RedLancer.txt" />
+    <Content Include="text\text_kor\46-RedLancer.txt" />
+    <Content Include="text\text_kor\47-RedLancer.txt" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
