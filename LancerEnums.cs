@@ -14,7 +14,10 @@ namespace LancerRemix
         internal static MenuSceneID SceneGhostLancerWhite;
         internal static MenuSceneID SceneGhostLancerYellow;
         internal static MenuSceneID SceneGhostLancerRed;
+
         internal static DreamID DreamHunterMeet;
+        internal static SLOracleBehaviorHasMark.MiscItemType NSHSwarmer;
+        internal static Conversation.ID MoonRecieveNSHSwarmer;
 
         internal static void RegisterExtEnum()
         {
@@ -22,7 +25,10 @@ namespace LancerRemix
             SceneGhostLancerWhite = new MenuSceneID("white ghost lancer", false);
             SceneGhostLancerYellow = new MenuSceneID("yellow ghost lancer", false);
             SceneGhostLancerRed = new MenuSceneID("red ghost lancer", false);
+
             DreamHunterMeet = new DreamID(nameof(DreamHunterMeet), true);
+            NSHSwarmer = new SLOracleBehaviorHasMark.MiscItemType(nameof(NSHSwarmer), true);
+            MoonRecieveNSHSwarmer = new Conversation.ID(nameof(MoonRecieveNSHSwarmer), true);
         }
 
         internal static void UnregisterExtEnum()
@@ -32,6 +38,8 @@ namespace LancerRemix
             SceneGhostLancerYellow = null;
             SceneGhostLancerRed = null;
             DreamHunterMeet?.Unregister(); DreamHunterMeet = null;
+            NSHSwarmer?.Unregister(); NSHSwarmer = null;
+            MoonRecieveNSHSwarmer?.Unregister(); MoonRecieveNSHSwarmer = null;
         }
 
         #endregion Enums

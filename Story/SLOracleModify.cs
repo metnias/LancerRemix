@@ -24,7 +24,7 @@ namespace LancerRemix.Story
             On.OverseerAbstractAI.PlayerGuideUpdate += LunterRemoveDupeOverseer;
             On.OverseerAbstractAI.Roam += LunterOverseerStayNearMoon;
             On.OverseerAI.Update += LunterOverseerLookAtMoon;
-            On.SLOracleBehavior.Update += LunterLookOverseer;
+            On.SLOracleBehavior.Update += LunterMoonHandler;
 
             On.Oracle.OracleArm.BaseDir += LonkSLOracleArmDir;
             On.Oracle.OracleArm.OnFramePos += LonkSLOracleArmPos;
@@ -311,6 +311,11 @@ namespace LancerRemix.Story
                 self.events.Add(new TextEvent(self, 0, self.Translate("I am happy to not be alone."), 20));
                 return;
             }
+            if (self.id == MoonRecieveNSHSwarmer)
+            {
+                self.LoadEventsFromFile(251, GetLancer(basis), false, 0);
+                return;
+            }
 
             #endregion Lunter
 
@@ -323,6 +328,11 @@ namespace LancerRemix.Story
         #region Lunter
 
         private static AbstractCreature lockedOverseer = null;
+
+        private static bool LookOverseer = true;
+
+        private static NSHSwarmer reelInSwarmer = null;
+        private static float swarmerReelIn = 0f;
 
         private static void LunterRemoveDupeOverseer(On.OverseerAbstractAI.orig_PlayerGuideUpdate orig, OverseerAbstractAI self, int time)
         {
@@ -349,7 +359,7 @@ namespace LancerRemix.Story
                 var worldCoordinate = new WorldCoordinate(self.world.GetAbstractRoom("SL_AI").index, Random.Range(57, 62), Random.Range(9, 32), -1);
                 self.SetDestinationNoPathing(worldCoordinate, true);
                 if (self.parent.realizedCreature != null)
-                    (self.parent.realizedCreature as Overseer).ZipToPosition(new Vector2((float)worldCoordinate.x * 20f, (float)worldCoordinate.y * 20f));
+                    (self.parent.realizedCreature as Overseer).ZipToPosition(new Vector2(worldCoordinate.x * 20f, worldCoordinate.y * 20f));
 
                 Debug.Log($"Lunter NSHOverseer stay near moon: {worldCoordinate}");
 
@@ -366,44 +376,105 @@ namespace LancerRemix.Story
                 && (self.creature.abstractAI as OverseerAbstractAI).spearmasterLockedOverseer && self.creature.Room.name == "SL_AI")
             {
                 for (int i = 0; i < self.overseer.room.physicalObjects.Length; i++)
-                {
                     for (int j = 0; j < self.overseer.room.physicalObjects[i].Count; j++)
-                    {
                         if (self.overseer.room.physicalObjects[i][j] is Oracle)
                         {
                             self.lookAt = self.overseer.room.physicalObjects[i][j].firstChunk.pos;
                             return;
                         }
-                    }
-                }
             }
         }
 
-        private static void LunterLookOverseer(On.SLOracleBehavior.orig_Update orig, SLOracleBehavior self, bool eu)
+        private static void LunterMoonHandler(On.SLOracleBehavior.orig_Update orig, SLOracleBehavior self, bool eu)
         {
             orig(self, eu);
             if (!IsStoryLancer || !self.hasNoticedPlayer) return;
             if (!self.oracle.room.game.IsStorySession || GetBasis(self.oracle.room.game.StoryCharacter) != SlugName.Red) return;
-            if (self.oracle.room.game.GetStorySession.saveState.miscWorldSaveData.EverMetMoon && lockedOverseer == null) return;
 
             if (self.player == null || self.player.room != self.oracle.room) return;
-            while (lockedOverseer == null)
+            ReelInNSHSwarmer();
+            ConvertingNSHSwarmer();
+
+            if (!self.oracle.room.game.GetStorySession.saveState.miscWorldSaveData.EverMetMoon) SummonNSHOverseer();
+            if (LookOverseer && lockedOverseer?.realizedCreature != null)
+                self.lookPoint = lockedOverseer.realizedCreature.DangerPos;
+
+            void ReelInNSHSwarmer()
             {
-                Debug.Log("Lunter Moon try summoning NSH overseer");
-                var worldCoordinate = new WorldCoordinate(self.oracle.room.world.offScreenDen.index, -1, -1, 0);
-                lockedOverseer = new AbstractCreature(self.oracle.room.world, StaticWorld.GetCreatureTemplate(CreatureTemplate.Type.Overseer), null, worldCoordinate, new EntityID(-1, 5));
-                if (self.oracle.room.world.GetAbstractRoom(worldCoordinate).offScreenDen)
-                    self.oracle.room.world.GetAbstractRoom(worldCoordinate).entitiesInDens.Add(lockedOverseer);
+                for (int j = 0; j < self.oracle.room.abstractRoom.entities.Count; j++)
+                {
+                    if (self.oracle.room.abstractRoom.entities[j] is AbstractPhysicalObject && (self.oracle.room.abstractRoom.entities[j] as AbstractPhysicalObject).realizedObject != null && Custom.DistLess((self.oracle.room.abstractRoom.entities[j] as AbstractPhysicalObject).realizedObject.firstChunk.pos, self.oracle.firstChunk.pos, 500f) && (self.oracle.room.abstractRoom.entities[j] as AbstractPhysicalObject).realizedObject.grabbedBy.Count == 0 && (self.oracle.room.abstractRoom.entities[j] as AbstractPhysicalObject).realizedObject is NSHSwarmer nshSwarmer)
+                    {
+                        if (reelInSwarmer == null && self.holdingObject == null)
+                            reelInSwarmer = nshSwarmer;
+                    }
+                }
+                if (reelInSwarmer != null && self.holdingObject == null)
+                {
+                    swarmerReelIn = Mathf.Min(1f, swarmerReelIn + 0.016666668f);
+                    reelInSwarmer.firstChunk.vel *= Custom.LerpMap(swarmerReelIn, 0.4f, 1f, 1f, 0.3f, 6f);
+                    reelInSwarmer.firstChunk.vel += Custom.DirVec(reelInSwarmer.firstChunk.pos, self.oracle.firstChunk.pos) * 3.2f * swarmerReelIn;
+                    if (Custom.DistLess(reelInSwarmer.firstChunk.pos, self.oracle.firstChunk.pos, 30f))
+                    {
+                        self.GrabObject(reelInSwarmer);
+                        reelInSwarmer = null;
+                    }
+                }
                 else
-                    self.oracle.room.world.GetAbstractRoom(worldCoordinate).AddEntity(lockedOverseer);
-                lockedOverseer.ignoreCycle = true;
-                (lockedOverseer.abstractAI as OverseerAbstractAI).spearmasterLockedOverseer = true;
-                (lockedOverseer.abstractAI as OverseerAbstractAI).SetAsPlayerGuide(2);
-                (lockedOverseer.abstractAI as OverseerAbstractAI).BringToRoomAndGuidePlayer(self.oracle.room.abstractRoom.index);
+                    swarmerReelIn = 0f;
             }
 
-            if (lockedOverseer.realizedCreature != null) self.lookPoint = lockedOverseer.realizedCreature.DangerPos;
+            void ConvertingNSHSwarmer()
+            {
+                if (self.holdingObject != null && self.holdingObject is NSHSwarmer)
+                {
+                    if (self.oracle.room.game.cameras[0].hud.dialogBox == null || self.oracle.room.game.cameras[0].hud.dialogBox.messages.Count < 1)
+                    {
+                        self.convertSwarmerCounter++;
+                        if (self.convertSwarmerCounter > 40)
+                        {
+                            Vector2 pos = self.holdingObject.firstChunk.pos;
+                            self.holdingObject.Destroy();
+                            self.holdingObject = null;
+                            SLOracleSwarmer sloracleSwarmer = new SLOracleSwarmer(new AbstractPhysicalObject(self.oracle.room.world, AbstractPhysicalObject.AbstractObjectType.SLOracleSwarmer, null, self.oracle.room.GetWorldCoordinate(pos), self.oracle.room.game.GetNewID()), self.oracle.room.world);
+                            self.oracle.room.abstractRoom.entities.Add(sloracleSwarmer.abstractPhysicalObject);
+                            sloracleSwarmer.firstChunk.HardSetPosition(pos);
+                            self.oracle.room.AddObject(sloracleSwarmer);
+                            self.ConvertingSSSwarmer();
+                            if (self is SLOracleBehaviorHasMark behavior && behavior.currentConversation.id == ConvID.MoonRecieveSwarmer)
+                                behavior.currentConversation = new SLOracleBehaviorHasMark.MoonConversation(MoonRecieveNSHSwarmer, behavior, SLOracleBehaviorHasMark.MiscItemType.NA);
+                        }
+                    }
+                }
+            }
+
+            void SummonNSHOverseer()
+            {
+                while (lockedOverseer == null)
+                {
+                    Debug.Log("Lunter Moon try summoning NSH overseer");
+                    var worldCoordinate = new WorldCoordinate(self.oracle.room.world.offScreenDen.index, -1, -1, 0);
+                    lockedOverseer = new AbstractCreature(self.oracle.room.world, StaticWorld.GetCreatureTemplate(CreatureTemplate.Type.Overseer), null, worldCoordinate, new EntityID(-1, 5));
+                    if (self.oracle.room.world.GetAbstractRoom(worldCoordinate).offScreenDen)
+                        self.oracle.room.world.GetAbstractRoom(worldCoordinate).entitiesInDens.Add(lockedOverseer);
+                    else
+                        self.oracle.room.world.GetAbstractRoom(worldCoordinate).AddEntity(lockedOverseer);
+                    lockedOverseer.ignoreCycle = true;
+                    (lockedOverseer.abstractAI as OverseerAbstractAI).spearmasterLockedOverseer = true;
+                    (lockedOverseer.abstractAI as OverseerAbstractAI).SetAsPlayerGuide(2);
+                    (lockedOverseer.abstractAI as OverseerAbstractAI).BringToRoomAndGuidePlayer(self.oracle.room.abstractRoom.index);
+                }
+                LookOverseer = true;
+            }
         }
+
+        private static SLOracleBehaviorHasMark.MiscItemType LunterTypeOfMiscItem(On.SLOracleBehaviorHasMark.orig_TypeOfMiscItem orig,
+            SLOracleBehaviorHasMark self, PhysicalObject testItem)
+        {
+            if (testItem is NSHSwarmer) return LancerEnums.NSHSwarmer;
+            return orig(self, testItem);
+        }
+
 
         #endregion Lunter
 
