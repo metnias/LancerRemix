@@ -187,7 +187,7 @@ namespace LancerRemix.Story
                 GetDeco(self).DrawSprites(null, sLeaser, rCam, timeStacker, camPos);
             else
             {
-                if (!self.owner.daddy.room.game.IsStorySession || !IsStoryLancer) return;
+                if (self.owner.daddy.dead || !self.owner.daddy.room.game.IsStorySession || !IsStoryLancer) return;
                 var basis = GetBasis(self.owner.daddy.room.game.StoryCharacter);
                 if (basis != SlugName.Red) return;
                 sLeaser.sprites[self.startSprite + 5].element = Futile.atlasManager.GetElementWithName("FaceA" +
