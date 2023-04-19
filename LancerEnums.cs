@@ -43,18 +43,18 @@ namespace LancerRemix
         internal static readonly HashSet<SlugName> AllLancer = new HashSet<SlugName>();
         private static readonly HashSet<SlugName> AllBasis = new HashSet<SlugName>();
 
-        internal static bool IsLancer(SlugName name) => AllLancer.Contains(name);
+        public static bool IsLancer(SlugName name) => AllLancer.Contains(name);
 
-        internal static bool HasLancer(SlugName basis) => AllBasis.Contains(basis);
+        public static bool HasLancer(SlugName basis) => AllBasis.Contains(basis);
 
-        internal static SlugName GetLancer(SlugName basis)
+        public static SlugName GetLancer(SlugName basis)
         {
             if (basis == null || basis.Index < 0) return basis;
             if (NameLancer.TryGetValue(basis, out var lancer)) return lancer;
             return basis;
         }
 
-        internal static SlugName GetBasis(SlugName lancer)
+        public static SlugName GetBasis(SlugName lancer)
         {
             if (lancer == null || lancer.Index < 0) return lancer;
             if (NameBasis.TryGetValue(lancer, out var basis)) return basis;

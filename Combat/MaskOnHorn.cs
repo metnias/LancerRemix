@@ -6,7 +6,7 @@ using BodyModeIndex = Player.BodyModeIndex;
 
 namespace LancerRemix.Combat
 {
-    internal class MaskOnHorn
+    public class MaskOnHorn
     {
         internal MaskOnHorn(LancerSupplement owner)
         {

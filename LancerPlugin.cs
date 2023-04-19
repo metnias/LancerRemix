@@ -38,15 +38,15 @@ namespace LancerRemix
         public const string PLUGIN_VERSION = "1.0.1.4";
 
         private static bool init = false;
-        internal static ManualLogSource LogSource;
+        internal static ManualLogSource LogSource { get; private set; }
 
-        public static LancerPlugin instance;
+        public static LancerPlugin Instance { get; private set; }
 
-        public static OptionInterface oi;
+        public static OptionInterface OI { get; private set; }
 
         public void OnEnable()
         {
-            instance = this;
+            Instance = this;
             LogSource = Logger;
 
             On.RainWorld.OnModsInit += WrapInit(Init);
@@ -57,8 +57,8 @@ namespace LancerRemix
 
         private static void Init(RainWorld rw)
         {
-            oi = MachineConnector.GetRegisteredOI("topicular.lancer");
-            if (oi is InternalOI_Auto) (oi as InternalOI_Auto).automated = false;
+            OI = MachineConnector.GetRegisteredOI("topicular.lancer");
+            if (OI is InternalOI_Auto) (OI as InternalOI_Auto).automated = false;
 
             LancerEnums.RegisterExtEnum();
             HornColorPick.Initalize();
@@ -75,8 +75,8 @@ namespace LancerRemix
             lastJollyEnabled = ModManager.JollyCoop;
             lastMMFEnabled = ModManager.MMF;
 
-            instance.Logger.LogMessage("The Lancer is Intialized.");
-            instance.Logger.LogMessage($"ILhooks: {Convert.ToString(ILhookFlags, 2)} ({(ILhookSuccess() ? "Success" : "Failed")})");
+            Instance.Logger.LogMessage("The Lancer is Intialized.");
+            Instance.Logger.LogMessage($"ILhooks: {Convert.ToString(ILhookFlags, 2)} ({(ILhookSuccess() ? "Success" : "Failed")})");
             if (!ILhookSuccess()) Debug.LogError($"Lancer failed some of ILhooks: {Convert.ToString(ILhookFlags, 2)}");
         }
 

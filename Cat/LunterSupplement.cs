@@ -2,7 +2,7 @@
 
 namespace LancerRemix.Cat
 {
-    internal class LunterSupplement : LancerSupplement
+    public class LunterSupplement : LancerSupplement
     {
         public LunterSupplement()
         {

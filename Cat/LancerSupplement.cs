@@ -9,7 +9,7 @@ using BodyIndex = Player.BodyModeIndex;
 
 namespace LancerRemix.Cat
 {
-    internal class LancerSupplement : CatSupplement, IAmLancer
+    public class LancerSupplement : CatSupplement, IAmLancer
     {
         /// <summary>
         /// Slide throw backward: backflip upwards

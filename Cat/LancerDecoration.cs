@@ -8,7 +8,7 @@ using SlugName = SlugcatStats.Name;
 
 namespace LancerRemix.Cat
 {
-    internal class LancerDecoration : CatDecoration, IAmLancer
+    public class LancerDecoration : CatDecoration, IAmLancer
     {
         public LancerDecoration(Player player) : base(player)
         {

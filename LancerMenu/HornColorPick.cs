@@ -36,7 +36,7 @@ namespace LancerRemix.LancerMenu
             }
         }
 
-        private static OptionInterface OI => LancerPlugin.oi;
+        private static OptionInterface OI => LancerPlugin.OI;
 
         private static readonly Configurable<Color>[] hornColors
             = new Configurable<Color>[4];
