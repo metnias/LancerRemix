@@ -278,6 +278,10 @@ namespace LancerRemix.LancerMenu
                 SaveLancerPlayers(self.manager.rainWorld.progression.miscProgressionData);
                 // StartGame(this.slugcatPages[this.slugcatPageIndex].slugcatNumber);
             }
+            if (message == "DEFAULTCOL")
+            {
+                HornColorPick.ResetColor(self.slugcatColorOrder[self.slugcatPageIndex]);
+            }
             orig(self, sender, message);
         }
 

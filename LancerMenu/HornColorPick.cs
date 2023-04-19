@@ -78,7 +78,7 @@ namespace LancerRemix.LancerMenu
 
         private static void SaveColor() => cpk?.wrapper.SaveConfig();
 
-        private static void ResetColor(SlugName playerClass)
+        internal static void ResetColor(SlugName playerClass)
         {
             if (cpk == null) return;
             var basis = LancerEnums.GetBasis(playerClass);
@@ -158,24 +158,32 @@ namespace LancerRemix.LancerMenu
 
         internal static void OnMMFEnablePatch()
         {
-            //On.Menu.SlugcatSelectMenu.CustomColorInterface.ctor += LancerCustomColorInterfaceCtor;
+            On.Menu.SlugcatSelectMenu.CustomColorInterface.ctor += LancerCustomColorInterfaceCtor;
+            On.Menu.SlugcatSelectMenu.CustomColorInterface.RemoveSprites += LancerCustomColorInterfaceRemove;
         }
 
         internal static void OnMMFDisablePatch()
         {
-            //On.Menu.SlugcatSelectMenu.CustomColorInterface.ctor -= LancerCustomColorInterfaceCtor;
+            On.Menu.SlugcatSelectMenu.CustomColorInterface.ctor -= LancerCustomColorInterfaceCtor;
+            On.Menu.SlugcatSelectMenu.CustomColorInterface.RemoveSprites -= LancerCustomColorInterfaceRemove;
         }
-
-#if !NO_MSC
 
         private static void LancerCustomColorInterfaceCtor(On.Menu.SlugcatSelectMenu.CustomColorInterface.orig_ctor orig, SlugcatSelectMenu.CustomColorInterface self,
             Menu.Menu menu, MenuObject owner, Vector2 pos, SlugName slugcatID, List<string> names, List<string> defaultColors)
         {
             orig(self, menu, owner, pos, slugcatID, names, defaultColors);
             if (!SlugcatPageLancer) return;
+            var offset = pos;
+            offset.y -= (self.bodyColors.Length + 3) * 40f ;
+            InitializeWrapper(self, offset + new Vector2(0f, -180f), 0, false);
         }
 
-#endif
+        private static void LancerCustomColorInterfaceRemove(On.Menu.SlugcatSelectMenu.CustomColorInterface.orig_RemoveSprites orig, SlugcatSelectMenu.CustomColorInterface self)
+        {
+            SaveColor();
+            DestroyWrappers();
+            orig(self);
+        }
 
         #endregion MMF
     }
