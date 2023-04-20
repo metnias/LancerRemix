@@ -199,7 +199,8 @@ namespace LancerRemix
             MineForLunterData = 1 << 3,
             LoadLancerState = 1 << 4,
             LonkEatMeatUpdate = 1 << 5,
-            LancerStartGamePatch = 1 << 6
+            LancerStartGamePatch = 1 << 6,
+            LancerCustomColorSlider = 1 << 7,
         }
 
         internal static void ILhookTry(ILhooks flag)

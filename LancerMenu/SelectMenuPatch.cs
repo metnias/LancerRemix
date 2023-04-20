@@ -14,6 +14,8 @@ using SlugBase;
 using SlugBase.Assets;
 using SlugBase.Features;
 using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -304,7 +306,20 @@ namespace LancerRemix.LancerMenu
             var cursor = new ILCursor(il);
             LancerPlugin.ILhookTry(LancerPlugin.ILhooks.LancerStartGamePatch);
 
-            // TODO: Add CustomColorSupport
+            #region CustomColor
+
+            if (!cursor.TryGotoNext(MoveType.After,
+                x => x.MatchLdnull(),
+                x => x.MatchStsfld(typeof(PlayerGraphics).GetField(nameof(PlayerGraphics.customColors)))
+                )) return;
+
+            DebugLogCursor();
+            cursor.Emit(OpCodes.Ldarg_0);
+            cursor.EmitDelegate<Action<SlugcatSelectMenu>>(
+                (self) => { if (slugcatPageLancer) SetLancerCustomColors(self); }
+                );
+
+            #endregion CustomColor
 
             #region SkipIntro
 
@@ -345,6 +360,30 @@ namespace LancerRemix.LancerMenu
 
             void DebugLogCursor() =>
                 LancerPlugin.LogSource.LogInfo($"{cursor.Prev.OpCode.Name} > Cursor < {cursor.Next.OpCode.Name}");
+        }
+
+        private static void SetLancerCustomColors(SlugcatSelectMenu self)
+        {
+            var lancer = GetLancer(self.slugcatColorOrder[self.slugcatPageIndex]);
+            if (ModManager.MMF && self.manager.rainWorld.progression.miscProgressionData.colorsEnabled.ContainsKey(lancer.value) && self.manager.rainWorld.progression.miscProgressionData.colorsEnabled[lancer.value])
+            {
+                List<Color> list = new List<Color>();
+                for (int i = 0; i < self.manager.rainWorld.progression.miscProgressionData.colorChoices[lancer.value].Count; ++i)
+                {
+                    Vector3 hsl = new Vector3(1f, 1f, 1f);
+                    if (self.manager.rainWorld.progression.miscProgressionData.colorChoices[lancer.value][i].Contains(","))
+                    {
+                        string[] array = self.manager.rainWorld.progression.miscProgressionData.colorChoices[lancer.value][i].Split(new char[] { ',' });
+                        hsl = new Vector3(float.Parse(array[0], NumberStyles.Any, CultureInfo.InvariantCulture), float.Parse(array[1], NumberStyles.Any, CultureInfo.InvariantCulture), float.Parse(array[2], NumberStyles.Any, CultureInfo.InvariantCulture));
+                    }
+                    list.Add(Custom.HSL2RGB(hsl[0], hsl[1], hsl[2]));
+                }
+                PlayerGraphics.customColors = list;
+            }
+            else
+            {
+                PlayerGraphics.customColors = null;
+            }
         }
 
         private static void ContinueLancerStartedGame(On.Menu.SlugcatSelectMenu.orig_ContinueStartedGame orig, SlugcatSelectMenu self, SlugName storyGameCharacter)
@@ -678,11 +717,39 @@ namespace LancerRemix.LancerMenu
 
         internal static void OnMMFEnablePatch()
         {
-            // TODO: Hook SSM SliderSetValue, ValueOfSlider; edit StartGame
+            IL.Menu.SlugcatSelectMenu.SliderSetValue += LancerCustomColorSlider;
+            IL.Menu.SlugcatSelectMenu.ValueOfSlider += LancerCustomColorSlider;
         }
 
         internal static void OnMMFDisablePatch()
         {
+            IL.Menu.SlugcatSelectMenu.SliderSetValue += LancerCustomColorSlider;
+            IL.Menu.SlugcatSelectMenu.ValueOfSlider += LancerCustomColorSlider;
+        }
+
+        private static void LancerCustomColorSlider(ILContext il)
+        {
+            var cursor = new ILCursor(il);
+            LancerPlugin.ILhookTry(LancerPlugin.ILhooks.LancerCustomColorSlider);
+
+            if (!cursor.TryGotoNext(MoveType.After, x => x.MatchStloc(0))) return;
+
+            DebugLogCursor();
+            cursor.Emit(OpCodes.Ldarg_0);
+            cursor.Emit(OpCodes.Ldloc, 0);
+            cursor.EmitDelegate<Func<SlugcatSelectMenu, SlugName, SlugName>>(
+                    (self, name) =>
+                    {
+                        if (slugcatPageLancer) return GetLancer(name);
+                        return name;
+                    }
+                );
+            cursor.Emit(OpCodes.Stloc, 0);
+
+            LancerPlugin.ILhookOkay(LancerPlugin.ILhooks.LancerCustomColorSlider);
+
+            void DebugLogCursor() =>
+                LancerPlugin.LogSource.LogInfo($"{cursor.Prev.OpCode.Name} > Cursor < {cursor.Next.OpCode.Name}");
         }
 
         #endregion MMFCustomColor
