@@ -83,7 +83,7 @@ namespace LancerRemix.Story
             }
         }
 
-        private static void LancerDreamProgress(On.DreamsState.orig_StaticEndOfCycleProgress orig, SaveState saveState, string currentRegion, string denPosition, ref int cyclesSinceLastDream, ref int cyclesSinceLastFamilyDream, ref int cyclesSinceLastGuideDream, ref int inGWOrSHCounter, ref DreamsState.DreamID upcomingDream, ref DreamsState.DreamID eventDream, ref bool everSleptInSB, ref bool everSleptInSB_S01, ref bool guideHasShownHimselfToPlayer, ref int guideThread, ref bool guideHasShownMoonThisRound, ref int familyThread)
+        private static void LancerDreamProgress(On.DreamsState.orig_StaticEndOfCycleProgress orig, SaveState saveState, string currentRegion, string denPosition, ref int cyclesSinceLastDream, ref int cyclesSinceLastFamilyDream, ref int cyclesSinceLastGuideDream, ref int inGWOrSHCounter, ref DreamsState.DreamID upcomingDream, ref DreamID eventDream, ref bool everSleptInSB, ref bool everSleptInSB_S01, ref bool guideHasShownHimselfToPlayer, ref int guideThread, ref bool guideHasShownMoonThisRound, ref int familyThread)
         {
             orig(saveState, currentRegion, denPosition, ref cyclesSinceLastDream, ref cyclesSinceLastFamilyDream, ref cyclesSinceLastGuideDream, ref inGWOrSHCounter, ref upcomingDream, ref eventDream, ref everSleptInSB, ref everSleptInSB_S01, ref guideHasShownHimselfToPlayer, ref guideThread, ref guideHasShownMoonThisRound, ref familyThread);
             if (!IsStoryLancer) return;
@@ -108,7 +108,7 @@ namespace LancerRemix.Story
             if (!IsStoryLancer) return;
             var basis = GetBasis(self.StoryCharacter);
             if (basis == null) return;
-            if(basis == SlugName.Red)
+            if (basis == SlugName.Red)
                 self.manager.nextSlideshow = SlideShow.SlideShowID.RedOutro;
             else if (basis == SlugName.White)
                 self.manager.nextSlideshow = SlideShow.SlideShowID.WhiteOutro;
@@ -139,7 +139,6 @@ namespace LancerRemix.Story
             self.playList[i].fadeInDoneAt = self.ConvertTime(0, 51, 20);
             self.playList[i].fadeOutStartAt = self.ConvertTime(0, 55, 60);
         }
-
 
         internal static WorldCoordinate? GetMiscWorldCoord(PlayerProgression.MiscProgressionData data, string key)
         {

@@ -1,4 +1,5 @@
-﻿using LancerRemix.Cat;
+﻿using HUD;
+using LancerRemix.Cat;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using MoreSlugcats;

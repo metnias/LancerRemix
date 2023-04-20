@@ -17,8 +17,10 @@ namespace LancerRemix.Story
         internal static void SubPatch()
         {
             On.SSOracleBehavior.Update += LonkKarmaCapOneStep;
-            On.SSOracleBehavior.ThrowOutBehavior.Update += ThrowUpdatePatch;
             On.SSOracleBehavior.PebblesConversation.AddEvents += AddLancerEvents;
+            On.Oracle.SetUpMarbles += LunterPebblesKeepGreenNeuron;
+            On.SSOracleBehavior.Update += LunterPebblesHoldingNeuron;
+            On.SSOracleBehavior.ThrowOutBehavior.Update += LunterPebblesPostMeetBehavior;
         }
 
         private static bool IsStoryLancer => ModifyCat.IsStoryLancer;
@@ -102,6 +104,7 @@ namespace LancerRemix.Story
             {
                 self.LoadEventsFromFile(46, GetLancer(SlugName.Red), false, 0);
                 SetProgValue(Custom.rainWorld.progression.currentSaveState.miscWorldSaveData, LUNTERTOOKNSHKEYBACK, false);
+                lunterStoleNeuron = false;
                 secondEntry = true; banned = false;
                 greenNeuron = self.owner.greenNeuron;
                 return;
@@ -110,6 +113,7 @@ namespace LancerRemix.Story
             {
                 self.LoadEventsFromFile(47, GetLancer(SlugName.Red), false, 0);
                 SetProgValue(Custom.rainWorld.progression.currentSaveState.miscWorldSaveData, LUNTERTOOKNSHKEYBACK, false);
+                lunterStoleNeuron = false;
                 secondEntry = true; banned = true;
                 return;
             }
@@ -137,50 +141,95 @@ namespace LancerRemix.Story
         private static NSHSwarmer greenNeuron = null;
         private static bool secondEntry = true;
         private static bool banned = false;
+        private static bool lunterStoleNeuron = false;
 
-        private static void ThrowUpdatePatch(On.SSOracleBehavior.ThrowOutBehavior.orig_Update orig, SSOracleBehavior.ThrowOutBehavior self)
+        private static void LunterPebblesKeepGreenNeuron(On.Oracle.orig_SetUpMarbles orig, Oracle self)
         {
-            if (!IsStoryLancer) goto NoLancer;
-            var basis = GetBasis(self.owner.oracle.room.game.StoryCharacter);
-            if (basis != SlugName.Red) goto NoLancer;
+            orig(self);
+            if (!IsStoryLancer) return;
+            var basis = GetBasis(self.room.game.StoryCharacter);
+            if (basis != SlugName.Red || self.room.abstractRoom.name != "SS_AI") return;
 
-            Vector2 GrabPos = (self.oracle.graphicsModule == null) ? self.oracle.firstChunk.pos : (self.oracle.graphicsModule as OracleGraphics).hands[1].pos;
-            bool lunterStoleNeuron = GetProgValue<bool>(Custom.rainWorld.progression.currentSaveState.miscWorldSaveData, LUNTERTOOKNSHKEYBACK);
+            if (self.room.game.GetStorySession.saveState.miscWorldSaveData.SSaiConversationsHad < 1) return; // never met
+            lunterStoleNeuron = GetProgValue<bool>(Custom.rainWorld.progression.currentSaveState.miscWorldSaveData, LUNTERTOOKNSHKEYBACK);
+            if (lunterStoleNeuron) return; // already taken
+
+            foreach (var list in self.room.physicalObjects)
+                foreach (var obj in list)
+                    if (obj is NSHSwarmer) // already exist for some reason
+                    { greenNeuron = obj as NSHSwarmer; KeepGreenNeuronToPebbles(self); return; }
+
+            var absNeuron = new AbstractPhysicalObject(self.room.world, AbstractPhysicalObject.AbstractObjectType.NSHSwarmer, null, self.room.GetWorldCoordinate(self.bodyChunks[0].pos), self.room.game.GetNewID());
+            self.room.abstractRoom.entities.Add(absNeuron);
+            absNeuron.RealizeInRoom();
+            greenNeuron = absNeuron.realizedObject as NSHSwarmer;
+            KeepGreenNeuronToPebbles(self);
+            Debug.Log("Lunter Pebbles respawns Green Neuron he has kept");
+        }
+
+        private static void KeepGreenNeuronToPebbles(Oracle self)
+        {
+            if (greenNeuron == null) return;
+            var GrabPos = (self.graphicsModule == null) ? self.firstChunk.pos : (self.graphicsModule as OracleGraphics).hands[1].pos;
+
+            greenNeuron.firstChunk.MoveFromOutsideMyUpdate(true, GrabPos);
+            greenNeuron.firstChunk.vel *= 0f;
+            greenNeuron.direction = Custom.PerpendicularVector(self.firstChunk.pos, greenNeuron.firstChunk.pos);
+            greenNeuron.storyFly = true;
+            greenNeuron.storyFlyTarget = GrabPos;
+        }
+
+        private static void LunterPebblesHoldingNeuron(On.SSOracleBehavior.orig_Update orig, SSOracleBehavior self, bool eu)
+        {
+            orig(self, eu);
+
+            if (!IsStoryLancer) return;
+            var basis = GetBasis(self.oracle.room.game.StoryCharacter);
+            if (basis != SlugName.Red) return;
+
+            // GreenNeuron inside room
+            if (greenNeuron?.room == self.oracle.room && !lunterStoleNeuron)
+            {
+                self.greenNeuron = greenNeuron;
+                if (self.greenNeuron.grabbedBy.Count < 1)
+                {
+                    KeepGreenNeuronToPebbles(self.oracle); // Green Neuron in 5P's hand
+                    if (Custom.DistLess(greenNeuron.firstChunk.pos, self.player.firstChunk.pos, 40f))
+                    {
+                        self.player.ReleaseGrasp(1);
+                        self.player.SlugcatGrab(greenNeuron, 1);
+                    }
+                }
+            }
+        }
+
+        private static void LunterPebblesPostMeetBehavior(On.SSOracleBehavior.ThrowOutBehavior.orig_Update orig, SSOracleBehavior.ThrowOutBehavior self)
+        {
+            if (!IsStoryLancer) goto NoLunter;
+            var basis = GetBasis(self.owner.oracle.room.game.StoryCharacter);
+            if (basis != SlugName.Red) goto NoLunter;
 
             if (self.player.room == self.oracle.room)
             {
-                if (!lunterStoleNeuron && greenNeuron?.room == self.oracle.room)
+                // GreenNeuron inside room
+                if (greenNeuron?.room == self.oracle.room)
                 {
-                    self.owner.greenNeuron = greenNeuron;
-                    if (self.owner.greenNeuron != null && self.owner.greenNeuron.grabbedBy.Count < 1)
+                    if (!lunterStoleNeuron)
                     {
-                        //instance.player.mainBodyChunk.vel *= Mathf.Lerp(0.9f, 1f, instance.oracle.room.gravity);
-                        //instance.player.bodyChunks[1].vel *= Mathf.Lerp(0.9f, 1f, instance.oracle.room.gravity);
-                        //instance.player.mainBodyChunk.vel += Custom.DirVec(instance.player.mainBodyChunk.pos, instance.owner.greenNeuron.firstChunk.pos)
-                        //    * 0.5f * (1f - instance.oracle.room.gravity);
-                        self.owner.greenNeuron.firstChunk.MoveFromOutsideMyUpdate(true, GrabPos);
-                        self.owner.greenNeuron.firstChunk.vel *= 0f;
-                        self.owner.greenNeuron.direction = Custom.PerpendicularVector(self.oracle.firstChunk.pos, self.owner.greenNeuron.firstChunk.pos);
-                        self.owner.greenNeuron.storyFly = true;
-                        if (self.owner.greenNeuron.storyFly)
+                        self.movementBehavior = SSOracleBehavior.MovementBehavior.KeepDistance;
+                        if (self.owner.greenNeuron != null &&
+                            self.owner.greenNeuron.grabbedBy.Count > 0 && self.owner.greenNeuron.grabbedBy[0].grabber is Player)
                         {
-                            self.owner.greenNeuron.storyFlyTarget = GrabPos;
-                            if (Custom.DistLess(self.owner.greenNeuron.firstChunk.pos, self.player.firstChunk.pos, 40f))
-                            {
-                                self.player.ReleaseGrasp(1);
-                                self.player.SlugcatGrab(self.owner.greenNeuron, 1);
-                            }
+                            GreenNeuronTakenByPlayerEvent(); // GreenN Neuron just taken by Player
                         }
                     }
-                    if (self.owner.greenNeuron != null && self.owner.greenNeuron.grabbedBy.Count > 0 && self.owner.greenNeuron.grabbedBy[0].grabber is Player)
+                    else
                     {
-                        self.owner.greenNeuron.storyFly = false;
-                        SetProgValue(Custom.rainWorld.progression.currentSaveState.miscWorldSaveData, LUNTERTOOKNSHKEYBACK, true);
-                        self.telekinThrowOut = false;
-                        self.owner.NewAction(SSAction.ThrowOut_ThrowOut);
-                        self.owner.throwOutCounter = 0;
-                        banned = false;
-                        greenNeuron = null;
+                        if (greenNeuron != null && greenNeuron.grabbedBy.Count < 1 && greenNeuron.room == self.oracle.room)
+                        {
+                            GreenNeuronFliesToPlayer();
+                        }
+                        else greenNeuron.storyFly = false;
                     }
                 }
 
@@ -194,13 +243,11 @@ namespace LancerRemix.Story
             if (self.action == SSAction.ThrowOut_ThrowOut)
             {
                 if (banned) { banned = false; self.owner.NewAction(SSAction.ThrowOut_Polite_ThrowOut); return; }
-                //stolen neuron
+                // Player Stolen Green neuron
                 if (self.player.room == self.oracle.room)
-                {
-                    self.owner.throwOutCounter++;
-                }
-                self.movementBehavior = SSOracleBehavior.MovementBehavior.KeepDistance;
-                self.telekinThrowOut = (self.owner.throwOutCounter > 1150);
+                    ++self.owner.throwOutCounter;
+                self.movementBehavior = SSOracleBehavior.MovementBehavior.Talk;
+                self.telekinThrowOut = self.owner.throwOutCounter > 1150;
                 if (self.owner.throwOutCounter == 50)
                 {
                     self.dialogBox.Interrupt(self.Translate("What? Why would you take it back? Do you even know where you're going with that?"), 0);
@@ -209,13 +256,13 @@ namespace LancerRemix.Story
                 }
                 else if (self.owner.throwOutCounter == 1200)
                 {
-                    self.telekinThrowOut = true;
                     self.dialogBox.Interrupt(self.Translate("Leave now, and don't come back."), 0);
                     banned = true;
+                    Debug.Log("5P throws out Lunter after Green Neuron being taken");
                     self.owner.NewAction(SSAction.ThrowOut_SecondThrowOut);
                 }
                 if (self.owner.playerOutOfRoomCounter > 100 && self.owner.throwOutCounter > 400)
-                {
+                { // player exited before last dialogue; return to idle
                     self.owner.NewAction(SSAction.General_Idle);
                     self.owner.getToWorking = 1f;
                 }
@@ -243,6 +290,7 @@ namespace LancerRemix.Story
                 }
                 else if (self.inActionCounter == 1100)
                 {
+                    Debug.Log("5P helps Lunter out");
                     self.dialogBox.NewMessage(self.Translate("Do you need some help, tiny creature?"), 0);
                 }
                 //if (lunterStoleNeuron) { instance.owner.NewAction(SSOracleBehavior.Action.ThrowOut_ThrowOut); }
@@ -251,51 +299,61 @@ namespace LancerRemix.Story
             if (self.action == SSAction.ThrowOut_SecondThrowOut)
             {
                 if (self.player.room == self.oracle.room)
-                {
-                    self.owner.throwOutCounter++;
-                }
+                    ++self.owner.throwOutCounter;
                 self.movementBehavior = SSOracleBehavior.MovementBehavior.Investigate;
                 self.telekinThrowOut = (self.inActionCounter > 220) && secondEntry || (banned && self.inActionCounter > 50);
-                if (!banned && self.owner.throwOutCounter == 50)
+                if (!banned)
                 {
-                    if (!lunterStoleNeuron && secondEntry)
+                    self.movementBehavior = SSOracleBehavior.MovementBehavior.Talk;
+                    if (self.owner.inActionCounter == 50)
                     {
-                        self.dialogBox.Interrupt(self.Translate("Why have you returned? There is nothing left for you here."), 0);
+                        self.owner.TurnOffSSMusic(false);
+                        if (secondEntry)
+                        {
+                            if (!lunterStoleNeuron)
+                                self.dialogBox.Interrupt(self.Translate("Why have you returned? There is nothing left for you here."), 0);
+                            else
+                                self.dialogBox.Interrupt(self.Translate("I implore you, little creature, for the sake of both of us, to just leave already."), 0);
+                        }
+                        else
+                        {
+                            self.dialogBox.Interrupt(self.Translate("Well, child, if you'd rather spend time with me than<LINE>search for eternal happiness, I will have to accommodate you for the time being."), 0);
+                        }
                     }
-                    else if (lunterStoleNeuron && secondEntry)
+                    else if (self.owner.inActionCounter == 250)
                     {
-                        self.dialogBox.Interrupt(self.Translate("I implore you, little creature, for the sake of both of us, to just leave already."), 0);
+                        if (secondEntry)
+                        {
+                            if (!lunterStoleNeuron)
+                                self.dialogBox.Interrupt(self.Translate("Please don't waste any more of your time, little creature."), 0);
+                            else
+                                self.dialogBox.Interrupt(self.Translate("I cannot assist you further."), 0);
+                        }
+                        else
+                        {
+                            self.dialogBox.Interrupt(self.Translate("Just be aware of the mistake you're making."), 0);
+                        }
                     }
-                    else
+                    else if (self.owner.inActionCounter == 700)
                     {
-                        self.telekinThrowOut = false;
-                        self.dialogBox.Interrupt(self.Translate("Well, child, if you'd rather spend time with me than<LINE>search for eternal happiness, I will have to accommodate you for the time being."), 0);
+                        if (secondEntry && !lunterStoleNeuron)
+                        {
+                            self.dialogBox.Interrupt(self.Translate("It is too long a journey to stall for even a moment."), 0);
+                        }
                     }
-                }
-                else if (!banned && self.owner.throwOutCounter == 250)
-                {
-                    if (!lunterStoleNeuron && secondEntry)
+                    else if (!secondEntry && self.owner.inActionCounter > 1000)
                     {
-                        self.dialogBox.Interrupt(self.Translate("Please don't waste any more of your time, little creature."), 0);
-                    }
-                    else if (lunterStoleNeuron && secondEntry)
-                    {
-                        self.dialogBox.Interrupt(self.Translate("I cannot assist you further."), 0);
-                    }
-                    else
-                    {
-                        self.dialogBox.Interrupt(self.Translate("Just be aware of the mistake you're making."), 0);
+                        self.movementBehavior = SSOracleBehavior.MovementBehavior.Idle;
                         self.owner.getToWorking = 1f;
                     }
                 }
-                else if (!banned && self.owner.throwOutCounter == 700)
+                else
                 {
-                    if (!lunterStoleNeuron && secondEntry)
-                    {
-                        self.dialogBox.Interrupt(self.Translate("It is too long a journey to stall for even a moment."), 0);
-                    }
+                    self.movementBehavior = SSOracleBehavior.MovementBehavior.KeepDistance;
+                    if (self.owner.inActionCounter == 50)
+                        self.dialogBox.Interrupt(self.Translate("I cannot assist you further."), 0);
                 }
-                if (self.owner.playerOutOfRoomCounter > 100 && self.owner.throwOutCounter > 400)
+                if (self.owner.playerOutOfRoomCounter > 100 && self.owner.inActionCounter > 400)
                 {
                     self.owner.NewAction(SSAction.General_Idle);
                     self.owner.getToWorking = 1f;
@@ -311,7 +369,33 @@ namespace LancerRemix.Story
                 }
                 return;
             }
-        NoLancer: orig.Invoke(self);
+        NoLunter: orig.Invoke(self);
+
+            void GreenNeuronTakenByPlayerEvent()
+            {
+                self.movementBehavior = SSOracleBehavior.MovementBehavior.Investigate;
+                self.owner.greenNeuron.storyFly = false;
+                SetProgValue(Custom.rainWorld.progression.currentSaveState.miscWorldSaveData, LUNTERTOOKNSHKEYBACK, true);
+                lunterStoleNeuron = true;
+                self.telekinThrowOut = false;
+                self.owner.NewAction(SSAction.ThrowOut_ThrowOut);
+                self.owner.throwOutCounter = 0;
+                banned = false;
+                Debug.Log("Lunter took Green Neuron back");
+            }
+
+            void GreenNeuronFliesToPlayer()
+            {
+                greenNeuron.storyFly = true;
+                greenNeuron.storyFlyTarget = self.player.firstChunk.pos;
+                /*
+                if (Custom.DistLess(greenNeuron.firstChunk.pos, self.player.firstChunk.pos, 40f))
+                {
+                    self.player.ReleaseGrasp(1);
+                    self.player.SlugcatGrab(greenNeuron, 1);
+                }
+                */
+            }
         }
     }
 }

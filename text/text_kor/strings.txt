@@ -46,12 +46,12 @@ I hope you find what you're looking for. Don't bother coming back.|네가 찾고
 
 // Lunter SSOracle
 What? Why would you take it back? Do you even know where you're going with that?|뭐라고? 왜 그걸 도로 가져가는 거지? 그걸 어디로 가져가야 하는지는 아는 건가?
-Fine, little creature. Have it your way. Her name is Looks to the Moon, and she lies decrepit in the waters to the east.|좋아, 자그만 생물. 너 알아서 하라고. 그녀의 이름은 달을 향해 보라이고, 동쪽의 물가에 노쇠해 쓰러져있다.
-It's a shame you'd choose to waste such a precious resource on her.<LINE>But I respect your courage, and if you feel that's what's right, I won't stand in your way.|그런 소중한 자원을 그녀한테 낭비하려 하다니 안타깝군.<LINE>하지만 네 용기는 존중하지. 그게 옳다고 생각한다면, 널 막지는 않겠어.
+Fine, little creature. Have it your way. Her name is Looks to the Moon, and she lies decrepit in the waters to the east.|좋아, 자그만 생물. 너 알아서 하라고. '달을 향해 보라'라는 이름을 갖고 있는 친구인데, 동쪽의 물가에 노쇠해 쓰러져있다.
+It's a shame you'd choose to waste such a precious resource on her.<LINE>But I respect your courage, and if you feel that's what's right, I won't stand in your way.|그런 소중한 자원을 달에게 낭비하려 하다니 안타깝군.<LINE>하지만 네 용기는 존중하지. 그게 옳다고 생각한다면, 널 막지는 않겠어.
 Leave now, and don't come back.|이제 떠나, 그리고 돌아오지 마.
 Do you need some help, tiny creature?|도움이 필요한가, 자그만 생물?
 Why have you returned? There is nothing left for you here.|어째서 돌아온 거지? 널 위해 남아있는 건 없어.
-I implore you, little creature, for the sake of both of us, to just leave already.|작은 생물, 우리 둘을 위해서라도 부탁하건데, 그냥 어서 떠나렴.
+I implore you, little creature, for the sake of both of us, to just leave already.|작은 생물, 우리 둘을 위해서라도 부탁하건데, 그냥 어서 떠나.
 Well, child, if you'd rather spend time with me than<LINE>search for eternal happiness, I will have to accommodate you for the time being.|뭐, 아이야, 영복을 찾느니 나와 시간을 보내겠다면, 잠시 돌봐주도록 하지.
 Please don't waste any more of your time, little creature.|더 시간을 낭비하지 마, 작은 생물.
 I cannot assist you further.|이 이상 더 도와줄 순 없어.
