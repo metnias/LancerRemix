@@ -4,6 +4,7 @@ using RWCustom;
 using System.Collections.Generic;
 using UnityEngine;
 using static LancerRemix.Cat.ModifyCat;
+using Shipping = CreatureTemplate.Relationship;
 
 namespace LancerRemix.Combat
 {
@@ -18,7 +19,7 @@ namespace LancerRemix.Combat
             On.Vulture.Violence += VultureLancerDropMask;
             On.MoreSlugcats.VultureMaskGraphics.DrawSprites += MaskDrawPatch;
             On.ScavengerAI.CollectScore_PhysicalObject_bool += ScavHornMaskNoPickUp;
-            On.LizardAI.DetermineBehavior += LizardHornMaskBehavior;
+            On.LizardAI.IUseARelationshipTracker_UpdateDynamicRelationship += LizardHornOnMaskRelationship;
         }
 
         private static bool CreatureGrabLancer(On.Creature.orig_Grab orig, Creature self, PhysicalObject obj, int graspUsed, int chunkGrabbed, Creature.Grasp.Shareability shareability, float dominance, bool overrideEquallyDominant, bool pacifying)
@@ -96,10 +97,8 @@ namespace LancerRemix.Combat
                 if (stick is MaskOnHorn.AbstractOnHornStick) { hornStick = stick as MaskOnHorn.AbstractOnHornStick; break; }
             if (hornStick == null || !(self.attachedTo is VultureMask))
             {
-                if (self.attachedTo is VultureMask)
-                {
-                    (self.attachedTo as VultureMask).lastDonned = 0f; (self.attachedTo as VultureMask).donned = 0f; //don't put on mask
-                }
+                //if (self.attachedTo is VultureMask)
+                //    (self.attachedTo as VultureMask).lastDonned = 0f; (self.attachedTo as VultureMask).donned = 0f; //don't put on mask
                 orig(self, sLeaser, rCam, timeStacker, camPos);
                 return;
             }
@@ -193,48 +192,33 @@ namespace LancerRemix.Combat
             return orig.Invoke(self, obj, weaponFiltered);
         }
 
-        private static LizardAI.Behavior LizardHornMaskBehavior(On.LizardAI.orig_DetermineBehavior orig, LizardAI self)
+        /// <summary>
+        /// New code suggested by Shiny Kelp
+        /// </summary>
+        private static Shipping LizardHornOnMaskRelationship(On.LizardAI.orig_IUseARelationshipTracker_UpdateDynamicRelationship orig,
+            LizardAI self, RelationshipTracker.DynamicRelationship dRelation)
         {
-            if (self.creature.creatureTemplate.type == CreatureTemplate.Type.BlackLizard || self.creature.creatureTemplate.type == CreatureTemplate.Type.RedLizard)
-                goto NoLunter;
-            Tracker.CreatureRepresentation rep = null;
-            Player player = null;
-            for (int i = 0; i < self.tracker.CreaturesCount; i++)
+            if (dRelation.trackerRep.representedCreature?.realizedCreature is Player player)
             {
-                rep = self.tracker.GetRep(i);
-                if (rep.representedCreature != null && rep.representedCreature.creatureTemplate.type == CreatureTemplate.Type.Slugcat)
+                if (!IsPlayerLancer(player)) goto NoLunter;
+                var lunterSub = GetSub<LunterSupplement>(player);
+                if (lunterSub == null) goto NoLunter;
+
+                if (lunterSub.maskOnHorn.HasAMask)
                 {
-                    if (rep.representedCreature.realizedCreature != null) { player = rep.representedCreature.realizedCreature as Player; break; }
+                    var auxGrasp = player.grasps[0];
+                    player.grasps[0] = new Creature.Grasp(player, lunterSub.maskOnHorn.Mask, 0, 0, Creature.Grasp.Shareability.CanNotShare, 0f, false);
+                    var result = orig(self, dRelation);
+                    player.grasps[0] = auxGrasp;
+
+                    ++self.usedToVultureMask; // horn mask is not as convincing
+                    result.intensity *= 0.8f;
+                    return result;
                 }
             }
-            if (player == null || !IsPlayerLancer(player)) goto NoLunter;
-            var lunterSub = GetSub<LunterSupplement>(player);
-            if (lunterSub == null) goto NoLunter;
 
-            if (rep.VisualContact && lunterSub.maskOnHorn.HasAMask)
-            {
-                bool king = lunterSub.maskOnHorn.Mask.King;
-                if (self.usedToVultureMask < (!king ? 700 : 1200))
-                {
-                    self.usedToVultureMask += 2;
-                    if (self.creature.creatureTemplate.type == CreatureTemplate.Type.GreenLizard && !king)
-                    {
-                        rep.dynamicRelationship.currentRelationship = new CreatureTemplate.Relationship(CreatureTemplate.Relationship.Type.Ignores, 0f);
-                    }
-                    else
-                    {
-                        rep.dynamicRelationship.currentRelationship = new CreatureTemplate.Relationship(CreatureTemplate.Relationship.Type.Afraid,
-                            Mathf.InverseLerp((float)(!king ? 700 : 1200), 600f, (float)self.usedToVultureMask)
-                            * (!king ? ((self.creature.creatureTemplate.type != CreatureTemplate.Type.BlueLizard) ? 0.4f : 0.6f) //0.6 0.8
-                            : ((self.creature.creatureTemplate.type != CreatureTemplate.Type.GreenLizard) ? 0.7f : 0.3f))); //0.9 0.4
-                    }
-
-                    self.preyTracker.ForgetPrey(player.abstractCreature);
-                    self.threatTracker.AddThreatCreature(rep);
-                }
-            }
         NoLunter:
-            return orig.Invoke(self);
+            return orig(self, dRelation);
         }
 
         #endregion HornOnMask
