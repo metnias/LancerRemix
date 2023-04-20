@@ -9,6 +9,7 @@ using UnityEngine;
 using static LancerRemix.LancerEnums;
 using MenuSceneID = Menu.MenuScene.SceneID;
 using SlugName = SlugcatStats.Name;
+//using MSCName = MoreSlugcats.MoreSlugcatsEnums.SlugcatStatsName;
 
 namespace LancerRemix.LancerMenu
 {
@@ -18,6 +19,7 @@ namespace LancerRemix.LancerMenu
         {
             On.Menu.MenuScene.ctor += LancerSceneSwap;
             IL.Menu.FastTravelScreen.ctor += LancerTravelScreen;
+            On.Menu.StoryGameStatisticsScreen.AddBkgIllustration += LancerStatsBkgScene;
 
             SelectMenuPatch.SubPatch();
             MultiplayerPatch.SubPatch();
@@ -79,6 +81,24 @@ namespace LancerRemix.LancerMenu
             }
         }
 
+        private static void LancerStatsBkgScene(On.Menu.StoryGameStatisticsScreen.orig_AddBkgIllustration orig, StoryGameStatisticsScreen self)
+        {
+            if (!IsStoryLancer) goto NoLancer;
+            var basis = GetBasis(ModManager.MSC ? RainWorld.lastActiveSaveSlot : SlugName.Red);
+            var lancer = GetLancer(basis);
+
+            var saveGameData = SlugcatSelectMenu.MineForSaveData(self.manager, lancer);
+            if (saveGameData != null && saveGameData.ascended) // && (!ModManager.MSC || RainWorld.lastActiveSaveSlot != MSCName.Saint)
+            {
+                self.scene = new InteractiveMenuScene(self, self.pages[0], MenuSceneID.Red_Ascend);
+                self.pages[0].subObjects.Add(self.scene);
+                return;
+            }
+
+        NoLancer:
+            orig(self);
+        }
+
         private static void LancerSceneSwap(On.Menu.MenuScene.orig_ctor orig, MenuScene self, Menu.Menu menu, MenuObject owner, MenuSceneID sceneID)
         {
             orig(self, menu, owner, sceneID);
@@ -95,6 +115,14 @@ namespace LancerRemix.LancerMenu
                 ReplaceIllust(self, "", "", "", "", new Vector2());
             }
             else if (sceneID == MenuSceneID.Outro_Hunter_3_Embrace)
+            {
+                ReplaceIllust(self, "", "", "", "", new Vector2());
+            }
+            else if (sceneID == MenuSceneID.Red_Ascend)
+            {
+                ReplaceIllust(self, "", "", "", "", new Vector2());
+            }
+            else if (sceneID == MenuSceneID.RedsDeathStatisticsBkg)
             {
                 ReplaceIllust(self, "", "", "", "", new Vector2());
             }
