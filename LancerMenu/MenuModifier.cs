@@ -1,4 +1,5 @@
 ﻿using LancerRemix.Cat;
+using LancerRemix.Story;
 using Menu;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
@@ -6,7 +7,7 @@ using System;
 using System.IO;
 using UnityEngine;
 using static LancerRemix.LancerEnums;
-using MenueSceneID = Menu.MenuScene.SceneID;
+using MenuSceneID = Menu.MenuScene.SceneID;
 using SlugName = SlugcatStats.Name;
 
 namespace LancerRemix.LancerMenu
@@ -78,10 +79,37 @@ namespace LancerRemix.LancerMenu
             }
         }
 
-        private static void LancerSceneSwap(On.Menu.MenuScene.orig_ctor orig, MenuScene self, Menu.Menu menu, MenuObject owner, MenueSceneID sceneID)
+        private static void LancerSceneSwap(On.Menu.MenuScene.orig_ctor orig, MenuScene self, Menu.Menu menu, MenuObject owner, MenuSceneID sceneID)
         {
             orig(self, menu, owner, sceneID);
-            if (IsStoryLancer && sceneID == MenueSceneID.SleepScreen) LancerSleepScene(self);
+            if (!IsStoryLancer) return;
+            if (sceneID == MenuSceneID.SleepScreen) LancerSleepScene(self);
+            else if (sceneID == MenuSceneID.Outro_3_Face) LancerOutroFace(self);
+            #region LunterOutro
+            else if (sceneID == MenuSceneID.Outro_Hunter_1_Swim)
+            {
+                ReplaceIllust(self, "", "", "", "", new Vector2());
+            }
+            else if (sceneID == MenuSceneID.Outro_Hunter_2_Sink)
+            {
+                ReplaceIllust(self, "", "", "", "", new Vector2());
+            }
+            else if (sceneID == MenuSceneID.Outro_Hunter_3_Embrace)
+            {
+                ReplaceIllust(self, "", "", "", "", new Vector2());
+            }
+            #endregion LunterOutro
+        }
+
+        private static void LancerOutroFace(MenuScene self)
+        {
+            var basis = DreamHandler.OutroLancerFaceBasis;
+            if (basis == null) return;
+
+            if (basis == SlugName.White)
+                ReplaceIllust(self, "", "", "", "", new Vector2());
+            else if (basis == SlugName.Yellow)
+                ReplaceIllust(self, "", "", "", "", new Vector2());
         }
 
         private static void LancerTravelScreen(ILContext il)

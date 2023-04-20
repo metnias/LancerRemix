@@ -1,5 +1,6 @@
 ﻿using LancerRemix.Cat;
 using Menu;
+using System.Linq;
 using static CatSub.Story.SaveManager;
 using static LancerRemix.LancerEnums;
 using DreamID = DreamsState.DreamID;
@@ -16,6 +17,8 @@ namespace LancerRemix.Story
             On.RainWorldGame.Win += WinLancer;
             On.DreamsState.StaticEndOfCycleProgress += LancerDreamProgress;
             On.Menu.DreamScreen.SceneFromDream += LancerSceneFromDream;
+            On.RainWorldGame.ExitToVoidSeaSlideShow += LancerToVoidSeaSlideShow;
+            On.Menu.SlideShow.ctor += LancerRemoveOutroTree;
 
             LunterScripts.SubPatch();
             SLOracleModify.SubPatch();
@@ -97,6 +100,46 @@ namespace LancerRemix.Story
 
             return orig(self, dreamID);
         }
+
+        private static void LancerToVoidSeaSlideShow(On.RainWorldGame.orig_ExitToVoidSeaSlideShow orig, RainWorldGame self)
+        {
+            OutroLancerFaceBasis = null;
+            orig(self);
+            if (!IsStoryLancer) return;
+            var basis = GetBasis(self.StoryCharacter);
+            if (basis == null) return;
+            if(basis == SlugName.Red)
+                self.manager.nextSlideshow = SlideShow.SlideShowID.RedOutro;
+            else if (basis == SlugName.White)
+                self.manager.nextSlideshow = SlideShow.SlideShowID.WhiteOutro;
+            else if (basis == SlugName.Yellow)
+                self.manager.nextSlideshow = SlideShow.SlideShowID.WhiteOutro;
+            OutroLancerFaceBasis = OutroLancerFaceBasis;
+        }
+
+        internal static SlugName OutroLancerFaceBasis { get; private set; } = null;
+
+        private static void LancerRemoveOutroTree(On.Menu.SlideShow.orig_ctor orig, SlideShow self,
+            ProcessManager manager, SlideShow.SlideShowID slideShowID)
+        {
+            orig(self, manager, slideShowID);
+            if (!IsStoryLancer || slideShowID != SlideShow.SlideShowID.WhiteOutro) return;
+
+            int i = 0;
+            for (; i < self.playList.Count; ++i)
+                if (self.playList[i].sceneID == MenuSceneID.Outro_4_Tree) break;
+            self.playList.RemoveAt(i);
+            var treeScene = self.preloadedScenes[i];
+            treeScene.RemoveSprites();
+            var sceneList = self.preloadedScenes.ToList();
+            sceneList.Remove(treeScene);
+            self.preloadedScenes = sceneList.ToArray();
+
+            --i;
+            self.playList[i].fadeInDoneAt = self.ConvertTime(0, 51, 20);
+            self.playList[i].fadeOutStartAt = self.ConvertTime(0, 55, 60);
+        }
+
 
         internal static WorldCoordinate? GetMiscWorldCoord(PlayerProgression.MiscProgressionData data, string key)
         {
