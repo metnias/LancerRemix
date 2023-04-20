@@ -5,7 +5,6 @@ using RWCustom;
 using System.Text;
 using UnityEngine;
 using static LancerRemix.LancerEnums;
-using static MonoMod.InlineRT.MonoModRule;
 using SlugName = SlugcatStats.Name;
 
 namespace LancerRemix.Story
@@ -16,6 +15,7 @@ namespace LancerRemix.Story
         {
             On.OverseerTutorialBehavior.PickupObjectInputInstructionController.Update += LancerPickupInstruction;
             On.RoomSpecificScript.SU_A23FirstCycleMessage.Update += LancerSU_A23;
+            On.Room.Loaded += LancerAddRoomSpecificScript;
             On.Menu.ControlMap.ctor += LancerControlMap;
 
             if (ModManager.MMF) OnMMFEnablePatch();
@@ -39,7 +39,7 @@ namespace LancerRemix.Story
 
         private static bool IsStoryLancer => ModifyCat.IsStoryLancer;
 
-        private static bool extraTutoShown = false;
+        internal static bool extraTutoRequested = false;
 
         private static string Translate(string text) => Custom.rainWorld.inGameTranslator.Translate(text);
 
@@ -56,14 +56,8 @@ namespace LancerRemix.Story
                         self.room.game.cameras[0].hud.textPrompt.AddMessage(Translate("But stabbing does not stun foes"), 20, 240, true, true);
                         self.room.game.cameras[0].hud.textPrompt.AddMessage(Translate("Have to find an opening"), 20, 240, true, true);
                         self.textShown = true;
-                        extraTutoShown = false;
+                        extraTutoRequested = true;
                     }
-                }
-                if ((!ModManager.MMF || MMF.cfgExtraTutorials.Value) && !extraTutoShown && self.room.abstractRoom.name == "SU_A25")
-                {
-                    Debug.Log("Lurvivor Extra Tutorial");
-                    self.room.game.cameras[0].hud.textPrompt.AddMessage(Translate("Press PICK UP while holding a spear to block beforehand"), 0, 300, true, true);
-                    extraTutoShown = true;
                 }
             }
             orig(self);
@@ -89,6 +83,17 @@ namespace LancerRemix.Story
             orig(self, eu);
         }
 
+        private static void LancerAddRoomSpecificScript(On.Room.orig_Loaded orig, Room self)
+        {
+            orig(self);
+            string name = self.abstractRoom.name;
+            if (string.IsNullOrEmpty(name)) return;
+            if (name == "SU_A25" && IsStoryLancer)
+            {
+                self.AddObject(new LancerSU_A25(self));
+            }
+        }
+
         private static void LancerControlMap(On.Menu.ControlMap.orig_ctor orig, ControlMap self, Menu.Menu menu, MenuObject owner, Vector2 pos, Options.ControlSetup.Preset preset, bool showPickupInstructions)
         {
             orig.Invoke(self, menu, owner, pos, preset, showPickupInstructions);
@@ -107,6 +112,28 @@ namespace LancerRemix.Story
             { S.Append("- "); S.AppendLine(Translate("Hold PICK UP with a mask to hang it onto your horn")); }
 
             self.pickupButtonInstructions.text = S.ToString();
+        }
+
+        private class LancerSU_A25 : UpdatableAndDeletable
+        {
+            public LancerSU_A25(Room room)
+            {
+                Debug.Log("Lancer Block Tutorial added");
+                this.room = room;
+            }
+
+            public override void Update(bool eu)
+            {
+                base.Update(eu);
+                if (extraTutoRequested && room.game.Players.Count > 0
+                    && room.game.Players[0].realizedCreature?.room == room)
+                {
+                    extraTutoRequested = false;
+                    room.game.cameras[0].hud.textPrompt.AddMessage(Translate("Press PICK UP while holding a spear to block beforehand"), 0, 300, true, true);
+
+                    Destroy();
+                }
+            }
         }
     }
 }
