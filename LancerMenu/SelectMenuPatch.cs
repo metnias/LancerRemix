@@ -314,10 +314,12 @@ namespace LancerRemix.LancerMenu
                 )) return;
 
             DebugLogCursor();
-            cursor.Emit(OpCodes.Ldarg_0);
+            cursor.Goto(cursor.Next, MoveType.After);
+            DebugLogCursor();
             cursor.EmitDelegate<Action<SlugcatSelectMenu>>(
                 (self) => { if (slugcatPageLancer) SetLancerCustomColors(self); }
                 );
+            cursor.Emit(OpCodes.Ldarg_0);
 
             #endregion CustomColor
 
@@ -384,6 +386,7 @@ namespace LancerRemix.LancerMenu
             {
                 PlayerGraphics.customColors = null;
             }
+            LancerPlugin.LogSource.LogInfo($"Lancer ({lancer}) CustomColors: {(PlayerGraphics.customColors != null ? PlayerGraphics.customColors.Count : 0)}");
         }
 
         private static void ContinueLancerStartedGame(On.Menu.SlugcatSelectMenu.orig_ContinueStartedGame orig, SlugcatSelectMenu self, SlugName storyGameCharacter)

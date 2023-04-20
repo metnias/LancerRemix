@@ -9,6 +9,7 @@ using UnityEngine;
 using static LancerRemix.LancerEnums;
 using MenuSceneID = Menu.MenuScene.SceneID;
 using SlugName = SlugcatStats.Name;
+
 //using MSCName = MoreSlugcats.MoreSlugcatsEnums.SlugcatStatsName;
 
 namespace LancerRemix.LancerMenu
@@ -53,8 +54,8 @@ namespace LancerRemix.LancerMenu
 
         private static bool IsStoryLancer => ModifyCat.IsStoryLancer;
 
-        private static void ReplaceIllust(MenuScene scene, string sceneFolder, string flatImage, string layerImageOrig, string layerImage, Vector2 layerPos)
-            => SelectMenuPatch.ReplaceIllust(scene, sceneFolder, flatImage, layerImageOrig, layerImage, layerPos, MenuDepthIllustration.MenuShader.Normal);
+        private static void ReplaceIllust(MenuScene scene, string sceneFolder, string flatImage, string layerImageOrig, string layerImage, Vector2 layerPos, MenuDepthIllustration.MenuShader shader = null)
+            => SelectMenuPatch.ReplaceIllust(scene, sceneFolder, flatImage, layerImageOrig, layerImage, layerPos, shader ?? MenuDepthIllustration.MenuShader.Normal);
 
         private static void LancerSleepScene(MenuScene scene)
         {
@@ -105,7 +106,10 @@ namespace LancerRemix.LancerMenu
             if (!IsStoryLancer) return;
             if (sceneID == MenuSceneID.SleepScreen) LancerSleepScene(self);
             else if (sceneID == MenuSceneID.Outro_3_Face) LancerOutroFace(self);
+
             #region LunterOutro
+
+            /*
             else if (sceneID == MenuSceneID.Outro_Hunter_1_Swim)
             {
                 ReplaceIllust(self, "", "", "", "", new Vector2());
@@ -126,6 +130,8 @@ namespace LancerRemix.LancerMenu
             {
                 ReplaceIllust(self, "", "", "", "", new Vector2());
             }
+            */
+
             #endregion LunterOutro
         }
 
@@ -133,11 +139,12 @@ namespace LancerRemix.LancerMenu
         {
             var basis = DreamHandler.OutroLancerFaceBasis;
             if (basis == null) return;
-
+            /*
             if (basis == SlugName.White)
                 ReplaceIllust(self, "", "", "", "", new Vector2());
             else if (basis == SlugName.Yellow)
                 ReplaceIllust(self, "", "", "", "", new Vector2());
+            */
         }
 
         private static void LancerTravelScreen(ILContext il)

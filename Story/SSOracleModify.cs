@@ -45,6 +45,8 @@ namespace LancerRemix.Story
                 for (int m = 0; m < 20; m++)
                     self.oracle.room.AddObject(new Spark(self.player.mainBodyChunk.pos, Custom.RNV() * UnityEngine.Random.value * 40f, new Color(1f, 1f, 1f), null, 30, 120));
                 self.oracle.room.PlaySound(SoundID.SS_AI_Give_The_Mark_Boom, 0f, 1f, 1f);
+
+                Debug.Log("Lonk receive one karma up");
                 return;
             }
         NoLonk: orig.Invoke(self, eu);

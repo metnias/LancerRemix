@@ -61,6 +61,7 @@ namespace LancerRemix.Story
                 }
                 if ((!ModManager.MMF || MMF.cfgExtraTutorials.Value) && !extraTutoShown && self.room.abstractRoom.name == "SU_A25")
                 {
+                    Debug.Log("Lurvivor Extra Tutorial");
                     self.room.game.cameras[0].hud.textPrompt.AddMessage(Translate("Press PICK UP while holding a spear to block beforehand"), 0, 300, true, true);
                     extraTutoShown = true;
                 }
