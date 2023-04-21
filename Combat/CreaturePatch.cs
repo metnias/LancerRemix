@@ -170,6 +170,7 @@ namespace LancerRemix.Combat
                     var auxGrasp = player.grasps[0];
                     player.grasps[0] = new Creature.Grasp(player, lunterSub.maskOnHorn.Mask, 0, 0, Creature.Grasp.Shareability.CanNotShare, 0f, false);
                     var result = orig(self, dRelation);
+                    player.grasps[0].Release();
                     player.grasps[0] = auxGrasp;
 
                     ++self.usedToVultureMask; // horn mask is not as convincing
