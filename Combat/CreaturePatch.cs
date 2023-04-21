@@ -17,7 +17,7 @@ namespace LancerRemix.Combat
             On.Lizard.Violence += LancerLizardViolencePatch;
             On.Creature.Stun += StunPatch;
             On.Vulture.Violence += VultureLancerDropMask;
-            On.MoreSlugcats.VultureMaskGraphics.DrawSprites += MaskDrawPatch;
+            On.MoreSlugcats.VultureMaskGraphics.DrawSprites += MaskOnHornDrawPatch;
             On.ScavengerAI.CollectScore_PhysicalObject_bool += ScavHornMaskNoPickUp;
             On.LizardAI.IUseARelationshipTracker_UpdateDynamicRelationship += LizardHornOnMaskRelationship;
         }
@@ -88,30 +88,22 @@ namespace LancerRemix.Combat
             if (lancer) vulture.AI.disencouraged = (disencouraged * 1.5f + vulture.AI.disencouraged) / 2.5f;
         }
 
-        #region HornOnMask
+        #region MaskOnHorn
 
-        private static void MaskDrawPatch(On.MoreSlugcats.VultureMaskGraphics.orig_DrawSprites orig, VultureMaskGraphics self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
+        private static void MaskOnHornDrawPatch(On.MoreSlugcats.VultureMaskGraphics.orig_DrawSprites orig, VultureMaskGraphics self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
         {
             MaskOnHorn.AbstractOnHornStick hornStick = null;
             foreach (var stick in self.attachedTo.abstractPhysicalObject.stuckObjects)
                 if (stick is MaskOnHorn.AbstractOnHornStick) { hornStick = stick as MaskOnHorn.AbstractOnHornStick; break; }
-            if (hornStick == null || !(self.attachedTo is VultureMask))
-            {
-                //if (self.attachedTo is VultureMask)
-                //    (self.attachedTo as VultureMask).lastDonned = 0f; (self.attachedTo as VultureMask).donned = 0f; //don't put on mask
-                orig(self, sLeaser, rCam, timeStacker, camPos);
-                return;
-            }
+            if (hornStick == null || !(self.attachedTo is VultureMask)) goto NotHorned;
 
             PlayerGraphics pg = hornStick.Player.realizedObject?.graphicsModule as PlayerGraphics;
-            Vector2 pos0, rotA, rotB;
-            float lgt, don;
-
+            Vector2 pos0, rot, anchor;
             pos0 = Vector2.Lerp((self.attachedTo as VultureMask).firstChunk.lastPos, (self.attachedTo as VultureMask).firstChunk.pos, timeStacker);
-            don = Mathf.Lerp((self.attachedTo as VultureMask).lastDonned, (self.attachedTo as VultureMask).donned, timeStacker);
-            lgt = rCam.room.Darkness(pos0) * (1f - rCam.room.LightSourceExposure(pos0)) * 0.8f * (1f - (self.attachedTo as VultureMask).fallOffVultureMode);
-            rotA = Vector3.Slerp((self.attachedTo as VultureMask).lastRotationA, (self.attachedTo as VultureMask).rotationA, timeStacker);
-            rotB = new Vector2(0f, 1f); //Vector3.Slerp(mask.lastRotationB, mask.rotationB, timeStacker);
+            float don = Mathf.Lerp((self.attachedTo as VultureMask).lastDonned, (self.attachedTo as VultureMask).donned, timeStacker);
+            // float lgt = rCam.room.Darkness(pos0) * (1f - rCam.room.LightSourceExposure(pos0)) * 0.8f * (1f - (self.attachedTo as VultureMask).fallOffVultureMode);
+            rot = Vector3.Slerp((self.attachedTo as VultureMask).lastRotationA, (self.attachedTo as VultureMask).rotationA, timeStacker);
+            anchor = new Vector2(0f, 1f);
 
             //if (don <= 0f) { goto ApplyChanges; }
             float view = Mathf.Lerp((self.attachedTo as VultureMask).lastViewFromSide, (self.attachedTo as VultureMask).viewFromSide, timeStacker);
@@ -120,64 +112,33 @@ namespace LancerRemix.Combat
             //pos0m = Vector2.Lerp(pos0m, Vector2.Lerp(pg.head.lastPos, pg.head.pos, timeStacker) + posM * 3f, 0.5f);
             pos0m = Vector2.Lerp(pos0m, Vector2.Lerp(pg.head.lastPos, pg.head.pos, timeStacker) - posM * 6f, 0.5f);
             pos0m += Vector2.Lerp(pg.lastLookDir, pg.lookDirection, timeStacker) * 1.5f;
-            rotA = Vector3.Slerp(rotA, posM, don);
+            rot = Vector3.Slerp(rot, posM, don);
+
             if ((pg.owner as Player).eatCounter < 35)
             { //eating
-                rotB = Vector3.Slerp(rotB, new Vector2(0f, -1f), don); //don
+                anchor = Vector3.Slerp(anchor, new Vector2(0f, -1f), don); //don
                 pos0m += posM * Mathf.InverseLerp(35f, 15f, (float)(pg.owner as Player).eatCounter) * 9f;
                 //Custom.LerpMap((float)(pg.owner as Player).eatCounter, 35f, 15f, 0f, 0.11f)
             }
             else
             {
-                rotB = Vector3.Slerp(rotB, new Vector2(0f, 1f), don);
+                anchor = Vector3.Slerp(anchor, new Vector2(0f, 1f), don);
             }
             if (view != 0f)
             {
-                rotA = Custom.DegToVec(Custom.VecToDeg(rotA) - 20f * view);
-                rotB = Vector3.Slerp(rotB, Custom.DegToVec(-50f * view), Mathf.Abs(view));
+                rot = Custom.DegToVec(Custom.VecToDeg(rot) - 20f * view);
+                anchor = Vector3.Slerp(anchor, Custom.DegToVec(-50f * view), Mathf.Abs(view));
                 pos0m += posM * 2f * Mathf.Abs(view);
                 pos0m -= Custom.PerpendicularVector(posM) * 4f * view;
             }
             pos0 = Vector2.Lerp(pos0, pos0m, don);
-            //ApplyChanges:
-            float deg = Custom.VecToDeg(rotB);
-            int idx = Custom.IntClamp(Mathf.RoundToInt(Mathf.Abs(deg / 180f) * 8f), 0, 8);
-            float size = (!(self.attachedTo as VultureMask).King) ? 1f : 1.15f;
-            for (int i = 0; i < ((!(self.attachedTo as VultureMask).King) ? 3 : 4); i++)
-            {
-                sLeaser.sprites[i].element = Futile.atlasManager.GetElementWithName(((i != 3) ? "KrakenMask" : "KrakenArrow") + idx);
-                sLeaser.sprites[i].rotation = Custom.VecToDeg(rotA);
-                sLeaser.sprites[i].x = pos0.x - camPos.x;
-                sLeaser.sprites[i].y = pos0.y - camPos.y;
-                sLeaser.sprites[i].anchorY = Custom.LerpMap(Mathf.Abs(deg), 0f, 100f, 0.5f, 0.675f, 2.1f);
-                sLeaser.sprites[i].anchorX = 0.5f - rotB.x * 0.1f * Mathf.Sign(deg);
-            }
-            sLeaser.sprites[1].scaleX *= 0.85f * size;
-            sLeaser.sprites[1].scaleY = 0.9f * size;
-            sLeaser.sprites[2].scaleY = 1.1f * size;
-            sLeaser.sprites[2].anchorY += 0.015f;
 
-            if ((self.attachedTo as VultureMask).blink > 0 && UnityEngine.Random.value < 0.5f)
-            {
-                for (int j = 0; j < ((!(self.attachedTo as VultureMask).King) ? 3 : 4); j++)
-                { sLeaser.sprites[j].color = new Color(1f, 1f, 1f); }
-            }
-            else
-            {
-                hornStick.maskOnHorn.color = Color.Lerp(Color.Lerp(hornStick.maskOnHorn.ColorA.rgb, new Color(1f, 1f, 1f), 0.35f * (self.attachedTo as VultureMask).fallOffVultureMode), hornStick.maskOnHorn.blackColor, Mathf.Lerp(0.2f, 1f, Mathf.Pow(lgt, 2f)));
-                sLeaser.sprites[0].color = hornStick.maskOnHorn.color;
-                sLeaser.sprites[1].color = Color.Lerp(hornStick.maskOnHorn.color, hornStick.maskOnHorn.blackColor, Mathf.Lerp(0.75f, 1f, lgt));
-                sLeaser.sprites[2].color = Color.Lerp(hornStick.maskOnHorn.color, hornStick.maskOnHorn.blackColor, Mathf.Lerp(0.75f, 1f, lgt));
-                if ((self.attachedTo as VultureMask).King)
-                {
-                    sLeaser.sprites[3].color = Color.Lerp(Color.Lerp(Color.Lerp(HSLColor.Lerp(hornStick.maskOnHorn.ColorA, hornStick.maskOnHorn.ColorB, 0.8f - 0.3f * (self.attachedTo as VultureMask).fallOffVultureMode).rgb, hornStick.maskOnHorn.blackColor, 0.53f),
-                        Color.Lerp(hornStick.maskOnHorn.ColorA.rgb, new Color(1f, 1f, 1f), 0.35f), 0.1f), hornStick.maskOnHorn.blackColor, 0.6f * lgt);
-                }
-            }
-            if ((self.attachedTo as VultureMask).slatedForDeletetion || (self.attachedTo as VultureMask).room != rCam.room)
-            {
-                sLeaser.CleanSpritesAndRemove();
-            }
+            self.overrideDrawVector = pos0;
+            self.overrideRotationVector = rot;
+            self.overrideAnchorVector = anchor;
+
+        NotHorned:
+            orig(self, sLeaser, rCam, timeStacker, camPos);
         }
 
         private static int ScavHornMaskNoPickUp(On.ScavengerAI.orig_CollectScore_PhysicalObject_bool orig, ScavengerAI self, PhysicalObject obj, bool weaponFiltered)
@@ -221,6 +182,6 @@ namespace LancerRemix.Combat
             return orig(self, dRelation);
         }
 
-        #endregion HornOnMask
+        #endregion MaskOnHorn
     }
 }
