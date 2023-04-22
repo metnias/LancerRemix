@@ -323,7 +323,7 @@ namespace LancerRemix.Cat
                 }
                 Vector2 away;
                 var spear = GetParrySpear();
-                if (source?.owner == null) goto NoParry;
+                if (source?.owner != null)
                 {
                     if (source.owner is Creature crit)
                     {
@@ -357,6 +357,11 @@ namespace LancerRemix.Cat
         {
             if (!(self.grasps[grasp]?.grabbed is Spear spear)) { orig(self, grasp, eu); return; }
 
+            LanceAttack(spear, orig, grasp, eu);
+        }
+
+        public virtual void LanceAttack(Spear spear, On.Player.orig_ThrowObject orig, int grasp, bool eu)
+        {
             if (lanceTimer != 0) return;
             if (ModManager.MSC && spear.bugSpear) { orig(self, grasp, eu); return; } // throw bugSpear normally
             lanceGrasp = grasp;
@@ -491,7 +496,7 @@ namespace LancerRemix.Cat
             orig.Invoke(self, eu);
         }
 
-        protected internal void FlingLance()
+        public void FlingLance()
         {
             Spear spear = lanceSpear;
             if (lanceSpear != null) ReleaseLanceSpear();
@@ -530,7 +535,7 @@ namespace LancerRemix.Cat
             SetLanceCooltime();
         }
 
-        protected internal void ReleaseLanceSpear()
+        public void ReleaseLanceSpear()
         {
             if (lanceSpear != null)
             {
@@ -542,7 +547,7 @@ namespace LancerRemix.Cat
             blockTimer = -blockTime;
         }
 
-        protected internal void RetrieveLanceSpear(Spear spear = null)
+        public void RetrieveLanceSpear(Spear spear = null)
         {
             if (spear == null) spear = lanceSpear;
             if (lanceTimer < 0 || spear == null || spear.grabbedBy.Count > 0 || spear.room != self.room || self.grasps[lanceGrasp] != null)
@@ -552,7 +557,7 @@ namespace LancerRemix.Cat
             SetLanceCooltime();
         }
 
-        protected virtual void SetLanceCooltime()
+        public void SetLanceCooltime()
         {
             lanceTimer = isLonk ? -16 : -24;
             if (self.exhausted || self.gourmandExhausted) lanceTimer -= 12;

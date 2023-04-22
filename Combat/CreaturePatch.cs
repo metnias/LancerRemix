@@ -22,6 +22,7 @@ namespace LancerRemix.Combat
             On.Creature.Stun += StunPatch;
             On.Vulture.Violence += VultureLancerDropMask;
             IL.BigNeedleWorm.Swish += BigNeedleWormParryCheck;
+            IL.KingTusks.Tusk.ShootUpdate += KingTuskParryCheck;
             On.MoreSlugcats.VultureMaskGraphics.DrawSprites += MaskOnHornDrawPatch;
             On.ScavengerAI.CollectScore_PhysicalObject_bool += ScavHornMaskNoPickUp;
             On.LizardAI.IUseARelationshipTracker_UpdateDynamicRelationship += LizardHornOnMaskRelationship;
@@ -109,20 +110,16 @@ namespace LancerRemix.Combat
             LancerPlugin.ILhookTry(LancerPlugin.ILhooks.BigNeedleWormParryCheck);
 
             if (!cursor.TryGotoNext(MoveType.After,
-                x => x.MatchLdcR4(1.22f),
-                x => x.MatchLdcR4(60f),
-                x => x.MatchCallvirt(typeof(Creature).GetMethod(nameof(Creature.Violence))),
-                x => x.MatchLdarg(0)
+                x => x.MatchCallvirt(typeof(Creature).GetMethod(nameof(Creature.Violence)))
                 )) return;
             DebugLogCursor();
             cursor.Emit(OpCodes.Nop);
             var lblNoParry = cursor.DefineLabel();
             lblNoParry.Target = cursor.Prev;
-            cursor.Emit(OpCodes.Ldarg_0);
             cursor.GotoLabel(lblNoParry, MoveType.Before);
             DebugLogCursor();
 
-            //cursor.Emit(OpCodes.Ldarg_0);
+            cursor.Emit(OpCodes.Ldarg_0);
             cursor.Emit(OpCodes.Ldloc, 1);
             cursor.EmitDelegate<Func<BigNeedleWorm, Vector2, bool>>(
                 (self, value) =>
@@ -132,7 +129,7 @@ namespace LancerRemix.Combat
                         var sub = GetSub<LancerSupplement>(player);
                         if (sub != null && sub.HasParried)
                         {
-                            BigNeedleWormParried(self, value, player);
+                            BigNeedleWormParried(self, value, sub);
                             return true;
                         }
                     }
@@ -148,7 +145,7 @@ namespace LancerRemix.Combat
                 LancerPlugin.LogSource.LogInfo($"{cursor.Prev.OpCode.Name} > Cursor < {cursor.Next.OpCode.Name}");
         }
 
-        private static void BigNeedleWormParried(BigNeedleWorm self, Vector2 swishDir, Player lancer)
+        private static void BigNeedleWormParried(BigNeedleWorm self, Vector2 swishDir, LancerSupplement sub)
         {
             Debug.Log("Lancer Parried BigNeedleWorm");
 
@@ -165,6 +162,64 @@ namespace LancerRemix.Combat
                 self.SetSegmentVel(i, vel);
             }
             self.impaleChunk = null;
+        }
+
+        private static void KingTuskParryCheck(ILContext il)
+        {
+            var cursor = new ILCursor(il);
+            LancerPlugin.ILhookTry(LancerPlugin.ILhooks.KingTuskParryCheck);
+
+            if (!cursor.TryGotoNext(MoveType.After,
+                x => x.MatchCallvirt(typeof(Creature).GetMethod(nameof(Creature.Violence)))
+                )) return;
+            DebugLogCursor();
+            cursor.Emit(OpCodes.Nop);
+            var lblNoParry = cursor.DefineLabel();
+            lblNoParry.Target = cursor.Prev;
+            cursor.GotoLabel(lblNoParry, MoveType.Before);
+            DebugLogCursor();
+
+            cursor.Emit(OpCodes.Ldarg_0);
+            cursor.EmitDelegate<Func<KingTusks.Tusk, bool>>(
+                (self) =>
+                {
+                    if (self.impaleChunk?.owner is Player player && IsPlayerLancer(player))
+                    {
+                        var sub = GetSub<LancerSupplement>(player);
+                        if (sub != null && sub.HasParried)
+                        {
+                            KingTuskParried(self, sub);
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+                );
+            cursor.Emit(OpCodes.Brfalse, lblNoParry);
+            cursor.Emit(OpCodes.Ret);
+
+            LancerPlugin.ILhookOkay(LancerPlugin.ILhooks.KingTuskParryCheck);
+
+            void DebugLogCursor() =>
+                LancerPlugin.LogSource.LogInfo($"{cursor.Prev.OpCode.Name} > Cursor < {cursor.Next.OpCode.Name}");
+        }
+
+        private static void KingTuskParried(KingTusks.Tusk self, LancerSupplement sub)
+        {
+            Debug.Log("Lancer Parried KingTusk");
+
+            var impaleChunk = self.impaleChunk;
+            self.SwitchMode(KingTusks.Tusk.Mode.Dangling);
+            self.impaleChunk = null;
+            self.chunkPoints[0, 2].x = (Mathf.Abs(self.chunkPoints[0, 2].x) + 15f) * Mathf.Sign(self.chunkPoints[0, 2].x) * -1.5f;
+            Vector2 spin = Custom.RNV();
+            self.chunkPoints[0, 2] += spin * 10f;
+            self.chunkPoints[1, 2] -= spin * 10f;
+            self.room.PlaySound(SoundID.King_Vulture_Tusk_Bounce_Off_Terrain, impaleChunk.pos, 1.2f, 1.5f);
+
+            impaleChunk.vel = Vector2.ClampMagnitude(impaleChunk.vel, 5f); // reduce fling
+
+            sub.FlingLance();
         }
 
         #region MaskOnHorn
