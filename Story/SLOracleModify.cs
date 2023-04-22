@@ -361,8 +361,16 @@ namespace LancerRemix.Story
         {
             if (IsStoryLancer && self.world.game.IsStorySession && GetBasis(self.world.game.StoryCharacter) == SlugName.Red)
             {
-                if (!self.spearmasterLockedOverseer &&
-                    (self.RelevantPlayer?.Room.name == "SL_AI" || self.world.game.GetStorySession.saveState.miscWorldSaveData.EverMetMoon))
+                if (!self.spearmasterLockedOverseer)
+                {
+                    if (self.RelevantPlayer?.Room.name == "SL_AI" || self.world.game.GetStorySession.saveState.miscWorldSaveData.EverMetMoon)
+                    {
+                        self.PlayerGuideGoAway(40);
+                        self.parent.Die();
+                        return;
+                    }
+                }
+                else if (self.RelevantPlayer?.Room.name != "SL_AI")
                 {
                     self.PlayerGuideGoAway(40);
                     self.parent.Die();
