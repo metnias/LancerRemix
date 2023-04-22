@@ -53,9 +53,14 @@ namespace LancerRemix.Story
 
             var basis = GetBasis(saveStateNumber);
 
-            if (basis != SlugName.Red) return;
-            self.dreamsState = new DreamsState(); // add dream state to lancer hunter
-            SetProgValue(self.miscWorldSaveData, LunterScripts.HUNTERMEET, 0); // never met
+            if (basis == SlugName.Red)
+            {
+                self.dreamsState = new DreamsState(); // add dream state to lancer hunter
+                SetProgValue(self.miscWorldSaveData, LunterScripts.HUNTERMEET, 0); // never met
+                return;
+            }
+            if (basis == SlugName.White || basis == SlugName.Yellow)
+                self.dreamsState = null; // no dream state for lancer surv/monk
         }
 
         private static void WinLancer(On.RainWorldGame.orig_Win orig, RainWorldGame self, bool malnourished)
