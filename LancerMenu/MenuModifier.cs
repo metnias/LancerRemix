@@ -3,10 +3,14 @@ using LancerRemix.Story;
 using Menu;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
+using RWCustom;
 using System;
+using System.Globalization;
 using System.IO;
+using System.Text.RegularExpressions;
 using UnityEngine;
 using static LancerRemix.LancerEnums;
+using static System.Net.Mime.MediaTypeNames;
 using MenuSceneID = Menu.MenuScene.SceneID;
 using SlugName = SlugcatStats.Name;
 

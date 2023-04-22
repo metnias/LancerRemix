@@ -185,7 +185,7 @@
     <Content Include="scenes\Outro 3\2 - facecloseup - Lsurv.png" />
     <Content Include="scenes\Outro 3\outro 3 - face - Lmonk - flat.png" />
     <Content Include="scenes\Outro 3\outro 3 - face - Lsurv - flat.png" />
-    <Content Include="slugbase\scenes\outro lhunter 1 - swim\outro Lhunter 1 - swim - 0.png" />
+    <Content Include="slugbase\scenes\outro lhunter 1 - swim\camera.txt" />
     <Content Include="slugbase\scenes\outro lhunter 1 - swim\outro Lhunter 1 - swim - 5.png" />
     <Content Include="slugbase\scenes\outro lhunter 1 - swim\outro Lhunter 1 - swim - 1.png" />
     <Content Include="slugbase\scenes\outro lhunter 1 - swim\outro Lhunter 1 - swim - 2.png" />
@@ -213,6 +213,7 @@
     <Content Include="scenes\Outro L_B\Outro 4_B - Home - LWhite - Flat.png" />
     <AdditionalFiles Include="scenes\Outro L_B\slugcat end_b - Lwhite - slugcat f.png" />
     <AdditionalFiles Include="scenes\Outro L_B\slugcat end_b - Lwhite - flat.png" />
+    <Content Include="slugbase\scenes\outro lhunter 1 - swim\outro Lhunter 1 - swim - 0.png" />
     <Content Include="slugbase\scenes\red ghost lancer\Lhunt ghost a.png" />
     <Content Include="slugbase\scenes\red ghost lancer\Lhunt ghost b.png" />
     <Content Include="slugbase\scenes\red ghost lancer\Lhunt ghost bkg.png" />
