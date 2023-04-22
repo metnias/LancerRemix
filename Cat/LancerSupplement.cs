@@ -539,6 +539,7 @@ namespace LancerRemix.Cat
                 lanceSpear = null;
             }
             SetLanceCooltime();
+            blockTimer = -blockTime;
         }
 
         protected internal void RetrieveLanceSpear(Spear spear = null)
