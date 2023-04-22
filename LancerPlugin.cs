@@ -201,6 +201,7 @@ namespace LancerRemix
             LonkEatMeatUpdate = 1 << 5,
             LancerStartGamePatch = 1 << 6,
             LancerCustomColorSlider = 1 << 7,
+            BigNeedleWormParryCheck = 1 << 8
         }
 
         internal static void ILhookTry(ILhooks flag)

@@ -1,6 +1,9 @@
 ﻿using LancerRemix.Cat;
+using Mono.Cecil.Cil;
+using MonoMod.Cil;
 using MoreSlugcats;
 using RWCustom;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using static LancerRemix.Cat.ModifyCat;
@@ -18,6 +21,7 @@ namespace LancerRemix.Combat
             On.Lizard.Violence += LancerLizardViolencePatch;
             On.Creature.Stun += StunPatch;
             On.Vulture.Violence += VultureLancerDropMask;
+            IL.BigNeedleWorm.Swish += BigNeedleWormParryCheck;
             On.MoreSlugcats.VultureMaskGraphics.DrawSprites += MaskOnHornDrawPatch;
             On.ScavengerAI.CollectScore_PhysicalObject_bool += ScavHornMaskNoPickUp;
             On.LizardAI.IUseARelationshipTracker_UpdateDynamicRelationship += LizardHornOnMaskRelationship;
@@ -51,7 +55,11 @@ namespace LancerRemix.Combat
                 else { stunBonus = -10000f; StunIgnores.Add(self.abstractCreature); }
             }
             if (self is Player player && IsPlayerLancer(player))
-            { GetSub<LancerSupplement>(player)?.Violence(orig, source, directionAndMomentum, hitChunk, hitAppendage, type, damage, stunBonus); return; }
+            {
+                GetSub<LancerSupplement>(player)?.Violence(orig, source, directionAndMomentum, hitChunk, hitAppendage, type, damage, stunBonus);
+                StunIgnores.Remove(self.abstractCreature);
+                return;
+            }
             orig(self, source, directionAndMomentum, hitChunk, hitAppendage, type, damage, stunBonus);
             StunIgnores.Remove(self.abstractCreature);
         }
@@ -73,7 +81,6 @@ namespace LancerRemix.Combat
         private static void StunPatch(On.Creature.orig_Stun orig, Creature self, int st)
         {
             if (StunIgnores.Contains(self.abstractCreature)) st = 0;
-            int s = self.stun;
             orig(self, st);
         }
 
@@ -82,9 +89,9 @@ namespace LancerRemix.Combat
             bool lancer = source?.owner is Spear && (source.owner as Spear).thrownBy is Player player
                 && IsPlayerLancer(player);
             if (lancer && hitChunk != null && hitChunk.index == 4 && (vulture.State as Vulture.VultureState).mask
-                && Random.value > Custom.LerpMap(damage, 0.0f, 0.9f, 0.0f, 0.5f))
+                && UnityEngine.Random.value > Custom.LerpMap(damage, 0.0f, 0.9f, 0.0f, 0.5f))
             {
-                vulture.DropMask(((directionAndMomentum == null) ? new Vector2(0f, 0f) : (directionAndMomentum.Value / 5f)) + Custom.RNV() * 7f * Random.value);
+                vulture.DropMask(((directionAndMomentum == null) ? new Vector2(0f, 0f) : (directionAndMomentum.Value / 5f)) + Custom.RNV() * 7f * UnityEngine.Random.value);
                 damage *= 1.5f;
                 //force stuck
                 source.owner.room.AddObject(new ExplosionSpikes(source.owner.room, source.owner.firstChunk.pos, 5, 4f, 6f, 4.5f, 30f, new Color(1f, 1f, 1f, 0.5f)));
@@ -94,6 +101,70 @@ namespace LancerRemix.Combat
             float disencouraged = vulture.AI.disencouraged;
             orig.Invoke(vulture, source, directionAndMomentum, hitChunk, onAppendagePos, type, damage, stunBonus);
             if (lancer) vulture.AI.disencouraged = (disencouraged * 1.5f + vulture.AI.disencouraged) / 2.5f;
+        }
+
+        private static void BigNeedleWormParryCheck(ILContext il)
+        {
+            var cursor = new ILCursor(il);
+            LancerPlugin.ILhookTry(LancerPlugin.ILhooks.BigNeedleWormParryCheck);
+
+            if (!cursor.TryGotoNext(MoveType.After,
+                x => x.MatchLdcR4(1.22f),
+                x => x.MatchLdcR4(60f),
+                x => x.MatchCallvirt(typeof(Creature).GetMethod(nameof(Creature.Violence))),
+                x => x.MatchLdarg(0)
+                )) return;
+            DebugLogCursor();
+            cursor.Emit(OpCodes.Nop);
+            var lblNoParry = cursor.DefineLabel();
+            lblNoParry.Target = cursor.Prev;
+            cursor.Emit(OpCodes.Ldarg_0);
+            cursor.GotoLabel(lblNoParry, MoveType.Before);
+            DebugLogCursor();
+
+            //cursor.Emit(OpCodes.Ldarg_0);
+            cursor.Emit(OpCodes.Ldloc, 1);
+            cursor.EmitDelegate<Func<BigNeedleWorm, Vector2, bool>>(
+                (self, value) =>
+                {
+                    if (self.impaleChunk?.owner is Player player && IsPlayerLancer(player))
+                    {
+                        var sub = GetSub<LancerSupplement>(player);
+                        if (sub != null && sub.HasParried)
+                        {
+                            BigNeedleWormParried(self, value, player);
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+                );
+            cursor.Emit(OpCodes.Brfalse, lblNoParry);
+            cursor.Emit(OpCodes.Ret);
+
+            LancerPlugin.ILhookOkay(LancerPlugin.ILhooks.BigNeedleWormParryCheck);
+
+            void DebugLogCursor() =>
+                LancerPlugin.LogSource.LogInfo($"{cursor.Prev.OpCode.Name} > Cursor < {cursor.Next.OpCode.Name}");
+        }
+
+        private static void BigNeedleWormParried(BigNeedleWorm self, Vector2 swishDir, Player lancer)
+        {
+            Debug.Log("Lancer Parried BigNeedleWorm");
+
+            float swish = 90f + 90f * Mathf.Sin(Mathf.InverseLerp(1f, 5f, self.swishCounter) * 3.14159274f);
+            Vector2 fangPos = self.bodyChunks[0].pos + swishDir * self.fangLength;
+            Vector2 fangSwishPos = self.bodyChunks[0].pos + swishDir * (self.fangLength + swish);
+            for (int i = 0; i < self.TotalSegments; i++)
+            {
+                if (i < self.bodyChunks.Length)
+                    self.SetSegmentPos(i, self.GetSegmentPos(i) + (fangSwishPos - fangPos));
+
+                var vel = Vector2.ClampMagnitude(self.GetSegmentVel(i), 6f);
+                vel.x = -vel.x;
+                self.SetSegmentVel(i, vel);
+            }
+            self.impaleChunk = null;
         }
 
         #region MaskOnHorn

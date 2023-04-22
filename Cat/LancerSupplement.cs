@@ -48,7 +48,9 @@ namespace LancerRemix.Cat
         protected bool spendSpear = false;
         public bool SpendSpear => spendSpear;
         protected bool grabParried = false;
+        protected bool violenceParried = false;
         public bool IsGrabParried => grabParried;
+        public bool HasParried => grabParried || violenceParried;
 
         public float BlockVisualAmount(float timeStacker)
             => lanceTimer != 0 ? 0f : Mathf.Clamp(Mathf.Lerp((float)blockTimer, blockTimer - (blockTimer != 0 ? Math.Sign(blockTimer) : 0), timeStacker) / blockTime, -1f, 1f);
@@ -123,6 +125,7 @@ namespace LancerRemix.Cat
                 --blockTimer;
                 if (blockTimer == 0 || (lanceTimer <= 0 && HasLanceReady() < 0))
                 {
+                    grabParried = false; violenceParried = false;
                     blockTimer = -blockTime; // block cooltime
                     ClearLeftoverStick(Owner);
                 }
@@ -132,6 +135,7 @@ namespace LancerRemix.Cat
             {
                 self.wantToPickUp = 0;
                 blockTimer = blockTime; // block
+                grabParried = false; violenceParried = false;
                 self.room.PlaySound(SoundID.Slugcat_Pick_Up_Spear, self.mainBodyChunk, false, 1.2f, 1.2f);
             }
         }
@@ -268,6 +272,10 @@ namespace LancerRemix.Cat
             if (hasExhaustion || (!guarded && !spendSpear)) FlingLance();
             // lanceTimer = 0; blockTimer = 0;
             grabParried = true;
+
+            orig(self, grasp);
+            grasp.Release();
+            ClearLeftoverStick(Owner);
             return;
         NoParry: orig(self, grasp);
         }
@@ -300,6 +308,7 @@ namespace LancerRemix.Cat
         public virtual void Violence(On.Creature.orig_Violence orig,
             BodyChunk source, Vector2? directionAndMomentum, BodyChunk hitChunk, PhysicalObject.Appendage.Pos hitAppendage, Creature.DamageType type, float damage, float stunBonus)
         {
+            violenceParried = false;
             if (type == Creature.DamageType.Bite || type == Creature.DamageType.Blunt || type == Creature.DamageType.Stab)
             {
                 if (type == Creature.DamageType.Bite)
@@ -320,8 +329,7 @@ namespace LancerRemix.Cat
                     {
                         away = (crit.mainBodyChunk.pos - self.mainBodyChunk.pos).normalized;
                         away.y = 1f; away.Normalize();
-                        for (int i = 0; i < crit.grasps.Length; ++i)
-                            if (crit.grasps[i].grabbed == self) { crit.grasps[i].Release(); break; }
+                        ClearLeftoverStick(crit.abstractCreature, false);
                         crit.Stun(Mathf.CeilToInt(Mathf.Lerp(80, 40, crit.TotalMass / 10f)));
                         if (ModManager.MSC && spear is ElectricSpear elecSpear) { elecSpear.Zap(); elecSpear.Electrocute(crit); }
                     }
@@ -333,11 +341,13 @@ namespace LancerRemix.Cat
                     }
                     source.owner.WeightedPush(0, source.owner.bodyChunks.Length - 1, away, 20f);
                 }
+                violenceParried = true;
 
                 guarded &= lanceTimer == 0;
                 AddParryEffect(guarded);
                 if (hasExhaustion || (!guarded && !spendSpear)) FlingLance();
                 // lanceTimer = 0; blockTimer = 0;
+                orig(self, source, null, hitChunk, hitAppendage, type, 0f, 0f);
                 return;
             }
         NoParry: orig(self, source, directionAndMomentum, hitChunk, hitAppendage, type, damage, stunBonus);
@@ -420,6 +430,7 @@ namespace LancerRemix.Cat
             self.bodyChunks[1].vel -= lanceDir.ToVector2() * 4f;
             lanceTimer = lanceDir.y == 0 ? 3 : 4;
             blockTimer = spendSpear ? Mathf.CeilToInt(blockTime * 1.5f) : blockTime;
+            grabParried = false; violenceParried = false;
             if (!spendSpear && this is LunterSupplement lunterSub) lunterSub.maskOnHorn.DropMask();
             if (spear.bugSpear) ReleaseLanceSpear();
 
