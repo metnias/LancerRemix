@@ -12,6 +12,7 @@ namespace LancerRemix.Combat
     {
         internal static void Patch()
         {
+            On.AbstractPhysicalObject.GetAllConnectedObjects += ClearLeftoverSticks;
             On.Creature.Grab += CreatureGrabLancer;
             On.Creature.Violence += LancerViolencePatch;
             On.Lizard.Violence += LancerLizardViolencePatch;
@@ -20,6 +21,13 @@ namespace LancerRemix.Combat
             On.MoreSlugcats.VultureMaskGraphics.DrawSprites += MaskOnHornDrawPatch;
             On.ScavengerAI.CollectScore_PhysicalObject_bool += ScavHornMaskNoPickUp;
             On.LizardAI.IUseARelationshipTracker_UpdateDynamicRelationship += LizardHornOnMaskRelationship;
+        }
+
+        private static List<AbstractPhysicalObject> ClearLeftoverSticks(On.AbstractPhysicalObject.orig_GetAllConnectedObjects orig, AbstractPhysicalObject self)
+        {
+            if (self is AbstractCreature crit)
+                LancerSupplement.ClearLeftoverStick(crit, crit.creatureTemplate.type == CreatureTemplate.Type.Slugcat);
+            return orig(self);
         }
 
         private static bool CreatureGrabLancer(On.Creature.orig_Grab orig, Creature self, PhysicalObject obj, int graspUsed, int chunkGrabbed, Creature.Grasp.Shareability shareability, float dominance, bool overrideEquallyDominant, bool pacifying)

@@ -124,12 +124,7 @@ namespace LancerRemix.Cat
                 if (blockTimer == 0 || (lanceTimer <= 0 && HasLanceReady() < 0))
                 {
                     blockTimer = -blockTime; // block cooltime
-                    for (int i = Owner.stuckObjects.Count - 1; i >= 0; --i)
-                    {
-                        if (Owner.stuckObjects[i] is AbstractPhysicalObject.CreatureGripStick stick && stick.B == Owner
-                            && (stick.A as AbstractCreature)?.creatureTemplate.smallCreature != true)
-                            Owner.stuckObjects[i].Deactivate();
-                    }
+                    ClearLeftoverStick(Owner);
                 }
             }
             else if (blockTimer < 0) ++blockTimer;
@@ -138,6 +133,46 @@ namespace LancerRemix.Cat
                 self.wantToPickUp = 0;
                 blockTimer = blockTime; // block
                 self.room.PlaySound(SoundID.Slugcat_Pick_Up_Spear, self.mainBodyChunk, false, 1.2f, 1.2f);
+            }
+        }
+
+        public static void ClearLeftoverStick(AbstractCreature crit, bool isB = true)
+        {
+            if (!isB && crit.creatureTemplate.smallCreature) return;
+            for (int i = crit.stuckObjects.Count - 1; i >= 0; --i)
+            {
+                if (crit.stuckObjects[i] is AbstractPhysicalObject.CreatureGripStick stick && CheckStick(stick))
+                {
+                    if (!IsRealStick(stick))
+                    {
+                        Debug.Log($"Lancer cleared leftoverStick: {stick.A.ID} ~ {stick.B.ID}");
+                        crit.stuckObjects[i].Deactivate();
+                    }
+                }
+            }
+
+            bool CheckStick(AbstractPhysicalObject.CreatureGripStick stick)
+            {
+                if (isB) return stick.B == crit
+                    && (stick.A as AbstractCreature)?.creatureTemplate.smallCreature != true;
+                return stick.A == crit;
+            }
+
+            bool IsRealStick(AbstractPhysicalObject.CreatureGripStick stick)
+            {
+                if (isB)
+                {
+                    if ((stick.A as AbstractCreature).realizedCreature != null)
+                        foreach (var grasp in (stick.A as AbstractCreature).realizedCreature.grasps)
+                            if (grasp?.grabbed.abstractPhysicalObject == crit) return true;
+                }
+                else
+                {
+                    if (crit.realizedCreature != null)
+                        foreach (var grasp in crit.realizedCreature.grasps)
+                            if (grasp?.grabbed.abstractPhysicalObject == stick.B) return true;
+                }
+                return false;
             }
         }
 
