@@ -610,6 +610,7 @@ namespace LancerRemix.LancerMenu
                 if (i < scene.depthIllustrations.Count - 1)
                     scene.depthIllustrations[i].sprite.MoveBehindOtherNode(scene.depthIllustrations[i + 1].sprite);
                 scene.subObjects.Add(scene.depthIllustrations[i]);
+                Debug.Log($"Replace Illust {i}: [{layerImage}] <- [{layerImageOrig}]");
             }
         }
 

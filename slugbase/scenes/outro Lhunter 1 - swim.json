@@ -1,0 +1,51 @@
+{
+  "id": "outro lhunter 1 - swim",
+  "scene_folder": "slugbase/scenes/outro lhunter 1 - swim",
+  "images": [
+    {
+      "name": "outro Lhunter 1 - swim - flat",
+      "pos": [ 0, 0 ],
+      "depth": -1.0,
+      "flatmode": true
+    },
+    {
+      "name": "outro Lhunter 1 - swim - 6",
+      "pos": [ -278, -102 ],
+      "depth": 100
+    },
+    {
+      "name": "outro Lhunter 1 - swim - 5",
+      "pos": [ -296, -30 ],
+      "depth": 8,
+      "shader": "Lighten"
+    },
+    {
+      "name": "outro Lhunter 1 - swim - 4",
+      "pos": [ -250, -42 ],
+      "depth": 7
+    },
+    {
+      "name": "outro Lhunter 1 - swim - 3",
+      "pos": [ -284, -162 ],
+      "depth": 4.5
+    },
+    {
+      "name": "outro Lhunter 1 - swim - 2",
+      "pos": [ 421, 194 ],
+      "depth": 3
+    },
+    {
+      "name": "outro Lhunter 1 - swim - 1",
+      "pos": [ -144, 0 ],
+      "depth": 1.2,
+      "shader": "Lighten"
+    },
+    {
+      "name": "outro Lhunter 1 - swim - 0",
+      "pos": [ -845, -407 ],
+      "depth": 0.25,
+      "shader": "LightEdges"
+    }
+  ],
+  "idle_depths": [ 5, 2 ]
+}

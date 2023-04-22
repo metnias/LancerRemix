@@ -108,6 +108,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </AdditionalFiles>
     <AdditionalFiles Include="slugbase\scenes\dream - lancer hunter meet.json" />
+    <AdditionalFiles Include="slugbase\scenes\outro lhunter 1 - swim.json" />
     <None Include="slugbase\scenes\red ghost lancer.json" />
     <None Include="slugbase\scenes\white ghost lancer.json" />
     <None Include="slugbase\scenes\yellow ghost lancer.json" />
@@ -184,6 +185,20 @@
     <Content Include="scenes\Outro 3\2 - facecloseup - Lsurv.png" />
     <Content Include="scenes\Outro 3\outro 3 - face - Lmonk - flat.png" />
     <Content Include="scenes\Outro 3\outro 3 - face - Lsurv - flat.png" />
+    <Content Include="slugbase\scenes\outro lhunter 1 - swim\outro Lhunter 1 - swim - 0.png" />
+    <Content Include="slugbase\scenes\outro lhunter 1 - swim\outro Lhunter 1 - swim - 5.png" />
+    <Content Include="slugbase\scenes\outro lhunter 1 - swim\outro Lhunter 1 - swim - 1.png" />
+    <Content Include="slugbase\scenes\outro lhunter 1 - swim\outro Lhunter 1 - swim - 2.png" />
+    <Content Include="slugbase\scenes\outro lhunter 1 - swim\outro Lhunter 1 - swim - 3.png" />
+    <Content Include="slugbase\scenes\outro lhunter 1 - swim\outro Lhunter 1 - swim - 4.png" />
+    <Content Include="slugbase\scenes\outro lhunter 1 - swim\outro Lhunter 1 - swim - 6.png" />
+    <Content Include="slugbase\scenes\outro lhunter 1 - swim\outro Lhunter 1 - swim - flat.png" />
+    <Content Include="scenes\outro lhunter 2 - sink\outro Lhunter 2 - sink - 1.png" />
+    <Content Include="scenes\outro lhunter 2 - sink\outro Lhunter 2 - sink - 3.png" />
+    <Content Include="scenes\outro lhunter 2 - sink\outro Lhunter 2 - sink - 4.png" />
+    <Content Include="scenes\outro lhunter 2 - sink\outro Lhunter 2 - sink - flat.png" />
+    <Content Include="scenes\outro lhunter 3 - embrace\outro Lhunter 3 - embrace - 2.png" />
+    <Content Include="scenes\outro lhunter 3 - embrace\outro Lhunter 3 - embrace - flat.png" />
     <Content Include="scenes\Outro L_B\Outro 1_B - Clearing - 0_LWhite.png" />
     <Content Include="scenes\Outro L_B\Outro 1_B - Clearing - LWhite - Flat.png" />
     <Content Include="scenes\Outro L_B\Outro 3_B - Return - YellowL 1.png" />

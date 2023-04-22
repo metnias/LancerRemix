@@ -102,6 +102,11 @@ namespace LancerRemix.LancerMenu
 
         private static void LancerSceneSwap(On.Menu.MenuScene.orig_ctor orig, MenuScene self, Menu.Menu menu, MenuObject owner, MenuSceneID sceneID)
         {
+            if (IsStoryLancer)
+            {
+                if (sceneID == MenuSceneID.Outro_Hunter_1_Swim)
+                    sceneID = SceneOutroLHunter1Swim;
+            }
             orig(self, menu, owner, sceneID);
             if (!IsStoryLancer) return;
             if (sceneID == MenuSceneID.SleepScreen) LancerSleepScene(self);
@@ -109,19 +114,21 @@ namespace LancerRemix.LancerMenu
 
             #region LunterOutro
 
-            /*
-            else if (sceneID == MenuSceneID.Outro_Hunter_1_Swim)
-            {
-                ReplaceIllust(self, "", "", "", "", new Vector2());
-            }
             else if (sceneID == MenuSceneID.Outro_Hunter_2_Sink)
             {
-                ReplaceIllust(self, "", "", "", "", new Vector2());
+                ReplaceIllust(self, $"scenes{Path.DirectorySeparatorChar}outro lhunter 2 - sink", "outro Lhunter 2 - sink - flat",
+                    "outro hunter 2 - sink - 4", "outro Lhunter 2 - sink - 4", new Vector2(179f, 127f));
+                ReplaceIllust(self, $"scenes{Path.DirectorySeparatorChar}outro lhunter 2 - sink", null,
+                    "outro hunter 2 - sink - 3", "outro Lhunter 2 - sink - 3", new Vector2(544f, 159f));
+                ReplaceIllust(self, $"scenes{Path.DirectorySeparatorChar}outro lhunter 2 - sink", null,
+                    "outro hunter 2 - sink - 1", "outro Lhunter 2 - sink - 1", new Vector2(315f, 49f));
             }
             else if (sceneID == MenuSceneID.Outro_Hunter_3_Embrace)
             {
-                ReplaceIllust(self, "", "", "", "", new Vector2());
+                ReplaceIllust(self, $"scenes{Path.DirectorySeparatorChar}outro Lhunter 3 - embrace", "outro Lhunter 3 - embrace - flat",
+                    "outro hunter 3 - embrace - 2", "outro Lhunter 3 - embrace - 2", new Vector2(488f, 208f));
             }
+            /*
             else if (sceneID == MenuSceneID.Red_Ascend)
             {
                 ReplaceIllust(self, "", "", "", "", new Vector2());

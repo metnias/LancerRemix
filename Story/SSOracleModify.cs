@@ -350,7 +350,7 @@ namespace LancerRemix.Story
                 else
                 {
                     self.movementBehavior = SSOracleBehavior.MovementBehavior.KeepDistance;
-                    if (self.owner.inActionCounter == 50)
+                    if (self.owner.throwOutCounter == 50)
                         self.dialogBox.Interrupt(self.Translate("I cannot assist you further."), 0);
                 }
                 if (self.owner.playerOutOfRoomCounter > 100 && self.owner.inActionCounter > 400)

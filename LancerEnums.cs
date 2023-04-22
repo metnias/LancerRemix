@@ -14,6 +14,7 @@ namespace LancerRemix
         internal static MenuSceneID SceneGhostLancerWhite;
         internal static MenuSceneID SceneGhostLancerYellow;
         internal static MenuSceneID SceneGhostLancerRed;
+        internal static MenuSceneID SceneOutroLHunter1Swim;
 
         internal static DreamID DreamHunterMeet;
         internal static Conversation.ID MoonRecieveNSHSwarmer;
@@ -24,6 +25,7 @@ namespace LancerRemix
             SceneGhostLancerWhite = new MenuSceneID("white ghost lancer", false);
             SceneGhostLancerYellow = new MenuSceneID("yellow ghost lancer", false);
             SceneGhostLancerRed = new MenuSceneID("red ghost lancer", false);
+            SceneOutroLHunter1Swim = new MenuSceneID("outro lhunter 1 - swim", false);
 
             DreamHunterMeet = new DreamID(nameof(DreamHunterMeet), true);
             MoonRecieveNSHSwarmer = new Conversation.ID(nameof(MoonRecieveNSHSwarmer), true);
