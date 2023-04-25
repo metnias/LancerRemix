@@ -10,6 +10,7 @@ SPECEVENT : lunterlook
 40 : 0 : 오.
 자그만 생물아... 네가 여기 있는 걸 거의 잊을 뻔했구나.
 네 상태가 좋지 못해.
+SPECEVENT : lunterlook
 여기 내 친구한테 분명 널 도와줄 계획이 있을 거야. 괴롭힘, 다 끝나면 얘를 네 통으로 인도해 주겠어?
 SPECEVENT : lunterlook
 고마워, 내 친구들. 너희가 날 위해 해준 건 상상 이상이었어.

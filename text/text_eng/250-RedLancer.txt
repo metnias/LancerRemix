@@ -11,6 +11,7 @@ SPECEVENT : lunterlook
 Tiny creature... I almost forgot you were there.
 I can see that you are not well.
 I am so sorry to say, but you do not have much time left, just like the last messenger. I wonder why...
+SPECEVENT : lunterlook
 Surely my friend here has a plan to help you. NSH, would you please guide them back to your can when you're done?
 SPECEVENT : lunterlook
 Thank you, my friends. What you've done for me is beyond extraordinary.
