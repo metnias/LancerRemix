@@ -2,12 +2,12 @@
 topicular.lancer-description|캠페인에 근접 전투하는 랜서 버전을 추가합니다.
 
 Horn|뿔
-Feeble but cautious cub. Stranded in a harsh world and surrounded by<LINE>its creatures, your journey will be a significantly more challenging one.|연약하지만 조심스러운 아이. 혹독한 세계에 고립되어<LINE>그 생물들에게 둘러싸인, 당신의 여정은 훨씬 더 도전다울 것이다.
+Feeble but cautious. Stranded in a harsh world and surrounded by<LINE>its creatures, your journey will be a significantly more challenging one.|연약하지만 조심스럽다. 혹독한 세계에 고립되어<LINE>그 생물들에게 둘러싸인, 당신의 여정은 훨씬 더 도전다울 것이다.
 To be released...|출시 예정...
 
 You are too young and weak to throw a metal rebar|철근을 들고 집어던지기에는 너무 어리고 연약하다
 But stabbing does not stun foes|하지만 찌르는 걸로는 적을 멈출 수 없다
-Have to find an opening|빈틈을 찾아야 한다
+Find an opening|빈틈을 찾아라
 Press PICK UP while holding a spear to block beforehand|창을 들고 줍기 버튼을 미리 눌러 방어한다
 
 May you overcome this world of violence|이 폭력이 가득한 세계에서 살아남기를

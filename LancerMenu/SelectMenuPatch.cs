@@ -639,7 +639,7 @@ namespace LancerRemix.LancerMenu
 
                 if (basisNumber == SlugName.Yellow)
                 {
-                    info = menu.Translate("Feeble but cautious cub. Stranded in a harsh world and surrounded by<LINE>its creatures, your journey will be a significantly more challenging one.");
+                    info = menu.Translate("Feeble but cautious. Stranded in a harsh world and surrounded by<LINE>its creatures, your journey will be a significantly more challenging one.");
                 }
                 if (!(menu as SlugcatSelectMenu).SlugcatUnlocked(slugcatNumber))
                 {

@@ -54,7 +54,7 @@ namespace LancerRemix.Story
                     {
                         self.room.game.cameras[0].hud.textPrompt.AddMessage(Translate("You are too young and weak to throw a metal rebar"), 0, 300, true, true);
                         self.room.game.cameras[0].hud.textPrompt.AddMessage(Translate("But stabbing does not stun foes"), 20, 240, true, true);
-                        self.room.game.cameras[0].hud.textPrompt.AddMessage(Translate("Have to find an opening"), 20, 240, true, true);
+                        self.room.game.cameras[0].hud.textPrompt.AddMessage(Translate("Find an opening"), 20, 240, true, true);
                         self.textShown = true;
                         extraTutoRequested = true;
                     }
