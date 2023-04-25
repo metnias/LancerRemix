@@ -115,8 +115,8 @@
   </ItemGroup>
   <ItemGroup>
     <AdditionalFiles Include="text\text_kor\strings.txt" />
-    <Content Include="illustrations\lancer_off.png" />
-    <Content Include="illustrations\lancer_on.png" />
+    <AdditionalFiles Include="illustrations\lancer_off.png" />
+    <AdditionalFiles Include="illustrations\lancer_on.png" />
     <AdditionalFiles Include="slugbase\scenes\dream - lancer hunter meet\1 - FG.png" />
     <AdditionalFiles Include="slugbase\scenes\dream - lancer hunter meet\2 - HLL.png" />
     <AdditionalFiles Include="slugbase\scenes\dream - lancer hunter meet\3 - HLancer.png" />
@@ -181,6 +181,7 @@
     <AdditionalFiles Include="illustrations\multiplayerportrait40-red-lancer.png" />
     <AdditionalFiles Include="illustrations\multiplayerportrait41-red-lancer.png" />
     <AdditionalFiles Include="thumbnail.png" />
+    <AdditionalFiles Include="illustrations\lonk-projection.png" />
     <Content Include="scenes\Outro 3\2 - facecloseup - Lmonk.png" />
     <Content Include="scenes\Outro 3\2 - facecloseup - Lsurv.png" />
     <Content Include="scenes\Outro 3\outro 3 - face - Lmonk - flat.png" />
@@ -226,10 +227,12 @@
     <Content Include="slugbase\scenes\yellow ghost lancer\Lmonk ghost b.png" />
     <Content Include="slugbase\scenes\yellow ghost lancer\Lmonk ghost bkg.png" />
     <Content Include="slugbase\scenes\yellow ghost lancer\Lmonk ghost slugcat - flat.png" />
-    <Content Include="text\text_eng\251-RedLancer.txt" />
-    <Content Include="text\text_kor\251-RedLancer.txt" />
-    <Content Include="text\text_kor\46-RedLancer.txt" />
-    <Content Include="text\text_kor\47-RedLancer.txt" />
+    <AdditionalFiles Include="text\text_eng\251-RedLancer.txt" />
+    <AdditionalFiles Include="text\text_eng\49-YellowLancer.txt" />
+    <AdditionalFiles Include="text\text_kor\251-RedLancer.txt" />
+    <AdditionalFiles Include="text\text_kor\46-RedLancer.txt" />
+    <AdditionalFiles Include="text\text_kor\47-RedLancer.txt" />
+    <AdditionalFiles Include="text\text_kor\49-YellowLancer.txt" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

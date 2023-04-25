@@ -1,0 +1,15 @@
+0-49
+0 : 40 : Hmm...
+That should work. Are you recieving me?
+60 : 40 : Curious. Pests usually don't make it to my chamber. Especially not ones so... small.
+I don't know what you're looking for, but whatever it is, I think I can provide something better.
+Every living thing is stuck in a cycle. From the...
+Hold on. Something about you is giving me an itch in my subroutines. Let me check.
+SPECEVENT: lonkprojection
+A rogue... an alternate stage of maturity caused by separation from colony during early development.<LINE>Likely an adaptation for estabLISHING NEW POPULATIONS?!
+Oh no. No no no. The scavengers are enough of a nuisance on my grounds. Your kind are NOT welcome here.
+SPECEVENT : karma
+Let's make a deal. Instead of continuing your search for a mate, use this gift.
+What you now possess is a key. Past my Farm Arrays in the west, you will find an entrance to the underbelly of this world.<LINE>Slink through the ancient tunnels and machinery ever downwards until you find the black sea.
+The waters of this sea will free you from the churning wheel of rebirth. Doesn't that sound better than getting pregnant?
+I am not asking. You will do what I say. Now, get on with it.
