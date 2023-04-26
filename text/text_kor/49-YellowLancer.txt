@@ -1,15 +1,15 @@
 0-49
-0 : 40 : ����...
-That should work. Are you recieving me?
-60 : 40 : Curious. Pests usually don't make it to my chamber. Especially not ones so... small.
-I don't know what you're looking for, but whatever it is, I think I can provide something better.
-Every living thing is stuck in a cycle. From the...
-Hold on. Something about you is giving me an itch in my subroutines. Let me check.
+0 : 40 : 흐음...
+그거면 되겠군. 내 말이 들리는가?
+60 : 40 : 흥미로워. 해충들은 대개 내 방까지 도달하지 못하는데. 특히 이 정도로... 작은 녀석은.
+네가 뭘 찾고자 하는지는 모르겠지만, 그게 무엇이든 간에, 내가 더 나은 걸 줄 수 있을 거야.
+모든 살아있는 건 주기 속에 갇혀있다. 내 처리층의...
+잠깐. 네 어딘가가 내 서브루틴을 간질이고 있어. 확인해 보지.
 SPECEVENT: lonkprojection
-A rogue... an alternate stage of maturity caused by separation from colony during early development.<LINE>Likely an adaptation for estabLISHING NEW POPULATIONS?!
-Oh no. No no no. The scavengers are enough of a nuisance on my grounds. Your kind are NOT welcome here.
+변이... 발달 과정 초기에 집단에서 떨어짐으로써 발달한 선택적 성숙기.<LINE>이러한 적응은 새로운 군집을 설립하기 위함일 것이라고?!
+오 안 돼. 아니 아니 아니지. 내 영역에 스캐빈저만으로도 골칫거리는 충분하다고. 너희 종족은 여기서 환영받지 못 해.
 SPECEVENT : karma
-Let's make a deal. Instead of continuing your search for a mate, use this gift.
-What you now possess is a key. Past my Farm Arrays in the west, you will find an entrance to the underbelly of this world.<LINE>Slink through the ancient tunnels and machinery ever downwards until you find the black sea.
-The waters of this sea will free you from the churning wheel of rebirth. Doesn't that sound better than getting pregnant?
-I am not asking. You will do what I say. Now, get on with it.
+거래를 하자고. 네 짝을 찾아 계속 여행하는 대신에, 이 선물을 사용해라.
+네가 지금 보유하고 있는 건 열쇠다. 서쪽의 내 농장 배열지를 지나가면, 이 세상의 아래로 내려가는 입구를 찾게 될 거야.<LINE>고대 터널과 기계 사이를 지나 더 아래로 검은 바다가 나올 때까지 내려가라.
+이 바다의 액체가 어지러운 재탄생의 수레바퀴에서 너를 자유롭게 할 거다. 그게 임신하는 것보다는 더 낫다고 생각되지 않나?
+질문하는 게 아니야. 내가 말한 대로 따라 해. 그럼, 움직이라고.
