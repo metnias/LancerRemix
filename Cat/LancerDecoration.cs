@@ -47,6 +47,7 @@ namespace LancerRemix.Cat
             Vector2 head = Vector2.Lerp(self.head.lastPos, self.head.pos, timeStacker);
             IntVector2 stat = HornStat(player.SlugCatClass);
             Vector2 draw1 = Vector2.Lerp(self.drawPositions[1, 1], self.drawPositions[1, 0], timeStacker);
+            head -= Custom.DirVec(draw1, head) * 3f; // move inward
             Vector2 tip = head + Custom.DirVec(draw1, head) * (float)stat.y;
             Vector2 thicc = Custom.PerpendicularVector(head, tip);
             Vector2 dir = (tip - head) * 0.6f;
