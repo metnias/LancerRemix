@@ -109,10 +109,6 @@ namespace LancerRemix
                 }
                 catch (Exception e) { Debug.LogException(e); }
             }
-            else if (ID == ProcessManager.ProcessID.SlugcatSelect)
-            {
-                ModifyCat.SetIsPlayerLancer(false, new bool[4]);
-            }
             orig(self, ID);
         }
 
