@@ -312,15 +312,17 @@ namespace LancerRemix.Story
             var miscData = self.world.game.rainWorld.progression.miscProgressionData;
             if (miscData.redsFlower != null && self.world.IsRoomInRegion(miscData.redsFlower.Value.room))
             {
-                if (ModManager.MSC) // Add normal hunter daddy
+                if (LancerGenerator.IsTimelineInbetween(story, SlugName.Red, ModManager.MSC ? MSCSlugName.Gourmand : SlugName.White))
                 {
-                    if (LancerGenerator.IsTimelineInbetween(story, SlugName.Red, MSCSlugName.Gourmand))
-                    {
-                        Debug.Log($"Lancer added HunterDaddy at {miscData.redsFlower}");
+                    Debug.Log($"Lancer added {(ModManager.MSC ? "HunterDaddy" : "HunterFlower")} at {miscData.redsFlower}");
+                    if (ModManager.MSC) // Add hunter daddy for lunter
                         self.world.GetAbstractRoom(miscData.redsFlower.Value)
                             .AddEntity(new AbstractCreature(self.world, StaticWorld.GetCreatureTemplate(MoreSlugcatsEnums.CreatureTemplateType.HunterDaddy),
                             null, miscData.redsFlower.Value, self.world.game.GetNewID()));
-                    }
+                    else // Add flower instead
+                        self.world.GetAbstractRoom(miscData.redsFlower.Value)
+                            .AddEntity(new AbstractConsumable(self.world, AbstractPhysicalObject.AbstractObjectType.KarmaFlower,
+                            null, miscData.redsFlower.Value, self.world.game.GetNewID(), -1, -1, null));
                 }
             }
             var lancerFlower = DreamHandler.GetMiscWorldCoord(miscData, HUNTERLANCERFLOWER);
