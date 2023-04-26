@@ -5,7 +5,7 @@ That should work. Are you recieving me?
 I don't know what you're looking for, but whatever it is, I think I can provide something better.
 Every living thing is stuck in a cycle. From the...
 Hold on. Something about you is giving me an itch in my subroutines. Let me check.
-SPECEVENT: lonkprojection
+SPECEVENT : lonkprojection
 A rogue... an alternate stage of maturity caused by separation from colony during early development.<LINE>Likely an adaptation for estabLISHING NEW POPULATIONS?!
 Oh no. No no no. The scavengers are enough of a nuisance on my grounds. Your kind are NOT welcome here.
 SPECEVENT : karma

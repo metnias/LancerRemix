@@ -211,7 +211,7 @@ namespace LancerRemix.Story
                     return float.MaxValue;
                 }
                 float num = Mathf.Abs(Vector2.Distance(tryPos, self.player.DangerPos) - 250f);
-                num -= Math.Min((float)self.oracle.room.aimap.getAItile(tryPos).terrainProximity, 9f) * 30f;
+                num -= Math.Min((float)self.oracle.room.aimap.getAItile(tryPos).terrainProximity, 11f) * 30f;
                 num -= Vector2.Distance(tryPos, self.owner.nextPos) * 0.5f;
                 for (int i = 0; i < self.oracle.arm.joints.Length; i++)
                 {
@@ -238,37 +238,40 @@ namespace LancerRemix.Story
                 if (self.communicationPause > 0) --self.communicationPause;
                 if (self.inActionCounter > 150 && self.communicationPause < 1)
                 {
-                    if (self.communicationIndex >= 1)
+                    if (lonkShowImageData.showImage != null)
                     {
-                        if (self.owner.conversation != null)
-                            self.owner.conversation.paused = false;
-                        self.owner.NewAction(SSAction.General_MarkTalk);
-                        lonkShowImageData = null;
-                        return;
+                        lonkShowImageData.showImage.Destroy();
+                        lonkShowImageData.showImage = null;
                     }
-                    else
+                    switch (self.communicationIndex)
                     {
-                        if (lonkShowImageData.showImage != null)
-                        {
-                            lonkShowImageData.showImage.Destroy();
-                            lonkShowImageData.showImage = null;
-                        }
-                        if (self.communicationIndex == 0)
-                        {
-                            lonkShowImageData.showImage = self.oracle.myScreen.AddImage("lonk-projection");
-                            self.communicationPause = 380;
-                        }
-                        if (lonkShowImageData.showImage != null)
-                        {
-                            self.oracle.room.PlaySound(SoundID.SS_AI_Image, 0f, 1f, 1f);
-                            lonkShowImageData.showImage.lastPos = lonkShowImageData.showMediaPos;
-                            lonkShowImageData.showImage.pos = lonkShowImageData.showMediaPos;
-                            lonkShowImageData.showImage.lastAlpha = 0f;
-                            lonkShowImageData.showImage.alpha = 0f;
-                            lonkShowImageData.showImage.setAlpha = new float?(1f);
-                        }
-                        ++self.communicationIndex;
+                        case 0:
+                            {
+                                lonkShowImageData.showImage = self.oracle.myScreen.AddImage("lonk-projection");
+                                self.communicationPause = 380;
+                            }
+                            break;
+
+                        default:
+                        case 1:
+                            {
+                                if (self.owner.conversation != null)
+                                    self.owner.conversation.paused = false;
+                                self.owner.NewAction(SSAction.General_MarkTalk);
+                                lonkShowImageData = null;
+                            }
+                            return;
                     }
+                    if (lonkShowImageData.showImage != null)
+                    {
+                        self.oracle.room.PlaySound(SoundID.SS_AI_Image, 0f, 1f, 1f);
+                        lonkShowImageData.showImage.lastPos = lonkShowImageData.showMediaPos;
+                        lonkShowImageData.showImage.pos = lonkShowImageData.showMediaPos;
+                        lonkShowImageData.showImage.lastAlpha = 0f;
+                        lonkShowImageData.showImage.alpha = 0f;
+                        lonkShowImageData.showImage.setAlpha = new float?(1f);
+                    }
+                    ++self.communicationIndex;
                 }
                 if (lonkShowImageData.showImage != null)
                 {
