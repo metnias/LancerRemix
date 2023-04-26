@@ -1,6 +1,7 @@
 ﻿using LancerRemix.Cat;
 using LancerRemix.LancerMenu;
 using Menu;
+using MoreSlugcats;
 using RWCustom;
 using System.Collections.Generic;
 using System.IO;
@@ -19,11 +20,13 @@ namespace LancerRemix.Story
         internal static void OnMSCEnableSubPatch()
         {
             On.Menu.MenuScene.BuildVanillaAltEnd += BuildLancerOEEnd;
+            On.RegionGate.customOEGateRequirements += LancerOEGateRequirements;
         }
 
         internal static void OnMSCDisableSubPatch()
         {
             On.Menu.MenuScene.BuildVanillaAltEnd -= BuildLancerOEEnd;
+            On.RegionGate.customOEGateRequirements -= LancerOEGateRequirements;
         }
 
         private static bool IsStoryLancer => ModifyCat.IsStoryLancer;
@@ -113,6 +116,16 @@ namespace LancerRemix.Story
                 }
                 return false;
             }
+        }
+
+        private static bool LancerOEGateRequirements(On.RegionGate.orig_customOEGateRequirements orig, RegionGate self)
+        {
+            if (!IsStoryLancer || !ModManager.MSC) return orig(self);
+            if (!(self.room.game.IsStorySession)) return false;
+            bool unlocked = self.room.game.rainWorld.progression.miscProgressionData.beaten_Gourmand || self.room.game.rainWorld.progression.miscProgressionData.beaten_Gourmand_Full || MoreSlugcats.MoreSlugcats.chtUnlockOuterExpanse.Value;
+            if (!unlocked) return false;
+            return LancerGenerator.IsTimelineInbetween(LancerEnums.GetLancer((self.room.game.session as StoryGameSession).saveStateNumber),
+                MoreSlugcatsEnums.SlugcatStatsName.Gourmand, MoreSlugcatsEnums.SlugcatStatsName.Rivulet);
         }
     }
 }
