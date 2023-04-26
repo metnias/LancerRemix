@@ -119,7 +119,7 @@ namespace LancerRemix.Story
                 self.manager.nextSlideshow = SlideShow.SlideShowID.WhiteOutro;
             else if (basis == SlugName.Yellow)
                 self.manager.nextSlideshow = SlideShow.SlideShowID.WhiteOutro;
-            OutroLancerFaceBasis = OutroLancerFaceBasis;
+            OutroLancerFaceBasis = basis;
         }
 
         internal static SlugName OutroLancerFaceBasis { get; private set; } = null;
@@ -141,8 +141,8 @@ namespace LancerRemix.Story
             self.preloadedScenes = sceneList.ToArray();
 
             --i;
-            self.playList[i].fadeInDoneAt = self.ConvertTime(0, 51, 20);
-            self.playList[i].fadeOutStartAt = self.ConvertTime(0, 55, 60);
+            self.playList[i].fadeInDoneAt = self.ConvertTime(0, 51, 20) - 1.1f;
+            self.playList[i].fadeOutStartAt = self.ConvertTime(0, 55, 60) - 1.1f;
         }
 
         internal static WorldCoordinate? GetMiscWorldCoord(PlayerProgression.MiscProgressionData data, string key)

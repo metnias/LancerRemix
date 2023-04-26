@@ -182,10 +182,10 @@
     <AdditionalFiles Include="illustrations\multiplayerportrait41-red-lancer.png" />
     <AdditionalFiles Include="thumbnail.png" />
     <AdditionalFiles Include="illustrations\lonk-projection.png" />
-    <Content Include="scenes\Outro 3\2 - facecloseup - Lmonk.png" />
-    <Content Include="scenes\Outro 3\2 - facecloseup - Lsurv.png" />
-    <Content Include="scenes\Outro 3\outro 3 - face - Lmonk - flat.png" />
-    <Content Include="scenes\Outro 3\outro 3 - face - Lsurv - flat.png" />
+    <AdditionalFiles Include="scenes\Outro L_3\2 - facecloseup - Lmonk.png" />
+    <AdditionalFiles Include="scenes\Outro L_3\2 - facecloseup - Lsurv.png" />
+    <AdditionalFiles Include="scenes\Outro L_3\outro 3 - face - Lmonk - flat.png" />
+    <AdditionalFiles Include="scenes\Outro L_3\outro 3 - face - Lsurv - flat.png" />
     <Content Include="slugbase\scenes\outro lhunter 1 - swim\camera.txt" />
     <Content Include="slugbase\scenes\outro lhunter 1 - swim\outro Lhunter 1 - swim - 5.png" />
     <Content Include="slugbase\scenes\outro lhunter 1 - swim\outro Lhunter 1 - swim - 1.png" />

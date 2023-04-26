@@ -150,12 +150,13 @@ namespace LancerRemix.LancerMenu
         {
             var basis = DreamHandler.OutroLancerFaceBasis;
             if (basis == null) return;
-            /*
+
             if (basis == SlugName.White)
-                ReplaceIllust(self, "", "", "", "", new Vector2());
+                ReplaceIllust(self, $"scenes{Path.DirectorySeparatorChar}Outro L_3", "outro 3 - face - Lsurv - flat",
+                    "2 - facecloseup", "2 - facecloseup - Lsurv", new Vector2(43f, -59f));
             else if (basis == SlugName.Yellow)
-                ReplaceIllust(self, "", "", "", "", new Vector2());
-            */
+                ReplaceIllust(self, $"scenes{Path.DirectorySeparatorChar}Outro L_3", "outro 3 - face - Lmonk - flat",
+                    "2 - facecloseup", "2 - facecloseup - Lmonk", new Vector2(43f, -59f));
         }
 
         private static void LancerTravelScreen(ILContext il)
