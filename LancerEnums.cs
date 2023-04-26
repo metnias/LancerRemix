@@ -18,6 +18,7 @@ namespace LancerRemix
 
         internal static DreamID DreamHunterMeet;
         internal static Conversation.ID MoonRecieveNSHSwarmer;
+        internal static SSOracleBehavior.Action MeetLonk_Images;
 
         internal static void RegisterExtEnum()
         {
@@ -29,6 +30,7 @@ namespace LancerRemix
 
             DreamHunterMeet = new DreamID(nameof(DreamHunterMeet), true);
             MoonRecieveNSHSwarmer = new Conversation.ID(nameof(MoonRecieveNSHSwarmer), true);
+            MeetLonk_Images = new SSOracleBehavior.Action(nameof(MeetLonk_Images), true);
         }
 
         internal static void UnregisterExtEnum()
@@ -39,6 +41,7 @@ namespace LancerRemix
             SceneGhostLancerRed = null;
             DreamHunterMeet?.Unregister(); DreamHunterMeet = null;
             MoonRecieveNSHSwarmer?.Unregister(); MoonRecieveNSHSwarmer = null;
+            MeetLonk_Images?.Unregister(); MeetLonk_Images = null;
         }
 
         #endregion Enums

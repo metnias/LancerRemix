@@ -1,5 +1,7 @@
 ﻿using LancerRemix.Cat;
 using RWCustom;
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 using static CatSub.Story.SaveManager;
 using static Conversation;
@@ -7,6 +9,7 @@ using static LancerRemix.LancerEnums;
 using static LancerRemix.LancerGenerator;
 using ConvID = Conversation.ID;
 using MSCName = MoreSlugcats.MoreSlugcatsEnums.SlugcatStatsName;
+using Random = UnityEngine.Random;
 using SlugName = SlugcatStats.Name;
 using SSAction = SSOracleBehavior.Action;
 
@@ -17,7 +20,11 @@ namespace LancerRemix.Story
         internal static void SubPatch()
         {
             On.SSOracleBehavior.Update += LonkKarmaCapOneStep;
+            On.SSOracleBehavior.SpecialEvent += LancerSpecEvents;
             On.SSOracleBehavior.PebblesConversation.AddEvents += AddLancerEvents;
+
+            On.SSOracleBehavior.SSOracleMeetYellow.Update += LonkShowImage;
+
             On.Oracle.SetUpMarbles += LunterPebblesKeepGreenNeuron;
             On.SSOracleBehavior.Update += LunterPebblesHoldingNeuron;
             On.SSOracleBehavior.ThrowOutBehavior.Update += LunterPebblesPostMeetBehavior;
@@ -54,11 +61,26 @@ namespace LancerRemix.Story
         NoLonk: orig.Invoke(self, eu);
         }
 
+        private static void LancerSpecEvents(On.SSOracleBehavior.orig_SpecialEvent orig, SSOracleBehavior self, string eventName)
+        {
+            if (eventName.Equals("lonkprojection", System.StringComparison.InvariantCultureIgnoreCase))
+            {
+                if (self.conversation != null)
+                {
+                    self.conversation.paused = true;
+                }
+                lonkShowImageData = new LonkShowImageData();
+                self.NewAction(MeetLonk_Images);
+                return;
+            }
+            orig(self, eventName);
+        }
+
         private static void AddLancerEvents(On.SSOracleBehavior.PebblesConversation.orig_AddEvents orig, SSOracleBehavior.PebblesConversation self)
         {
             if (!IsStoryLancer) goto NoLancer;
 
-            if (self.id == ConvID.Pebbles_White || self.id == ConvID.Pebbles_Yellow)
+            if (self.id == ConvID.Pebbles_White)
             {
                 var lancer = GetLancer(self.owner.oracle.room.game.StoryCharacter);
                 if (IsTimelineInbetween(lancer, SlugName.Yellow, ModManager.MSC ? MSCName.Rivulet : null))
@@ -100,6 +122,11 @@ namespace LancerRemix.Story
 
                 return;
             }
+            if (self.id == ConvID.Pebbles_Yellow)
+            {
+                self.LoadEventsFromFile(49, GetLancer(SlugName.Yellow), false, 0);
+                return;
+            }
             if (self.id == ConvID.Pebbles_Red_Green_Neuron)
             {
                 self.LoadEventsFromFile(46, GetLancer(SlugName.Red), false, 0);
@@ -137,6 +164,127 @@ namespace LancerRemix.Story
                 return false;
             }
         }
+
+        private static LonkShowImageData lonkShowImageData = null;
+
+        private class LonkShowImageData
+        {
+            public ProjectedImage showImage;
+            public Vector2 idealShowMediaPos;
+            public Vector2 showMediaPos;
+            public int consistentShowMediaPosCounter;
+        }
+
+        private static void LonkShowMediaMovementBehavior(SSOracleBehavior.SSOracleMeetYellow self)
+        {
+            if (self.player != null)
+            {
+                self.owner.lookPoint = self.player.DangerPos;
+            }
+            Vector2 vector = new Vector2(Random.value * self.oracle.room.PixelWidth, Random.value * self.oracle.room.PixelHeight);
+            if (self.owner.CommunicatePosScore(vector) + 40f < self.owner.CommunicatePosScore(self.owner.nextPos) && !Custom.DistLess(vector, self.owner.nextPos, 30f))
+            {
+                self.owner.SetNewDestination(vector);
+            }
+            lonkShowImageData.consistentShowMediaPosCounter += (int)Custom.LerpMap(Vector2.Distance(lonkShowImageData.showMediaPos, lonkShowImageData.idealShowMediaPos), 0f, 200f, 1f, 10f);
+            vector = new Vector2(Random.value * self.oracle.room.PixelWidth, Random.value * self.oracle.room.PixelHeight);
+            if (ShowMediaScore(vector) + 40f < ShowMediaScore(lonkShowImageData.idealShowMediaPos))
+            {
+                lonkShowImageData.idealShowMediaPos = vector;
+                lonkShowImageData.consistentShowMediaPosCounter = 0;
+            }
+            vector = lonkShowImageData.idealShowMediaPos + Custom.RNV() * Random.value * 40f;
+            if (ShowMediaScore(vector) + 20f < ShowMediaScore(lonkShowImageData.idealShowMediaPos))
+            {
+                lonkShowImageData.idealShowMediaPos = vector;
+                lonkShowImageData.consistentShowMediaPosCounter = 0;
+            }
+            if (lonkShowImageData.consistentShowMediaPosCounter > 300)
+            {
+                lonkShowImageData.showMediaPos = Vector2.Lerp(lonkShowImageData.showMediaPos, lonkShowImageData.idealShowMediaPos, 0.1f);
+                lonkShowImageData.showMediaPos = Custom.MoveTowards(lonkShowImageData.showMediaPos, lonkShowImageData.idealShowMediaPos, 10f);
+            }
+
+            float ShowMediaScore(Vector2 tryPos)
+            {
+                if (self.oracle.room.GetTile(tryPos).Solid || self.player == null)
+                {
+                    return float.MaxValue;
+                }
+                float num = Mathf.Abs(Vector2.Distance(tryPos, self.player.DangerPos) - 250f);
+                num -= Math.Min((float)self.oracle.room.aimap.getAItile(tryPos).terrainProximity, 9f) * 30f;
+                num -= Vector2.Distance(tryPos, self.owner.nextPos) * 0.5f;
+                for (int i = 0; i < self.oracle.arm.joints.Length; i++)
+                {
+                    num -= Mathf.Min(Vector2.Distance(tryPos, self.oracle.arm.joints[i].pos), 100f) * 10f;
+                }
+                if (self.oracle.graphicsModule != null)
+                {
+                    for (int j = 0; j < (self.oracle.graphicsModule as OracleGraphics).umbCord.coord.GetLength(0); j += 3)
+                    {
+                        num -= Mathf.Min(Vector2.Distance(tryPos, (self.oracle.graphicsModule as OracleGraphics).umbCord.coord[j, 0]), 100f);
+                    }
+                }
+                return num;
+            }
+        }
+
+        private static void LonkShowImage(On.SSOracleBehavior.SSOracleMeetYellow.orig_Update orig, SSOracleBehavior.SSOracleMeetYellow self)
+        {
+            orig(self);
+            if (self.action == MeetLonk_Images)
+            {
+                self.movementBehavior = SSOracleBehavior.MovementBehavior.ShowMedia;
+                LonkShowMediaMovementBehavior(self);
+                if (self.communicationPause > 0) --self.communicationPause;
+                if (self.inActionCounter > 150 && self.communicationPause < 1)
+                {
+                    if (self.communicationIndex >= 1)
+                    {
+                        if (self.owner.conversation != null)
+                            self.owner.conversation.paused = false;
+                        self.owner.NewAction(SSAction.General_MarkTalk);
+                        lonkShowImageData = null;
+                        return;
+                    }
+                    else
+                    {
+                        if (lonkShowImageData.showImage != null)
+                        {
+                            lonkShowImageData.showImage.Destroy();
+                            lonkShowImageData.showImage = null;
+                        }
+                        if (self.communicationIndex == 0)
+                        {
+                            lonkShowImageData.showImage = self.oracle.myScreen.AddImage("lonk-projection");
+                            self.communicationPause = 380;
+                        }
+                        if (lonkShowImageData.showImage != null)
+                        {
+                            self.oracle.room.PlaySound(SoundID.SS_AI_Image, 0f, 1f, 1f);
+                            lonkShowImageData.showImage.lastPos = lonkShowImageData.showMediaPos;
+                            lonkShowImageData.showImage.pos = lonkShowImageData.showMediaPos;
+                            lonkShowImageData.showImage.lastAlpha = 0f;
+                            lonkShowImageData.showImage.alpha = 0f;
+                            lonkShowImageData.showImage.setAlpha = new float?(1f);
+                        }
+                        ++self.communicationIndex;
+                    }
+                }
+                if (lonkShowImageData.showImage != null)
+                {
+                    lonkShowImageData.showImage.setPos = new Vector2?(lonkShowImageData.showMediaPos);
+                }
+                if (Random.value < 0.033333335f)
+                {
+                    lonkShowImageData.idealShowMediaPos += Custom.RNV() * Random.value * 30f;
+                    lonkShowImageData.showMediaPos += Custom.RNV() * Random.value * 30f;
+                    return;
+                }
+            }
+        }
+
+        #region Lunter
 
         private static NSHSwarmer greenNeuron = null;
         private static bool secondEntry = true;
@@ -397,5 +545,7 @@ namespace LancerRemix.Story
                 */
             }
         }
+
+        #endregion Lunter
     }
 }
