@@ -219,9 +219,12 @@ namespace LancerRemix.Combat
             public AbstractOnHornStick(AbstractPhysicalObject player, AbstractPhysicalObject mask, MaskOnHorn maskOnHorn) : base(player, mask)
             {
                 this.maskOnHorn = maskOnHorn;
+                abstractGrasp = new Creature.Grasp((player.realizedObject as Player), (mask.realizedObject as VultureMask), 0, 0, Creature.Grasp.Shareability.CanNotShare, 0f, false);
             }
 
             public readonly MaskOnHorn maskOnHorn;
+
+            public readonly Creature.Grasp abstractGrasp;
 
             public AbstractPhysicalObject Player
             {

@@ -24,7 +24,8 @@ namespace LancerRemix.Combat
             IL.BigNeedleWorm.Swish += BigNeedleWormParryCheck;
             IL.KingTusks.Tusk.ShootUpdate += KingTuskParryCheck;
             On.MoreSlugcats.VultureMaskGraphics.DrawSprites += MaskOnHornDrawPatch;
-            On.ScavengerAI.CollectScore_PhysicalObject_bool += ScavHornMaskNoPickUp;
+            On.ScavengerAI.WeaponScore += ScavHornMaskNoWeapon;
+            On.ScavengerAI.CollectScore_PhysicalObject_bool += ScavHornMaskNoCollect;
             On.LizardAI.IUseARelationshipTracker_UpdateDynamicRelationship += LizardHornOnMaskRelationship;
         }
 
@@ -275,7 +276,19 @@ namespace LancerRemix.Combat
             orig(self, sLeaser, rCam, timeStacker, camPos);
         }
 
-        private static int ScavHornMaskNoPickUp(On.ScavengerAI.orig_CollectScore_PhysicalObject_bool orig, ScavengerAI self, PhysicalObject obj, bool weaponFiltered)
+        private static int ScavHornMaskNoWeapon(On.ScavengerAI.orig_WeaponScore orig, ScavengerAI self, PhysicalObject obj, bool pickupDropInsteadOfWeaponSelection)
+        {
+            if (ModManager.MMF && !MMF.cfgHunterBackspearProtect.Value) goto NoProtect;
+            if (obj is VultureMask mask)
+            {
+                foreach (var stick in mask.abstractPhysicalObject.stuckObjects)
+                    if (stick is MaskOnHorn.AbstractOnHornStick) return 0;
+            }
+        NoProtect:
+            return orig.Invoke(self, obj, pickupDropInsteadOfWeaponSelection);
+        }
+
+        private static int ScavHornMaskNoCollect(On.ScavengerAI.orig_CollectScore_PhysicalObject_bool orig, ScavengerAI self, PhysicalObject obj, bool weaponFiltered)
         {
             if (ModManager.MMF && !MMF.cfgHunterBackspearProtect.Value) goto NoProtect;
             if (obj is VultureMask mask)
@@ -302,9 +315,8 @@ namespace LancerRemix.Combat
                 if (lunterSub.maskOnHorn.HasAMask)
                 {
                     var auxGrasp = player.grasps[0];
-                    player.grasps[0] = new Creature.Grasp(player, lunterSub.maskOnHorn.Mask, 0, 0, Creature.Grasp.Shareability.CanNotShare, 0f, false);
+                    player.grasps[0] = lunterSub.maskOnHorn.abstractStick.abstractGrasp;
                     var result = orig(self, dRelation);
-                    player.grasps[0].Release();
                     player.grasps[0] = auxGrasp;
 
                     ++self.usedToVultureMask; // horn mask is not as convincing
