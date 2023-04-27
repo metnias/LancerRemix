@@ -233,6 +233,17 @@
     <AdditionalFiles Include="text\text_kor\46-RedLancer.txt" />
     <AdditionalFiles Include="text\text_kor\47-RedLancer.txt" />
     <AdditionalFiles Include="text\text_kor\49-YellowLancer.txt" />
+    <AdditionalFiles Include="text\text_rus\250-RedLancer.txt" />
+    <AdditionalFiles Include="text\text_rus\251-RedLancer.txt" />
+    <AdditionalFiles Include="text\text_rus\255-RedLancer.txt" />
+    <AdditionalFiles Include="text\text_rus\46-RedLancer.txt" />
+    <AdditionalFiles Include="text\text_rus\47-RedLancer.txt" />
+    <AdditionalFiles Include="text\text_rus\48-WhiteLancer.txt" />
+    <AdditionalFiles Include="text\text_rus\49-YellowLancer.txt" />
+    <AdditionalFiles Include="text\text_rus\50-RedLancer.txt" />
+    <AdditionalFiles Include="text\text_rus\51-RedLancer.txt" />
+    <AdditionalFiles Include="text\text_rus\55-RedLancer.txt" />
+    <AdditionalFiles Include="text\text_rus\strings.txt" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
