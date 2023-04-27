@@ -115,9 +115,15 @@ namespace LancerRemix.Cat
             if (lanceTimer > 0)
             {
                 --lanceTimer;
-                if (lanceTimer == 0
-                    && (lanceSpear?.mode == Weapon.Mode.Thrown || lanceSpear?.mode == Weapon.Mode.Free))
-                    RetrieveLanceSpear(lanceSpear);
+                if (lanceTimer == 0)
+                {
+                    if (lanceSpear?.mode == Weapon.Mode.Thrown) // lanceSpear?.mode == Weapon.Mode.Free
+                        RetrieveLanceSpear(lanceSpear);
+                    else if (lanceSpear?.mode == Weapon.Mode.Free)
+                        FlingLance();
+                    else
+                        ReleaseLanceSpear();
+                }
             }
             else if (lanceTimer < 0) ++lanceTimer;
             if (blockTimer > 0)
@@ -363,6 +369,8 @@ namespace LancerRemix.Cat
         public virtual void LanceAttack(Spear spear, On.Player.orig_ThrowObject orig, int grasp, bool eu)
         {
             if (lanceTimer != 0) return;
+            bool deepSwim = self.animation == AnimIndex.DeepSwim;
+            if (deepSwim && self.airInLungs < 0.5f) return; // out of breath
             if (ModManager.MSC && spear.bugSpear) { orig(self, grasp, eu); return; } // throw bugSpear normally
             lanceGrasp = grasp;
             spendSpear = false;
@@ -373,6 +381,9 @@ namespace LancerRemix.Cat
             if (self.graphicsModule != null) LookAtTarget();
 
             self.AerobicIncrease(0.9f);
+            self.airInLungs -= 0.1f * ((ModManager.MMF && MMF.cfgFreeSwimBoosts.Value) ? 0f : 1f);
+            if (self.room.BeingViewed && deepSwim)
+                self.room.AddObject(new Bubble(self.mainBodyChunk.pos, self.mainBodyChunk.vel, false, false));
             lanceSpear = spear;
             spear.spearDamageBonus = GetLanceDamage(self.slugcatStats.throwingSkill);
             if (self.exhausted || self.gourmandExhausted) spear.spearDamageBonus *= 0.4f;
@@ -432,13 +443,12 @@ namespace LancerRemix.Cat
             self.ReleaseGrasp(grasp);
             self.dontGrabStuff = 10;
             self.bodyChunks[0].vel += lanceDir.ToVector2() * 7f;
-            self.bodyChunks[1].vel -= lanceDir.ToVector2() * 4f;
+            if (!deepSwim) self.bodyChunks[1].vel -= lanceDir.ToVector2() * 4f;
             lanceTimer = lanceDir.y == 0 ? 3 : 4;
             blockTimer = spendSpear ? Mathf.CeilToInt(blockTime * 1.5f) : blockTime;
             grabParried = false; violenceParried = false;
             if (!spendSpear && this is LunterSupplement lunterSub) lunterSub.maskOnHorn.DropMask();
             if (spear.bugSpear) ReleaseLanceSpear();
-
 
             IntVector2 GetLanceDir()
             {

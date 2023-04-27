@@ -22,11 +22,6 @@ namespace LancerRemix.Combat
             On.PlayerCarryableItem.Update += LanceReduceWaterFriction;
             On.Spear.DrawSprites += SpearDrawSprites;
 
-            /// TODO:
-            /// monk difficulty adjust
-            /// story patch
-            /// custom color ui support
-
             if (ModManager.MSC) OnMSCEnablePatch();
         }
 
@@ -157,6 +152,7 @@ namespace LancerRemix.Combat
 
             DebugLogCursor();
 
+            bool setFlag2 = false;
             cursor.Emit(OpCodes.Ldarg_0);
             cursor.EmitDelegate<Func<bool, Spear, bool>>(
                 (flag, self) =>
@@ -166,15 +162,19 @@ namespace LancerRemix.Combat
                     {
                         var sub = GetSub<LancerSupplement>(thrwPlayer);
                         if (sub != null && sub.SpendSpear) return flag;
-                        if (self.throwDir.y == 0 && !Custom.DistLess(self.thrownPos, self.firstChunk.pos, 80f))
-                            flag = false;
+                        if (self.throwDir.y == 0 && !Custom.DistLess(self.thrownPos, self.firstChunk.pos, 20f))
+                        { flag = false; setFlag2 = true; }
                     }
                     return flag;
                 }
                 );
             cursor.Emit(OpCodes.Stloc, 5);
-            cursor.Emit(OpCodes.Ldloc, 5);
 
+            cursor.Emit(OpCodes.Ldloc, 6);
+            cursor.EmitDelegate<Func<bool, bool>>((flag2) => flag2 || setFlag2);
+            cursor.Emit(OpCodes.Stloc, 6);
+
+            cursor.Emit(OpCodes.Ldloc, 5);
 
             LancerPlugin.ILhookOkay(LancerPlugin.ILhooks.LanceFarStickPrevent);
 
