@@ -8,7 +8,6 @@ Hold on. Something about you is giving me an itch in my subroutines. Let me chec
 SPECEVENT : lonkprojection
 A rogue... an alternate stage of maturity caused by separation from colony during early development.<LINE>Likely an adaptation for estabLISHING NEW POPULATIONS?!
 Oh no. No no no. The scavengers are enough of a nuisance on my grounds. Your kind are NOT welcome here.
-SPECEVENT : karma
 Let's make a deal. Instead of continuing your search for a mate, use this gift.
 What you now possess is a key. Past my Farm Arrays in the west, you will find an entrance to the underbelly of this world.<LINE>Slink through the ancient tunnels and machinery ever downwards until you find the black sea.
 The waters of this sea will free you from the churning wheel of rebirth. Doesn't that sound better than getting pregnant?
