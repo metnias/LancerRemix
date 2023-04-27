@@ -6,6 +6,7 @@ using RWCustom;
 using System;
 using UnityEngine;
 using static LancerRemix.Cat.ModifyCat;
+using static MonoMod.InlineRT.MonoModRule;
 
 namespace LancerRemix.Combat
 {
@@ -18,6 +19,7 @@ namespace LancerRemix.Combat
             On.Spear.LodgeInCreature += SpearLodgeCreature;
             On.Spear.Update += SpearUpdate;
             IL.Spear.Update += LanceFarStickPrevent;
+            On.PlayerCarryableItem.Update += LanceReduceWaterFriction;
             On.Spear.DrawSprites += SpearDrawSprites;
 
             /// TODO:
@@ -178,6 +180,19 @@ namespace LancerRemix.Combat
 
             void DebugLogCursor() =>
                 LancerPlugin.LogSource.LogInfo($"{cursor.Prev.OpCode.Name} > Cursor < {cursor.Next.OpCode.Name}");
+        }
+
+        private static void LanceReduceWaterFriction(On.PlayerCarryableItem.orig_Update orig, PlayerCarryableItem self, bool eu)
+        {
+            if (self is Spear spear && spear.mode == Weapon.Mode.Thrown)
+            {
+                if (spear.thrownBy != null && spear.thrownBy is Player thrwPlayer && IsPlayerLancer(thrwPlayer))
+                {
+                    var sub = GetSub<LancerSupplement>(thrwPlayer);
+                    if (sub != null && !sub.SpendSpear) spear.waterRetardationImmunity = 0.98f; // 0.9f
+                }
+            }
+            orig(self, eu);
         }
 
         private static void SpearUpdate(On.Spear.orig_Update orig, Spear self, bool eu)

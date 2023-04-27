@@ -439,6 +439,7 @@ namespace LancerRemix.Cat
             if (!spendSpear && this is LunterSupplement lunterSub) lunterSub.maskOnHorn.DropMask();
             if (spear.bugSpear) ReleaseLanceSpear();
 
+
             IntVector2 GetLanceDir()
             {
                 var res = new IntVector2(self.ThrowDirection, 0);
