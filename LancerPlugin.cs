@@ -198,7 +198,8 @@ namespace LancerRemix
             LancerStartGamePatch = 1 << 6,
             LancerCustomColorSlider = 1 << 7,
             BigNeedleWormParryCheck = 1 << 8,
-            KingTuskParryCheck = 1 << 9
+            KingTuskParryCheck = 1 << 9,
+            LanceFarStickPrevent = 1 << 10
         }
 
         internal static void ILhookTry(ILhooks flag)

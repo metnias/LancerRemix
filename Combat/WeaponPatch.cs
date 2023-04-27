@@ -1,6 +1,9 @@
 ﻿using LancerRemix.Cat;
+using Mono.Cecil.Cil;
+using MonoMod.Cil;
 using MoreSlugcats;
 using RWCustom;
+using System;
 using UnityEngine;
 using static LancerRemix.Cat.ModifyCat;
 
@@ -14,6 +17,7 @@ namespace LancerRemix.Combat
             On.Spear.HitSomething += SpearHit;
             On.Spear.LodgeInCreature += SpearLodgeCreature;
             On.Spear.Update += SpearUpdate;
+            IL.Spear.Update += LanceFarStickPrevent;
             On.Spear.DrawSprites += SpearDrawSprites;
 
             /// TODO:
@@ -136,6 +140,44 @@ namespace LancerRemix.Combat
             if (self is ExplosiveSpear || sub.SpendSpear)
             { sub.ReleaseLanceSpear(); return; }
             sub.RetrieveLanceSpear(self);
+        }
+
+        private static void LanceFarStickPrevent(ILContext il)
+        {
+            var cursor = new ILCursor(il);
+
+            LancerPlugin.ILhookTry(LancerPlugin.ILhooks.LanceFarStickPrevent);
+
+            if (!cursor.TryGotoNext(MoveType.After,
+                x => x.MatchLdcI4(0),
+                x => x.MatchStloc(5),
+                x => x.MatchLdloc(5))) return;
+
+            DebugLogCursor();
+
+            cursor.Emit(OpCodes.Ldarg_0);
+            cursor.EmitDelegate<Func<bool, Spear, bool>>(
+                (flag, self) =>
+                {
+                    if (!flag) return flag;
+                    if (self.thrownBy != null && self.thrownBy is Player thrwPlayer && IsPlayerLancer(thrwPlayer))
+                    {
+                        var sub = GetSub<LancerSupplement>(thrwPlayer);
+                        if (sub != null && sub.SpendSpear) return flag;
+                        if (self.throwDir.y == 0 && !Custom.DistLess(self.thrownPos, self.firstChunk.pos, 80f))
+                            flag = false;
+                    }
+                    return flag;
+                }
+                );
+            cursor.Emit(OpCodes.Stloc, 5);
+            cursor.Emit(OpCodes.Ldloc, 5);
+
+
+            LancerPlugin.ILhookOkay(LancerPlugin.ILhooks.LanceFarStickPrevent);
+
+            void DebugLogCursor() =>
+                LancerPlugin.LogSource.LogInfo($"{cursor.Prev.OpCode.Name} > Cursor < {cursor.Next.OpCode.Name}");
         }
 
         private static void SpearUpdate(On.Spear.orig_Update orig, Spear self, bool eu)
