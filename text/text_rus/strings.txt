@@ -1,0 +1,80 @@
+0topicular.lancer-name|ЛАНСЕР
+topicular.lancer-description|Добавляет в кампанию версию Лансера для ближнего боя.
+
+Horn|Рог
+Feeble but cautious. Stranded in a harsh world and surrounded by<LINE>its creatures, your journey will be a significantly more challenging one.|Слабый, но осторожный. Застряв в суровом мире и окруженный <LINE> его существами, ваше путешествие будет значительно более сложным.
+To be released...|Будет выпущен...
+
+You are too young and weak to throw a metal rebar|Ты слишком молод и слаб, чтобы метать арматуру
+But stabbing does not stun foes|Но колющие удары не оглушают врагов
+Find an opening|Найдите открытие
+Press PICK UP while holding a spear to block beforehand|Нажмите ВЗЯТЬ, удерживая копьё, чтобы заблокировать заранее
+
+May you overcome this world of violence|Можете ли вы преодолеть этот мир насилия
+
+Stab / Throw|Удар / Бросок
+Lancer Interactions:|Взаимодействия Лансера:
+Press THROW to stab with a spear|Нажмите БРОСИТЬ, чтобы нанести удар копьём.
+Press PICK UP to defend with a spear|Нажмите ВЗЯТЬ, чтобы защититься копьём.
+Hold PICK UP with a mask to hang it onto your horn|Удерживайте ВЗЯТЬ с маской, чтобы повесить её на рог.
+
+// Jolly
+Player <p_n> will be lancer|Игрок <p_n> будет лансером
+
+// Arena
+Left click to change class, right click to toggle lancer for Player <X>|Левый клик, чтобы изменить класс, правый клик, чтобы переключить лансера для игрока <X>
+<A> to change class, <B> to toggle lancer for Player <X>|<A> для смены класса, <B> для переключения лансера для игрока <X>
+
+// SLOracle
+lancersl-tiny|Крошечный
+lancersl-student|Студент
+lancersl-child|Ребёнок
+lancersl-imp|Бес
+lancersl-animal|Животное
+
+// Lurvivor Lonk SSOracle
+A tiny animal. A young one, too. Your journey has taken you deep into my chamber,<LINE>but I doubt you came here on purpose.|Крошечное животное. Тоже молодой. Твоё путешествие завело тебя глубоко в мою комнату,<LINE>но я сомневаюсь, что ты пришёл сюда нарочно.
+I'm afraid I can't assist you in the way you would have hoped for.<LINE> I do not know what would drive you to come all the way here in search for your family... Or how you managed it.|Боюсь, я не смогу помочь тебе так, как ты надеялся.<LINE> Я не знаю, что заставило тебя проделать весь этот путь в поисках своей семьи... Или как вам это удалось.
+I can assure you they are nowhere in my premises, your kind don't seem to take well to this place.<LINE>My overseers would take great delight in reporting an entire group of you, seeing how they react to just one.|Уверяю вас, их нигде нет в моем помещении, ваш вид, похоже, не очень хорошо относится к этому месту.<LINE>Мои наблюдатели с большим удовольствием сообщат о вас всей группе, видя, как они реагируют только на одного.
+Your family may be long gone by now... I can assure you they are nowhere in my premises,<LINE>your kind don't seem to take well to this place. My overseers would take great delight<LINE>in reporting an entire group of you, seeing how they react to just one.|Твоя семья, возможно, уже давно ушла... Уверяю тебя, их нигде нет в моем доме,<LINE>тебе, похоже, не нравится это место. Мои наблюдатели с большим удовольствием<LINE>сообщат о вас всей группе и увидят, как они отреагируют всего на одного.
+However, if it's any consolation, I will give you an opportunity.<LINE>To go the way of my creators. Eternal bliss, how does that sound?|Однако, если тебя это утешит, я дам тебе возможность.<LINE>Пойти путем моих создателей. Вечное блаженство, как это звучит?
+From here, go west past the Farm Arrays and find the place where the land fissures.<LINE>Clamber down into the earth, as deep as you can reach, and then go further.|Отсюда иди на запад мимо массивов ферм и найдите место, где земля растрескивается.<LINE>Залезайте в землю как можно глубже, а затем идите дальше.
+Saying you'll need luck is an understatement... but I admit I feel<LINE>a pang of sympathy for you, and it feels wrong to leave you empty handed.|Сказать, что тебе понадобится удача, это ничего не сказать... но я признаю, что испытываю<LINE>пристум сочувствия к тебе, и мне кажется неправильным оставлять тебя с пустыми руками.
+At the end of time none of this will matter, I suppose. Even if you fail<LINE>you'll live an eternity of lives more, and maybe eventually, you'll make it in the end.|Я полагаю, в конце времён всё это не будет иметь значения. Даже если ты потерпишь неудачу<LINE>, ты проживёшь ещё целую вечность жизней и, возможно, в конце концов добьёшься успеха.
+Either way, you must leave now. There's a perfectly good access shaft right here.|В любом случае, ты должен уйти сейчас же. Прямо здесь есть отличная шахта доступа.
+I hope you find what you're looking for. Don't bother coming back.|Надеюсь, ты найдёшь то, что ищешь. Не вздумай возвращаться.
+
+// Lunter SSOracle
+What? Why would you take it back? Do you even know where you're going with that?|Что? Почему бы тебе взять его обратно? Ты хоть знаешь, куда ты идешь с этим?
+Fine, little creature. Have it your way. Her name is Looks to the Moon, and she lies decrepit in the waters to the east.|Ладно, маленькое создание. Будь по-твоему. Её зовут Смотрящая на Луну, и лежит она дряхлая в водах к востоку.
+It's a shame you'd choose to waste such a precious resource on her.<LINE>But I respect your courage, and if you feel that's what's right, I won't stand in your way.|Жаль, что ты решил потратить на неё такой драгоценный ресурс.<LINE>Но я уважаю твоё мужество, и если ты считаешь, что это правильно, я не буду стоять у тебя на пути.
+Leave now, and don't come back.|Уходи сейчас же и не возвращайся.
+Do you need some help, tiny creature?|Тебе нужна помощь, крошечное создание?
+Why have you returned? There is nothing left for you here.|Почему ты вернулся? Здесь для тебя ничего не осталось.
+I implore you, little creature, for the sake of both of us, to just leave already.|Я умоляю тебя, маленькое создание, ради нас обоих, просто уйди уже.
+Well, child, if you'd rather spend time with me than<LINE>search for eternal happiness, I will have to accommodate you for the time being.|Что ж, дитя, если ты предпочитаешь проводить со мной время, а не<LINE>искать вечное счастье, мне придется пока тебе угождать.
+Please don't waste any more of your time, little creature.|Пожалуйста, не трать больше времени, маленькое создание.
+I cannot assist you further.|Я не могу помочь тебе дальше.
+Just be aware of the mistake you're making.|Просто осознайте ошибку, которую ты делаешь.
+It is too long a journey to stall for even a moment.|Это слишком долгий путь, чтобы останавливаться даже на мгновение.
+
+// Lurvivor SLOracle first visit
+Get... get away... small.... thing.|Уйди... уйди... маленькая... вещь.
+I see that someone has given you the gift of communication.<LINE>Must have been Five Pebbles, as you don't look like you can travel very far at all...|Я вижу, что кто-то дал тебе дар общения.<LINE>Должно быть, Пять Галек, потому что ты не выглядишь так, будто можешь далеко путешествовать...
+He's sick, if you haven't noticed. Being corrupted from the inside by his own experiments. Maybe they all are by now, who knows.<LINE>We weren't designed to transcend and it drives us mad.|Он болен, если ты не заметил. Развращённый изнутри собственными экспериментами. Может быть, они уже все такие, кто знает.<LINE>Мы не созданы для превосходства, и это сводит нас с ума.
+It is good to have someone to talk to even if that's a child like you.<LINE>My last visitor stopped coming here many cycles ago, and<LINE>here I was about to get used to its visits.|Хорошо, когда есть с кем поговорить, даже если это такой ребёнок, как ты.<LINE>Мой последний гость перестал приходить сюда много циклов назад, и<LINE>здесь я собиралась привыкнуть к его визитам.
+Hello <PlayerName>. Are you lost?|Привет <PlayerName>. Ты заблудился?
+I am sorry to say that there is nothing here for you.|Мне жаль говорить, что здесь для тебя ничего нет.
+// Lurvivor SLOracle second visit
+I do enjoy the company though. You're welcome to stay a while, quiet petite thing.|Хотя я получаю удовольствие от компании. Ты можешь остаться на некоторое время, тихая маленькая штучка
+I have had another visitor from your specie before. And they left me alive!<LINE>But... I have told you that already, haven't I?|Раньше у меня был ещё один посетитель из вашего вида. И он оставил меня в живых!<LINE>Но... Я уже говорила тебе это, не так ли?
+Even the last visitor that came here from time to time left with nothing. But... I have told you that already, haven't I?|Даже последний посетитель, который время от времени заходил сюда, уходил ни с чем. Но... Я уже говорила тебе это, не так ли?
+
+// Lurvivor SLOracle bring neuron
+Maybe this is asking too much for a child like you but...<LINE>could you bring me another one?|Может быть, это слишком много для такого ребёнка, как ты, но...<LINE>не мог бы ты принести мне еще один?
+Or actually I'm sure he would, but he has so many of these~<LINE>it doesn't do him any difference.<LINE>For me though, it does! Thank you, tiny creature!|Вернее, я уверена, что так и будет, но у него их так много~<LINE>это не имеет для него никакого значения.<LINE>Но для меня это имеет значение! Спасибо, маленькое существо!
+
+// Lunter SLOracle
+This much effort, just to help me... It means more than you could ever know.|Эти большие усилия, просто чтобы помочь мне... Это значит больше, чем ты когда-либо мог себе представить.
+All of this trouble just to save me... You are more generous than anyone I've known.|Все эти неприятности только для того, чтобы спасти меня... Ты щедрее всех, кого я знаю.
+I am happy that I'm not alone.|Я счастлива, что я не одина.
