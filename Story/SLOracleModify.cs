@@ -132,7 +132,7 @@ namespace LancerRemix.Story
         {
             if (!IsStoryLancer) goto NoLancer;
             var basis = GetBasis(self.currentSaveFile);
-            if (basis != SlugName.Red && basis != SlugName.White && basis != SlugName.Yellow) goto NoLancer;
+            // if (basis != SlugName.Red && basis != SlugName.White && basis != SlugName.Yellow) goto NoLancer;
 
             Debug.Log($"Lancer {self.id} {self.State.neuronsLeft}");
             var slBehavior = self.myBehavior as SLOracleBehaviorHasMark;
@@ -292,6 +292,7 @@ namespace LancerRemix.Story
 
             #region Lunter
 
+            if (basis != SlugName.Red) goto NoLancer; // not Lunter
             bool already = GetProgValue<bool>(Custom.rainWorld.progression?.currentSaveState.miscWorldSaveData, REDALREADYSUCCEED);
             //bool nsh = GetProgValue<bool>(Custom.rainWorld.progression.currentSaveState.miscWorldSaveData, LUNTERNSHAWARE);
             if (self.id == ConvID.Moon_Red_First_Conversation)
