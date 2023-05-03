@@ -44,7 +44,7 @@ namespace LancerRemix.Story
 
             if (IsTimelineInbetween(story, ModManager.MSC ? MSCName.Spear : null, SlugName.Red))
                 self.neuronsLeft = 0; // dead after spear and before red
-            else if (IsTimelineInbetween(story, SlugName.Red, SlugName.White))
+            else if (IsTimelineInbetween(story, SlugName.Red, SlugName.White) && Custom.rainWorld.progression?.currentSaveState != null)
             {
                 self.neuronsLeft = TryMineRedData(); // dead if red has not succeed and before white
                 if (basis == SlugName.Red && story == GetLancer(SlugName.Red))
@@ -60,7 +60,7 @@ namespace LancerRemix.Story
 
             int TryMineRedData()
             {
-                var progLines = Custom.rainWorld.progression?.GetProgLinesFromMemory();
+                var progLines = Custom.rainWorld.progression.GetProgLinesFromMemory();
                 if (progLines == null || progLines.Length == 0) return 0;
                 for (int i = 0; i < progLines.Length; ++i)
                 {
