@@ -1,7 +1,7 @@
 {
   "id": "topicular.lancer",
   "name": "Lancer",
-  "version": "1.0.3.0",
+  "version": "1.1.0.0",
   "hide_version": false,
   "authors": "Lead Dev: topicular<LINE>Cat Pics: Merang<LINE>Writings: Empathy Module<LINE>Russian: MaxBogomol",
   "description": "Adds Lancer variant for campaigns, which use melee combat.",
