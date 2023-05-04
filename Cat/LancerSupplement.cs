@@ -117,9 +117,11 @@ namespace LancerRemix.Cat
                 --lanceTimer;
                 if (lanceTimer == 0)
                 {
-                    if (lanceSpear?.mode == Weapon.Mode.Thrown) // lanceSpear?.mode == Weapon.Mode.Free
+                    if (lanceSpear?.mode == Weapon.Mode.Thrown
+                        || (lanceSpear?.mode == Weapon.Mode.StuckInCreature && !SpendSpear)) // lanceSpear?.mode == Weapon.Mode.Free
                         RetrieveLanceSpear(lanceSpear);
-                    else if (lanceSpear?.mode == Weapon.Mode.Free)
+                    else if (lanceSpear?.mode != Weapon.Mode.StuckInWall &&
+                        lanceSpear?.mode != Weapon.Mode.StuckInCreature)
                         FlingLance();
                     else
                         ReleaseLanceSpear();
