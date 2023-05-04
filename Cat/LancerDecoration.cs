@@ -82,9 +82,12 @@ namespace LancerRemix.Cat
         public Color GetHornColor()
         {
             if (self.useJollyColor || PlayerGraphics.CustomColorsEnabled())
-                return HornColorPick.GetHornColor(self.player.playerState.playerNumber);
+                return
+                    self.player?.playerState == null ? DefaultHornColor(SlugName.White) :
+                    HornColorPick.GetHornColor(self.player.playerState.playerNumber);
 
-            return DefaultHornColor(self.player.SlugCatClass);
+            return self.player?.SlugCatClass == null ? DefaultHornColor(SlugName.White) :
+                DefaultHornColor(self.player.SlugCatClass);
         }
 
         public static Color DefaultHornColor(SlugName basis)

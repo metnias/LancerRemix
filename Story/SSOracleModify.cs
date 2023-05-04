@@ -355,7 +355,7 @@ namespace LancerRemix.Story
 
         private static void LunterPebblesPostMeetBehavior(On.SSOracleBehavior.ThrowOutBehavior.orig_Update orig, SSOracleBehavior.ThrowOutBehavior self)
         {
-            if (!IsStoryLancer) goto NoLunter;
+            if (!IsStoryLancer || self.player?.room == null) goto NoLunter;
             var basis = GetBasis(self.owner.oracle.room.game.StoryCharacter);
             if (basis != SlugName.Red) goto NoLunter;
 
@@ -367,8 +367,7 @@ namespace LancerRemix.Story
                     if (!lunterStoleNeuron)
                     {
                         self.movementBehavior = SSOracleBehavior.MovementBehavior.KeepDistance;
-                        if (self.owner.greenNeuron != null &&
-                            self.owner.greenNeuron.grabbedBy.Count > 0 && self.owner.greenNeuron.grabbedBy[0].grabber is Player)
+                        if (self.owner.greenNeuron.grabbedBy.Count > 0 && self.owner.greenNeuron.grabbedBy[0].grabber is Player)
                         {
                             GreenNeuronTakenByPlayerEvent(); // GreenN Neuron just taken by Player
                         }

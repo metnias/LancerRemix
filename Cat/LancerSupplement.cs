@@ -561,9 +561,9 @@ namespace LancerRemix.Cat
         public void RetrieveLanceSpear(Spear spear = null)
         {
             if (spear == null) spear = lanceSpear;
-            if (lanceTimer < 0 || spear == null || spear.grabbedBy.Count > 0 || spear.room != self.room || self.grasps[lanceGrasp] != null)
+            if (lanceTimer < 0 || spear == null || spear.grabbedBy.Count > 0 || spear.room != self.room)
             { ReleaseLanceSpear(); return; }
-            self.SlugcatGrab(spear, lanceGrasp); // retrieve
+            self.SlugcatGrab(spear, Mathf.Clamp(lanceGrasp, 0, self.grasps.Length - 1)); // retrieve
             lanceSpear = null;
             SetLanceCooltime();
         }
