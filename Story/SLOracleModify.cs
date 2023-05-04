@@ -462,6 +462,7 @@ namespace LancerRemix.Story
                         Vector2 pos = self.holdingObject.firstChunk.pos;
                         self.holdingObject.Destroy();
                         self.holdingObject = null;
+                        self.oracle.room.game.GetStorySession.saveState.miscWorldSaveData.moonRevived = true;
                         SLOracleSwarmer sloracleSwarmer = new SLOracleSwarmer(new AbstractPhysicalObject(self.oracle.room.world, AbstractPhysicalObject.AbstractObjectType.SLOracleSwarmer, null, self.oracle.room.GetWorldCoordinate(pos), self.oracle.room.game.GetNewID()), self.oracle.room.world);
                         self.oracle.room.abstractRoom.entities.Add(sloracleSwarmer.abstractPhysicalObject);
                         sloracleSwarmer.firstChunk.HardSetPosition(pos);
