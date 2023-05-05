@@ -132,6 +132,10 @@ namespace LancerRemix.Cat
             {
                 catSubs.Add(self.playerState, new LancerSupplement(self));
                 catDecos.Add(self.playerState, new LancerDecoration(self));
+                if (basis == SlugName.Yellow && self.room?.game.session is StoryGameSession && self.room.abstractRoom?.name == "SU_C04")
+                { // Give first food for Lonk
+                    self.playerState.foodInStomach = 1;
+                }
             }
         }
 
