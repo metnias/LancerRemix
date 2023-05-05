@@ -334,7 +334,7 @@ namespace LancerRemix.Story
             orig(self, eu);
 
             if (!IsStoryLancer) return;
-            var basis = GetBasis(self.oracle.room.game.StoryCharacter);
+            var basis = GetBasis(self.oracle.room?.game.StoryCharacter);
             if (basis != SlugName.Red) return;
 
             // GreenNeuron inside room
@@ -344,7 +344,7 @@ namespace LancerRemix.Story
                 if (self.greenNeuron.grabbedBy.Count < 1)
                 {
                     KeepGreenNeuronToPebbles(self.oracle); // Green Neuron in 5P's hand
-                    if (Custom.DistLess(greenNeuron.firstChunk.pos, self.player.firstChunk.pos, 40f))
+                    if (self.player != null && Custom.DistLess(greenNeuron.firstChunk.pos, self.player.firstChunk.pos, 40f))
                     {
                         self.player.ReleaseGrasp(1);
                         self.player.SlugcatGrab(greenNeuron, 1);
@@ -355,11 +355,11 @@ namespace LancerRemix.Story
 
         private static void LunterPebblesPostMeetBehavior(On.SSOracleBehavior.ThrowOutBehavior.orig_Update orig, SSOracleBehavior.ThrowOutBehavior self)
         {
-            if (!IsStoryLancer || self.player?.room == null) goto NoLunter;
+            if (!IsStoryLancer) goto NoLunter;
             var basis = GetBasis(self.owner.oracle.room.game.StoryCharacter);
             if (basis != SlugName.Red) goto NoLunter;
 
-            if (self.player.room == self.oracle.room)
+            if (self.player?.room == self.oracle.room)
             {
                 // GreenNeuron inside room
                 if (greenNeuron?.room == self.oracle.room)
@@ -393,7 +393,7 @@ namespace LancerRemix.Story
             {
                 if (banned) { banned = false; self.owner.NewAction(SSAction.ThrowOut_Polite_ThrowOut); return; }
                 // Player Stolen Green neuron
-                if (self.player.room == self.oracle.room)
+                if (self.player?.room == self.oracle.room)
                     ++self.owner.throwOutCounter;
                 self.movementBehavior = SSOracleBehavior.MovementBehavior.Talk;
                 self.telekinThrowOut = self.owner.throwOutCounter > 1150;
@@ -447,7 +447,7 @@ namespace LancerRemix.Story
             }
             if (self.action == SSAction.ThrowOut_SecondThrowOut)
             {
-                if (self.player.room == self.oracle.room)
+                if (self.player?.room == self.oracle.room)
                     ++self.owner.throwOutCounter;
                 self.movementBehavior = SSOracleBehavior.MovementBehavior.Investigate;
                 self.telekinThrowOut = (self.inActionCounter > 220) && secondEntry || (banned && self.inActionCounter > 50);
@@ -511,7 +511,7 @@ namespace LancerRemix.Story
             }
             if (self.action == SSAction.ThrowOut_KillOnSight)
             {
-                if (self.player.room == self.oracle.room)
+                if (self.player?.room == self.oracle.room)
                 {
                     secondEntry = false;
                     self.owner.NewAction(SSAction.ThrowOut_SecondThrowOut);
