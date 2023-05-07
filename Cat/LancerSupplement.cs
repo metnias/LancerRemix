@@ -157,7 +157,7 @@ namespace LancerRemix.Cat
                 {
                     if (!IsRealStick(stick))
                     {
-                        Debug.Log($"Lancer cleared leftoverStick: {stick.A.ID} ~ {stick.B.ID}");
+                        Debug.Log($"Lancer cleared leftoverStick {(isB ? "B" : "A")}: {stick.A.ID} ~ {stick.B.ID}");
                         crit.stuckObjects[i].Deactivate();
                     }
                 }
@@ -175,16 +175,23 @@ namespace LancerRemix.Cat
                 if (isB)
                 {
                     if ((stick.A as AbstractCreature).realizedCreature != null)
+                    {
                         foreach (var grasp in (stick.A as AbstractCreature).realizedCreature.grasps)
                             if (grasp?.grabbed.abstractPhysicalObject == crit) return true;
+                        return false;
+                    }
                 }
                 else
                 {
+                    if (!(stick.B is AbstractCreature cB) || cB.creatureTemplate.type != CreatureTemplate.Type.Slugcat) return true; // Not Lancer
                     if (crit.realizedCreature != null)
+                    {
                         foreach (var grasp in crit.realizedCreature.grasps)
                             if (grasp?.grabbed.abstractPhysicalObject == stick.B) return true;
+                        return false;
+                    }
                 }
-                return false;
+                return true;
             }
         }
 

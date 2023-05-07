@@ -31,7 +31,7 @@ namespace LancerRemix.Combat
 
         private static List<AbstractPhysicalObject> ClearLeftoverSticks(On.AbstractPhysicalObject.orig_GetAllConnectedObjects orig, AbstractPhysicalObject self)
         {
-            if (self is AbstractCreature crit)
+            if (self is AbstractCreature crit && crit.realizedCreature != null)
                 LancerSupplement.ClearLeftoverStick(crit, crit.creatureTemplate.type == CreatureTemplate.Type.Slugcat);
             return orig(self);
         }
