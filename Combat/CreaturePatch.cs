@@ -53,8 +53,7 @@ namespace LancerRemix.Combat
         {
             if (source?.owner is Spear spear && spear.thrownBy is Player atkPlayer && IsPlayerLancer(atkPlayer))
             {
-                if (GetSub<LancerSupplement>(atkPlayer)?.SpendSpear == true) stunBonus *= 2f;
-                else { stunBonus = -10000f; StunIgnores.Add(self.abstractCreature); }
+                LancerModifyViolence(self, ref stunBonus, atkPlayer, spear);
             }
             if (self is Player player && IsPlayerLancer(player))
             {
@@ -66,13 +65,33 @@ namespace LancerRemix.Combat
             StunIgnores.Remove(self.abstractCreature);
         }
 
+        private static void LancerModifyViolence(Creature self, ref float stunBonus, Player atkPlayer, Spear spear)
+        {
+            var lancerSub = GetSub<LancerSupplement>(atkPlayer);
+            if (lancerSub == null) return;
+            if (lancerSub is LunterSupplement lunterSub) lunterSub.maskOnHorn.DropMask();
+
+            if (lancerSub.SpendSpear) stunBonus *= 2f;
+            else
+            {
+                //Debug.Log($"LancerDEBUG) {self.abstractCreature.creatureTemplate.type} Danger{atkPlayer.dangerGrasp != null} Lonk{lancerSub.isLonk} Elec{spear is ElectricSpear}");
+                if (atkPlayer.dangerGrasp == null && !lancerSub.isLonk)
+                {
+                    if (!ModManager.MSC || !(spear is ElectricSpear))
+                    {
+                        stunBonus = -10000f;
+                        StunIgnores.Add(self.abstractCreature);
+                    }
+                }
+            }
+        }
+
         private static void LancerLizardViolencePatch(On.Lizard.orig_Violence orig, Lizard self,
             BodyChunk source, Vector2? directionAndMomentum, BodyChunk hitChunk, PhysicalObject.Appendage.Pos hitAppendage, Creature.DamageType type, float damage, float stunBonus)
         {
             if (source?.owner is Spear spear && spear.thrownBy is Player atkPlayer && IsPlayerLancer(atkPlayer))
             {
-                if (GetSub<LancerSupplement>(atkPlayer)?.SpendSpear == true) stunBonus *= 2f;
-                else { stunBonus = -10000f; StunIgnores.Add(self.abstractCreature); }
+                LancerModifyViolence(self, ref stunBonus, atkPlayer, spear);
             }
             orig(self, source, directionAndMomentum, hitChunk, hitAppendage, type, damage, stunBonus);
             StunIgnores.Remove(self.abstractCreature);
@@ -83,6 +102,7 @@ namespace LancerRemix.Combat
         private static void StunPatch(On.Creature.orig_Stun orig, Creature self, int st)
         {
             if (StunIgnores.Contains(self.abstractCreature)) st = 0;
+            //Debug.Log($"LancerDEBUG) {self.abstractCreature.creatureTemplate.type} stun: {st}");
             orig(self, st);
         }
 

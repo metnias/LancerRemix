@@ -9,5 +9,5 @@
   "requirements": [ "slime-cubed.slugbase", "topicular.catsupplement" ],
   "requirements_names": [ "SlugBase", "CatSupplement" ],
   "tags": [ "Campaigns", "Game Mechanics" ],
-  "checksum_override_version": true
+  "checksum_override_version": false
 }

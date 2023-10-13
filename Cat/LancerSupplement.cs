@@ -32,7 +32,7 @@ namespace LancerRemix.Cat
         {
         }
 
-        protected readonly bool isLonk = false;
+        public readonly bool isLonk = false;
         protected bool hasExhaustion = false;
 
         protected virtual void UpdateHasExhaustion()
@@ -456,7 +456,7 @@ namespace LancerRemix.Cat
             lanceTimer = lanceDir.y == 0 ? 3 : 4;
             blockTimer = spendSpear ? Mathf.CeilToInt(blockTime * 1.5f) : blockTime;
             grabParried = false; violenceParried = false;
-            if (!spendSpear && this is LunterSupplement lunterSub) lunterSub.maskOnHorn.DropMask();
+            // if (!spendSpear && this is LunterSupplement lunterSub) lunterSub.maskOnHorn.DropMask();
             if (spear.bugSpear) ReleaseLanceSpear();
 
             IntVector2 GetLanceDir()
