@@ -138,6 +138,7 @@ namespace LancerRemix.Story
             if (!ModManager.MSC) return false;
             if (self.setupValues.testMoonCloak) return true;
             if (!self.IsStorySession) return false;
+            if (LancerEnums.GetBasis(self.GetStorySession.saveStateNumber) == SlugName.Yellow) return false;
             if (self.GetStorySession.saveState.miscWorldSaveData.moonGivenRobe) return true;
             return LancerGenerator.IsTimelineInbetween(LancerEnums.GetLancer(self.GetStorySession.saveStateNumber),
                 self.rainWorld.progression.miscProgressionData.CloakTimelinePosition, null);

@@ -516,14 +516,14 @@ namespace LancerRemix.Story
 
         private static Vector2 LonkSLOracleArmDir(On.Oracle.OracleArm.orig_BaseDir orig, Oracle.OracleArm self, float timeStacker)
         {
-            if (self.oracle.room.game.IsStorySession && IsMoonComatose(self.oracle.room.game.StoryCharacter))
+            if (self.oracle.room.game.IsStorySession && IsMoonComatose(self.oracle.room.game.StoryCharacter) && self.oracle.ID == Oracle.OracleID.SL)
                 return Vector2.down;
             return orig(self, timeStacker);
         }
 
         private static Vector2 LonkSLOracleArmPos(On.Oracle.OracleArm.orig_OnFramePos orig, Oracle.OracleArm self, float timeStacker)
         {
-            if (self.oracle.room.game.IsStorySession && IsMoonComatose(self.oracle.room.game.StoryCharacter))
+            if (self.oracle.room.game.IsStorySession && IsMoonComatose(self.oracle.room.game.StoryCharacter) && self.oracle.ID == Oracle.OracleID.SL)
                 return new Vector2(1670f, 605f);
             return orig(self, timeStacker);
         }
