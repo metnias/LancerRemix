@@ -95,8 +95,8 @@ namespace LancerRemix
 
             if (basis == SlugName.White || basis == SlugName.Yellow || basis == SlugName.Red || basis == SlugName.Night)
                 lancer = RegisterVanillaLancer(basis);
-            //else if (SlugcatStats.IsSlugcatFromMSC(basis))
-            //    lancer = RegisterMSCLancer(basis);
+            else if (SlugcatStats.IsSlugcatFromMSC(basis) && !LancerPlugin.MSCLANCERS)
+                lancer = RegisterVanillaLancer(basis);
 
             if (SlugBaseCharacter.TryGet(basis, out var _))
                 lancer = RegisterSlugBaseLancer(basis);
