@@ -15,6 +15,8 @@ namespace LancerRemix.Story
     {
         internal static void SubPatch()
         {
+            On.RegionGate.ctor += LonkRegionGateCtorPatch;
+            On.CreatureCommunities.LoadDefaultCommunityAlignments += LonkDefaultCommunity;
         }
 
         internal static void OnMSCEnableSubPatch()
@@ -152,5 +154,30 @@ namespace LancerRemix.Story
             if (self.cloakTimelinePosition == null || self.cloakTimelinePosition.Index < 0) self.cloakTimelinePosition = lancer;
             else if (LancerGenerator.IsTimelineInbetween(self.cloakTimelinePosition, lancer, null)) self.cloakTimelinePosition = lancer;
         }
+
+        #region Lonk
+
+        private static void LonkRegionGateCtorPatch(On.RegionGate.orig_ctor orig, RegionGate gate, Room room)
+        {
+            orig.Invoke(gate, room);
+            if (IsStoryLancer && LancerEnums.GetBasis(room.game.StoryCharacter) == SlugName.Yellow && !File.Exists(Custom.RootFolderDirectory() + "nifflasmode.txt"))
+                gate.unlocked = false;
+        }
+
+        private static void LonkDefaultCommunity(On.CreatureCommunities.orig_LoadDefaultCommunityAlignments orig, CreatureCommunities self, SlugName saveStateNumber)
+        {
+            if (!IsStoryLancer) { orig.Invoke(self, saveStateNumber); return; }
+            var basis = LancerEnums.GetBasis(saveStateNumber);
+            orig.Invoke(self, basis == SlugName.Yellow ? SlugName.White : basis);
+            if (saveStateNumber == SlugName.Yellow)
+            { //Lonk Reduce Reputation
+                for (int p = 0; p < self.playerOpinions.GetLength(0); p++)
+                    for (int q = 0; q < self.playerOpinions.GetLength(1); q++)
+                        for (int r = 0; r < self.playerOpinions.GetLength(2); r++)
+                            self.playerOpinions[p, q, r] = Mathf.Lerp(self.playerOpinions[p, q, r], -1f, 0.15f);
+            }
+        }
+
+        #endregion Lonk
     }
 }
