@@ -250,6 +250,8 @@ namespace LancerRemix.Cat
 
         public virtual void Die(On.Player.orig_Die orig)
         {
+            //Debug.Log($"LancerDEBUG) Die:\n{Environment.StackTrace}");
+            //if (HasParried) return;
             orig(self);
             ReleaseLanceSpear();
         }
@@ -317,7 +319,7 @@ namespace LancerRemix.Cat
                 self.room.AddObject(new Spark(self.mainBodyChunk.pos, Custom.RNV() * 5f, Color.yellow, null, 25, 90));
             self.room.PlaySound(SoundID.Spear_Bounce_Off_Wall, self.mainBodyChunk, false, 1.5f, 0.8f);
             self.room.InGameNoise(new InGameNoise(self.mainBodyChunk.pos, guarded ? 200f : 700f, self, 1f));
-            self.mushroomEffect += guarded ? 0.4f : 0.2f;
+            self.mushroomEffect += guarded ? 0.6f : 0.2f;
         }
 
         public virtual void Violence(On.Creature.orig_Violence orig,
@@ -338,6 +340,7 @@ namespace LancerRemix.Cat
                 }
                 Vector2 away;
                 var spear = GetParrySpear();
+                if (blockTimer < 1) spear = null;
                 if (source?.owner != null)
                 {
                     if (source.owner is Creature crit)
@@ -360,7 +363,7 @@ namespace LancerRemix.Cat
 
                 guarded &= lanceTimer == 0;
                 AddParryEffect(guarded);
-                if (hasExhaustion || (!guarded && !spendSpear)) FlingLance();
+                if ((hasExhaustion || (!guarded && !spendSpear)) && blockTimer > 0) FlingLance();
                 // lanceTimer = 0; blockTimer = 0;
                 orig(self, source, null, hitChunk, hitAppendage, type, 0f, 0f);
                 return;

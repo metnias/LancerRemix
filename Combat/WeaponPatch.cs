@@ -6,6 +6,7 @@ using RWCustom;
 using System;
 using UnityEngine;
 using static LancerRemix.Cat.ModifyCat;
+using Random = UnityEngine.Random;
 
 namespace LancerRemix.Combat
 {
@@ -70,6 +71,22 @@ namespace LancerRemix.Combat
 
         private static bool SpearHit(On.Spear.orig_HitSomething orig, Spear self, SharedPhysics.CollisionResult result, bool eu)
         {
+            if (result.obj is Player hitPlayer && IsPlayerLancer(hitPlayer))
+            {
+                var hitSub = GetSub<LancerSupplement>(hitPlayer);
+                if (hitSub != null)
+                {
+                    hitPlayer.Violence(self.firstChunk, new Vector2?(self.firstChunk.vel * self.firstChunk.mass * 2f), result.chunk, result.onAppendagePos, Creature.DamageType.Stab, 0f, 0f); // parry test
+                    if (hitSub.HasParried)
+                    {
+                        self.vibrate = 20;
+                        self.ChangeMode(Weapon.Mode.Free);
+                        self.firstChunk.vel = self.firstChunk.vel * -0.5f + Custom.DegToVec(Random.value * 360f) * Mathf.Lerp(0.1f, 0.4f, Random.value) * self.firstChunk.vel.magnitude;
+                        self.SetRandomSpin();
+                        return false;
+                    }
+                }
+            }
             var res = orig(self, result, eu);
             if (res && self.thrownBy is Player atkPlayer && IsPlayerLancer(atkPlayer))
             {
