@@ -1,6 +1,4 @@
-﻿#define NO_MSC
-
-using JollyCoop.JollyMenu;
+﻿using JollyCoop.JollyMenu;
 using LancerRemix.Cat;
 using Menu;
 using Menu.Remix;

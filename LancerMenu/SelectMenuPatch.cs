@@ -1,6 +1,4 @@
-﻿#define NO_MSC
-
-using CatSub.Story;
+﻿using CatSub.Story;
 using HUD;
 using JollyCoop.JollyMenu;
 using LancerRemix.Cat;
@@ -216,10 +214,13 @@ namespace LancerRemix.LancerMenu
 
         #region LancerPlayers
 
-        private static readonly bool[] lancerPlayers = new bool[4];
+        private static bool[] lancerPlayers = new bool[4];
 
         internal static void SetLancerPlayers(int num, bool lancer)
-            => lancerPlayers[num] = lancer;
+        {
+            if (num >= lancerPlayers.Length) Array.Resize(ref lancerPlayers, (num + 3) / 4 * 4);
+            lancerPlayers[num] = lancer;
+        }
 
         internal static bool GetLancerPlayers(int num) => lancerPlayers[num];
 
@@ -268,8 +269,7 @@ namespace LancerRemix.LancerMenu
             if (message == "START")
             {
                 if (!ModManager.JollyCoop) lancerPlayers[0] = slugcatPageLancer;
-#if NO_MSC
-                else
+                else if (!LancerPlugin.MSCLANCERS)
                 {
                     for (int i = 0; i < 4; ++i)
                     {
@@ -277,7 +277,7 @@ namespace LancerRemix.LancerMenu
                         if (basis?.Index >= 0 && SlugcatStats.IsSlugcatFromMSC(basis)) SetLancerPlayers(i, false);
                     }
                 }
-#endif
+
                 UpdateIsPlayerLancer(slugcatPageLancer);
                 SaveLancerPlayers(self.manager.rainWorld.progression.miscProgressionData);
                 // StartGame(this.slugcatPages[this.slugcatPageIndex].slugcatNumber);

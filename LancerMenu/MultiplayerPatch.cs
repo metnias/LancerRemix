@@ -1,6 +1,4 @@
-﻿#define NO_MSC
-
-using LancerRemix.Cat;
+﻿using LancerRemix.Cat;
 using Menu;
 using Menu.Remix;
 using Menu.Remix.MixedUI;
@@ -20,9 +18,7 @@ namespace LancerRemix.LancerMenu
         internal static void SubPatch()
         {
             On.Menu.MultiplayerMenu.Singal += ArenaMenuSingal;
-#if NO_MSC
             On.Menu.ChallengeSelectPage.StartButton_OnPressDone += ExpeditionDisableMSCLancers;
-#endif
         }
 
         #region Jolly
@@ -208,14 +204,12 @@ namespace LancerRemix.LancerMenu
                 UpdateIsPlayerLancer(false);
                 if (!ModManager.MSC || self.currentGameType == MoreSlugcatsEnums.GameTypeID.Challenge)
                     for (int i = 0; i < 4; ++i) SetLancerPlayers(i, false);
-#if NO_MSC
-                else
+                else if (!LancerPlugin.MSCLANCERS)
                 {
                     for (int i = 0; i < 4; ++i)
                         if (self.GetArenaSetup.playerClass[i] != null && SlugcatStats.IsSlugcatFromMSC(self.GetArenaSetup.playerClass[i]))
                             SetLancerPlayers(i, false);
                 }
-#endif
                 SaveLancerPlayers(self.manager.rainWorld.progression.miscProgressionData);
             }
         Skip: orig(self, sender, message);
@@ -223,29 +217,23 @@ namespace LancerRemix.LancerMenu
 
         #endregion Arena
 
-#if NO_MSC
-
         private static void ExpeditionDisableMSCLancers(On.Menu.ChallengeSelectPage.orig_StartButton_OnPressDone orig,
             ChallengeSelectPage self, UIfocusable trigger)
         {
             UpdateIsPlayerLancer(false);
             if (!ModManager.JollyCoop || !ModManager.CoopAvailable)
                 for (int i = 0; i < 4; ++i) SetLancerPlayers(i, false);
-#if NO_MSC
             else
             {
                 for (int i = 0; i < self.menu.manager.rainWorld.options.JollyPlayerCount; ++i)
                 {
                     var character = self.menu.manager.rainWorld.options.jollyPlayerOptionsArray[i].playerClass;
-                    if (character != null && SlugcatStats.IsSlugcatFromMSC(LancerEnums.GetBasis(character)))
+                    if (character != null && SlugcatStats.IsSlugcatFromMSC(LancerEnums.GetBasis(character)) && !LancerPlugin.MSCLANCERS)
                         SetLancerPlayers(i, false);
                 }
             }
-#endif
             SaveLancerPlayers(self.menu.manager.rainWorld.progression.miscProgressionData);
             orig(self, trigger);
         }
-
-#endif
     }
 }

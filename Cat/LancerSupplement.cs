@@ -35,7 +35,7 @@ namespace LancerRemix.Cat
         protected readonly bool isLonk = false;
         protected bool hasExhaustion = false;
 
-        private void UpdateHasExhaustion()
+        protected virtual void UpdateHasExhaustion()
         {
             hasExhaustion = self.Malnourished || isLonk;
         }
@@ -64,7 +64,7 @@ namespace LancerRemix.Cat
 
         public override string TargetSubVersion => "1.0";
 
-        private float aerobicCache;
+        protected float aerobicCache;
 
         public override void Update(On.Player.orig_Update orig, bool eu)
         {

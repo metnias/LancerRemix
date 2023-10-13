@@ -1,6 +1,4 @@
-﻿#define NO_MSC
-
-using CatSub.Cat;
+﻿using CatSub.Cat;
 using LancerRemix.LancerMenu;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
@@ -68,13 +66,14 @@ namespace LancerRemix.Cat
         {
         }
 
-        private static readonly bool[] isPlayerLancer = new bool[4];
+        private static bool[] isPlayerLancer = new bool[4];
         public static bool IsStoryLancer { get; private set; } = false;
 
         public static void SetIsPlayerLancer(bool story, bool[] players)
         {
             IsStoryLancer = story;
-            for (int i = 0; i < 4; ++i) isPlayerLancer[i] = players[i];
+            if (players.Length > isPlayerLancer.Length) Array.Resize(ref isPlayerLancer, players.Length);
+            for (int i = 0; i < players.Length; ++i) isPlayerLancer[i] = players[i];
         }
 
         public static bool IsPlayerLancer(int playerNumber) => isPlayerLancer[playerNumber];
@@ -114,15 +113,13 @@ namespace LancerRemix.Cat
             orig(self, abstractCreature, world);
             if (!IsPlayerLancer(self)) return;
             var basis = GetBasis(self.SlugCatClass);
-#if NO_MSC
-            if (SlugcatStats.IsSlugcatFromMSC(basis))
+            if (SlugcatStats.IsSlugcatFromMSC(basis) && !LancerPlugin.MSCLANCERS)
             {
                 isPlayerLancer[self.playerState.playerNumber] = false;
                 SelectMenuPatch.SetLancerPlayers(self.playerState.playerNumber, false);
                 SelectMenuPatch.SaveLancerPlayers(world.game.rainWorld.progression.miscProgressionData);
                 return;
             }
-#endif
             if (basis == SlugName.Red)
             {
                 catSubs.Add(self.playerState, new LunterSupplement(self));

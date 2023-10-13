@@ -6,7 +6,6 @@ using RWCustom;
 using System;
 using UnityEngine;
 using static LancerRemix.Cat.ModifyCat;
-using static MonoMod.InlineRT.MonoModRule;
 
 namespace LancerRemix.Combat
 {

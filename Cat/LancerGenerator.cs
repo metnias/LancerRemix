@@ -1,6 +1,4 @@
-﻿#define NO_MSC
-
-using CatSub.Story;
+﻿using CatSub.Story;
 using LancerRemix.Cat;
 using LancerRemix.LancerMenu;
 using Menu;
@@ -20,27 +18,21 @@ namespace LancerRemix
             On.SlugcatStats.SlugcatFoodMeter += LancerFoodMeter;
             On.SlugcatStats.SlugcatUnlocked += LancerUnlocked;
             On.SlugcatStats.NourishmentOfObjectEaten += LancerNourishmentOfObjectEaten;
-#if NO_MSC
             On.Menu.MenuScene.UseSlugcatUnlocked += UseLancerUnlocked;
-#endif
             On.SlugcatStats.HiddenOrUnplayableSlugcat += DisableLancerRegularSelect;
         }
 
         private static bool IsStoryLancer => ModifyCat.IsStoryLancer;
-
-#if NO_MSC
 
         private static bool LancerUnlocked(On.SlugcatStats.orig_SlugcatUnlocked orig, SlugName i, RainWorld rainWorld)
         {
             if (IsLancer(i))
             {
                 i = GetBasis(i);
-                if (SlugcatStats.IsSlugcatFromMSC(i)) return false; // TBA
+                if (SlugcatStats.IsSlugcatFromMSC(i)) return LancerPlugin.MSCLANCERS;
             }
             return orig(i, rainWorld);
         }
-
-#endif
 
         private static bool UseLancerUnlocked(On.Menu.MenuScene.orig_UseSlugcatUnlocked orig, MenuScene self, SlugName slugcat)
         {
@@ -99,11 +91,13 @@ namespace LancerRemix
             string id = GetLancerName(basis.value);
             lancer = new SlugName(id, false);
             if (lancer.Index >= 0) return false;
+            lancerModifiers.Remove(basis);
 
             if (basis == SlugName.White || basis == SlugName.Yellow || basis == SlugName.Red || basis == SlugName.Night)
                 lancer = RegisterVanillaLancer(basis);
-            else if (SlugcatStats.IsSlugcatFromMSC(basis))
-                lancer = RegisterMSCLancer(basis);
+            //else if (SlugcatStats.IsSlugcatFromMSC(basis))
+            //    lancer = RegisterMSCLancer(basis);
+
             if (SlugBaseCharacter.TryGet(basis, out var _))
                 lancer = RegisterSlugBaseLancer(basis);
             if (lancer == null || lancer.Index < 0) return false; // something went wrong
@@ -122,7 +116,16 @@ namespace LancerRemix
             //return pair.Key;
         }
 
-        private static string GetLancerName(string basisName) => $"{basisName}Lancer";
+        private static string GetLancerName(string basisName)
+        {
+            if (CustomLancerDictionary.TryGetValue(basisName, out var lancer)) return lancer;
+            return $"{basisName}Lancer";
+        }
+
+        public static bool HasCustomLancer(string basisName, out string lancerName)
+            => CustomLancerDictionary.TryGetValue(basisName, out lancerName);
+
+        private static readonly Dictionary<string, string> CustomLancerDictionary = new Dictionary<string, string>();
 
         internal static void DeleteLancer(SlugName lancer)
         {
@@ -143,7 +146,7 @@ namespace LancerRemix
                 StoryRegistry.RegisterTimeline(new StoryRegistry.TimelinePointer(lancer, StoryRegistry.TimelinePointer.Relative.After, basis));
             var modifier = new StatModifier
             {
-                lungsFac = 1.1f,
+                lungsFac = 0.6f,
                 poleClimbSpeedFac = 1.1f,
                 corridorClimbSpeedFac = 1.05f,
                 runspeedFac = 1.2f,
@@ -158,24 +161,28 @@ namespace LancerRemix
             return lancer;
         }
 
-        private static SlugName RegisterMSCLancer(SlugName basis)
+        /// <summary>
+        /// Register custom slugcat lancer campaign. <paramref name="lancer"/> should be SlugBase character.
+        /// </summary>
+        /// <param name="basis"></param>
+        /// <param name="lancer"></param>
+        public static void RegisterCustomLancer(SlugName basis, SlugName lancer)
         {
-            var lancer = new SlugName(GetLancerName(basis.value), true);
-            StoryRegistry.RegisterTimeline(new StoryRegistry.TimelinePointer(lancer, StoryRegistry.TimelinePointer.Relative.After, basis));
             var modifier = new StatModifier
             {
-                lungsFac = 1.1f,
-                poleClimbSpeedFac = 1.1f,
-                corridorClimbSpeedFac = 1.05f,
-                runspeedFac = 1.2f,
-                bodyWeightFac = 0.8f,
-                loudnessFac = 0.8f,
+                lungsFac = 1f,
+                poleClimbSpeedFac = 1f,
+                corridorClimbSpeedFac = 1f,
+                runspeedFac = 1f,
+                bodyWeightFac = 1f,
+                loudnessFac = 1f,
 
-                generalVisibilityBonus = -0.1f,
-                visualStealthInSneakMode = 0.2f
+                generalVisibilityBonus = 0f,
+                visualStealthInSneakMode = 0f
             };
             lancerModifiers.Add(basis, modifier);
-            return lancer;
+            CustomLancerDictionary.Remove(basis.value);
+            CustomLancerDictionary.Add(basis.value, lancer.value);
         }
 
         private static SlugName RegisterSlugBaseLancer(SlugName basis)
@@ -255,6 +262,7 @@ namespace LancerRemix
             public float generalVisibilityBonus;
 
             public float visualStealthInSneakMode;
+
             // public int throwingSkill;
         }
     }

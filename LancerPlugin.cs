@@ -35,7 +35,7 @@ namespace LancerRemix
     {
         public const string PLUGIN_ID = "com.rainworldgame.topicular.lancer.plugin";
         public const string PLUGIN_NAME = "Lancer";
-        public const string PLUGIN_VERSION = "1.1.0.5";
+        public const string PLUGIN_VERSION = "1.1.1.0";
 
         private static bool init = false;
         internal static ManualLogSource LogSource { get; private set; }
@@ -99,12 +99,16 @@ namespace LancerRemix
             };
         }
 
+        internal static bool MSCLANCERS = false;
+
         private static void RegisterLancersAfterMainMenu(On.ProcessManager.orig_PreSwitchMainProcess orig, ProcessManager self, ProcessManager.ProcessID ID)
         {
             if (self.currentMainLoop?.ID == ProcessManager.ProcessID.MainMenu)
             {
                 try
                 {
+                    MSCLANCERS = MachineConnector.IsThisModActive("com.rainworldgame.topicular.morelancer.plugin");
+
                     LancerEnums.RegisterLancers();
                 }
                 catch (Exception e) { Debug.LogException(e); }

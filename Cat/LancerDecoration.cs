@@ -105,7 +105,7 @@ namespace LancerRemix.Cat
             return defaultHornColors[basis];
         }
 
-        private static readonly Dictionary<SlugName, Color> defaultHornColors
+        public static readonly Dictionary<SlugName, Color> defaultHornColors
             = new Dictionary<SlugName, Color>()
             {
                 { SlugName.White, new Color(0.1f, 0.3f, 0.0f) },
@@ -114,14 +114,14 @@ namespace LancerRemix.Cat
                 { SlugName.Night, new Color(0.1f, 0.5f, 0.3f) }
             };
 
-        internal static IntVector2 HornStat(SlugName basis)
+        public static IntVector2 HornStat(SlugName basis)
         {
             basis = GetBasis(basis);
             if (vanillaHornStats.TryGetValue(basis, out var res)) return res;
             return new IntVector2(3, 8);
         }
 
-        private static readonly Dictionary<SlugName, IntVector2> vanillaHornStats
+        public static readonly Dictionary<SlugName, IntVector2> vanillaHornStats
             = new Dictionary<SlugName, IntVector2>()
             {
                 { SlugName.White, new IntVector2(3, 8) },
