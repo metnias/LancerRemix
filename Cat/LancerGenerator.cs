@@ -29,7 +29,7 @@ namespace LancerRemix
             if (IsLancer(i))
             {
                 i = GetBasis(i);
-                if (SlugcatStats.IsSlugcatFromMSC(i)) return LancerPlugin.MSCLANCERS;
+                if (SlugcatStats.IsSlugcatFromMSC(i)) return LancerPlugin.MSCLANCERS && HasCustomLancer(i.value, out var _);
             }
             return orig(i, rainWorld);
         }
@@ -95,7 +95,7 @@ namespace LancerRemix
 
             if (basis == SlugName.White || basis == SlugName.Yellow || basis == SlugName.Red || basis == SlugName.Night)
                 lancer = RegisterVanillaLancer(basis);
-            else if (SlugcatStats.IsSlugcatFromMSC(basis) && !LancerPlugin.MSCLANCERS)
+            else if (SlugcatStats.IsSlugcatFromMSC(basis) && !HasCustomLancer(basis.value, out var _))
                 lancer = RegisterVanillaLancer(basis);
 
             if (SlugBaseCharacter.TryGet(basis, out var _))
@@ -122,10 +122,14 @@ namespace LancerRemix
             return $"{basisName}Lancer";
         }
 
-        public static bool HasCustomLancer(string basisName, out string lancerName)
+        internal static bool HasCustomLancer(string basisName, out string lancerName)
             => CustomLancerDictionary.TryGetValue(basisName, out lancerName);
 
+        internal static bool IsCustomLancer(string lancerName)
+            => CustomLancers.Contains(lancerName);
+
         private static readonly Dictionary<string, string> CustomLancerDictionary = new Dictionary<string, string>();
+        private static readonly HashSet<string> CustomLancers = new HashSet<string>();
 
         internal static void DeleteLancer(SlugName lancer)
         {
@@ -161,12 +165,7 @@ namespace LancerRemix
             return lancer;
         }
 
-        /// <summary>
-        /// Register custom slugcat lancer campaign. <paramref name="lancer"/> should be SlugBase character.
-        /// </summary>
-        /// <param name="basis"></param>
-        /// <param name="lancer"></param>
-        public static void RegisterCustomLancer(SlugName basis, SlugName lancer)
+        internal static void RegisterCustomLancer(SlugName basis, SlugName lancer)
         {
             var modifier = new StatModifier
             {
@@ -181,8 +180,10 @@ namespace LancerRemix
                 visualStealthInSneakMode = 0f
             };
             lancerModifiers.Add(basis, modifier);
-            CustomLancerDictionary.Remove(basis.value);
+            if (CustomLancers.Contains(lancer.value)) CustomLancerDictionary.Remove(basis.value);
+            CustomLancers.Add(lancer.value);
             CustomLancerDictionary.Add(basis.value, lancer.value);
+            LancerPlugin.LogSource.LogMessage($"Registered Custom Lancer {lancer}({lancer.Index}) for {basis}({basis.Index})");
         }
 
         private static SlugName RegisterSlugBaseLancer(SlugName basis)

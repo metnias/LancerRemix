@@ -269,12 +269,13 @@ namespace LancerRemix.LancerMenu
             if (message == "START")
             {
                 if (!ModManager.JollyCoop) lancerPlayers[0] = slugcatPageLancer;
-                else if (!LancerPlugin.MSCLANCERS)
+                else
                 {
                     for (int i = 0; i < 4; ++i)
                     {
                         var basis = GetBasis(Custom.rainWorld.options.jollyPlayerOptionsArray[i].playerClass);
-                        if (basis?.Index >= 0 && SlugcatStats.IsSlugcatFromMSC(basis)) SetLancerPlayers(i, false);
+                        if (basis?.Index >= 0 && SlugcatStats.IsSlugcatFromMSC(basis)
+                            && (!LancerPlugin.MSCLANCERS || !LancerGenerator.HasCustomLancer(basis.value, out var _))) SetLancerPlayers(i, false);
                     }
                 }
 
@@ -618,9 +619,10 @@ namespace LancerRemix.LancerMenu
 
         internal class LancerPageNewGame : SlugcatPageNewGame
         {
-            public LancerPageNewGame(Menu.Menu menu, MenuObject owner, int pageIndex, SlugName lancerNumber) : base(menu, owner, pageIndex, GetBasis(lancerNumber))
+            public LancerPageNewGame(Menu.Menu menu, MenuObject owner, int pageIndex, SlugName lancerNumber)
+                : base(menu, owner, pageIndex, LancerGenerator.IsCustomLancer(lancerNumber.value) ? lancerNumber : GetBasis(lancerNumber))
             {
-                basisNumber = slugcatNumber;
+                basisNumber = GetBasis(slugcatNumber);
                 slugcatNumber = lancerNumber;
 
                 LancerPortrait(this);
@@ -643,7 +645,8 @@ namespace LancerRemix.LancerMenu
                 }
                 if (!(menu as SlugcatSelectMenu).SlugcatUnlocked(slugcatNumber))
                 {
-                    if (ModManager.MSC && SlugcatStats.IsSlugcatFromMSC(basisNumber))
+                    if (ModManager.MSC && SlugcatStats.IsSlugcatFromMSC(basisNumber) &&
+                        (!LancerPlugin.MSCLANCERS || !LancerGenerator.HasCustomLancer(basisNumber.value, out var _)))
                     {
                         diff = "???";
                         info = menu.Translate("To be released...");
@@ -665,9 +668,10 @@ namespace LancerRemix.LancerMenu
 
         internal class LancerPageContinue : SlugcatPageContinue
         {
-            public LancerPageContinue(Menu.Menu menu, MenuObject owner, int pageIndex, SlugName lancerNumber) : base(menu, owner, pageIndex, GetBasis(lancerNumber))
+            public LancerPageContinue(Menu.Menu menu, MenuObject owner, int pageIndex, SlugName lancerNumber)
+                : base(menu, owner, pageIndex, LancerGenerator.IsCustomLancer(lancerNumber.value) ? lancerNumber : GetBasis(lancerNumber))
             {
-                basisNumber = slugcatNumber;
+                basisNumber = GetBasis(slugcatNumber);
                 slugcatNumber = lancerNumber;
 
                 LancerPortrait(this);

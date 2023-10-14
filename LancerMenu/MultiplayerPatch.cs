@@ -8,6 +8,7 @@ using System.IO;
 using System.Text.RegularExpressions;
 using UnityEngine;
 using static LancerRemix.LancerMenu.SelectMenuPatch;
+using static UnityEngine.RectTransform;
 using JollyName = JollyCoop.JollyEnums.Name;
 using SlugName = SlugcatStats.Name;
 
@@ -204,11 +205,15 @@ namespace LancerRemix.LancerMenu
                 UpdateIsPlayerLancer(false);
                 if (!ModManager.MSC || self.currentGameType == MoreSlugcatsEnums.GameTypeID.Challenge)
                     for (int i = 0; i < 4; ++i) SetLancerPlayers(i, false);
-                else if (!LancerPlugin.MSCLANCERS)
+                else
                 {
                     for (int i = 0; i < 4; ++i)
-                        if (self.GetArenaSetup.playerClass[i] != null && SlugcatStats.IsSlugcatFromMSC(self.GetArenaSetup.playerClass[i]))
+                    {
+                        var character = LancerEnums.GetBasis(self.GetArenaSetup.playerClass[i]);
+                        if (self.GetArenaSetup.playerClass[i] != null && SlugcatStats.IsSlugcatFromMSC(character)
+                            && (!LancerPlugin.MSCLANCERS || !LancerGenerator.HasCustomLancer(character.value, out var _)))
                             SetLancerPlayers(i, false);
+                    }
                 }
                 SaveLancerPlayers(self.manager.rainWorld.progression.miscProgressionData);
             }
@@ -227,8 +232,9 @@ namespace LancerRemix.LancerMenu
             {
                 for (int i = 0; i < self.menu.manager.rainWorld.options.JollyPlayerCount; ++i)
                 {
-                    var character = self.menu.manager.rainWorld.options.jollyPlayerOptionsArray[i].playerClass;
-                    if (character != null && SlugcatStats.IsSlugcatFromMSC(LancerEnums.GetBasis(character)) && !LancerPlugin.MSCLANCERS)
+                    var character = LancerEnums.GetBasis(self.menu.manager.rainWorld.options.jollyPlayerOptionsArray[i].playerClass);
+                    if (character != null && SlugcatStats.IsSlugcatFromMSC(character)
+                        && (!LancerPlugin.MSCLANCERS || !LancerGenerator.HasCustomLancer(character.value, out var _)))
                         SetLancerPlayers(i, false);
                 }
             }

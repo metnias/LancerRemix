@@ -78,6 +78,9 @@ namespace LancerRemix
             Instance.Logger.LogMessage("The Lancer is Intialized.");
             Instance.Logger.LogMessage($"ILhooks: {Convert.ToString(ILhookFlags, 2)} ({(ILhookSuccess() ? "Success" : "Failed")})");
             if (!ILhookSuccess()) Debug.LogError($"Lancer failed some of ILhooks: {Convert.ToString(ILhookFlags, 2)}");
+
+            MSCLANCERS = MachineConnector.IsThisModActive("topicular.morelancer");
+            if (MSCLANCERS) LogSource.LogInfo($"More Lancers detected!");
         }
 
         public static On.RainWorld.hook_OnModsInit WrapInit(Action<RainWorld> loadResources)
@@ -107,8 +110,6 @@ namespace LancerRemix
             {
                 try
                 {
-                    MSCLANCERS = MachineConnector.IsThisModActive("com.rainworldgame.topicular.morelancer.plugin");
-
                     LancerEnums.RegisterLancers();
                 }
                 catch (Exception e) { Debug.LogException(e); }

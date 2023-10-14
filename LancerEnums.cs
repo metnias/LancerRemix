@@ -80,11 +80,16 @@ namespace LancerRemix
             {
                 var slug = new SlugName(name, false);
                 if (slug.Index < 0) continue;
-                // if (ModManager.MSC && SlugcatStats.IsSlugcatFromMSC(slug)) continue;
+                if (LancerGenerator.IsCustomLancer(name)) continue;
+
                 if (SlugcatStats.HiddenOrUnplayableSlugcat(slug))
                     if (!ModManager.MSC || slug != MSCName.Sofanthiel) continue;
                 SlugName lancer;
-                if (LancerGenerator.HasCustomLancer(name, out var customName)) lancer = new SlugName(customName, false);
+                if (LancerGenerator.HasCustomLancer(name, out var customName))
+                {
+                    lancer = new SlugName(customName, false);
+                    if (lancer.Index < 0) continue;
+                }
                 else if (!LancerGenerator.CreateLancer(slug, out lancer)) continue;
                 AllLancer.Add(lancer);
                 AllBasis.Add(slug);
@@ -144,5 +149,11 @@ namespace LancerRemix
         }
 
         #endregion Lancers
+
+        /// <summary>
+        /// Register custom slugcat lancer campaign. <paramref name="lancer"/> should be SlugBase character.
+        /// </summary>
+        public static void RegisterCustomLancer(SlugName basis, SlugName lancer)
+            => LancerGenerator.RegisterCustomLancer(basis, lancer);
     }
 }
