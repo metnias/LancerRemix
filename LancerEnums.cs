@@ -84,6 +84,7 @@ namespace LancerRemix
 
                 if (SlugcatStats.HiddenOrUnplayableSlugcat(slug))
                     if (!ModManager.MSC || slug != MSCName.Sofanthiel) continue;
+
                 SlugName lancer;
                 if (LancerGenerator.HasCustomLancer(name, out var customName))
                 {

@@ -45,11 +45,13 @@ namespace LancerRemix.Cat
             return orig(self, saveStateNumber);
         }
 
+        /// <summary>
+        /// Dead Lunter Switch to Stats
+        /// </summary>
         private static void ContinueStartedLancer(On.Menu.SlugcatSelectMenu.orig_ContinueStartedGame orig, SlugcatSelectMenu self, SlugName storyGameCharacter)
         {
             if (IsStoryLancer)
             {
-                // Switch to Stats
                 var lancer = GetLancer(storyGameCharacter);
                 if (storyGameCharacter == SlugName.Red && self.saveGameData[lancer].redsDeath)
                 {

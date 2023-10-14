@@ -279,9 +279,14 @@ namespace LancerRemix.LancerMenu
                     }
                 }
 
-                UpdateIsPlayerLancer(slugcatPageLancer);
+                bool isCustomLancer = LancerGenerator.IsCustomLancer(GetLancer(self.slugcatColorOrder[self.slugcatPageIndex]).value);
+                UpdateIsPlayerLancer(slugcatPageLancer && !isCustomLancer);
                 SaveLancerPlayers(self.manager.rainWorld.progression.miscProgressionData);
-                // StartGame(this.slugcatPages[this.slugcatPageIndex].slugcatNumber);
+                if (isCustomLancer)
+                {
+                    self.StartGame(GetLancer(self.slugcatColorOrder[self.slugcatPageIndex]));
+                    return;
+                }
             }
             if (message == "DEFAULTCOL" && slugcatPageLancer)
             {

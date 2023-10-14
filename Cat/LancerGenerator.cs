@@ -99,7 +99,10 @@ namespace LancerRemix
                 lancer = RegisterVanillaLancer(basis);
 
             if (SlugBaseCharacter.TryGet(basis, out var _))
-                lancer = RegisterSlugBaseLancer(basis);
+            {
+                if (lancer.Index >= 0 && SlugBaseCharacter.TryGet(lancer, out var _)) RegisterCustomLancer(basis, lancer);
+                else lancer = RegisterSlugBaseLancer(basis);
+            }
             if (lancer == null || lancer.Index < 0) return false; // something went wrong
 
             return true;
@@ -116,7 +119,7 @@ namespace LancerRemix
             //return pair.Key;
         }
 
-        private static string GetLancerName(string basisName)
+        internal static string GetLancerName(string basisName)
         {
             if (CustomLancerDictionary.TryGetValue(basisName, out var lancer)) return lancer;
             return $"{basisName}Lancer";
@@ -138,6 +141,7 @@ namespace LancerRemix
                 SlugBaseCharacter.Registry.Remove(lancer);
             lancerModifiers.Remove(GetBasis(lancer));
 
+            if (IsCustomLancer(lancer.value)) return;
             lancer?.Unregister();
         }
 
