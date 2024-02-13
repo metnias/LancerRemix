@@ -66,13 +66,17 @@ namespace LancerRemix.Cat
         {
         }
 
-        private static bool[] isPlayerLancer = new bool[4];
+        private static bool[] isPlayerLancer = new bool[RainWorld.PlayerObjectBodyColors.Length];
         public static bool IsStoryLancer { get; private set; } = false;
 
         public static void SetIsPlayerLancer(bool story, bool[] players)
         {
             IsStoryLancer = story;
-            if (players.Length > isPlayerLancer.Length) Array.Resize(ref isPlayerLancer, players.Length);
+            if (players.Length > isPlayerLancer.Length)
+            {
+                Array.Resize(ref isPlayerLancer, players.Length);
+                HornColorPick.ResizeHornColors(players.Length);
+            }
             for (int i = 0; i < players.Length; ++i) isPlayerLancer[i] = players[i];
         }
 
@@ -81,6 +85,12 @@ namespace LancerRemix.Cat
         public static bool IsPlayerLancer(Player player) => !player.isNPC && IsPlayerLancer(player.playerState.playerNumber);
 
         public static bool IsPlayerLancer(PlayerGraphics playerGraphics) => IsPlayerLancer(playerGraphics.player);
+
+        public static bool IsPlayerCustomLancer(SlugName name) => LancerGenerator.IsCustomLancer(name.value);
+
+        public static bool IsPlayerCustomLancer(Player player) => !player.isNPC && IsPlayerCustomLancer(player.playerState.slugcatCharacter);
+
+        public static bool IsPlayerCustomLancer(PlayerGraphics playerGraphics) => IsPlayerCustomLancer(playerGraphics.player);
 
         public static bool IsLancer(SlugName name) => LancerEnums.IsLancer(name);
 
@@ -91,18 +101,18 @@ namespace LancerRemix.Cat
         private static readonly ConditionalWeakTable<PlayerState, CatSupplement> catSubs
             = new ConditionalWeakTable<PlayerState, CatSupplement>();
 
-        public static T GetSub<T>(PlayerState playerState) where T : CatSupplement
+        public static T GetSub<T>(Player player) where T : CatSupplement
         {
-            if (catSubs.TryGetValue(playerState, out var sub))
+            if (catSubs.TryGetValue(player.playerState, out var sub))
                 if (sub is T) return sub as T;
+            if (IsPlayerCustomLancer(player) && AppendCatSub.TryGetSub(player, out var customSub))
+                return customSub as T;
+
             return null;
         }
 
-        public static T GetSub<T>(Player player) where T : CatSupplement
-            => GetSub<T>(player.playerState);
-
         public static T GetSub<T>(PlayerGraphics playerGraphics) where T : CatSupplement
-           => GetSub<T>(playerGraphics.player.playerState);
+           => GetSub<T>(playerGraphics.player);
 
         #endregion SubRegistry
 
@@ -111,6 +121,11 @@ namespace LancerRemix.Cat
         private static void PlayerCtor(On.Player.orig_ctor orig, Player self, AbstractCreature abstractCreature, World world)
         {
             orig(self, abstractCreature, world);
+            if (IsPlayerCustomLancer(self))
+            {
+                isPlayerLancer[self.playerState.playerNumber] = true;
+                return; // CatSub will add supplements
+            }
             if (!IsPlayerLancer(self)) return;
             var basis = GetBasis(self.SlugCatClass);
             if (SlugcatStats.IsSlugcatFromMSC(basis) && !LancerPlugin.MSCLANCERS)
@@ -139,14 +154,14 @@ namespace LancerRemix.Cat
         private static void PlayerUpdate(On.Player.orig_Update orig, Player self, bool eu)
         {
             orig(self, eu);
-            if (IsPlayerLancer(self))
+            if (IsPlayerLancer(self) && !IsPlayerCustomLancer(self))
                 GetSub<LancerSupplement>(self)?.Update(null, eu);
         }
 
         private static void PlayerDestroy(On.Player.orig_Destroy orig, Player self)
         {
             orig(self);
-            if (IsPlayerLancer(self))
+            if (IsPlayerLancer(self) && !IsPlayerCustomLancer(self))
                 GetSub<LancerSupplement>(self)?.Destroy(null);
         }
 
@@ -289,18 +304,17 @@ namespace LancerRemix.Cat
         private static readonly ConditionalWeakTable<PlayerState, CatDecoration> catDecos
            = new ConditionalWeakTable<PlayerState, CatDecoration>();
 
-        public static T GetDeco<T>(PlayerState playerState) where T : CatDecoration
+        public static T GetDeco<T>(Player player) where T : CatDecoration
         {
-            if (catDecos.TryGetValue(playerState, out var deco))
+            if (catDecos.TryGetValue(player.playerState, out var deco))
                 if (deco is T) return deco as T;
+            if (IsPlayerCustomLancer(player) && AppendCatDeco.TryGetDeco(player.graphicsModule as PlayerGraphics, out var customDeco))
+                return customDeco as T;
             return null;
         }
 
-        public static T GetDeco<T>(Player player) where T : CatDecoration
-            => GetDeco<T>(player.playerState);
-
         public static T GetDeco<T>(PlayerGraphics playerGraphics) where T : CatDecoration
-           => GetDeco<T>(playerGraphics.player.playerState);
+           => GetDeco<T>(playerGraphics.player);
 
         #endregion DecoRegistry
 
@@ -309,49 +323,49 @@ namespace LancerRemix.Cat
         private static void GrafInitSprite(On.PlayerGraphics.orig_InitiateSprites orig, PlayerGraphics self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam)
         {
             orig(self, sLeaser, rCam);
-            if (IsPlayerLancer(self))
+            if (IsPlayerLancer(self) && !IsPlayerCustomLancer(self))
                 GetDeco<LancerDecoration>(self)?.InitiateSprites(null, sLeaser, rCam);
         }
 
         private static void GrafAddToContainer(On.PlayerGraphics.orig_AddToContainer orig, PlayerGraphics self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, FContainer newContatiner)
         {
             orig(self, sLeaser, rCam, newContatiner);
-            if (IsPlayerLancer(self))
+            if (IsPlayerLancer(self) && !IsPlayerCustomLancer(self))
                 GetDeco<LancerDecoration>(self)?.AddToContainer(null, sLeaser, rCam, newContatiner);
         }
 
         private static void GrafUpdate(On.PlayerGraphics.orig_Update orig, PlayerGraphics self)
         {
             orig(self);
-            if (IsPlayerLancer(self))
+            if (IsPlayerLancer(self) && !IsPlayerCustomLancer(self))
                 GetDeco<LancerDecoration>(self)?.Update(null);
         }
 
         private static void GrafDrawSprite(On.PlayerGraphics.orig_DrawSprites orig, PlayerGraphics self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
         {
             orig(self, sLeaser, rCam, timeStacker, camPos);
-            if (IsPlayerLancer(self))
+            if (IsPlayerLancer(self) && !IsPlayerCustomLancer(self))
                 GetDeco<LancerDecoration>(self)?.DrawSprites(null, sLeaser, rCam, timeStacker, camPos);
         }
 
         private static void GrafApplyPalette(On.PlayerGraphics.orig_ApplyPalette orig, PlayerGraphics self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, RoomPalette palette)
         {
             orig(self, sLeaser, rCam, palette);
-            if (IsPlayerLancer(self))
+            if (IsPlayerLancer(self) && !IsPlayerCustomLancer(self))
                 GetDeco<LancerDecoration>(self)?.ApplyPalette(null, sLeaser, rCam, palette);
         }
 
         private static void GrafSuckedIntoShortCut(On.PlayerGraphics.orig_SuckedIntoShortCut orig, PlayerGraphics self, Vector2 shortCutPosition)
         {
             orig(self, shortCutPosition);
-            if (IsPlayerLancer(self))
+            if (IsPlayerLancer(self) && !IsPlayerCustomLancer(self))
                 GetDeco<LancerDecoration>(self)?.SuckedIntoShortCut(null, shortCutPosition);
         }
 
         private static void GrafReset(On.PlayerGraphics.orig_Reset orig, PlayerGraphics self)
         {
             orig(self);
-            if (IsPlayerLancer(self))
+            if (IsPlayerLancer(self) && !IsPlayerCustomLancer(self))
                 GetDeco<LancerDecoration>(self)?.Reset(null);
         }
 

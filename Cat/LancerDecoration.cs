@@ -20,8 +20,12 @@ namespace LancerRemix.Cat
 
         public override void InitiateSprites(On.PlayerGraphics.orig_InitiateSprites orig, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam)
         {
-            base.InitiateSprites(null, sLeaser, rCam);
+            base.InitiateSprites(orig, sLeaser, rCam);
+            InitiateHorn(sLeaser, rCam);
+        }
 
+        protected virtual void InitiateHorn(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam)
+        {
             sprites = new FSprite[1];
             var tris = new TriangleMesh.Triangle[] { new TriangleMesh.Triangle(0, 1, 2) };
             var triangleMesh = new TriangleMesh("Futile_White", tris, false, false);
@@ -32,18 +36,22 @@ namespace LancerRemix.Cat
 
         public override void AddToContainer(On.PlayerGraphics.orig_AddToContainer orig, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, FContainer newContatiner)
         {
-            base.AddToContainer(null, sLeaser, rCam, newContatiner);
+            base.AddToContainer(orig, sLeaser, rCam, newContatiner);
         }
 
         public override void Update(On.PlayerGraphics.orig_Update orig)
         {
-            base.Update(null);
+            base.Update(orig);
         }
 
         public override void DrawSprites(On.PlayerGraphics.orig_DrawSprites orig, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
         {
-            base.DrawSprites(null, sLeaser, rCam, timeStacker, camPos);
+            base.DrawSprites(orig, sLeaser, rCam, timeStacker, camPos);
+            DrawHorn(sLeaser, timeStacker, camPos);
+        }
 
+        protected virtual void DrawHorn(RoomCamera.SpriteLeaser sLeaser, float timeStacker, Vector2 camPos)
+        {
             Vector2 head = Vector2.Lerp(self.head.lastPos, self.head.pos, timeStacker);
             IntVector2 stat = HornStat(player.SlugCatClass);
             Vector2 draw1 = Vector2.Lerp(self.drawPositions[1, 1], self.drawPositions[1, 0], timeStacker);
@@ -66,21 +74,26 @@ namespace LancerRemix.Cat
 
         public override void ApplyPalette(On.PlayerGraphics.orig_ApplyPalette orig, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, RoomPalette palette)
         {
-            base.ApplyPalette(null, sLeaser, rCam, palette);
+            base.ApplyPalette(orig, sLeaser, rCam, palette);
+            ApplyHornPalette();
+        }
+
+        protected virtual void ApplyHornPalette()
+        {
             sprites[0].color = GetHornColor();
         }
 
         public override void SuckedIntoShortCut(On.PlayerGraphics.orig_SuckedIntoShortCut orig, Vector2 shortCutPosition)
         {
-            base.SuckedIntoShortCut(null, shortCutPosition);
+            base.SuckedIntoShortCut(orig, shortCutPosition);
         }
 
         public override void Reset(On.PlayerGraphics.orig_Reset orig)
         {
-            base.Reset(null);
+            base.Reset(orig);
         }
 
-        public Color GetHornColor()
+        public virtual Color GetHornColor()
         {
             if (self.useJollyColor || PlayerGraphics.CustomColorsEnabled())
                 return

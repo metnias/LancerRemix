@@ -214,7 +214,7 @@ namespace LancerRemix.LancerMenu
 
         #region LancerPlayers
 
-        private static bool[] lancerPlayers = new bool[4];
+        private static bool[] lancerPlayers = new bool[RainWorld.PlayerObjectBodyColors.Length];
 
         internal static void SetLancerPlayers(int num, bool lancer)
         {

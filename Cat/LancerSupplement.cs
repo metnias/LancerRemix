@@ -49,13 +49,13 @@ namespace LancerRemix.Cat
         public bool SpendSpear => spendSpear;
         protected bool grabParried = false;
         protected bool violenceParried = false;
-        public bool IsGrabParried => grabParried;
-        public bool HasParried => grabParried || violenceParried;
+        public virtual bool IsGrabParried => grabParried;
+        public virtual bool HasParried => grabParried || violenceParried;
 
-        public float BlockVisualAmount(float timeStacker)
+        public virtual float BlockVisualAmount(float timeStacker)
             => lanceTimer != 0 ? 0f : Mathf.Clamp(Mathf.Lerp((float)blockTimer, blockTimer - (blockTimer != 0 ? Math.Sign(blockTimer) : 0), timeStacker) / blockTime, -1f, 1f);
 
-        public int HasLanceReady()
+        public virtual int HasLanceReady()
         {
             for (int i = 0; i < self.grasps.Length; ++i)
                 if (self.grasps[i]?.grabbed is Spear) return i;
@@ -69,7 +69,7 @@ namespace LancerRemix.Cat
         public override void Update(On.Player.orig_Update orig, bool eu)
         {
             aerobicCache = self.aerobicLevel;
-            base.Update(null, eu);
+            base.Update(orig, eu);
             if (hasExhaustion)
             {
                 if (self.aerobicLevel >= 0.95f) self.gourmandExhausted = true;
@@ -112,6 +112,11 @@ namespace LancerRemix.Cat
         public virtual void MovementUpdate(On.Player.orig_MovementUpdate orig, bool eu)
         {
             orig(self, eu);
+            LancerMovementUpdate();
+        }
+
+        protected virtual void LancerMovementUpdate()
+        {
             if (lanceTimer > 0)
             {
                 --lanceTimer;
@@ -195,7 +200,13 @@ namespace LancerRemix.Cat
             }
         }
 
-        public void TerrainImpact(On.Player.orig_TerrainImpact orig, int chunk, IntVector2 direction, float speed, bool firstContact)
+        public virtual void TerrainImpact(On.Player.orig_TerrainImpact orig, int chunk, IntVector2 direction, float speed, bool firstContact)
+        {
+            LancerTerrainImpact(direction, speed, firstContact);
+            orig.Invoke(self, chunk, direction, speed, firstContact);
+        }
+
+        protected virtual void LancerTerrainImpact(IntVector2 direction, float speed, bool firstContact)
         {
             if (speed > 9f)
                 self.Blink(Custom.IntClamp((int)speed, 9, 60) / 2);
@@ -233,10 +244,9 @@ namespace LancerRemix.Cat
                     self.Stun((int)Custom.LerpMap(speed, 28f, 40f, 40f, 140f, 2.5f));
                 }
             }
-            orig.Invoke(self, chunk, direction, speed, firstContact);
         }
 
-        public void SetMalnourished(On.Player.orig_SetMalnourished orig, bool m)
+        public virtual void SetMalnourished(On.Player.orig_SetMalnourished orig, bool m)
         {
             orig(self, m);
             UpdateHasExhaustion();
@@ -258,7 +268,7 @@ namespace LancerRemix.Cat
 
         public override void Destroy(On.Player.orig_Destroy orig)
         {
-            base.Destroy(null);
+            base.Destroy(orig);
         }
 
         public static bool BiteParriable(Creature crit)
@@ -268,15 +278,30 @@ namespace LancerRemix.Cat
 
         public virtual void Grabbed(On.Player.orig_Grabbed orig, Creature.Grasp grasp)
         {
+            if (HasLancerGrabParried(grasp))
+            {
+                orig(self, grasp);
+                grasp.Release();
+                ClearLeftoverStick(Owner);
+            }
+            else
+            {
+                orig(self, grasp);
+            }
+        }
+
+        protected virtual bool HasLancerGrabParried(Creature.Grasp grasp)
+        {
             grabParried = false;
             bool guarded = true;
             if (blockTimer < 1)
             {
                 if (this is LunterSupplement lunterSub && lunterSub.maskOnHorn.HasAMask) lunterSub.maskOnHorn.DropMask(true);
-                else goto NoParry;
+                else return false;
                 guarded = false;
             }
-            if (grasp.grabber == null || !BiteParriable(grasp.grabber)) goto NoParry;
+            if (grasp.grabber == null || !BiteParriable(grasp.grabber)) return false;
+
             // Parry!
             grasp.grabber.Stun(Mathf.CeilToInt(Mathf.Lerp(80, 40, grasp.grabber.TotalMass / 10f)));
             Vector2 away = (grasp.grabber.mainBodyChunk.pos - self.mainBodyChunk.pos).normalized;
@@ -290,14 +315,10 @@ namespace LancerRemix.Cat
             // lanceTimer = 0; blockTimer = 0;
             grabParried = true;
 
-            orig(self, grasp);
-            grasp.Release();
-            ClearLeftoverStick(Owner);
-            return;
-        NoParry: orig(self, grasp);
+            return true;
         }
 
-        protected Spear GetParrySpear()
+        protected virtual Spear GetParrySpear()
         {
             Spear spear = lanceSpear;
             if (lanceSpear == null)
@@ -309,7 +330,7 @@ namespace LancerRemix.Cat
             return spear;
         }
 
-        protected void AddParryEffect(bool guarded)
+        protected virtual void AddParryEffect(bool guarded)
         {
             var spear = GetParrySpear();
             if (spear != null) spear.vibrate = 20;
@@ -326,16 +347,28 @@ namespace LancerRemix.Cat
             BodyChunk source, Vector2? directionAndMomentum, BodyChunk hitChunk, PhysicalObject.Appendage.Pos hitAppendage, Creature.DamageType type, float damage, float stunBonus)
         {
             violenceParried = false;
+            if (HasLancerViolenceParried(source, directionAndMomentum, hitChunk, hitAppendage, type, damage, stunBonus))
+            {
+                orig(self, source, null, hitChunk, hitAppendage, type, 0f, 0f);
+            }
+            else
+            {
+                orig(self, source, directionAndMomentum, hitChunk, hitAppendage, type, damage, stunBonus);
+            }
+        }
+
+        protected virtual bool HasLancerViolenceParried(BodyChunk source, Vector2? directionAndMomentum, BodyChunk hitChunk, PhysicalObject.Appendage.Pos hitAppendage, Creature.DamageType type, float damage, float stunBonus)
+        {
             if (type == Creature.DamageType.Bite || type == Creature.DamageType.Blunt || type == Creature.DamageType.Stab)
             {
                 if (type == Creature.DamageType.Bite)
-                    if (!(source.owner is Creature crit) || !BiteParriable(crit)) goto NoParry;
+                    if (!(source.owner is Creature crit) || !BiteParriable(crit)) return false;
 
                 bool guarded = true;
                 if (blockTimer < 1)
                 {
                     if (this is LunterSupplement lunterSub && lunterSub.maskOnHorn.HasAMask) lunterSub.maskOnHorn.DropMask(true);
-                    else goto NoParry;
+                    else return false;
                     guarded = false;
                 }
                 Vector2 away;
@@ -365,20 +398,19 @@ namespace LancerRemix.Cat
                 AddParryEffect(guarded);
                 if ((hasExhaustion || (!guarded && !spendSpear)) && blockTimer > 0) FlingLance();
                 // lanceTimer = 0; blockTimer = 0;
-                orig(self, source, null, hitChunk, hitAppendage, type, 0f, 0f);
-                return;
+                return true;
             }
-        NoParry: orig(self, source, directionAndMomentum, hitChunk, hitAppendage, type, damage, stunBonus);
+            return false;
         }
 
         public virtual void ThrowObject(On.Player.orig_ThrowObject orig, int grasp, bool eu)
         {
             if (!(self.grasps[grasp]?.grabbed is Spear spear)) { orig(self, grasp, eu); return; }
 
-            LanceAttack(spear, orig, grasp, eu);
+            LanceAttack(orig, spear, grasp, eu);
         }
 
-        public virtual void LanceAttack(Spear spear, On.Player.orig_ThrowObject orig, int grasp, bool eu)
+        public virtual void LanceAttack(On.Player.orig_ThrowObject orig, Spear spear, int grasp, bool eu)
         {
             if (lanceTimer != 0) return;
             bool deepSwim = self.animation == AnimIndex.DeepSwim;
@@ -502,6 +534,11 @@ namespace LancerRemix.Cat
         public virtual bool CanIPickThisUp(On.Player.orig_CanIPickThisUp orig, PhysicalObject obj)
         {
             var res = orig(self, obj);
+            return LancerCanIPickThisUp(obj, res);
+        }
+
+        protected virtual bool LancerCanIPickThisUp(PhysicalObject obj, bool res)
+        {
             if (obj is Spear spear)
             {
                 if (ModManager.MMF && MMF.cfgDislodgeSpears.Value) return res;
@@ -512,14 +549,19 @@ namespace LancerRemix.Cat
 
         public virtual void ThrowToGetFree(On.Player.orig_ThrowToGetFree orig, bool eu)
         {
+            LancerThrowToGetFree(eu);
+            orig.Invoke(self, eu);
+        }
+
+        protected virtual void LancerThrowToGetFree(bool eu)
+        {
             spendSpear = true;
             int lance = HasLanceReady();
             if (lanceTimer == 0 && lance >= 0)
             { lanceSpear = self.grasps[lance].grabbed as Spear; lanceTimer = 4; lanceGrasp = lance; }
-            orig.Invoke(self, eu);
         }
 
-        public void FlingLance()
+        public virtual void FlingLance()
         {
             Spear spear = lanceSpear;
             if (lanceSpear != null) ReleaseLanceSpear();
@@ -558,7 +600,7 @@ namespace LancerRemix.Cat
             SetLanceCooltime();
         }
 
-        public void ReleaseLanceSpear()
+        public virtual void ReleaseLanceSpear()
         {
             if (lanceSpear != null)
             {
@@ -570,7 +612,7 @@ namespace LancerRemix.Cat
             blockTimer = -blockTime;
         }
 
-        public void RetrieveLanceSpear(Spear spear = null)
+        public virtual void RetrieveLanceSpear(Spear spear = null)
         {
             if (spear == null) spear = lanceSpear;
             if (lanceTimer < 0 || spear == null || spear.grabbedBy.Count > 0 || spear.room != self.room)
@@ -580,13 +622,13 @@ namespace LancerRemix.Cat
             SetLanceCooltime();
         }
 
-        public void SetLanceCooltime()
+        public virtual void SetLanceCooltime()
         {
             lanceTimer = isLonk ? -16 : -24;
             if (self.exhausted || self.gourmandExhausted) lanceTimer -= 12;
         }
 
-        protected float GetLanceDamage(int throwingSkill)
+        protected virtual float GetLanceDamage(int throwingSkill)
         {
             float dmg;
             switch (throwingSkill)

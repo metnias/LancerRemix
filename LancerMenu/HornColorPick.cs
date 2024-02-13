@@ -4,6 +4,7 @@ using Menu;
 using Menu.Remix;
 using Menu.Remix.MixedUI;
 using RWCustom;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using static LancerRemix.LancerMenu.SelectMenuPatch;
@@ -36,11 +37,14 @@ namespace LancerRemix.LancerMenu
 
         private static OptionInterface OI => LancerPlugin.OI;
 
-        private static readonly Configurable<Color>[] hornColors
-            = new Configurable<Color>[4];
+        private static Configurable<Color>[] hornColors
+            = new Configurable<Color>[RainWorld.PlayerObjectBodyColors.Length];
 
         public static Color GetHornColor(int playerNumber)
             => hornColors[playerNumber].Value;
+
+        public static void ResizeHornColors(int newLength)
+            => Array.Resize(ref hornColors, newLength);
 
         #region Wrappers
 

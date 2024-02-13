@@ -34,9 +34,9 @@
     <Reference Include="BepInEx">
       <HintPath>debug\BepInEx.dll</HintPath>
     </Reference>
-    <Reference Include="CatSupplement, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="CatSupplement, Version=1.0.0.1, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>debug\CatSupplement.dll</HintPath>
+      <HintPath>..\References\RWDownpour\CatSupplement.dll</HintPath>
     </Reference>
     <Reference Include="HOOKS-Assembly-CSharp">
       <HintPath>debug\HOOKS-Assembly-CSharp.dll</HintPath>
