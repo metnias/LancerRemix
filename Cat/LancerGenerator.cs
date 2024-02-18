@@ -131,6 +131,9 @@ namespace LancerRemix
         internal static bool IsCustomLancer(string lancerName)
             => CustomLancers.Contains(lancerName);
 
+        internal static bool IsCustomLancer(SlugName lancerName)
+            => IsCustomLancer(lancerName.value);
+
         private static readonly Dictionary<string, string> CustomLancerDictionary = new Dictionary<string, string>();
         private static readonly HashSet<string> CustomLancers = new HashSet<string>();
 

@@ -88,6 +88,10 @@ namespace LancerRemix.Cat
             {
                 SetMiscValue(self.miscProgressionData, CURRSLUGCATLANCER, true);
                 var basis = self.currentSaveState.saveStateNumber;
+                if (LancerGenerator.IsCustomLancer(GetLancer(basis)))
+                {
+                    return orig(self, saveCurrentState, saveMaps, saveMiscProg);
+                }
                 self.currentSaveState.saveStateNumber = GetLancer(basis);
                 // UnityEngine.Debug.Log($"{self.currentSaveState.saveStateNumber}({basis}) redsDeath: {self.currentSaveState.deathPersistentSaveData.redsDeath}");
                 var res = orig(self, saveCurrentState, saveMaps, saveMiscProg);
@@ -104,10 +108,13 @@ namespace LancerRemix.Cat
             if (IsStoryLancer && self.currentSaveState != null)
             {
                 var basis = self.currentSaveState.saveStateNumber;
-                self.currentSaveState.saveStateNumber = GetLancer(basis);
-                orig(self, saveAsIfPlayerDied, saveAsIfPlayerQuit);
-                self.currentSaveState.saveStateNumber = basis;
-                return;
+                if (!LancerGenerator.IsCustomLancer(GetLancer(basis)))
+                {
+                    self.currentSaveState.saveStateNumber = GetLancer(basis);
+                    orig(self, saveAsIfPlayerDied, saveAsIfPlayerQuit);
+                    self.currentSaveState.saveStateNumber = basis;
+                    return;
+                }
             }
             orig(self, saveAsIfPlayerDied, saveAsIfPlayerQuit);
         }
@@ -346,6 +353,7 @@ namespace LancerRemix.Cat
             cursor.Emit(OpCodes.Ldarg_0);
             cursor.EmitDelegate<Func<string[], PlayerProgression, bool>>((array, self) =>
                 BackwardsCompatibilityRemix.ParseSaveNumber(array[1]) == GetLancer(self.currentSaveState.saveStateNumber)
+                    && !LancerGenerator.IsCustomLancer(GetLancer(self.currentSaveState.saveStateNumber))
             );
             cursor.Emit(OpCodes.Brtrue, lblOkay);
             cursor.Emit(OpCodes.Br, lblNope);
@@ -363,9 +371,9 @@ namespace LancerRemix.Cat
         private static SlugName GetStoryBasisForLancer(SlugName storyIndex)
         {
             if (storyIndex == null) return null;
-            if (IsLancer(storyIndex) || IsStoryLancer)
+            if ((IsLancer(storyIndex) || IsStoryLancer) && !LancerGenerator.IsCustomLancer(GetLancer(storyIndex)))
                 return LancerGenerator.GetStoryBasisForLancer(storyIndex);
-            return storyIndex; // Not lancer
+            return storyIndex; // Not lancer or is custom
         }
 
         private static void LancerRoomSettings(On.RoomSettings.orig_ctor orig, RoomSettings self, string name, Region region, bool template, bool firstTemplate, SlugName playerChar)
@@ -410,7 +418,7 @@ namespace LancerRemix.Cat
         private static void UpdateConditionalLancerShelters(On.PlayerProgression.MiscProgressionData.orig_updateConditionalShelters orig,
             PlayerProgression.MiscProgressionData self, string room, SlugName slugcatIndex)
         {
-            if (IsStoryLancer) slugcatIndex = GetLancer(slugcatIndex);
+            if (IsStoryLancer && !LancerGenerator.IsCustomLancer(GetLancer(slugcatIndex))) slugcatIndex = GetLancer(slugcatIndex);
             orig(self, room, slugcatIndex);
         }
 
