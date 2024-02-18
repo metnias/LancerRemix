@@ -8,6 +8,6 @@
   "target_game_version": "v1.9.07b",
   "requirements": [ "slime-cubed.slugbase", "topicular.catsupplement" ],
   "requirements_names": [ "SlugBase", "CatSupplement" ],
-  "tags": [ "Campaigns", "Game Mechanics" ],
+  "tags": [ "Campaigns", "Game Mechanics", "Custom Slugcat" ],
   "checksum_override_version": false
 }
