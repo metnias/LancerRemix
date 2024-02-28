@@ -25,6 +25,7 @@ namespace LancerRemix.Cat
         {
             player.playerState.isPup = true;
             isLonk = LancerEnums.GetBasis(player.SlugCatClass) == SlugcatStats.Name.Yellow;
+            removeStun = !isLonk;
             UpdateHasExhaustion();
         }
 
@@ -34,6 +35,7 @@ namespace LancerRemix.Cat
 
         public readonly bool isLonk = false;
         protected bool hasExhaustion = false;
+        public bool removeStun = true;
 
         protected virtual void UpdateHasExhaustion()
         {

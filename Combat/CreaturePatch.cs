@@ -75,7 +75,7 @@ namespace LancerRemix.Combat
             else
             {
                 //Debug.Log($"LancerDEBUG) {self.abstractCreature.creatureTemplate.type} Danger{atkPlayer.dangerGrasp != null} Lonk{lancerSub.isLonk} Elec{spear is ElectricSpear}");
-                if (atkPlayer.dangerGrasp == null && !lancerSub.isLonk)
+                if (atkPlayer.dangerGrasp == null && lancerSub.removeStun)
                 {
                     if (!ModManager.MSC || !(spear is ElectricSpear))
                     {

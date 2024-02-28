@@ -10,7 +10,7 @@ using Random = UnityEngine.Random;
 
 namespace LancerRemix.Combat
 {
-    internal class WeaponPatch
+    public class WeaponPatch
     {
         internal static void Patch()
         {
@@ -37,7 +37,7 @@ namespace LancerRemix.Combat
 
         private static void LancerThrownWeapon(On.Weapon.orig_Thrown orig, Weapon self, Creature thrownBy, Vector2 thrownPos, Vector2? firstFrameTraceFromPos, IntVector2 throwDir, float frc, bool eu)
         {
-            if (thrownBy != null && thrownBy is Player player && IsPlayerLancer(player) && !(self is Spear))
+            if (thrownBy != null && thrownBy is Player player && IsPlayerLancer(player) && !IsPlayerCustomLancer(player) && !(self is Spear))
             {
                 if (self is Rock) frc = Mathf.Lerp(0.8f, 1.2f, player.Adrenaline);
                 else frc = Mathf.Lerp(0.6f, 0.9f, player.Adrenaline);
@@ -48,10 +48,20 @@ namespace LancerRemix.Combat
 
         #region Spear
 
+        public static Func<Player, Spear, float, Vector2> OnGetGrabLancerAimDir = null;
+        public static Func<Player, Spear, float, Vector2> OnGetThrwLancerAimDir = null;
+
         private static bool GetLancerAimDir(Spear self, float timeStacker, out Vector2 aimDir)
         {
             if (self.grabbedBy.Count > 0 && self.grabbedBy[0].grabber is Player grabPlayer && IsPlayerLancer(grabPlayer))
             {
+                if (IsPlayerCustomLancer(grabPlayer))
+                {
+                    var customDir = OnGetGrabLancerAimDir?.Invoke(grabPlayer, self, timeStacker);
+                    if (customDir.HasValue && customDir != Vector2.zero) { aimDir = customDir.Value; return true; }
+                    else { aimDir = Vector2.zero; return false; }
+                }
+
                 float block = GetSub<LancerSupplement>(grabPlayer)?.BlockVisualAmount(timeStacker) ?? 0f;
                 if (block >= 0f)
                     aimDir = Vector3.Slerp(grabPlayer.ThrowDirection >= 0f ? Vector3.right : Vector3.left, Vector3.up, Custom.LerpCircEaseOut(0.0f, 1.0f, block));
@@ -61,6 +71,12 @@ namespace LancerRemix.Combat
             }
             else if (self.mode == Weapon.Mode.Thrown && self.thrownBy != null && self.thrownBy is Player thrwPlayer && IsPlayerLancer(thrwPlayer))
             {
+                if (IsPlayerCustomLancer(thrwPlayer))
+                {
+                    var customDir = OnGetThrwLancerAimDir?.Invoke(thrwPlayer, self, timeStacker);
+                    if (customDir.HasValue && customDir != Vector2.zero) { aimDir = customDir.Value; return true; }
+                    else { aimDir = Vector2.zero; return false; }
+                }
                 //var rot = Vector3.Slerp(spear.lastRotation, spear.rotation, timeStacker);
                 aimDir = self.throwDir.ToVector2();
                 return true;
@@ -68,6 +84,8 @@ namespace LancerRemix.Combat
             aimDir = Vector2.zero;
             return false;
         }
+
+        public static Func<Player, bool, Spear, SharedPhysics.CollisionResult, bool, bool> OnLancerSpearHit = null;
 
         private static bool SpearHit(On.Spear.orig_HitSomething orig, Spear self, SharedPhysics.CollisionResult result, bool eu)
         {
@@ -90,6 +108,12 @@ namespace LancerRemix.Combat
             var res = orig(self, result, eu);
             if (res && self.thrownBy is Player atkPlayer && IsPlayerLancer(atkPlayer))
             {
+                if (IsPlayerCustomLancer(atkPlayer))
+                {
+                    var customResult = OnLancerSpearHit?.Invoke(atkPlayer, res, self, result, eu);
+                    if (customResult.HasValue) return customResult.Value;
+                    return orig(self, result, eu);
+                }
                 var sub = GetSub<LancerSupplement>(atkPlayer);
                 if (sub != null)
                 {
@@ -142,10 +166,17 @@ namespace LancerRemix.Combat
             return res;
         }
 
+        public static Func<Player, Spear, SharedPhysics.CollisionResult, bool, bool> OnLancerSpearLodgeCreature = null;
+
         private static void SpearLodgeCreature(On.Spear.orig_LodgeInCreature orig, Spear self, SharedPhysics.CollisionResult result, bool eu)
         {
             orig(self, result, eu);
             if (!(self.thrownBy is Player player) || !IsPlayerLancer(player)) return;
+            if (IsPlayerCustomLancer(player))
+            {
+                var customAction = OnLancerSpearLodgeCreature?.Invoke(player, self, result, eu);
+                if (customAction.HasValue && customAction.Value) return;
+            }
 
             var sub = GetSub<LancerSupplement>(player);
             if (sub == null) return;
