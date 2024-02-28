@@ -361,48 +361,47 @@ namespace LancerRemix.Cat
 
         protected virtual bool HasLancerViolenceParried(BodyChunk source, Vector2? directionAndMomentum, BodyChunk hitChunk, PhysicalObject.Appendage.Pos hitAppendage, Creature.DamageType type, float damage, float stunBonus)
         {
-            if (type == Creature.DamageType.Bite || type == Creature.DamageType.Blunt || type == Creature.DamageType.Stab)
+            if (type != Creature.DamageType.Bite && type != Creature.DamageType.Blunt && type != Creature.DamageType.Stab)
+                return false;
+
+            if (type == Creature.DamageType.Bite)
+                if (!(source.owner is Creature crit) || !BiteParriable(crit)) return false;
+
+            bool guarded = true;
+            if (blockTimer < 1)
             {
-                if (type == Creature.DamageType.Bite)
-                    if (!(source.owner is Creature crit) || !BiteParriable(crit)) return false;
-
-                bool guarded = true;
-                if (blockTimer < 1)
-                {
-                    if (this is LunterSupplement lunterSub && lunterSub.maskOnHorn.HasAMask) lunterSub.maskOnHorn.DropMask(true);
-                    else return false;
-                    guarded = false;
-                }
-                Vector2 away;
-                var spear = GetParrySpear();
-                if (blockTimer < 1) spear = null;
-                if (source?.owner != null)
-                {
-                    if (source.owner is Creature crit)
-                    {
-                        away = (crit.mainBodyChunk.pos - self.mainBodyChunk.pos).normalized;
-                        away.y = 1f; away.Normalize();
-                        ClearLeftoverStick(crit.abstractCreature, false);
-                        crit.Stun(Mathf.CeilToInt(Mathf.Lerp(80, 40, crit.TotalMass / 10f)));
-                        if (ModManager.MSC && spear is ElectricSpear elecSpear) { elecSpear.Zap(); elecSpear.Electrocute(crit); }
-                    }
-                    else
-                    {
-                        away = (source.owner.bodyChunks[0].pos - self.mainBodyChunk.pos).normalized;
-                        away.y = 1f; away.Normalize();
-                        if (ModManager.MSC && spear is ElectricSpear elecSpear) elecSpear.Zap();
-                    }
-                    source.owner.WeightedPush(0, source.owner.bodyChunks.Length - 1, away, 20f);
-                }
-                violenceParried = true;
-
-                guarded &= lanceTimer == 0;
-                AddParryEffect(guarded);
-                if ((hasExhaustion || (!guarded && !spendSpear)) && blockTimer > 0) FlingLance();
-                // lanceTimer = 0; blockTimer = 0;
-                return true;
+                if (this is LunterSupplement lunterSub && lunterSub.maskOnHorn.HasAMask) lunterSub.maskOnHorn.DropMask(true);
+                else return false;
+                guarded = false;
             }
-            return false;
+            Vector2 away;
+            var spear = GetParrySpear();
+            if (blockTimer < 1) spear = null;
+            if (source?.owner != null)
+            {
+                if (source.owner is Creature crit)
+                {
+                    away = (crit.mainBodyChunk.pos - self.mainBodyChunk.pos).normalized;
+                    away.y = 1f; away.Normalize();
+                    ClearLeftoverStick(crit.abstractCreature, false);
+                    crit.Stun(Mathf.CeilToInt(Mathf.Lerp(80, 40, crit.TotalMass / 10f)));
+                    if (ModManager.MSC && spear is ElectricSpear elecSpear) { elecSpear.Zap(); elecSpear.Electrocute(crit); }
+                }
+                else
+                {
+                    away = (source.owner.bodyChunks[0].pos - self.mainBodyChunk.pos).normalized;
+                    away.y = 1f; away.Normalize();
+                    if (ModManager.MSC && spear is ElectricSpear elecSpear) elecSpear.Zap();
+                }
+                source.owner.WeightedPush(0, source.owner.bodyChunks.Length - 1, away, 20f);
+            }
+            violenceParried = true;
+
+            guarded &= lanceTimer == 0;
+            AddParryEffect(guarded);
+            if ((hasExhaustion || (!guarded && !spendSpear)) && blockTimer > 0) FlingLance();
+            // lanceTimer = 0; blockTimer = 0;
+            return true;
         }
 
         public virtual void ThrowObject(On.Player.orig_ThrowObject orig, int grasp, bool eu)
