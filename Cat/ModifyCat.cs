@@ -19,6 +19,7 @@ namespace LancerRemix.Cat
         internal static void Patch()
         {
             On.Player.ctor += PlayerCtor;
+            On.Player.GetInitialSlugcatClass += GetInitialLancerClass;
             On.Player.Update += PlayerUpdate;
             On.Player.Destroy += PlayerDestroy;
             On.Player.Grabbed += PlayerGrabbed;
@@ -88,7 +89,7 @@ namespace LancerRemix.Cat
 
         public static bool IsPlayerCustomLancer(SlugName name) => LancerGenerator.IsCustomLancer(name.value);
 
-        public static bool IsPlayerCustomLancer(Player player) => !player.isNPC && IsPlayerCustomLancer(player.playerState.slugcatCharacter);
+        public static bool IsPlayerCustomLancer(Player player) => !player.isNPC && IsPlayerCustomLancer(player.SlugCatClass);
 
         public static bool IsPlayerCustomLancer(PlayerGraphics playerGraphics) => IsPlayerCustomLancer(playerGraphics.player);
 
@@ -128,7 +129,7 @@ namespace LancerRemix.Cat
             }
             if (!IsPlayerLancer(self)) return;
             var basis = GetBasis(self.SlugCatClass);
-            if (SlugcatStats.IsSlugcatFromMSC(basis) && !LancerPlugin.MSCLANCERS)
+            if (SlugcatStats.IsSlugcatFromMSC(basis) && (!LancerPlugin.MSCLANCERS || !IsPlayerCustomLancer(self.SlugCatClass)))
             {
                 isPlayerLancer[self.playerState.playerNumber] = false;
                 SelectMenuPatch.SetLancerPlayers(self.playerState.playerNumber, false);
@@ -149,6 +150,13 @@ namespace LancerRemix.Cat
                     self.playerState.foodInStomach = 1;
                 }
             }
+        }
+
+        private static void GetInitialLancerClass(On.Player.orig_GetInitialSlugcatClass orig, Player self)
+        {
+            orig(self);
+            if (IsPlayerLancer(self.playerState.playerNumber) && IsPlayerCustomLancer(GetLancer(self.SlugCatClass)))
+                self.SlugCatClass = GetLancer(self.SlugCatClass);
         }
 
         private static void PlayerUpdate(On.Player.orig_Update orig, Player self, bool eu)

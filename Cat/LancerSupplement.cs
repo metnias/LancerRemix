@@ -27,6 +27,7 @@ namespace LancerRemix.Cat
             isLonk = LancerEnums.GetBasis(player.SlugCatClass) == SlugcatStats.Name.Yellow;
             removeStun = !isLonk;
             UpdateHasExhaustion();
+            Debug.Log($"Added {GetType()} for {player.SlugCatClass}");
         }
 
         public LancerSupplement() : base()
