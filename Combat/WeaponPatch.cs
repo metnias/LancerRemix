@@ -48,8 +48,8 @@ namespace LancerRemix.Combat
 
         #region Spear
 
-        public static Func<Player, Spear, float, Vector2> OnGetGrabLancerAimDir = null;
-        public static Func<Player, Spear, float, Vector2> OnGetThrwLancerAimDir = null;
+        public static Func<Player, Spear, float, Vector2?> OnGetGrabLancerAimDir = null;
+        public static Func<Player, Spear, float, Vector2?> OnGetThrwLancerAimDir = null;
 
         private static bool GetLancerAimDir(Spear self, float timeStacker, out Vector2 aimDir)
         {
@@ -58,8 +58,7 @@ namespace LancerRemix.Combat
                 if (IsPlayerCustomLancer(grabPlayer))
                 {
                     var customDir = OnGetGrabLancerAimDir?.Invoke(grabPlayer, self, timeStacker);
-                    if (customDir.HasValue && customDir != Vector2.zero) { aimDir = customDir.Value; return true; }
-                    else { aimDir = Vector2.zero; return false; }
+                    if (customDir.HasValue && customDir.Value != Vector2.zero) { aimDir = customDir.Value; return true; }
                 }
 
                 float block = GetSub<LancerSupplement>(grabPlayer)?.BlockVisualAmount(timeStacker) ?? 0f;
@@ -75,7 +74,6 @@ namespace LancerRemix.Combat
                 {
                     var customDir = OnGetThrwLancerAimDir?.Invoke(thrwPlayer, self, timeStacker);
                     if (customDir.HasValue && customDir != Vector2.zero) { aimDir = customDir.Value; return true; }
-                    else { aimDir = Vector2.zero; return false; }
                 }
                 //var rot = Vector3.Slerp(spear.lastRotation, spear.rotation, timeStacker);
                 aimDir = self.throwDir.ToVector2();
@@ -85,7 +83,7 @@ namespace LancerRemix.Combat
             return false;
         }
 
-        public static Func<Player, bool, Spear, SharedPhysics.CollisionResult, bool, bool> OnLancerSpearHit = null;
+        public static Func<Player, bool, Spear, SharedPhysics.CollisionResult, bool, bool?> OnLancerSpearHit = null;
 
         private static bool SpearHit(On.Spear.orig_HitSomething orig, Spear self, SharedPhysics.CollisionResult result, bool eu)
         {
@@ -112,7 +110,6 @@ namespace LancerRemix.Combat
                 {
                     var customResult = OnLancerSpearHit?.Invoke(atkPlayer, res, self, result, eu);
                     if (customResult.HasValue) return customResult.Value;
-                    return orig(self, result, eu);
                 }
                 var sub = GetSub<LancerSupplement>(atkPlayer);
                 if (sub != null)
@@ -166,7 +163,7 @@ namespace LancerRemix.Combat
             return res;
         }
 
-        public static Func<Player, Spear, SharedPhysics.CollisionResult, bool, bool> OnLancerSpearLodgeCreature = null;
+        public static Func<Player, Spear, SharedPhysics.CollisionResult, bool, bool?> OnLancerSpearLodgeCreature = null;
 
         private static void SpearLodgeCreature(On.Spear.orig_LodgeInCreature orig, Spear self, SharedPhysics.CollisionResult result, bool eu)
         {
@@ -175,7 +172,7 @@ namespace LancerRemix.Combat
             if (IsPlayerCustomLancer(player))
             {
                 var customAction = OnLancerSpearLodgeCreature?.Invoke(player, self, result, eu);
-                if (customAction.HasValue && customAction.Value) return;
+                if (customAction.HasValue) return;
             }
 
             var sub = GetSub<LancerSupplement>(player);
