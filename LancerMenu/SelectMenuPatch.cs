@@ -213,6 +213,7 @@ namespace LancerRemix.LancerMenu
         {
             if (!_lancerInit) return;
             orig(self);
+            SaveManager.SetMiscValue(self.manager.rainWorld.progression.miscProgressionData, SwapSave.CURRSLUGCATLANCER, slugcatPageLancer);
             if (!slugcatPageLancer) return;
             self.manager.rainWorld.progression.miscProgressionData.currentlySelectedSinglePlayerSlugcat =
                 lancerPages[self.slugcatPageIndex]?.slugcatNumber;
