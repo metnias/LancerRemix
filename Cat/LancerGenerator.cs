@@ -49,6 +49,7 @@ namespace LancerRemix
 
         private static void LancerStats(On.SlugcatStats.orig_ctor orig, SlugcatStats self, SlugName slugcat, bool malnourished)
         {
+            if (IsCustomLancer(slugcat)) { orig(self, slugcat, malnourished); return; }
             var basis = GetBasis(slugcat);
             orig(self, basis, malnourished);
             if (!IsStoryLancer && !IsLancer(slugcat)) return;
@@ -69,6 +70,7 @@ namespace LancerRemix
 
         private static IntVector2 LancerFoodMeter(On.SlugcatStats.orig_SlugcatFoodMeter orig, SlugName slugcat)
         {
+            if (IsCustomLancer(slugcat)) return orig(slugcat);
             var basis = GetBasis(slugcat);
             var res = orig(basis);
             if (!IsStoryLancer && !IsLancer(slugcat)) return res;
@@ -78,6 +80,7 @@ namespace LancerRemix
 
         private static int LancerNourishmentOfObjectEaten(On.SlugcatStats.orig_NourishmentOfObjectEaten orig, SlugName slugcatIndex, IPlayerEdible eatenObject)
         {
+            if (IsCustomLancer(slugcatIndex)) return orig(slugcatIndex, eatenObject);
             var basis = GetBasis(slugcatIndex);
             var res = orig(basis, eatenObject);
             //Debug.Log($"{slugcatIndex}({IsStoryLancer}) Nourishment: {res}");
