@@ -52,10 +52,14 @@ namespace LancerRemix.LancerMenu
         {
             _lancerInit = false;
             redIsDead = false;
+            //Debug.Log($"CtorStart slugcatPageLancer{slugcatPageLancer} currentlySelectedSinglePlayerSlugcat{manager.rainWorld.progression.miscProgressionData.currentlySelectedSinglePlayerSlugcat}");
             LoadLancerPlayers(Custom.rainWorld.progression.miscProgressionData);
-            ModifyCat.SetIsPlayerLancer(false, lancerPlayers);
+            bool isSelectedLancer = IsLancer(manager.rainWorld.progression.miscProgressionData.currentlySelectedSinglePlayerSlugcat);
+            ModifyCat.SetIsPlayerLancer(isSelectedLancer, lancerPlayers);
+            manager.rainWorld.progression.miscProgressionData.currentlySelectedSinglePlayerSlugcat = GetBasis(manager.rainWorld.progression.miscProgressionData.currentlySelectedSinglePlayerSlugcat);
+
             orig(self, manager);
-            if (TryGetCurrSlugcatLancer())
+            if (isSelectedLancer || TryGetCurrSlugcatLancer())
             { slugcatPageLancer = true; lancerTransition = 1f; lastLancerTransition = 1f; }
             else
             { slugcatPageLancer = false; lancerTransition = 0f; lastLancerTransition = 0f; }
@@ -87,6 +91,8 @@ namespace LancerRemix.LancerMenu
             _lancerInit = true;
             self.UpdateStartButtonText();
             self.UpdateSelectedSlugcatInMiscProg();
+
+            Debug.Log($"CtorEnd slugcatPageLancer{slugcatPageLancer} currentlySelectedSinglePlayerSlugcat{self.manager.rainWorld.progression.miscProgressionData.currentlySelectedSinglePlayerSlugcat}");
 
             int GetBasisOrder(SlugName lancer)
             {
@@ -210,6 +216,7 @@ namespace LancerRemix.LancerMenu
             if (!slugcatPageLancer) return;
             self.manager.rainWorld.progression.miscProgressionData.currentlySelectedSinglePlayerSlugcat =
                 lancerPages[self.slugcatPageIndex]?.slugcatNumber;
+            //Debug.Log($"UpdateSelectedLancerInMiscProg {lancerPages[self.slugcatPageIndex]?.slugcatNumber}({GetBasis(lancerPages[self.slugcatPageIndex]?.slugcatNumber)})");
         }
 
         #region LancerPlayers
