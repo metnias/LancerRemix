@@ -269,6 +269,12 @@ namespace LancerRemix.Cat
             ReleaseLanceSpear();
         }
 
+        public virtual void Deafen(On.Player.orig_Deafen orig, int df)
+        {
+            df >>= 1;
+            orig(self, df);
+        }
+
         public override void Destroy(On.Player.orig_Destroy orig)
         {
             base.Destroy(orig);

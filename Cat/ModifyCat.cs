@@ -29,6 +29,7 @@ namespace LancerRemix.Cat
             On.Player.CanIPickThisUp += PlayerCanIPickThisUp;
             On.Player.Stun += PlayerStun;
             On.Player.Die += PlayerDie;
+            On.Player.Deafen += PlayerDeafen;
             On.Player.UpdateMSC += PlayerUpdateMSC;
             On.Player.MovementUpdate += LancerMovementUpdate;
             IL.Player.EatMeatUpdate += LonkEatMeatUpdate;
@@ -234,6 +235,13 @@ namespace LancerRemix.Cat
             if (IsPlayerLancer(self))
             { GetSub<LancerSupplement>(self)?.Die(orig); return; }
             orig(self);
+        }
+
+        private static void PlayerDeafen(On.Player.orig_Deafen orig, Player self, int df)
+        {
+            if (IsPlayerLancer(self))
+            { GetSub<LancerSupplement>(self)?.Deafen(orig, df); return; }
+            orig(self, df);
         }
 
         private static void PlayerUpdateMSC(On.Player.orig_UpdateMSC orig, Player self)
