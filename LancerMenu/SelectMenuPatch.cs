@@ -351,24 +351,31 @@ namespace LancerRemix.LancerMenu
             var lblOkay = cursor.DefineLabel();
             lblOkay.Target = cursor.Prev;
 
-            if (!cursor.TryGotoPrev(MoveType.Before,
-                x => x.MatchLdcI4(0),
-                x => x.MatchLdcI4(11),
-                x => x.MatchLdarg(0),
+            /*
+            if (!cursor.TryGotoNext(MoveType.Before,
+                x => x.MatchLdarg(1),
+                x => x.MatchLdsfld(typeof(SlugName).GetField(nameof(SlugName.Yellow)))
+                )) return;
+            */
+            if (!cursor.TryGotoNext(MoveType.Before,
                 x => x.MatchLdfld(typeof(MainLoopProcess).GetField(nameof(MainLoopProcess.manager))),
-                x => x.MatchLdfld(typeof(ProcessManager).GetField(nameof(ProcessManager.rainWorld)))
+                x => x.MatchLdsfld(typeof(ProcessManager.ProcessID).GetField(nameof(ProcessManager.ProcessID.SlideShow))),
+                x => x.MatchCallOrCallvirt(typeof(ProcessManager).GetMethod(nameof(ProcessManager.RequestMainProcessSwitch), new Type[] { typeof(ProcessManager.ProcessID) }))
                 )) return;
 
             DebugLogCursor();
+            cursor.Emit(OpCodes.Pop); // removes Ldarg0 before this
             cursor.Emit(OpCodes.Ldarg_1);
             cursor.EmitDelegate<Func<SlugName, bool>>((storyGameCharacter) =>
             {
+                Debug.Log($"isLancer{slugcatPageLancer} {storyGameCharacter}");
                 if (!slugcatPageLancer) return false;
                 var basis = GetBasis(storyGameCharacter);
                 return basis == SlugName.White || basis == SlugName.Yellow;
             }
                 );
             cursor.Emit(OpCodes.Brtrue, lblOkay);
+            cursor.Emit(OpCodes.Ldarg_0); // readd Ldarg0
 
             #endregion SkipIntro
 

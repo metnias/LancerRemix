@@ -16,7 +16,7 @@ namespace LancerRemix.Combat
         {
             On.Weapon.Thrown += LancerThrownWeapon;
             On.Spear.HitSomething += SpearHit;
-            On.Spear.LodgeInCreature += SpearLodgeCreature;
+            On.Spear.LodgeInCreature_CollisionResult_bool_bool += SpearLodgeCreature;
             On.Spear.Update += SpearUpdate;
             IL.Spear.Update += LanceFarStickPrevent;
             On.PlayerCarryableItem.Update += LanceReduceWaterFriction;
@@ -165,9 +165,9 @@ namespace LancerRemix.Combat
 
         public static Func<Player, Spear, SharedPhysics.CollisionResult, bool, bool?> OnLancerSpearLodgeCreature = null;
 
-        private static void SpearLodgeCreature(On.Spear.orig_LodgeInCreature orig, Spear self, SharedPhysics.CollisionResult result, bool eu)
+        private static void SpearLodgeCreature(On.Spear.orig_LodgeInCreature_CollisionResult_bool_bool orig, Spear self, SharedPhysics.CollisionResult result, bool eu, bool isJellyFish = false)
         {
-            orig(self, result, eu);
+            orig(self, result, eu, isJellyFish);
             if (!(self.thrownBy is Player player) || !IsPlayerLancer(player)) return;
             if (IsPlayerCustomLancer(player))
             {

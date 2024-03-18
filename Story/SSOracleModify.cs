@@ -211,7 +211,7 @@ namespace LancerRemix.Story
                     return float.MaxValue;
                 }
                 float num = Mathf.Abs(Vector2.Distance(tryPos, self.player.DangerPos) - 250f);
-                num -= Math.Min((float)self.oracle.room.aimap.getAItile(tryPos).terrainProximity, 11f) * 30f;
+                num -= Math.Min(self.oracle.room.aimap.getTerrainProximity(tryPos), 11f) * 30f;
                 num -= Vector2.Distance(tryPos, self.owner.nextPos) * 0.5f;
                 for (int i = 0; i < self.oracle.arm.joints.Length; i++)
                 {
