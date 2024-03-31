@@ -107,10 +107,10 @@ namespace LancerRemix.Story
             var S = new StringBuilder();
             S.AppendLine(Translate("Lancer Interactions:"));
             S.AppendLine();
-            S.Append("- "); S.AppendLine(Translate("Press THROW to stab with a spear"));
-            S.Append("- "); S.AppendLine(Translate("Press PICK UP to defend with a spear"));
+            S.Append("- "); S.AppendLine(Translate("Press <THROW> to stab with a spear").Replace("<THROW>", Menu.Remix.OptionalText.GetButtonName_Throw()));
+            S.Append("- "); S.AppendLine(Translate("Press <PICK UP> to defend with a spear").Replace("<PICK UP>", Menu.Remix.OptionalText.GetButtonName_PickUp()));
             if (rwg.IsStorySession && rwg.StoryCharacter != null && GetBasis(rwg.StoryCharacter) == SlugName.Red)
-            { S.Append("- "); S.AppendLine(Translate("Hold PICK UP with a mask to hang it onto your horn")); }
+            { S.Append("- "); S.AppendLine(Translate("Hold <PICK UP> with a mask to hang it onto your horn").Replace("<PICK UP>", Menu.Remix.OptionalText.GetButtonName_PickUp())); }
 
             self.pickupButtonInstructions.text = S.ToString();
         }

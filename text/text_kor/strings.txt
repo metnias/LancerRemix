@@ -17,6 +17,9 @@ Lancer Interactions:|랜서 상호작용:
 Press THROW to stab with a spear|창을 들고 투척 버튼을 눌러 찌르기
 Press PICK UP to defend with a spear|창을 들고 줍기 버튼을 눌러 방어
 Hold PICK UP with a mask to hang it onto your horn|가면을 들고 줍기 버튼을 길게 눌러 뿔에 걸치기
+Press <THROW> to stab with a spear|창을 들고 <THROW>을(를) 눌러 찌르기
+Press <PICK UP> to defend with a spear|창을 들고 <PICK UP>을(를) 눌러 방어
+Hold <PICK UP> with a mask to hang it onto your horn|가면을 들고 <PICK UP>을(를) 길게 눌러 뿔에 걸치기
 
 // Jolly
 Player <p_n> will be lancer|플레이어 <p_n>(은)는 랜서

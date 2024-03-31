@@ -17,6 +17,9 @@ Lancer Interactions:|Взаимодействия Лансера:
 Press THROW to stab with a spear|Нажмите БРОСИТЬ, чтобы нанести удар копьём.
 Press PICK UP to defend with a spear|Нажмите ВЗЯТЬ, чтобы защититься копьём.
 Hold PICK UP with a mask to hang it onto your horn|Удерживайте ВЗЯТЬ с маской, чтобы повесить её на рог.
+Press <THROW> to stab with a spear|Нажмите <THROW>, чтобы нанести удар копьём.
+Press <PICK UP> to defend with a spear|Нажмите <PICK UP>, чтобы защититься копьём.
+Hold <PICK UP> with a mask to hang it onto your horn|Удерживайте <PICK UP> с маской, чтобы повесить её на рог.
 
 // Jolly
 Player <p_n> will be lancer|Игрок <p_n> будет лансером
