@@ -99,6 +99,7 @@ namespace LancerRemix.Story
             orig.Invoke(self, menu, owner, pos, preset, showPickupInstructions);
             if (!(menu.manager?.currentMainLoop is RainWorldGame rwg)) return;
             if (!IsStoryLancer) return;
+            if (LancerGenerator.IsCustomLancer(rwg.StoryCharacter)) return;
             if (self.controlLabels[5] != null)
                 self.controlLabels[5].text = $"{Menu.Remix.OptionalText.GetButtonName_Throw()} - {Translate("Stab / Throw")}";
 
