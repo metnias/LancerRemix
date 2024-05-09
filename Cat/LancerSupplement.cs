@@ -423,7 +423,8 @@ namespace LancerRemix.Cat
             if (lanceTimer != 0) return;
             bool deepSwim = self.animation == AnimIndex.DeepSwim;
             if (deepSwim && self.airInLungs < 0.5f) return; // out of breath
-            if (ModManager.MSC && spear.bugSpear) { orig(self, grasp, eu); spendSpear = true; return; } // throw bugSpear normally
+            if (ModManager.MSC && spear.bugSpear)
+            { orig(self, grasp, eu); spear.spearDamageBonus = GetLanceDamage(self.slugcatStats.throwingSkill) * 2f; spendSpear = true; return; } // throw bugSpear normally
             lanceGrasp = grasp;
             spendSpear = false;
             var lanceDir = GetLanceDir();
