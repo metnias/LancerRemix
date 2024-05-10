@@ -252,27 +252,27 @@ namespace LancerRemix.Combat
                 if (stick is MaskOnHorn.AbstractOnHornStick) { hornStick = stick as MaskOnHorn.AbstractOnHornStick; break; }
             if (hornStick == null || !(self.attachedTo is VultureMask)) goto NotHorned;
 
-            PlayerGraphics pg = hornStick.Player.realizedObject?.graphicsModule as PlayerGraphics;
             Vector2 pos0, rot, anchor;
             pos0 = Vector2.Lerp((self.attachedTo as VultureMask).firstChunk.lastPos, (self.attachedTo as VultureMask).firstChunk.pos, timeStacker);
             float don = Mathf.Lerp((self.attachedTo as VultureMask).lastDonned, (self.attachedTo as VultureMask).donned, timeStacker);
             // float lgt = rCam.room.Darkness(pos0) * (1f - rCam.room.LightSourceExposure(pos0)) * 0.8f * (1f - (self.attachedTo as VultureMask).fallOffVultureMode);
             rot = Vector3.Slerp((self.attachedTo as VultureMask).lastRotationA, (self.attachedTo as VultureMask).rotationA, timeStacker);
             anchor = new Vector2(0f, 1f);
-
-            //if (don <= 0f) { goto ApplyChanges; }
             float view = Mathf.Lerp((self.attachedTo as VultureMask).lastViewFromSide, (self.attachedTo as VultureMask).viewFromSide, timeStacker);
-            Vector2 posM = Custom.DirVec(Vector2.Lerp(pg.drawPositions[1, 1], pg.drawPositions[1, 0], timeStacker), Vector2.Lerp(pg.drawPositions[0, 1], pg.drawPositions[0, 0], timeStacker));
-            Vector2 pos0m = Vector2.Lerp(pg.drawPositions[0, 1], pg.drawPositions[0, 0], timeStacker) + posM * 3f;
+
+            PlayerGraphics pg = hornStick.Player.realizedObject?.graphicsModule as PlayerGraphics;
+            //if (don <= 0f) { goto ApplyChanges; }
+            Vector2 dirHead = Custom.DirVec(Vector2.Lerp(pg.drawPositions[1, 1], pg.drawPositions[1, 0], timeStacker), Vector2.Lerp(pg.drawPositions[0, 1], pg.drawPositions[0, 0], timeStacker));
+            Vector2 posHorn = Vector2.Lerp(pg.drawPositions[0, 1], pg.drawPositions[0, 0], timeStacker) + dirHead * 3f;
             //pos0m = Vector2.Lerp(pos0m, Vector2.Lerp(pg.head.lastPos, pg.head.pos, timeStacker) + posM * 3f, 0.5f);
-            pos0m = Vector2.Lerp(pos0m, Vector2.Lerp(pg.head.lastPos, pg.head.pos, timeStacker) - posM * 6f, 0.5f);
-            pos0m += Vector2.Lerp(pg.lastLookDir, pg.lookDirection, timeStacker) * 1.5f;
-            rot = Vector3.Slerp(rot, posM, don);
+            posHorn = Vector2.Lerp(posHorn, Vector2.Lerp(pg.head.lastPos, pg.head.pos, timeStacker) - dirHead * 6f, 0.5f);
+            posHorn += Vector2.Lerp(pg.lastLookDir, pg.lookDirection, timeStacker) * 1.5f;
+            rot = Vector3.Slerp(rot, dirHead, don);
 
             if ((pg.owner as Player).eatCounter < 35)
             { //eating
                 anchor = Vector3.Slerp(anchor, new Vector2(0f, -1f), don); //don
-                pos0m += posM * Mathf.InverseLerp(35f, 15f, (float)(pg.owner as Player).eatCounter) * 9f;
+                posHorn += dirHead * Mathf.InverseLerp(35f, 15f, (float)(pg.owner as Player).eatCounter) * 9f;
                 //Custom.LerpMap((float)(pg.owner as Player).eatCounter, 35f, 15f, 0f, 0.11f)
             }
             else
@@ -283,10 +283,10 @@ namespace LancerRemix.Combat
             {
                 rot = Custom.DegToVec(Custom.VecToDeg(rot) - 20f * view);
                 anchor = Vector3.Slerp(anchor, Custom.DegToVec(-50f * view), Mathf.Abs(view));
-                pos0m += posM * 2f * Mathf.Abs(view);
-                pos0m -= Custom.PerpendicularVector(posM) * 4f * view;
+                posHorn += dirHead * 2f * Mathf.Abs(view);
+                posHorn -= Custom.PerpendicularVector(dirHead) * 4f * view;
             }
-            pos0 = Vector2.Lerp(pos0, pos0m, don);
+            pos0 = Vector2.Lerp(pos0, posHorn, don);
 
             self.overrideDrawVector = pos0;
             self.overrideRotationVector = rot;
