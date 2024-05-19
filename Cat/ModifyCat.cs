@@ -413,7 +413,7 @@ namespace LancerRemix.Cat
 
         private static Color DefaultLancerColor(On.PlayerGraphics.orig_DefaultSlugcatColor orig, SlugName i)
         {
-            if (IsLancer(i))
+            if (IsLancer(i) && !IsPlayerCustomLancer(i))
             {
                 var basis = GetBasis(i);
                 if (defaultLancerBodyColors.TryGetValue(basis, out var res)) return res;
