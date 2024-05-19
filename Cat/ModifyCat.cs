@@ -186,12 +186,13 @@ namespace LancerRemix.Cat
         private static Color LancerShortCutColor(On.Player.orig_ShortCutColor orig, Player self)
         {
             if (!IsPlayerLancer(self) || self.abstractCreature.world.game.IsArenaSession) return orig(self);
+            if (IsPlayerCustomLancer(self)) return orig(self);
             return PlayerGraphics.SlugcatColor(GetLancer(self.playerState.slugcatCharacter));
         }
 
         private static float LancerDeathByBiteMultiplier(On.Player.orig_DeathByBiteMultiplier orig, Player self)
         {
-            if (IsPlayerLancer(self))
+            if (IsPlayerLancer(self) && !IsPlayerCustomLancer(self))
             {
                 if (self.abstractCreature.world.game.IsStorySession)
                     return 0.2f + self.abstractCreature.world.game.GetStorySession.difficulty / 4f;
