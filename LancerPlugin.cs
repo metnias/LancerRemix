@@ -74,6 +74,7 @@ namespace LancerRemix
             lastMSCEnabled = ModManager.MSC;
             lastJollyEnabled = ModManager.JollyCoop;
             lastMMFEnabled = ModManager.MMF;
+            lastWatcherEnabled = ModManager.Watcher;
 
             Instance.Logger.LogMessage("The Lancer is Intialized.");
             Instance.Logger.LogMessage($"ILhooks: {Convert.ToString(ILhookFlags, 2)} ({(ILhookSuccess() ? "Success" : "Failed")})");
@@ -122,6 +123,7 @@ namespace LancerRemix
         private static bool lastMSCEnabled;
         private static bool lastJollyEnabled;
         private static bool lastMMFEnabled;
+        private static bool lastWatcherEnabled;
 
         internal static bool AnyModChanged { get; private set; } = true;
 
@@ -154,6 +156,12 @@ namespace LancerRemix
                 HornColorPick.OnMMFEnablePatch();
                 lastMMFEnabled = ModManager.MMF;
             }
+            if (!lastWatcherEnabled && ModManager.Watcher)
+            {
+                LogSource.LogInfo("Lancer detected Watcher newly enabled.");
+                ModifyLatcher.OnWatcherEnablePatch();
+                lastWatcherEnabled = ModManager.Watcher;
+            }
         }
 
         private static void OnModsDisabled(On.RainWorld.orig_OnModsDisabled orig, RainWorld rw, ModManager.Mod[] newlyDisabledMods)
@@ -182,6 +190,12 @@ namespace LancerRemix
                 SelectMenuPatch.OnMMFDisablePatch();
                 HornColorPick.OnMMFDisablePatch();
                 lastMMFEnabled = ModManager.MMF;
+            }
+            if (lastWatcherEnabled && !ModManager.Watcher)
+            {
+                LogSource.LogInfo("Lancer detected Watcher newly disabled.");
+                ModifyLatcher.OnWatcherDisablePatch();
+                lastWatcherEnabled = ModManager.Watcher;
             }
         }
 

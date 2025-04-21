@@ -83,6 +83,7 @@
     <Compile Include="Cat\LancerGenerator.cs" />
     <Compile Include="Cat\LunterDecoration.cs" />
     <Compile Include="Cat\LunterSupplement.cs" />
+    <Compile Include="Cat\ModifyLatcher.cs" />
     <Compile Include="Cat\SwapSave.cs" />
     <Compile Include="Combat\CreaturePatch.cs" />
     <Compile Include="Combat\MaskOnHorn.cs" />

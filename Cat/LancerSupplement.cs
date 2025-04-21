@@ -100,7 +100,7 @@ namespace LancerRemix.Cat
                     {
                         var bodyChunk = self.bodyChunks[UnityEngine.Random.Range(0, self.bodyChunks.Length)];
                         Vector2 vel = bodyChunk.vel * 0.5f + Custom.RNV() * UnityEngine.Random.Range(0f, 3f);
-                        var sporeCloud = new SporeCloud(bodyChunk.pos, vel, new Color(0.02f, 0.1f, 0.08f), UnityEngine.Random.Range(0.65f, 0.8f), null, 0, null, this.abstractPhysicalObject.rippleLayer)
+                        var sporeCloud = new SporeCloud(bodyChunk.pos, vel, new Color(0.02f, 0.1f, 0.08f), UnityEngine.Random.Range(0.65f, 0.8f), null, 0, null, self.abstractPhysicalObject.rippleLayer)
                         {
                             pos = bodyChunk.pos + UnityEngine.Random.insideUnitCircle * bodyChunk.rad,
                             nonToxic = true
