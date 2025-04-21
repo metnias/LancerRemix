@@ -273,6 +273,7 @@ namespace LancerRemix.LancerMenu
                 self.PlaySound(SoundID.MENU_Next_Slugcat);
                 self.UpdateStartButtonText();
                 self.UpdateSelectedSlugcatInMiscProg();
+                self.restartAvailable = false;
                 return;
             }
             if (message == "START")
@@ -372,7 +373,8 @@ namespace LancerRemix.LancerMenu
                 Debug.Log($"isLancer{slugcatPageLancer} {storyGameCharacter}");
                 if (!slugcatPageLancer) return false;
                 var basis = GetBasis(storyGameCharacter);
-                return basis == SlugName.White || basis == SlugName.Yellow;
+                return basis == SlugName.White || basis == SlugName.Yellow
+                    || (ModManager.Watcher && basis == WatcherEnums.SlugcatStatsName.Watcher);
             }
                 );
             cursor.Emit(OpCodes.Brtrue, lblOkay);
@@ -678,7 +680,7 @@ namespace LancerRemix.LancerMenu
                         (!LancerPlugin.MSCLANCERS || !LancerGenerator.HasCustomLancer(basisNumber.value, out var _));
                     bool isWatcherLocked = ModManager.Watcher && basisNumber == WatcherEnums.SlugcatStatsName.Watcher;
 #if LATCHER
-                    isWatcherLocked = false;
+                    if (ModManager.Watcher) isWatcherLocked &= !SlugcatStats.SlugcatUnlocked(WatcherEnums.SlugcatStatsName.Watcher, menu.manager.rainWorld);
 #endif
                     if (isMSCLocked || isWatcherLocked)
                     {

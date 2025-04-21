@@ -4,11 +4,12 @@ using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using MoreSlugcats;
 using System;
+using System.Collections.Generic;
 using static CatSub.Story.SaveManager;
-using static CatSub.Story.StoryRegistry;
 using static LancerRemix.LancerEnums;
 using SlugName = SlugcatStats.Name;
 using SlugTime = SlugcatStats.Timeline;
+using Debug = UnityEngine.Debug;
 
 namespace LancerRemix.Cat
 {
@@ -70,7 +71,23 @@ namespace LancerRemix.Cat
         private static void WipeSaveLancer(On.PlayerProgression.orig_WipeSaveState orig, PlayerProgression self, SlugName saveStateNumber)
         {
             if (IsStoryLancer) saveStateNumber = GetLancer(saveStateNumber);
+
+            /*
+            Debug.Log($"WipeSaveStateTest: {saveStateNumber.value}");
+            var list = new List<string>();
+            foreach (var slug in ExtEnumBase.GetNames(typeof(SlugName)))
+                if (self.IsThereASavedGame(new SlugName(slug, false))) list.Add(slug);
+            Debug.Log("Orig: " + string.Join(", ", list));
+            */
+
             orig(self, saveStateNumber);
+
+            /*
+            list.Clear();
+            foreach (var slug in ExtEnumBase.GetNames(typeof(SlugName)))
+                if (self.IsThereASavedGame(new SlugName(slug, false))) list.Add(slug);
+            Debug.Log("Left: " + string.Join(", ", list));
+            */
         }
 
         #endregion SlugcatSelectMenu
