@@ -105,7 +105,7 @@ namespace LancerRemix.Cat
                         moveExhaust = self.bodyMode == BodyIndex.Crawl ? 400f : 800f;
                         stillExhaust = self.bodyMode == BodyIndex.Crawl ? 125f : 200f;
                     }
-                    aerobicCache = Mathf.Max(1f - self.airInLungs, aerobicCache - ((!self.slugcatStats.malnourished) ? 1f : 1.2f) / (((self.input[0].x != 0 || self.input[0].y != 0) ? moveExhaust : stillExhaust) * (1f + 3f * Mathf.InverseLerp(0.9f, 1f, self.aerobicLevel))));
+                    aerobicCache = Mathf.Max(1f - self.airInLungs, aerobicCache - (self.slugcatStats.malnourished ? 1.2f : 1f) / (((self.input[0].x != 0 || self.input[0].y != 0) ? moveExhaust : stillExhaust) * (1f + 3f * Mathf.InverseLerp(0.9f, 1f, aerobicCache))));
                 }
                 if (ModManager.MSC && self.Wounded && aerobicCache > 0.98f) aerobicCache = 0.35f;
                 self.aerobicLevel = aerobicCache;

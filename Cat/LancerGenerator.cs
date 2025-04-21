@@ -151,9 +151,9 @@ namespace LancerRemix
 
         internal static void DeleteLancer(SlugName lancer)
         {
-            if (LancerTimes.TryGetValue(lancer.value, out var lancerTime))
+            if (LancerTimes.TryGetValue(lancer, out var lancerTime))
             {
-                LancerTimes.Remove(lancer.value);
+                LancerTimes.Remove(lancer);
                 lancerTime?.Unregister();
             }
             if (SlugBaseCharacter.Registry.TryGet(lancer, out var _))
@@ -168,7 +168,7 @@ namespace LancerRemix
         {
             var lancer = new SlugName(GetLancerName(basis.value), true);
             var lancerTime = new SlugTime(lancer.value, true);
-            LancerTimes.Add(lancer.value, lancerTime);
+            LancerTimes.Add(lancer, lancerTime);
 
             // Moved to AppendLancerTimelineOrder
             //if (basis == SlugName.Yellow)
@@ -217,7 +217,7 @@ namespace LancerRemix
         {
             var lancer = new SlugName(GetLancerName(basis.value), true);
             var lancerTime = new SlugTime(lancer.value, true);
-            LancerTimes.Add(lancer.value, lancerTime);
+            LancerTimes.Add(lancer, lancerTime);
             //StoryRegistry.RegisterTimeline(new StoryRegistry.TimelinePointer(lancer, StoryRegistry.TimelinePointer.Relative.After, basis));
             var modifier = new StatModifier
             {
@@ -284,8 +284,6 @@ namespace LancerRemix
 
         #region TimeLine
 
-        private static readonly Dictionary<string, SlugTime> LancerTimes = new Dictionary<string, SlugTime>();
-
         internal static bool IsTimelineInbetween(SlugName check, SlugName leftExclusive, SlugName rightExclusive)
             => IsTimelineInbetween(SlugcatStats.SlugcatToTimeline(check), SlugcatStats.SlugcatToTimeline(leftExclusive), SlugcatStats.SlugcatToTimeline(rightExclusive));
 
@@ -313,15 +311,15 @@ namespace LancerRemix
             for (LinkedListNode<SlugTime> node = timeline.First; node != null; node = node.Next)
             {
                 if (node.Value == SlugTime.White)
-                    timeline.AddAfter(node, LancerTimes[GetLancer(SlugName.White).value]);
+                    timeline.AddAfter(node, LancerTimes[GetLancer(SlugName.White)]);
                 else if (node.Value == SlugTime.Red)
                 {
-                    timeline.AddAfter(node, LancerTimes[GetLancer(SlugName.Red).value]);
-                    timeline.AddBefore(node, LancerTimes[GetLancer(SlugName.Yellow).value]);
+                    timeline.AddBefore(node, LancerTimes[GetLancer(SlugName.Yellow)]);
+                    timeline.AddAfter(node, LancerTimes[GetLancer(SlugName.Red)]);
                 }
                 else if (ModManager.Watcher && node.Value == SlugTime.Watcher)
                 {
-                    timeline.AddAfter(node, LancerTimes[GetLancer(WatcherEnums.SlugcatStatsName.Watcher).value]);
+                    timeline.AddAfter(node, LancerTimes[GetLancer(WatcherEnums.SlugcatStatsName.Watcher)]);
                 }
             }
 
@@ -332,7 +330,8 @@ namespace LancerRemix
         {
             if (IsLancer(slugcat))
             {
-                if (LancerTimes.TryGetValue(slugcat.value, out var slugTime))
+                //UnityEngine.Debug.Log($"LancerToTimeline: {slugcat} > {LancerTimes[slugcat]}");
+                if (LancerTimes.TryGetValue(slugcat, out var slugTime))
                     return slugTime;
             }
             return orig(slugcat);

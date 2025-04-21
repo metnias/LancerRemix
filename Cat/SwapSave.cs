@@ -4,12 +4,11 @@ using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using MoreSlugcats;
 using System;
-using System.Collections.Generic;
 using static CatSub.Story.SaveManager;
 using static LancerRemix.LancerEnums;
+using Debug = UnityEngine.Debug;
 using SlugName = SlugcatStats.Name;
 using SlugTime = SlugcatStats.Timeline;
-using Debug = UnityEngine.Debug;
 
 namespace LancerRemix.Cat
 {
@@ -30,7 +29,7 @@ namespace LancerRemix.Cat
 
             On.RoomSettings.ctor_Room_string_Region_bool_bool_Timeline_RainWorldGame += LancerRoomSettings;
             On.Region.GetRegionFullName += LancerRegionFullName;
-            On.WorldLoader.ctor_RainWorldGame_Name_bool_string_Region_SetupValues += LancerWorldLoader;
+            On.WorldLoader.ctor_RainWorldGame_Name_Timeline_bool_string_Region_SetupValues += LancerWorldLoader;
             On.DeathPersistentSaveData.CanUseUnlockedGates += LonkNoUnlockGate;
             On.Region.ctor_string_int_int_Timeline += LancerGetBasisRegion;
             On.Region.LoadAllRegions_Timeline += LoadAllLancerRegion;
@@ -400,14 +399,16 @@ namespace LancerRemix.Cat
         private static void LancerRoomSettings(On.RoomSettings.orig_ctor_Room_string_Region_bool_bool_Timeline_RainWorldGame orig,
             RoomSettings self, Room room, string name, Region region, bool template, bool firstTemplate, SlugTime timelinePoint, RainWorldGame game)
         {
-            if (timelinePoint != null)
+            if (IsStoryLancer && game != null)
             {
-                var story = GetStoryBasisForLancer(new SlugName(timelinePoint.value, false));
+                var story = GetStoryBasisForLancer(game.StoryCharacter);
                 timelinePoint = SlugcatStats.SlugcatToTimeline(story);
 
                 // LonkInvSLRoomSettings
-                if (ModManager.MSC && SLOracleModify.IsMoonComatose(story) && region.name == "SL")
+                if (ModManager.MSC && SLOracleModify.IsMoonComatose(GetLancer(game.StoryCharacter)) && region.name == "SL")
                     timelinePoint = SlugTime.Sofanthiel;
+
+                //Debug.Log($"LancerRoomSettings: {game.StoryCharacter} {game.TimelinePoint} > {timelinePoint} ({SLOracleModify.IsMoonComatose(story)})");
             }
 
             orig(self, room, name, region, template, firstTemplate, timelinePoint, game);
@@ -420,12 +421,15 @@ namespace LancerRemix.Cat
             return orig(regionAcro, slugcatIndex);
         }
 
-        private static void LancerWorldLoader(On.WorldLoader.orig_ctor_RainWorldGame_Name_bool_string_Region_SetupValues orig, WorldLoader self,
-            RainWorldGame game, SlugName playerCharacter, bool singleRoomWorld, string worldName, Region region, RainWorldGame.SetupValues setupValues)
+        private static void LancerWorldLoader(On.WorldLoader.orig_ctor_RainWorldGame_Name_Timeline_bool_string_Region_SetupValues orig, WorldLoader self,
+            RainWorldGame game, SlugName playerCharacter, SlugTime timelinePosition, bool singleRoomWorld, string worldName, Region region, RainWorldGame.SetupValues setupValues)
         {
             if (singleRoomWorld) goto Init;
+            Debug.Log($"LancerWorldLoader: {playerCharacter} {timelinePosition} > {GetStoryBasisForLancer(playerCharacter)}");
             playerCharacter = GetStoryBasisForLancer(playerCharacter);
-        Init: orig(self, game, playerCharacter, singleRoomWorld, worldName, region, setupValues);
+            timelinePosition = SlugcatStats.SlugcatToTimeline(playerCharacter);
+
+        Init: orig(self, game, playerCharacter, timelinePosition, singleRoomWorld, worldName, region, setupValues);
         }
 
         private static bool LonkNoUnlockGate(On.DeathPersistentSaveData.orig_CanUseUnlockedGates orig, DeathPersistentSaveData self, SlugName slugcat)

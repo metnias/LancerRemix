@@ -3,6 +3,7 @@ using DreamID = DreamsState.DreamID;
 using MenuSceneID = Menu.MenuScene.SceneID;
 using MSCName = MoreSlugcats.MoreSlugcatsEnums.SlugcatStatsName;
 using SlugName = SlugcatStats.Name;
+using SlugTime = SlugcatStats.Timeline;
 
 namespace LancerRemix
 {
@@ -52,6 +53,7 @@ namespace LancerRemix
         private static readonly Dictionary<SlugName, SlugName> NameBasis = new Dictionary<SlugName, SlugName>();
         internal static readonly HashSet<SlugName> AllLancer = new HashSet<SlugName>();
         private static readonly HashSet<SlugName> AllBasis = new HashSet<SlugName>();
+        internal static readonly Dictionary<SlugName, SlugTime> LancerTimes = new Dictionary<SlugName, SlugTime>();
 
         public static bool IsLancer(SlugName name) => AllLancer.Contains(name);
 
@@ -114,6 +116,7 @@ namespace LancerRemix
             NameBasis.Clear();
             AllLancer.Clear();
             AllBasis.Clear();
+            LancerTimes.Clear();
         }
 
         private static int slugNameVersion = -1;
