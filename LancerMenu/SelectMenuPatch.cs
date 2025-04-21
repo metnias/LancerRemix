@@ -534,7 +534,17 @@ namespace LancerRemix.LancerMenu
             }
             else if (ModManager.Watcher && basis == WatcherEnums.SlugcatStatsName.Watcher)
             {
-                // TODO: REPLACE
+#if LATCHER
+                if ((page.menu as SlugcatSelectMenu).SlugcatUnlocked(page.slugcatNumber))
+                {
+                    ReplaceIllust(page.slugcatImage, $"scenes{Path.DirectorySeparatorChar}slugcat - lancer",
+                        "lancer - red - flat", "red slugcat - 1", "red lancer - 1", new Vector2(462f, 225f));
+                    MoveGlow("red lancer - 1");
+                }
+                else
+#endif
+                ReplaceIllust(page.slugcatImage, $"scenes{Path.DirectorySeparatorChar}slugcat - lancer",
+                "Lancer - Watcher Dark - Flat", "Watcher Slugcat - 5 - Dark", "Watcher Lancer - 5 - Dark", new Vector2(577f, 100f), MenuDepthIllustration.MenuShader.Basic);
             }
 
             void UpdateEffectColor()
