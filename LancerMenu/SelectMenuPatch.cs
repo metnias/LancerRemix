@@ -534,17 +534,15 @@ namespace LancerRemix.LancerMenu
             }
             else if (ModManager.Watcher && basis == WatcherEnums.SlugcatStatsName.Watcher)
             {
-#if LATCHER
                 if ((page.menu as SlugcatSelectMenu).SlugcatUnlocked(page.slugcatNumber))
                 {
                     ReplaceIllust(page.slugcatImage, $"scenes{Path.DirectorySeparatorChar}slugcat - lancer",
-                        "lancer - red - flat", "red slugcat - 1", "red lancer - 1", new Vector2(462f, 225f));
+                        "Lancer - Watcher - Flat", "Watcher Slugcat - 5", "Watcher Lancer - 5", new Vector2(577f, 100f));
                     MoveGlow("red lancer - 1");
                 }
                 else
-#endif
-                ReplaceIllust(page.slugcatImage, $"scenes{Path.DirectorySeparatorChar}slugcat - lancer",
-                "Lancer - Watcher Dark - Flat", "Watcher Slugcat - 5 - Dark", "Watcher Lancer - 5 - Dark", new Vector2(577f, 100f), MenuDepthIllustration.MenuShader.Basic);
+                    ReplaceIllust(page.slugcatImage, $"scenes{Path.DirectorySeparatorChar}slugcat - lancer",
+                    "Lancer - Watcher Dark - Flat", "Watcher Slugcat - 5 - Dark", "Watcher Lancer - 5 - Dark", new Vector2(577f, 100f), MenuDepthIllustration.MenuShader.Basic);
             }
 
             void UpdateEffectColor()
@@ -702,14 +700,14 @@ namespace LancerRemix.LancerMenu
                 {
                     bool isMSCLocked = ModManager.MSC && SlugcatStats.IsSlugcatFromMSC(basisNumber) &&
                         (!LancerPlugin.MSCLANCERS || !LancerGenerator.HasCustomLancer(basisNumber.value, out var _));
-                    bool isWatcherLocked = ModManager.Watcher && basisNumber == WatcherEnums.SlugcatStatsName.Watcher;
-#if LATCHER
-                    if (ModManager.Watcher) isWatcherLocked &= !SlugcatStats.SlugcatUnlocked(WatcherEnums.SlugcatStatsName.Watcher, menu.manager.rainWorld);
-#endif
-                    if (isMSCLocked || isWatcherLocked)
+                    if (isMSCLocked)
                     {
                         diff = "???";
                         info = menu.Translate("To be released...");
+                    }
+                    else if (ModManager.Watcher && basisNumber == WatcherEnums.SlugcatStatsName.Watcher)
+                    {
+                        info = menu.Translate("Clear the game as Survivor or Monk to unlock.");
                     }
                 }
                 info = Custom.ReplaceLineDelimeters(info);
