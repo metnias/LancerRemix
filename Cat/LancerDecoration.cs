@@ -19,6 +19,9 @@ namespace LancerRemix.Cat
         {
         }
 
+        private bool IsLatcher
+            => ModManager.Watcher && GetBasis(player.SlugCatClass) == WatcherEnums.SlugcatStatsName.Watcher;
+
         public override void InitiateSprites(On.PlayerGraphics.orig_InitiateSprites orig, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam)
         {
             base.InitiateSprites(orig, sLeaser, rCam);
@@ -49,6 +52,22 @@ namespace LancerRemix.Cat
         {
             base.DrawSprites(orig, sLeaser, rCam, timeStacker, camPos);
             DrawHorn(sLeaser, timeStacker, camPos);
+            if (IsLatcher)
+            {
+                var eyeColor = Color.Lerp(new Color(1f, 1f, 1f), rCam.currentPalette.blackColor, 0.3f);
+                if (self.useJollyColor)
+                    eyeColor = PlayerGraphics.JollyColor(player.playerState.playerNumber, 1);
+                if (PlayerGraphics.CustomColorsEnabled())
+                    eyeColor = PlayerGraphics.CustomColorSafety(1);
+                if (self.malnourished > 0f)
+                {
+                    float malnourished = player.Malnourished ? self.malnourished : Mathf.Max(0f, self.malnourished - 0.005f);
+                    eyeColor = Color.Lerp(eyeColor, Color.Lerp(Color.white, rCam.currentPalette.fogColor, 0.5f), 0.2f * malnourished * malnourished);
+                }
+                eyeColor = Color.Lerp(eyeColor, Color.white, player.camoProgress);
+
+                sLeaser.sprites[9].color = eyeColor;
+            }
         }
 
         protected virtual void DrawHorn(RoomCamera.SpriteLeaser sLeaser, float timeStacker, Vector2 camPos)
