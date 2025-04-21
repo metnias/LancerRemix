@@ -6,6 +6,7 @@ using MonoMod.RuntimeDetour;
 using RWCustom;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using UnityEngine;
@@ -38,6 +39,7 @@ namespace LancerRemix.Cat
             On.Player.SetMalnourished += LancerSetMalnourished;
             On.Player.TerrainImpact += LancerTerrainImpact;
 
+            On.PlayerGraphics.ctor += GrafCtor;
             On.PlayerGraphics.InitiateSprites += GrafInitSprite;
             On.PlayerGraphics.AddToContainer += GrafAddToContainer;
             On.PlayerGraphics.Update += GrafUpdate;
@@ -50,10 +52,10 @@ namespace LancerRemix.Cat
                 typeof(PlayerGraphics).GetProperty(nameof(PlayerGraphics.CharacterForColor), BindingFlags.Instance | BindingFlags.Public).GetGetMethod(),
                 typeof(ModifyCat).GetMethod(nameof(ModifyCat.LancerForColor), BindingFlags.Static | BindingFlags.NonPublic)
             );
-            /*var renderAsPup = new Hook(
+            var renderAsPup = new Hook(
                 typeof(PlayerGraphics).GetProperty(nameof(PlayerGraphics.RenderAsPup), BindingFlags.Instance | BindingFlags.Public).GetGetMethod(),
                 typeof(ModifyCat).GetMethod(nameof(ModifyCat.RenderAsLancer), BindingFlags.Static | BindingFlags.NonPublic)
-            );*/
+            );
             On.PlayerGraphics.DefaultSlugcatColor += DefaultLancerColor;
 
             SwapSave.SubPatch();
@@ -338,6 +340,30 @@ namespace LancerRemix.Cat
 
         #region CatDeco
 
+        private static void GrafCtor(On.PlayerGraphics.orig_ctor orig, PlayerGraphics self, PhysicalObject ow)
+        {
+            orig(self, ow);
+            if (IsPlayerLancer(self))
+            {
+                var bodyParts = self.bodyParts.ToList();
+                bodyParts.Remove(self.tail[0]);
+                bodyParts.Remove(self.tail[1]);
+                bodyParts.Remove(self.tail[2]);
+                bodyParts.Remove(self.tail[3]);
+
+                self.tail = new TailSegment[4];
+                self.tail[0] = new TailSegment(self, 6f, 2f, null, 0.85f, 1f, 1f, true);
+                self.tail[1] = new TailSegment(self, 4f, 3.5f, self.tail[0], 0.85f, 1f, 0.5f, true);
+                self.tail[2] = new TailSegment(self, 2.5f, 3.5f, self.tail[1], 0.85f, 1f, 0.5f, true);
+                self.tail[3] = new TailSegment(self, 1f, 3.5f, self.tail[2], 0.85f, 1f, 0.5f, true);
+
+                bodyParts.Add(self.tail[0]);
+                bodyParts.Add(self.tail[1]);
+                bodyParts.Add(self.tail[2]);
+                bodyParts.Add(self.tail[3]);
+            }
+        }
+
         private static void GrafInitSprite(On.PlayerGraphics.orig_InitiateSprites orig, PlayerGraphics self, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam)
         {
             orig(self, sLeaser, rCam);
@@ -400,15 +426,13 @@ namespace LancerRemix.Cat
             return res;
         }
 
-        /*
         private delegate bool orig_RenderAsPup(PlayerGraphics self);
 
         private static bool RenderAsLancer(orig_RenderAsPup orig, PlayerGraphics self)
         {
-            if (IsLancer(self)) return true;
+            if (IsPlayerLancer(self)) return true;
             return orig(self);
         }
-        */
 
         #endregion Properties
 

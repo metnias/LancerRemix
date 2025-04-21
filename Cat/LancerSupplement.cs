@@ -23,7 +23,8 @@ namespace LancerRemix.Cat
         /// </summary>
         public LancerSupplement(Player player) : base(player)
         {
-            player.playerState.isPup = true;
+            //player.playerState.isPup = true;
+            player.setPupStatus(true);
             isLonk = LancerEnums.GetBasis(player.SlugCatClass) == SlugcatStats.Name.Yellow;
             removeStun = !isLonk;
             UpdateHasExhaustion();
