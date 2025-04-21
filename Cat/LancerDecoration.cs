@@ -13,14 +13,14 @@ namespace LancerRemix.Cat
     {
         public LancerDecoration(Player player) : base(player)
         {
+            isLatcher = ModManager.Watcher && GetBasis(player.SlugCatClass) == WatcherEnums.SlugcatStatsName.Watcher;
         }
 
         public LancerDecoration() : base()
         {
         }
 
-        private bool IsLatcher
-            => ModManager.Watcher && GetBasis(player.SlugCatClass) == WatcherEnums.SlugcatStatsName.Watcher;
+        private readonly bool isLatcher = false;
 
         public override void InitiateSprites(On.PlayerGraphics.orig_InitiateSprites orig, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam)
         {
@@ -52,7 +52,7 @@ namespace LancerRemix.Cat
         {
             base.DrawSprites(orig, sLeaser, rCam, timeStacker, camPos);
             DrawHorn(sLeaser, timeStacker, camPos);
-            if (IsLatcher)
+            if (isLatcher)
             {
                 var eyeColor = Color.Lerp(new Color(1f, 1f, 1f), rCam.currentPalette.blackColor, 0.3f);
                 if (self.useJollyColor)
