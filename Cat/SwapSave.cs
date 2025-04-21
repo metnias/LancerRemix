@@ -383,12 +383,15 @@ namespace LancerRemix.Cat
         private static void LancerRoomSettings(On.RoomSettings.orig_ctor_Room_string_Region_bool_bool_Timeline_RainWorldGame orig,
             RoomSettings self, Room room, string name, Region region, bool template, bool firstTemplate, SlugTime timelinePoint, RainWorldGame game)
         {
-            var story = GetStoryBasisForLancer(new SlugName(timelinePoint.value, false));
-            timelinePoint = SlugcatStats.SlugcatToTimeline(story);
+            if (timelinePoint != null)
+            {
+                var story = GetStoryBasisForLancer(new SlugName(timelinePoint.value, false));
+                timelinePoint = SlugcatStats.SlugcatToTimeline(story);
 
-            // LonkInvSLRoomSettings
-            if (ModManager.MSC && SLOracleModify.IsMoonComatose(story) && region.name == "SL")
-                timelinePoint = SlugTime.Sofanthiel;
+                // LonkInvSLRoomSettings
+                if (ModManager.MSC && SLOracleModify.IsMoonComatose(story) && region.name == "SL")
+                    timelinePoint = SlugTime.Sofanthiel;
+            }
 
             orig(self, room, name, region, template, firstTemplate, timelinePoint, game);
         }

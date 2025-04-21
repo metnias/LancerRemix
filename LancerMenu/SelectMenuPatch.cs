@@ -18,6 +18,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
+using Watcher;
 using static LancerRemix.LancerEnums;
 using static Menu.SlugcatSelectMenu;
 using SceneID = Menu.MenuScene.SceneID;
@@ -515,6 +516,10 @@ namespace LancerRemix.LancerMenu
                 if (page.markSquare != null) { page.markSquare.RemoveFromContainer(); page.markSquare = null; }
                 if (page.markGlow != null) { page.markGlow.RemoveFromContainer(); page.markGlow = null; }
             }
+            else if (ModManager.Watcher && basis == WatcherEnums.SlugcatStatsName.Watcher)
+            {
+                // TODO: REPLACE
+            }
 
             void UpdateEffectColor()
             {
@@ -554,6 +559,10 @@ namespace LancerRemix.LancerMenu
                         else res = SceneID.Slugcat_Red;
                     }
                     else if (ModManager.MSC && SlugcatStats.IsSlugcatFromMSC(basis))
+                    {
+                        // TODO: fill this
+                    }
+                    else if (ModManager.Watcher && basis == WatcherEnums.SlugcatStatsName.Watcher)
                     {
                         // TODO: fill this
                     }
@@ -665,8 +674,13 @@ namespace LancerRemix.LancerMenu
                 }
                 if (!(menu as SlugcatSelectMenu).SlugcatUnlocked(slugcatNumber))
                 {
-                    if (ModManager.MSC && SlugcatStats.IsSlugcatFromMSC(basisNumber) &&
-                        (!LancerPlugin.MSCLANCERS || !LancerGenerator.HasCustomLancer(basisNumber.value, out var _)))
+                    bool isMSCLocked = ModManager.MSC && SlugcatStats.IsSlugcatFromMSC(basisNumber) &&
+                        (!LancerPlugin.MSCLANCERS || !LancerGenerator.HasCustomLancer(basisNumber.value, out var _));
+                    bool isWatcherLocked = ModManager.Watcher && basisNumber == WatcherEnums.SlugcatStatsName.Watcher;
+#if LATCHER
+                    isWatcherLocked = false;
+#endif
+                    if (isMSCLocked || isWatcherLocked)
                     {
                         diff = "???";
                         info = menu.Translate("To be released...");

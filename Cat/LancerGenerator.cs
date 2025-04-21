@@ -4,6 +4,7 @@ using Menu;
 using RWCustom;
 using SlugBase;
 using System.Collections.Generic;
+using Watcher;
 using static LancerRemix.LancerEnums;
 using SlugName = SlugcatStats.Name;
 using SlugTime = SlugcatStats.Timeline;
@@ -33,6 +34,9 @@ namespace LancerRemix
             {
                 i = GetBasis(i);
                 if (SlugcatStats.IsSlugcatFromMSC(i)) return LancerPlugin.MSCLANCERS && HasCustomLancer(i.value, out var _);
+#if !LATCHER
+                if (ModManager.Watcher && i == WatcherEnums.SlugcatStatsName.Watcher) return false;
+#endif
             }
             return orig(i, rainWorld);
         }
@@ -102,6 +106,8 @@ namespace LancerRemix
             if (basis == SlugName.White || basis == SlugName.Yellow || basis == SlugName.Red || basis == SlugName.Night)
                 lancer = RegisterVanillaLancer(basis);
             else if (SlugcatStats.IsSlugcatFromMSC(basis) && !HasCustomLancer(basis.value, out var _))
+                lancer = RegisterVanillaLancer(basis);
+            else if (ModManager.Watcher && basis == Watcher.WatcherEnums.SlugcatStatsName.Watcher)
                 lancer = RegisterVanillaLancer(basis);
 
             if (SlugBaseCharacter.TryGet(basis, out var _))
@@ -312,6 +318,10 @@ namespace LancerRemix
                 {
                     timeline.AddAfter(node, LancerTimes[GetLancer(SlugName.Red).value]);
                     timeline.AddBefore(node, LancerTimes[GetLancer(SlugName.Yellow).value]);
+                }
+                else if (ModManager.Watcher && node.Value == SlugTime.Watcher)
+                {
+                    timeline.AddAfter(node, LancerTimes[GetLancer(WatcherEnums.SlugcatStatsName.Watcher).value]);
                 }
             }
 
