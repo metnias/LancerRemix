@@ -115,10 +115,10 @@ namespace LancerRemix.Story
         }
 
         private static void LunterDaddyTentacleCtor(On.DaddyTentacle.orig_ctor orig, DaddyTentacle self,
-            DaddyLongLegs daddy, BodyChunk chunk, float length, int tentacleNumber, Vector2 tentacleDir)
+            DaddyLongLegs daddy, DaddyLongLegs.IHaveRotParts rotOwner, BodyChunk chunk, float length, int tentacleNumber, Vector2 tentacleDir)
         {
             if (IsLunter(daddy)) length *= 0.7f;
-            orig(self, daddy, chunk, length, tentacleNumber, tentacleDir);
+            orig(self, daddy, rotOwner, chunk, length, tentacleNumber, tentacleDir);
         }
 
         private static void LunterDaddyDie(On.DaddyLongLegs.orig_Die orig, DaddyLongLegs self)
@@ -231,7 +231,7 @@ namespace LancerRemix.Story
         private static void LunterTubeApplyPalette(On.DaddyGraphics.DaddyTubeGraphic.orig_ApplyPalette orig, DaddyTubeGraphic self,
             RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, RoomPalette palette)
         {
-            if (IsLunter(self.owner.daddy))
+            if (self.owner.owner is DaddyLongLegs dll && IsLunter(dll))
             {
                 Color color = Color.Lerp(LunterColor, Color.gray, 0.4f);
                 for (int i = 0; i < (sLeaser.sprites[self.firstSprite] as TriangleMesh).vertices.Length; i++)
@@ -257,7 +257,7 @@ namespace LancerRemix.Story
         private static void LunterTubeDangleApplyPalette(On.DaddyGraphics.DaddyDangleTube.orig_ApplyPalette orig, DaddyDangleTube self,
             RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, RoomPalette palette)
         {
-            if (IsLunter(self.owner.daddy))
+            if (self.owner.owner is DaddyLongLegs dll && IsLunter(dll))
             {
                 Color color = Color.Lerp(LunterColor, Color.gray, 0.4f);
                 for (int i = 0; i < (sLeaser.sprites[self.firstSprite] as TriangleMesh).vertices.Length; i++)
@@ -278,7 +278,7 @@ namespace LancerRemix.Story
         private static void LunterDeadLegApplyPalette(On.DaddyGraphics.DaddyDeadLeg.orig_ApplyPalette orig, DaddyDeadLeg self,
             RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, RoomPalette palette)
         {
-            if (IsLunter(self.owner.daddy))
+            if (self.owner.owner is DaddyLongLegs dll && IsLunter(dll))
             {
                 Color color = Color.Lerp(LunterColor, Color.gray, 0.4f);
                 for (int i = 0; i < (sLeaser.sprites[self.firstSprite] as TriangleMesh).vertices.Length; i++)

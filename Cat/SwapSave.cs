@@ -1,11 +1,14 @@
-﻿using Menu;
+﻿using LancerRemix.Story;
+using Menu;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using MoreSlugcats;
 using System;
 using static CatSub.Story.SaveManager;
+using static CatSub.Story.StoryRegistry;
 using static LancerRemix.LancerEnums;
 using SlugName = SlugcatStats.Name;
+using SlugTime = SlugcatStats.Timeline;
 
 namespace LancerRemix.Cat
 {
@@ -24,12 +27,12 @@ namespace LancerRemix.Cat
             //On.PlayerProgression.LoadGameState += LoadLancerStateInstead;
             IL.PlayerProgression.LoadGameState += LoadLancerState;
 
-            On.RoomSettings.ctor += LancerRoomSettings;
+            On.RoomSettings.ctor_Room_string_Region_bool_bool_Timeline_RainWorldGame += LancerRoomSettings;
             On.Region.GetRegionFullName += LancerRegionFullName;
             On.WorldLoader.ctor_RainWorldGame_Name_bool_string_Region_SetupValues += LancerWorldLoader;
             On.DeathPersistentSaveData.CanUseUnlockedGates += LonkNoUnlockGate;
-            On.Region.ctor += LancerGetBasisRegion;
-            On.Region.LoadAllRegions += LoadAllLancerRegion;
+            On.Region.ctor_string_int_int_Timeline += LancerGetBasisRegion;
+            On.Region.LoadAllRegions_Timeline += LoadAllLancerRegion;
             On.PlayerProgression.MiscProgressionData.updateConditionalShelters += UpdateConditionalLancerShelters;
         }
 
@@ -371,15 +374,23 @@ namespace LancerRemix.Cat
         private static SlugName GetStoryBasisForLancer(SlugName storyIndex)
         {
             if (storyIndex == null) return null;
-            if ((IsLancer(storyIndex) || IsStoryLancer) && !LancerGenerator.IsCustomLancer(GetLancer(storyIndex)))
-                return LancerGenerator.GetStoryBasisForLancer(storyIndex);
+            var slugName = new SlugName(storyIndex.value, false);
+            if ((IsLancer(slugName) || IsStoryLancer) && !LancerGenerator.IsCustomLancer(GetLancer(slugName)))
+                return LancerGenerator.GetStoryBasisForLancer(slugName);
             return storyIndex; // Not lancer or is custom
         }
 
-        private static void LancerRoomSettings(On.RoomSettings.orig_ctor orig, RoomSettings self, string name, Region region, bool template, bool firstTemplate, SlugName playerChar)
+        private static void LancerRoomSettings(On.RoomSettings.orig_ctor_Room_string_Region_bool_bool_Timeline_RainWorldGame orig,
+            RoomSettings self, Room room, string name, Region region, bool template, bool firstTemplate, SlugTime timelinePoint, RainWorldGame game)
         {
-            playerChar = GetStoryBasisForLancer(playerChar);
-            orig(self, name, region, template, firstTemplate, playerChar);
+            var story = GetStoryBasisForLancer(new SlugName(timelinePoint.value, false));
+            timelinePoint = SlugcatStats.SlugcatToTimeline(story);
+
+            // LonkInvSLRoomSettings
+            if (ModManager.MSC && SLOracleModify.IsMoonComatose(story) && region.name == "SL")
+                timelinePoint = SlugTime.Sofanthiel;
+
+            orig(self, room, name, region, template, firstTemplate, timelinePoint, game);
         }
 
         private static string LancerRegionFullName(On.Region.orig_GetRegionFullName orig, string regionAcro, SlugName slugcatIndex)
@@ -403,16 +414,18 @@ namespace LancerRemix.Cat
             return orig(self, slugcat);
         }
 
-        private static void LancerGetBasisRegion(On.Region.orig_ctor orig, Region self, string name, int firstRoomIndex, int regionNumber, SlugName storyIndex)
+        private static void LancerGetBasisRegion(On.Region.orig_ctor_string_int_int_Timeline orig, Region self, string name, int firstRoomIndex, int regionNumber, SlugTime timelineIndex)
         {
-            storyIndex = GetStoryBasisForLancer(storyIndex);
-            orig(self, name, firstRoomIndex, regionNumber, storyIndex);
+            var story = GetStoryBasisForLancer(new SlugName(timelineIndex.value, false));
+            timelineIndex = SlugcatStats.SlugcatToTimeline(story);
+            orig(self, name, firstRoomIndex, regionNumber, timelineIndex);
         }
 
-        private static Region[] LoadAllLancerRegion(On.Region.orig_LoadAllRegions orig, SlugName storyIndex)
+        private static Region[] LoadAllLancerRegion(On.Region.orig_LoadAllRegions_Timeline orig, SlugTime timelineIndex)
         {
-            storyIndex = GetStoryBasisForLancer(storyIndex);
-            return orig(storyIndex);
+            var story = GetStoryBasisForLancer(new SlugName(timelineIndex.value, false));
+            timelineIndex = SlugcatStats.SlugcatToTimeline(story);
+            return orig(timelineIndex);
         }
 
         private static void UpdateConditionalLancerShelters(On.PlayerProgression.MiscProgressionData.orig_updateConditionalShelters orig,

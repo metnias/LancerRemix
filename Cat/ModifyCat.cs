@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using UnityEngine;
+using Watcher;
 using static LancerRemix.LancerEnums;
 using SlugName = SlugcatStats.Name;
 
@@ -428,7 +429,8 @@ namespace LancerRemix.Cat
                 { SlugName.White, new Color(0.8f, 1.0f, 0.5f) },
                 { SlugName.Yellow, new Color(1.0f, 0.9f, 0.4f) },
                 { SlugName.Red, new Color(0.3f, 0.5f, 1.0f) },
-                { SlugName.Night, new Color(0.8f, 0.1f, 0.3f) }
+                { SlugName.Night, new Color(0.8f, 0.1f, 0.3f) },
+                { WatcherEnums.SlugcatStatsName.Watcher, new Color(0.8f, 0.1f, 0.3f) }
             };
 
         #endregion PlayerGraphics

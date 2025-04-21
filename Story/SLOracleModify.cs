@@ -511,7 +511,7 @@ namespace LancerRemix.Story
 
         #region Lonk
 
-        private static bool IsMoonComatose(SlugName storyCharacter)
+        internal static bool IsMoonComatose(SlugName storyCharacter)
             => IsStoryLancer && IsTimelineInbetween(GetLancer(storyCharacter), ModManager.MSC ? MSCName.Spear : null, SlugName.Red);
 
         private static Vector2 LonkSLOracleArmDir(On.Oracle.OracleArm.orig_BaseDir orig, Oracle.OracleArm self, float timeStacker)
@@ -526,13 +526,6 @@ namespace LancerRemix.Story
             if (self.oracle.room.game.IsStorySession && IsMoonComatose(self.oracle.room.game.StoryCharacter) && self.oracle.ID == Oracle.OracleID.SL)
                 return new Vector2(1670f, 605f);
             return orig(self, timeStacker);
-        }
-
-        internal static void LonkInvSLRoomSettings(On.RoomSettings.orig_ctor orig, RoomSettings self,
-            string name, Region region, bool template, bool firstTemplate, SlugName playerChar)
-        {
-            if (ModManager.MSC && IsMoonComatose(playerChar) && region.name == "SL") playerChar = MSCName.Sofanthiel;
-            orig(self, name, region, template, firstTemplate, playerChar);
         }
 
         #endregion Lonk

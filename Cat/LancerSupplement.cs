@@ -65,7 +65,7 @@ namespace LancerRemix.Cat
             return -1;
         }
 
-        public override string TargetSubVersion => "1.0";
+        public override string TargetSubVersion => "1.1";
 
         protected float aerobicCache;
 

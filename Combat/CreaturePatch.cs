@@ -296,7 +296,7 @@ namespace LancerRemix.Combat
             orig(self, sLeaser, rCam, timeStacker, camPos);
         }
 
-        private static int ScavHornMaskNoWeapon(On.ScavengerAI.orig_WeaponScore orig, ScavengerAI self, PhysicalObject obj, bool pickupDropInsteadOfWeaponSelection)
+        private static int ScavHornMaskNoWeapon(On.ScavengerAI.orig_WeaponScore orig, ScavengerAI self, PhysicalObject obj, bool pickupDropInsteadOfWeaponSelection, bool reallyWantsSpear)
         {
             if (ModManager.MMF && !MMF.cfgHunterBackspearProtect.Value) goto NoProtect;
             if (obj is VultureMask mask)
@@ -305,7 +305,7 @@ namespace LancerRemix.Combat
                     if (stick is MaskOnHorn.AbstractOnHornStick) return 0;
             }
         NoProtect:
-            return orig.Invoke(self, obj, pickupDropInsteadOfWeaponSelection);
+            return orig.Invoke(self, obj, pickupDropInsteadOfWeaponSelection, reallyWantsSpear);
         }
 
         private static int ScavHornMaskNoCollect(On.ScavengerAI.orig_CollectScore_PhysicalObject_bool orig, ScavengerAI self, PhysicalObject obj, bool weaponFiltered)

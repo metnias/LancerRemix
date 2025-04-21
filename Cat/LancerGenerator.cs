@@ -1,5 +1,4 @@
-﻿using CatSub.Story;
-using LancerRemix.Cat;
+﻿using LancerRemix.Cat;
 using LancerRemix.LancerMenu;
 using Menu;
 using RWCustom;
@@ -7,6 +6,7 @@ using SlugBase;
 using System.Collections.Generic;
 using static LancerRemix.LancerEnums;
 using SlugName = SlugcatStats.Name;
+using SlugTime = SlugcatStats.Timeline;
 
 namespace LancerRemix
 {
@@ -20,6 +20,9 @@ namespace LancerRemix
             On.SlugcatStats.NourishmentOfObjectEaten += LancerNourishmentOfObjectEaten;
             On.Menu.MenuScene.UseSlugcatUnlocked += UseLancerUnlocked;
             On.SlugcatStats.HiddenOrUnplayableSlugcat += DisableLancerRegularSelect;
+
+            On.SlugcatStats.SlugcatTimelineOrder += AppendLancerTimelineOrder;
+            On.SlugcatStats.SlugcatToTimeline += LancerToTimeline;
         }
 
         private static bool IsStoryLancer => ModifyCat.IsStoryLancer;
@@ -142,7 +145,11 @@ namespace LancerRemix
 
         internal static void DeleteLancer(SlugName lancer)
         {
-            StoryRegistry.UnregisterTimeline(lancer);
+            if (LancerTimes.TryGetValue(lancer.value, out var lancerTime))
+            {
+                LancerTimes.Remove(lancer.value);
+                lancerTime?.Unregister();
+            }
             if (SlugBaseCharacter.Registry.TryGet(lancer, out var _))
                 SlugBaseCharacter.Registry.Remove(lancer);
             lancerModifiers.Remove(GetBasis(lancer));
@@ -154,10 +161,14 @@ namespace LancerRemix
         private static SlugName RegisterVanillaLancer(SlugName basis)
         {
             var lancer = new SlugName(GetLancerName(basis.value), true);
-            if (basis == SlugName.Yellow)
-                StoryRegistry.RegisterTimeline(new StoryRegistry.TimelinePointer(lancer, StoryRegistry.TimelinePointer.Relative.Before, SlugName.Red));
-            else
-                StoryRegistry.RegisterTimeline(new StoryRegistry.TimelinePointer(lancer, StoryRegistry.TimelinePointer.Relative.After, basis));
+            var lancerTime = new SlugTime(lancer.value, true);
+            LancerTimes.Add(lancer.value, lancerTime);
+
+            // Moved to AppendLancerTimelineOrder
+            //if (basis == SlugName.Yellow)
+            //    StoryRegistry.RegisterTimeline(new StoryRegistry.TimelinePointer(lancer, StoryRegistry.TimelinePointer.Relative.Before, SlugName.Red));
+            //else
+            //    StoryRegistry.RegisterTimeline(new StoryRegistry.TimelinePointer(lancer, StoryRegistry.TimelinePointer.Relative.After, basis));
             var modifier = new StatModifier
             {
                 lungsFac = 0.6f,
@@ -199,7 +210,9 @@ namespace LancerRemix
         private static SlugName RegisterSlugBaseLancer(SlugName basis)
         {
             var lancer = new SlugName(GetLancerName(basis.value), true);
-            StoryRegistry.RegisterTimeline(new StoryRegistry.TimelinePointer(lancer, StoryRegistry.TimelinePointer.Relative.After, basis));
+            var lancerTime = new SlugTime(lancer.value, true);
+            LancerTimes.Add(lancer.value, lancerTime);
+            //StoryRegistry.RegisterTimeline(new StoryRegistry.TimelinePointer(lancer, StoryRegistry.TimelinePointer.Relative.After, basis));
             var modifier = new StatModifier
             {
                 lungsFac = 1.1f,
@@ -237,22 +250,8 @@ namespace LancerRemix
         internal static SlugName GetStoryBasisForLancer(SlugName lancer)
         {
             var basis = GetBasis(lancer);
-            if (basis == SlugName.Yellow) basis = SlugName.Red;
+            if (basis == SlugName.Yellow) return SlugName.Red;
             return basis;
-        }
-
-        internal static bool IsTimelineInbetween(SlugName check, SlugName leftExclusive, SlugName rightExclusive)
-        {
-            var timeline = SlugcatStats.getSlugcatTimelineOrder();
-            int c = -1, l = -1, r = timeline.Length;
-            for (int i = 0; i < timeline.Length; ++i)
-            {
-                if (timeline[i] == check) c = i;
-                if (timeline[i] == leftExclusive) l = i;
-                if (timeline[i] == rightExclusive) r = i;
-            }
-            //Debug.Log($"Timeline Check: {l}<{c}<{r}");
-            return l < c && c < r;
         }
 
         private static readonly Dictionary<SlugName, StatModifier> lancerModifiers
@@ -276,5 +275,59 @@ namespace LancerRemix
 
             // public int throwingSkill;
         }
+
+        #region TimeLine
+
+        private static readonly Dictionary<string, SlugTime> LancerTimes = new Dictionary<string, SlugTime>();
+
+        internal static bool IsTimelineInbetween(SlugName check, SlugName leftExclusive, SlugName rightExclusive)
+            => IsTimelineInbetween(SlugcatStats.SlugcatToTimeline(check), SlugcatStats.SlugcatToTimeline(leftExclusive), SlugcatStats.SlugcatToTimeline(rightExclusive));
+
+        internal static bool IsTimelineInbetween(SlugTime check, SlugTime leftExclusive, SlugTime rightExclusive)
+        {
+            var timeline = SlugcatStats.SlugcatTimelineOrder();
+            int c = -1, l = -1, r = timeline.Count, i = 0;
+
+            for (LinkedListNode<SlugTime> node = timeline.First; node != null; node = node.Next)
+            {
+                if (node.Value == check) c = i;
+                if (node.Value == leftExclusive) l = i;
+                if (node.Value == rightExclusive) r = i;
+                ++i;
+            }
+            //Debug.Log($"Timeline Check: {l}<{c}<{r}");
+            return l < c && c < r;
+        }
+
+        private static LinkedList<SlugTime> AppendLancerTimelineOrder(On.SlugcatStats.orig_SlugcatTimelineOrder orig)
+        {
+            var timeline = orig();
+            // Only do for vanilla as others will be dealt with SlugBase
+
+            for (LinkedListNode<SlugTime> node = timeline.First; node != null; node = node.Next)
+            {
+                if (node.Value == SlugTime.White)
+                    timeline.AddAfter(node, LancerTimes[GetLancer(SlugName.White).value]);
+                else if (node.Value == SlugTime.Red)
+                {
+                    timeline.AddAfter(node, LancerTimes[GetLancer(SlugName.Red).value]);
+                    timeline.AddBefore(node, LancerTimes[GetLancer(SlugName.Yellow).value]);
+                }
+            }
+
+            return timeline;
+        }
+
+        private static SlugTime LancerToTimeline(On.SlugcatStats.orig_SlugcatToTimeline orig, SlugName slugcat)
+        {
+            if (IsLancer(slugcat))
+            {
+                if (LancerTimes.TryGetValue(slugcat.value, out var slugTime))
+                    return slugTime;
+            }
+            return orig(slugcat);
+        }
+
+        #endregion TimeLine
     }
 }

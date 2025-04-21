@@ -3,6 +3,7 @@ using LancerRemix.LancerMenu;
 using RWCustom;
 using System.Collections.Generic;
 using UnityEngine;
+using Watcher;
 using static LancerRemix.LancerEnums;
 using SlugName = SlugcatStats.Name;
 
@@ -124,7 +125,8 @@ namespace LancerRemix.Cat
                 { SlugName.White, new Color(0.1f, 0.3f, 0.0f) },
                 { SlugName.Yellow, new Color(0.5f, 0.1f, 0.0f) },
                 { SlugName.Red, new Color(0.0f, 0.1f, 0.5f) },
-                { SlugName.Night, new Color(0.1f, 0.5f, 0.3f) }
+                { SlugName.Night, new Color(0.1f, 0.5f, 0.3f) },
+                { WatcherEnums.SlugcatStatsName.Watcher, new Color(0.1f, 0.5f, 0.3f) }
             };
 
         public static IntVector2 HornStat(SlugName basis)

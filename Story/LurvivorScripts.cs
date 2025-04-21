@@ -8,6 +8,7 @@ using System.IO;
 using System.Text.RegularExpressions;
 using UnityEngine;
 using SlugName = SlugcatStats.Name;
+using SlugTime = SlugcatStats.Timeline;
 
 namespace LancerRemix.Story
 {
@@ -24,7 +25,7 @@ namespace LancerRemix.Story
             On.Menu.MenuScene.BuildVanillaAltEnd += BuildLancerOEEnd;
             On.RegionGate.customOEGateRequirements += LancerOEGateRequirements;
             On.RainWorldGame.MoonHasRobe += LancerMoonHasRobe;
-            On.PlayerProgression.MiscProgressionData.SetCloakTimelinePosition += LancerSetCloakTimelinePosition;
+            On.PlayerProgression.MiscProgressionData.orig_SetCloakTimelinePosition_Name += LancerSetCloakTimelinePosition;
         }
 
         internal static void OnMSCDisableSubPatch()
@@ -32,7 +33,7 @@ namespace LancerRemix.Story
             On.Menu.MenuScene.BuildVanillaAltEnd -= BuildLancerOEEnd;
             On.RegionGate.customOEGateRequirements -= LancerOEGateRequirements;
             On.RainWorldGame.MoonHasRobe -= LancerMoonHasRobe;
-            On.PlayerProgression.MiscProgressionData.SetCloakTimelinePosition -= LancerSetCloakTimelinePosition;
+            On.PlayerProgression.MiscProgressionData.orig_SetCloakTimelinePosition_Name -= LancerSetCloakTimelinePosition;
         }
 
         private static bool IsStoryLancer => ModifyCat.IsStoryLancer;
@@ -146,7 +147,7 @@ namespace LancerRemix.Story
                 self.rainWorld.progression.miscProgressionData.CloakTimelinePosition, null);
         }
 
-        private static void LancerSetCloakTimelinePosition(On.PlayerProgression.MiscProgressionData.orig_SetCloakTimelinePosition orig,
+        private static void LancerSetCloakTimelinePosition(On.PlayerProgression.MiscProgressionData.orig_SetCloakTimelinePosition_Name orig,
             PlayerProgression.MiscProgressionData self, SlugName slugcat)
         {
             if (!IsStoryLancer) { orig(self, slugcat); return; }
