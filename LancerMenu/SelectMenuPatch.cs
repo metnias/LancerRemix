@@ -93,6 +93,12 @@ namespace LancerRemix.LancerMenu
             self.UpdateStartButtonText();
             self.UpdateSelectedSlugcatInMiscProg();
 
+            // Add Jolly Warn
+            labelJollyWarn = new MenuLabel(self, self.pages[0], self.Translate("Player 1 is set to non-Lancer by Jolly Co-op").Replace("<LINE>", "\n"), new Vector2(976f, 110f), new Vector2(200f, 60f), false);
+            labelJollyWarn.label.color = new Color(1f, .7f, .7f);
+            self.pages[0].subObjects.Add(labelJollyWarn);
+            labelJollyWarn.label.isVisible = false;
+
             Debug.Log($"CtorEnd slugcatPageLancer{slugcatPageLancer} currentlySelectedSinglePlayerSlugcat{self.manager.rainWorld.progression.miscProgressionData.currentlySelectedSinglePlayerSlugcat}");
 
             int GetBasisOrder(SlugName lancer)
@@ -120,6 +126,7 @@ namespace LancerRemix.LancerMenu
         private static SymbolButtonToggle lancerButton;
         private static float lancerTransition = 0f;
         private static float lastLancerTransition = 0f;
+        private static MenuLabel labelJollyWarn;
         internal static bool SlugcatPageLancer => slugcatPageLancer;
 
         private static bool IsLancerPage(SlugcatPage page)
@@ -134,6 +141,10 @@ namespace LancerRemix.LancerMenu
             lastLancerTransition = lancerTransition;
             lancerTransition = Custom.LerpAndTick(lancerTransition, slugcatPageLancer ? 1f : 0f, 0.07f, 0.03f);
             self.startButton.GetButtonBehavior.greyedOut |= lancerTransition > 0.1f && lancerTransition < 0.9f;
+
+            labelJollyWarn.label.isVisible = slugcatPageLancer && ModManager.JollyCoop && !GetLancerPlayers(0);
+            //if (labelJollyWarn.label.isVisible)
+            //    labelJollyWarn.label.color = Color.Lerp(Color.red, Color.white, Mathf.PingPong(Time.time * 2f, 1f));
         }
 
         private static SlugName LancerFromIndex(On.Menu.SlugcatSelectMenu.orig_colorFromIndex orig, SlugcatSelectMenu self, int index)

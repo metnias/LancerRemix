@@ -23,6 +23,7 @@ Hold <PICK UP> with a mask to hang it onto your horn|가면을 들고 <PICK UP>�
 
 // Jolly
 Player <p_n> will be lancer|플레이어 <p_n>(은)는 랜서
+Player 1 is set to non-Lancer by Jolly Co-op|졸리 협동에서 플레이어 1이<LINE>랜서가 아니게 설정되어 있습니다
 
 // Arena
 Left click to change class, right click to toggle lancer for Player <X>|왼쪽 클릭으로 플레이어 <X> 클래스 변경, 오른쪽 클릭으로 랜서 토글
