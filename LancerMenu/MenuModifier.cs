@@ -3,14 +3,10 @@ using LancerRemix.Story;
 using Menu;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
-using RWCustom;
 using System;
-using System.Globalization;
 using System.IO;
-using System.Text.RegularExpressions;
 using UnityEngine;
 using static LancerRemix.LancerEnums;
-using static System.Net.Mime.MediaTypeNames;
 using MenuSceneID = Menu.MenuScene.SceneID;
 using SlugName = SlugcatStats.Name;
 
@@ -164,6 +160,7 @@ namespace LancerRemix.LancerMenu
             var cursor = new ILCursor(il);
             LancerPlugin.ILhookTry(LancerPlugin.ILhooks.LancerTravelScreen);
 
+            /*
             if (!cursor.TryGotoNext(MoveType.After,
                 z => z.MatchLdcI4(-1),
                 z => z.MatchStloc(1))) return;
@@ -203,6 +200,30 @@ namespace LancerRemix.LancerMenu
             cursor.Emit(OpCodes.Stloc, 1);
 
             #endregion SetNumToLancer
+
+            */
+
+            if (!cursor.TryGotoNext(MoveType.After,
+                z => z.MatchStfld(typeof(FastTravelScreen).GetField(nameof(FastTravelScreen.activeMenuSlugcat))))) return;
+
+            DebugLogCursor();
+
+            #region SetNumToLancer
+
+            cursor.Emit(OpCodes.Ldarg_0);
+            cursor.EmitDelegate<Action<FastTravelScreen>>(
+                (self) =>
+                {
+                    if (!IsStoryLancer) return;
+                    var lancer = GetLancer(self.activeMenuSlugcat);
+                    Debug.Log($"Lancer: Switched FastTravelScreen for {lancer.value}({lancer.Index}) (basis: {self.activeMenuSlugcat})");
+                    self.activeMenuSlugcat = lancer;
+                }
+                );
+
+            #endregion SetNumToLancer
+
+            DebugLogCursor();
 
             LancerPlugin.ILhookOkay(LancerPlugin.ILhooks.LancerTravelScreen);
 

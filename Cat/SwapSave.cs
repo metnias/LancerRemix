@@ -373,7 +373,7 @@ namespace LancerRemix.Cat
 
         private static SlugName GetStoryBasisForLancer(SlugName storyIndex)
         {
-            if (storyIndex == null) return null;
+            if (storyIndex == null) return SlugName.White; // failsafe
             var slugName = new SlugName(storyIndex.value, false);
             if ((IsLancer(slugName) || IsStoryLancer) && !LancerGenerator.IsCustomLancer(GetLancer(slugName)))
                 return LancerGenerator.GetStoryBasisForLancer(slugName);
@@ -398,7 +398,8 @@ namespace LancerRemix.Cat
 
         private static string LancerRegionFullName(On.Region.orig_GetRegionFullName orig, string regionAcro, SlugName slugcatIndex)
         {
-            slugcatIndex = GetStoryBasisForLancer(slugcatIndex);
+            if (slugcatIndex != null)
+                slugcatIndex = GetStoryBasisForLancer(slugcatIndex);
             return orig(regionAcro, slugcatIndex);
         }
 
@@ -419,15 +420,21 @@ namespace LancerRemix.Cat
 
         private static void LancerGetBasisRegion(On.Region.orig_ctor_string_int_int_Timeline orig, Region self, string name, int firstRoomIndex, int regionNumber, SlugTime timelineIndex)
         {
-            var story = GetStoryBasisForLancer(new SlugName(timelineIndex.value, false));
-            timelineIndex = SlugcatStats.SlugcatToTimeline(story);
+            if (timelineIndex != null)
+            {
+                var story = GetStoryBasisForLancer(new SlugName(timelineIndex.value, false));
+                timelineIndex = SlugcatStats.SlugcatToTimeline(story);
+            }
             orig(self, name, firstRoomIndex, regionNumber, timelineIndex);
         }
 
         private static Region[] LoadAllLancerRegion(On.Region.orig_LoadAllRegions_Timeline orig, SlugTime timelineIndex)
         {
-            var story = GetStoryBasisForLancer(new SlugName(timelineIndex.value, false));
-            timelineIndex = SlugcatStats.SlugcatToTimeline(story);
+            if (timelineIndex != null)
+            {
+                var story = GetStoryBasisForLancer(new SlugName(timelineIndex.value, false));
+                timelineIndex = SlugcatStats.SlugcatToTimeline(story);
+            }
             return orig(timelineIndex);
         }
 
