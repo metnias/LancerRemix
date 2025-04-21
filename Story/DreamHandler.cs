@@ -32,14 +32,14 @@ namespace LancerRemix.Story
         {
             LunterScripts.OnMSCEnableSubPatch();
             LurvivorScripts.OnMSCEnableSubPatch();
-            On.RoomSettings.ctor += SLOracleModify.LonkInvSLRoomSettings;
+            //On.RoomSettings.ctor += SLOracleModify.LonkInvSLRoomSettings;
         }
 
         internal static void OnMSCDisablePatch()
         {
             LunterScripts.OnMSCDisableSubPatch();
             LurvivorScripts.OnMSCDisableSubPatch();
-            On.RoomSettings.ctor -= SLOracleModify.LonkInvSLRoomSettings;
+            //On.RoomSettings.ctor -= SLOracleModify.LonkInvSLRoomSettings;
         }
 
         internal const string COORDNULL = "COORDNULL";
@@ -63,14 +63,14 @@ namespace LancerRemix.Story
                 self.dreamsState = null; // no dream state for lancer surv/monk
         }
 
-        private static void WinLancer(On.RainWorldGame.orig_Win orig, RainWorldGame self, bool malnourished)
+        private static void WinLancer(On.RainWorldGame.orig_Win orig, RainWorldGame self, bool malnourished, bool fromWarpPoint)
         {
             if (IsStoryLancer)
             {
                 var state = self.GetStorySession.saveState;
                 if (state.dreamsState != null) LancerCheckEventDream(state);
             }
-            orig(self, malnourished);
+            orig(self, malnourished, fromWarpPoint);
 
             void LancerCheckEventDream(SaveState saveState)
             {

@@ -25,7 +25,7 @@ namespace LancerRemix.Story
             On.Menu.MenuScene.BuildVanillaAltEnd += BuildLancerOEEnd;
             On.RegionGate.customOEGateRequirements += LancerOEGateRequirements;
             On.RainWorldGame.MoonHasRobe += LancerMoonHasRobe;
-            On.PlayerProgression.MiscProgressionData.orig_SetCloakTimelinePosition_Name += LancerSetCloakTimelinePosition;
+            On.PlayerProgression.MiscProgressionData.SetCloakTimelinePosition_Timeline += LancerSetCloakTimelinePosition;
         }
 
         internal static void OnMSCDisableSubPatch()
@@ -33,7 +33,7 @@ namespace LancerRemix.Story
             On.Menu.MenuScene.BuildVanillaAltEnd -= BuildLancerOEEnd;
             On.RegionGate.customOEGateRequirements -= LancerOEGateRequirements;
             On.RainWorldGame.MoonHasRobe -= LancerMoonHasRobe;
-            On.PlayerProgression.MiscProgressionData.orig_SetCloakTimelinePosition_Name -= LancerSetCloakTimelinePosition;
+            On.PlayerProgression.MiscProgressionData.SetCloakTimelinePosition_Timeline -= LancerSetCloakTimelinePosition;
         }
 
         private static bool IsStoryLancer => ModifyCat.IsStoryLancer;
@@ -143,17 +143,18 @@ namespace LancerRemix.Story
             if (!self.IsStorySession) return false;
             if (LancerEnums.GetBasis(self.GetStorySession.saveStateNumber) == SlugName.Yellow) return false;
             if (self.GetStorySession.saveState.miscWorldSaveData.moonGivenRobe) return true;
-            return LancerGenerator.IsTimelineInbetween(LancerEnums.GetLancer(self.GetStorySession.saveStateNumber),
+            return LancerGenerator.IsTimelineInbetween(SlugcatStats.SlugcatToTimeline(LancerEnums.GetLancer(self.GetStorySession.saveStateNumber)),
                 self.rainWorld.progression.miscProgressionData.CloakTimelinePosition, null);
         }
 
-        private static void LancerSetCloakTimelinePosition(On.PlayerProgression.MiscProgressionData.orig_SetCloakTimelinePosition_Name orig,
-            PlayerProgression.MiscProgressionData self, SlugName slugcat)
+        private static void LancerSetCloakTimelinePosition(On.PlayerProgression.MiscProgressionData.orig_SetCloakTimelinePosition_Timeline orig,
+            PlayerProgression.MiscProgressionData self, SlugTime time)
         {
-            if (!IsStoryLancer) { orig(self, slugcat); return; }
-            var lancer = LancerEnums.GetLancer(slugcat);
-            if (self.cloakTimelinePosition == null || self.cloakTimelinePosition.Index < 0) self.cloakTimelinePosition = lancer;
-            else if (LancerGenerator.IsTimelineInbetween(self.cloakTimelinePosition, lancer, null)) self.cloakTimelinePosition = lancer;
+            if (!IsStoryLancer) { orig(self, time); return; }
+            var lancer = LancerEnums.GetLancer(new SlugName(time.value, false));
+            var lancerTime = SlugcatStats.SlugcatToTimeline(lancer);
+            if (self.cloakTimelinePosition == null || self.cloakTimelinePosition.Index < 0) self.cloakTimelinePosition = lancerTime;
+            else if (LancerGenerator.IsTimelineInbetween(self.cloakTimelinePosition, lancerTime, null)) self.cloakTimelinePosition = lancerTime;
         }
 
         #region Lonk
