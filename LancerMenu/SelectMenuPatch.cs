@@ -53,17 +53,20 @@ namespace LancerRemix.LancerMenu
         {
             _lancerInit = false;
             redIsDead = false;
-            //Debug.Log($"CtorStart slugcatPageLancer{slugcatPageLancer} currentlySelectedSinglePlayerSlugcat{manager.rainWorld.progression.miscProgressionData.currentlySelectedSinglePlayerSlugcat}");
-            LoadLancerPlayers(Custom.rainWorld.progression.miscProgressionData);
+            Debug.Log($"CtorStart slugcatPageLancer:{slugcatPageLancer} currentlySelectedSinglePlayerSlugcat:{manager.rainWorld.progression.miscProgressionData.currentlySelectedSinglePlayerSlugcat}");
             bool isSelectedLancer = IsLancer(manager.rainWorld.progression.miscProgressionData.currentlySelectedSinglePlayerSlugcat);
-            ModifyCat.SetIsPlayerLancer(isSelectedLancer, lancerPlayers);
             manager.rainWorld.progression.miscProgressionData.currentlySelectedSinglePlayerSlugcat = GetBasis(manager.rainWorld.progression.miscProgressionData.currentlySelectedSinglePlayerSlugcat);
+            // Reset Lancer State to prevent interfering loading
+            slugcatPageLancer = false;
+            ModifyCat.SetIsPlayerLancer(false, new bool[] { false, false, false, false });
 
             orig(self, manager);
             if (isSelectedLancer || TryGetCurrSlugcatLancer())
             { slugcatPageLancer = true; lancerTransition = 1f; lastLancerTransition = 1f; }
             else
             { slugcatPageLancer = false; lancerTransition = 0f; lastLancerTransition = 0f; }
+            ModifyCat.SetIsPlayerLancer(slugcatPageLancer, lancerPlayers);
+            LoadLancerPlayers(Custom.rainWorld.progression.miscProgressionData);
 
             lancerPages = new SlugcatPage[self.slugcatPages.Count];
             foreach (var lancer in AllLancer)
@@ -99,7 +102,7 @@ namespace LancerRemix.LancerMenu
             self.pages[0].subObjects.Add(labelJollyWarn);
             labelJollyWarn.label.isVisible = false;
 
-            Debug.Log($"CtorEnd slugcatPageLancer{slugcatPageLancer} currentlySelectedSinglePlayerSlugcat{self.manager.rainWorld.progression.miscProgressionData.currentlySelectedSinglePlayerSlugcat}");
+            Debug.Log($"CtorEnd slugcatPageLancer:{slugcatPageLancer} currentlySelectedSinglePlayerSlugcat:{self.manager.rainWorld.progression.miscProgressionData.currentlySelectedSinglePlayerSlugcat}");
 
             int GetBasisOrder(SlugName lancer)
             {
