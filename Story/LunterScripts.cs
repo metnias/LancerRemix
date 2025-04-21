@@ -34,15 +34,16 @@ namespace LancerRemix.Story
             On.DaddyLongLegs.Update += HunterMeetLancerTrigger;
             On.DaddyLongLegs.CheckDaddyConsumption += HunterRecognizeLancer;
             On.DaddyLongLegs.Die += LunterDaddyDie;
-            On.DaddyGraphics.ApplyPalette += LunterDaddyApplyPalette;
+            //On.DaddyGraphics.ApplyPalette += LunterDaddyApplyPalette;
             On.DaddyGraphics.HunterDummy.ctor += LunterDummyCtor;
             On.DaddyGraphics.HunterDummy.InitiateSprites += LunterDummyInitSprites;
             On.DaddyGraphics.HunterDummy.AddToContainer += LunterDummyAddToContainer;
             On.DaddyGraphics.HunterDummy.DrawSprites += LunterDummyDrawSprites;
             On.DaddyGraphics.HunterDummy.ApplyPalette += LunterDummyApplyPalette;
-            On.DaddyGraphics.DaddyTubeGraphic.ApplyPalette += LunterTubeApplyPalette;
-            On.DaddyGraphics.DaddyDangleTube.ApplyPalette += LunterTubeDangleApplyPalette;
-            On.DaddyGraphics.DaddyDeadLeg.ApplyPalette += LunterDeadLegApplyPalette;
+            On.DaddyGraphics.RotBodyColor += LunterRotBodyColor;
+            //On.DaddyGraphics.DaddyTubeGraphic.ApplyPalette += LunterTubeApplyPalette;
+            //On.DaddyGraphics.DaddyDangleTube.ApplyPalette += LunterTubeDangleApplyPalette;
+            //On.DaddyGraphics.DaddyDeadLeg.ApplyPalette += LunterDeadLegApplyPalette;
         }
 
         internal static void OnMSCDisableSubPatch()
@@ -52,15 +53,16 @@ namespace LancerRemix.Story
             On.DaddyLongLegs.Update -= HunterMeetLancerTrigger;
             On.DaddyLongLegs.CheckDaddyConsumption -= HunterRecognizeLancer;
             On.DaddyLongLegs.Die -= LunterDaddyDie;
-            On.DaddyGraphics.ApplyPalette -= LunterDaddyApplyPalette;
+            //On.DaddyGraphics.ApplyPalette -= LunterDaddyApplyPalette;
             On.DaddyGraphics.HunterDummy.ctor -= LunterDummyCtor;
             On.DaddyGraphics.HunterDummy.InitiateSprites -= LunterDummyInitSprites;
             On.DaddyGraphics.HunterDummy.AddToContainer -= LunterDummyAddToContainer;
             On.DaddyGraphics.HunterDummy.DrawSprites -= LunterDummyDrawSprites;
             On.DaddyGraphics.HunterDummy.ApplyPalette -= LunterDummyApplyPalette;
-            On.DaddyGraphics.DaddyTubeGraphic.ApplyPalette -= LunterTubeApplyPalette;
-            On.DaddyGraphics.DaddyDangleTube.ApplyPalette -= LunterTubeDangleApplyPalette;
-            On.DaddyGraphics.DaddyDeadLeg.ApplyPalette -= LunterDeadLegApplyPalette;
+            On.DaddyGraphics.RotBodyColor -= LunterRotBodyColor;
+            //On.DaddyGraphics.DaddyTubeGraphic.ApplyPalette -= LunterTubeApplyPalette;
+            //On.DaddyGraphics.DaddyDangleTube.ApplyPalette -= LunterTubeDangleApplyPalette;
+            //On.DaddyGraphics.DaddyDeadLeg.ApplyPalette -= LunterDeadLegApplyPalette;
         }
 
         internal const string HUNTERMEET = "LancerHunterMeet";
@@ -99,8 +101,8 @@ namespace LancerRemix.Story
             return !(otherObject is Player);
         }
 
-        private static bool IsLunter(DaddyLongLegs self)
-            => self.HDmode && self.abstractCreature.ID.altSeed == LUNTERSEED;
+        private static bool IsLunter(Creature self)
+            => self is DaddyLongLegs dll && dll.HDmode && self.abstractCreature.ID.altSeed == LUNTERSEED;
 
         private static Color LunterColor => ModifyCat.defaultLancerBodyColors[SlugName.Red];
 
@@ -115,7 +117,7 @@ namespace LancerRemix.Story
         }
 
         private static void LunterDaddyTentacleCtor(On.DaddyTentacle.orig_ctor orig, DaddyTentacle self,
-            DaddyLongLegs daddy, DaddyLongLegs.IHaveRotParts rotOwner, BodyChunk chunk, float length, int tentacleNumber, Vector2 tentacleDir)
+            Creature daddy, DaddyLongLegs.IHaveRotParts rotOwner, BodyChunk chunk, float length, int tentacleNumber, Vector2 tentacleDir)
         {
             if (IsLunter(daddy)) length *= 0.7f;
             orig(self, daddy, rotOwner, chunk, length, tentacleNumber, tentacleDir);
@@ -218,6 +220,13 @@ namespace LancerRemix.Story
 
         #endregion Dummy
 
+        private static Color LunterRotBodyColor(On.DaddyGraphics.orig_RotBodyColor orig, DaddyGraphics self)
+        {
+            if (IsLunter(self.daddy)) return Color.Lerp(LunterColor, Color.gray, 0.4f);
+            return orig(self);
+        }
+
+        /*
         private static void LunterDaddyApplyPalette(On.DaddyGraphics.orig_ApplyPalette orig, DaddyGraphics self,
             RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, RoomPalette palette)
         {
@@ -275,24 +284,45 @@ namespace LancerRemix.Story
             orig(self, sLeaser, rCam, palette);
         }
 
-        private static void LunterDeadLegApplyPalette(On.DaddyGraphics.DaddyDeadLeg.orig_ApplyPalette orig, DaddyDeadLeg self,
+        private static void LunterTubeApplyPalette(On.DaddyGraphics.DaddyTubeGraphic.orig_ApplyPalette orig, DaddyTubeGraphic self,
             RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, RoomPalette palette)
         {
             if (self.owner.owner is DaddyLongLegs dll && IsLunter(dll))
             {
                 Color color = Color.Lerp(LunterColor, Color.gray, 0.4f);
+                Color effectColor = self.rotOwner.TubeEffectColor(self);
                 for (int i = 0; i < (sLeaser.sprites[self.firstSprite] as TriangleMesh).vertices.Length; i++)
                 {
                     float floatPos = Mathf.InverseLerp(0.3f, 1f, (float)i / (float)((sLeaser.sprites[self.firstSprite] as TriangleMesh).vertices.Length - 1));
-                    (sLeaser.sprites[self.firstSprite] as TriangleMesh).verticeColors[i] = Color.Lerp(color, self.owner.EffectColor, self.OnTubeEffectColorFac(floatPos));
+                    (sLeaser.sprites[self.firstSprite] as TriangleMesh).verticeColors[i] = Color.Lerp(color, effectColor, self.OnTubeEffectColorFac(floatPos));
                 }
                 int num = 0;
                 for (int j = 0; j < self.bumps.Length; j++)
                 {
-                    sLeaser.sprites[self.firstSprite + 1 + j].color = Color.Lerp(color, self.owner.EffectColor, self.OnTubeEffectColorFac(self.bumps[j].pos.y));
+                    sLeaser.sprites[self.firstSprite + 1 + j].color = Color.Lerp(color, effectColor, self.OnTubeEffectColorFac(self.bumps[j].pos.y));
                     if (self.bumps[j].eyeSize > 0f)
                     {
-                        sLeaser.sprites[self.firstSprite + 1 + self.bumps.Length + num].color = (self.owner.colorClass ? (self.owner.EffectColor * Mathf.Lerp(0.5f, 0.2f, self.deadness)) : color);
+                        sLeaser.sprites[self.firstSprite + 1 + self.bumps.Length + num].color = (self.owner.colorClass ? (effectColor * Mathf.Lerp(0.5f, 0.2f, self.deadness)) : color);
+                        num++;
+                    }
+                }
+
+                self.palette = palette;
+                Color a = this.rotOwner.RotBodyColor();
+                Color b = this.rotOwner.TubeEffectColor(this);
+                Color color = this.rotOwner.TubeBumpColor(this);
+                for (int i = 0; i < (sLeaser.sprites[this.firstSprite] as TriangleMesh).vertices.Length; i++)
+                {
+                    float floatPos = Mathf.InverseLerp(0.3f, 1f, (float)i / (float)((sLeaser.sprites[this.firstSprite] as TriangleMesh).vertices.Length - 1));
+                    (sLeaser.sprites[this.firstSprite] as TriangleMesh).verticeColors[i] = Color.Lerp(a, b, this.OnTubeEffectColorFac(floatPos));
+                }
+                int num = 0;
+                for (int j = 0; j < this.bumps.Length; j++)
+                {
+                    sLeaser.sprites[this.firstSprite + 1 + j].color = Color.Lerp(a, b, this.OnTubeEffectColorFac(this.bumps[j].pos.y));
+                    if (this.bumps[j].eyeSize > 0f)
+                    {
+                        sLeaser.sprites[this.firstSprite + 1 + this.bumps.Length + num].color = color;
                         num++;
                     }
                 }
@@ -300,6 +330,7 @@ namespace LancerRemix.Story
             }
             orig(self, sLeaser, rCam, palette);
         }
+        */
 
         #endregion DaddyCreature
 
