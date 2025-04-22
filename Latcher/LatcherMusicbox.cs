@@ -19,7 +19,7 @@ namespace LancerRemix.Latcher
             On.Player.CanIPickThisUp += CanIPickUpPatch;
             On.WaterNut.Swell += WaterNutSwellPatch;
             On.VirtualMicrophone.DrawUpdate += MicrophoneDrawPatch;
-            worldSpeed = 1f; worldTPS = playerTPS = 40f;
+            worldSpeed = 1f; worldTPS = playerTPS = 40f; worldTickStacker = 0f;
         }
 
         private static float worldTPS;
@@ -27,14 +27,27 @@ namespace LancerRemix.Latcher
         private static float worldSpeed;
         private const float STOP_THRESHOLD = 0.05f;
         private static bool doWorldTick;
+        private static float worldTickStacker = 0f;
         internal static float playerSlowRatio;
 
         private static void RoomUpdatePatch(On.Room.orig_Update orig, Room self)
         {
             doWorldTick = true;
             if (self.game == null || !IsStoryLatcher(self.game)
-                || Mathf.Approximately(worldSpeed, 1f)) goto normalSpeed;
-            doWorldTick = Random.value < worldSpeed;
+                || Mathf.Approximately(worldSpeed, 1f))
+            {
+                worldTickStacker = 0f; goto normalSpeed;
+            }
+            doWorldTick = false;
+            if (worldSpeed >= STOP_THRESHOLD)
+            {
+                worldTickStacker += worldSpeed;
+                if (worldTickStacker > 1f)
+                {
+                    doWorldTick = true;
+                    worldTickStacker -= 1f;
+                }
+            }
         /*
         if (self.fullyLoaded && (!self.abstractRoom.gate && !self.abstractRoom.shelter))
         {
@@ -483,9 +496,9 @@ namespace LancerRemix.Latcher
         private static void AbstractRoomPatch(On.AbstractRoom.orig_Update orig, AbstractRoom room, int timePassed)
         {
             int newTime = Mathf.RoundToInt(timePassed * worldSpeed);
-            if (Mathf.Approximately(newTime, 0f))
+            if (newTime == 0)
             {
-                if (Random.value < worldSpeed)
+                if (Random.value < timePassed * worldSpeed)
                     orig(room, 1);
             }
             else
@@ -503,7 +516,7 @@ namespace LancerRemix.Latcher
             else if (Mathf.Approximately(worldSpeed, 1f)) { orig.Invoke(cycle); return; }
             else
             {
-                if (Random.value < worldSpeed) orig(cycle);
+                if (doWorldTick) orig(cycle);
             }
         }
 
@@ -511,7 +524,7 @@ namespace LancerRemix.Latcher
         {
             for (int i = handler.transportVessels.Count - 1; i >= 0; i--)
             { if (handler.transportVessels[i].creature is Player) { orig(handler); return; } }
-            if (Mathf.Approximately(worldSpeed, 1f) || (worldSpeed >= STOP_THRESHOLD && Random.value < worldSpeed))
+            if (Mathf.Approximately(worldSpeed, 1f) || (worldSpeed >= STOP_THRESHOLD && doWorldTick))
                 orig(handler);
         }
 
@@ -554,8 +567,8 @@ namespace LancerRemix.Latcher
 
         private static void WaterNutSwellPatch(On.WaterNut.orig_Swell orig, WaterNut nut)
         {
-            if (Mathf.Approximately(worldSpeed, 1f))
-                orig(nut);
+            //if (Mathf.Approximately(worldSpeed, 1f))
+            orig(nut);
         }
 
         private static void MicrophoneDrawPatch(On.VirtualMicrophone.orig_DrawUpdate orig, VirtualMicrophone mic, float timeStacker, float timeSpeed)
