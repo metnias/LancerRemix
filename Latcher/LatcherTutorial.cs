@@ -9,6 +9,7 @@ namespace LancerRemix.Latcher
         internal static void SubPatch()
         {
             if (!ModManager.Watcher) return;
+            OnWatcherEnableSubPatch();
         }
 
         internal static void OnWatcherEnableSubPatch()

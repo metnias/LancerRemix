@@ -340,9 +340,9 @@ namespace LancerRemix.Cat
                 x => x.MatchLdcI4(1),
                 x => x.MatchAdd())) return;
             DebugLogCursor();
-            cursor.Emit(OpCodes.Nop);
             var lblNope = cursor.DefineLabel();
-            lblNope.Target = cursor.Prev;
+            cursor.Emit(OpCodes.Nop);
+            cursor.MarkLabel(lblNope);
 
             if (!cursor.TryGotoPrev(MoveType.Before,
                 x => x.MatchLdarg(0),
@@ -350,9 +350,9 @@ namespace LancerRemix.Cat
                 x => x.MatchLdloc(3),
                 x => x.MatchLdcI4(1))) return;
             DebugLogCursor();
-            cursor.Emit(OpCodes.Nop);
             var lblOkay = cursor.DefineLabel();
-            lblOkay.Target = cursor.Prev;
+            cursor.Emit(OpCodes.Nop);
+            cursor.MarkLabel(lblOkay);
 
             if (!cursor.TryGotoPrev(MoveType.Before,
                 x => x.MatchLdloc(3),
@@ -360,9 +360,9 @@ namespace LancerRemix.Cat
                 x => x.MatchLdelemRef(),
                 x => x.MatchCall(typeof(BackwardsCompatibilityRemix).GetMethod(nameof(BackwardsCompatibilityRemix.ParseSaveNumber))))) return;
             DebugLogCursor();
-            cursor.Emit(OpCodes.Nop);
             var lblNoLancer = cursor.DefineLabel();
-            lblNoLancer.Target = cursor.Prev;
+            cursor.Emit(OpCodes.Nop);
+            cursor.MarkLabel(lblNoLancer);
             cursor.GotoLabel(lblNoLancer, MoveType.Before);
 
             cursor.EmitDelegate<Func<bool>>(() => IsStoryLancer);

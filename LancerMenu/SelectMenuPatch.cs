@@ -97,7 +97,7 @@ namespace LancerRemix.LancerMenu
             self.UpdateSelectedSlugcatInMiscProg();
 
             // Add Jolly Warn
-            labelJollyWarn = new MenuLabel(self, self.pages[0], self.Translate("Player 1 is set to non-Lancer by Jolly Co-op").Replace("<LINE>", "\n"), new Vector2(976f, 110f), new Vector2(200f, 60f), false);
+            labelJollyWarn = new MenuLabel(self, self.pages[0], self.Translate("Player 1 is set to non-Lancer by Jolly Co-op").Replace("<LINE>", Environment.NewLine), new Vector2(976f, 110f), new Vector2(200f, 60f), false);
             labelJollyWarn.label.color = new Color(1f, .7f, .7f);
             self.pages[0].subObjects.Add(labelJollyWarn);
             labelJollyWarn.label.isVisible = false;
@@ -363,9 +363,9 @@ namespace LancerRemix.LancerMenu
                 )) return;
 
             DebugLogCursor();
-            cursor.Emit(OpCodes.Nop);
             var lblOkay = cursor.DefineLabel();
-            lblOkay.Target = cursor.Prev;
+            cursor.Emit(OpCodes.Nop);
+            cursor.MarkLabel(lblOkay);
 
             /*
             if (!cursor.TryGotoNext(MoveType.Before,

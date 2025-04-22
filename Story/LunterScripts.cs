@@ -440,6 +440,7 @@ namespace LancerRemix.Story
                     return check && self.world.region.name != "SS" && self.world.region.name != "MS";
                 }
                 if (basis == SlugName.Yellow) return false;
+                if (ModManager.Watcher && basis == Watcher.WatcherEnums.SlugcatStatsName.Watcher) return false;
                 return orig(self, basis);
             }
             return orig(self, character);

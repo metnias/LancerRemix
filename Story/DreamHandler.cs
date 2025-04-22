@@ -61,6 +61,8 @@ namespace LancerRemix.Story
             }
             if (basis == SlugName.White || basis == SlugName.Yellow)
                 self.dreamsState = null; // no dream state for lancer surv/monk
+            if (ModManager.Watcher && basis == Watcher.WatcherEnums.SlugcatStatsName.Watcher)
+                self.dreamsState = null; // no dream state for latcher
         }
 
         private static void WinLancer(On.RainWorldGame.orig_Win orig, RainWorldGame self, bool malnourished, bool fromWarpPoint)

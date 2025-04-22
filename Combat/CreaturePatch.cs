@@ -134,9 +134,9 @@ namespace LancerRemix.Combat
                 x => x.MatchCallvirt(typeof(Creature).GetMethod(nameof(Creature.Violence)))
                 )) return;
             DebugLogCursor();
-            cursor.Emit(OpCodes.Nop);
             var lblNoParry = cursor.DefineLabel();
-            lblNoParry.Target = cursor.Prev;
+            cursor.Emit(OpCodes.Nop);
+            cursor.MarkLabel(lblNoParry);
             cursor.GotoLabel(lblNoParry, MoveType.Before);
             DebugLogCursor();
 
@@ -194,9 +194,9 @@ namespace LancerRemix.Combat
                 x => x.MatchCallvirt(typeof(Creature).GetMethod(nameof(Creature.Violence)))
                 )) return;
             DebugLogCursor();
-            cursor.Emit(OpCodes.Nop);
             var lblNoParry = cursor.DefineLabel();
-            lblNoParry.Target = cursor.Prev;
+            cursor.Emit(OpCodes.Nop);
+            cursor.MarkLabel(lblNoParry);
             cursor.GotoLabel(lblNoParry, MoveType.Before);
             DebugLogCursor();
 

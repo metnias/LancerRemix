@@ -8,6 +8,7 @@ using static LancerRemix.Cat.ModifyCat;
 using static LancerRemix.LancerEnums;
 using WatcherName = Watcher.WatcherEnums.SlugcatStatsName;
 using Random = UnityEngine.Random;
+using Menu;
 
 namespace LancerRemix.Latcher
 {
@@ -16,10 +17,11 @@ namespace LancerRemix.Latcher
         internal static void SubPatch()
         {
             hooks.Clear();
+            LatcherPatch.SubPatch();
+            LatcherTutorial.SubPatch();
+
             if (!ModManager.Watcher) return;
             OnWatcherEnablePatch();
-
-            LatcherTutorial.SubPatch();
         }
 
         internal static void OnWatcherEnablePatch()
@@ -33,9 +35,14 @@ namespace LancerRemix.Latcher
                 typeof(Player).GetProperty(nameof(Player.RippleAbilityActivationButtonCondition), BindingFlags.Instance | BindingFlags.Public).GetGetMethod(),
                 typeof(ModifyLatcher).GetMethod(nameof(LatcherRippleAbilityActivationButtonCondition), BindingFlags.Static | BindingFlags.NonPublic)
             ));
+            hooks.Add(new Hook(
+                typeof(KarmaLadderScreen).GetProperty(nameof(KarmaLadderScreen.WatcherMode), BindingFlags.Instance | BindingFlags.Public).GetGetMethod(),
+                typeof(ModifyLatcher).GetMethod(nameof(KarmaLadderScreenLatcherMode), BindingFlags.Static | BindingFlags.NonPublic)
+            ));
 
             On.Player.WatcherUpdate += LatcherUpdate;
 
+            LatcherPatch.OnWatcherEnableSubPatch();
             LatcherTutorial.OnWatcherEnableSubPatch();
         }
 
@@ -46,6 +53,7 @@ namespace LancerRemix.Latcher
 
             On.Player.WatcherUpdate -= LatcherUpdate;
 
+            LatcherPatch.OnWatcherDisableSubPatch();
             LatcherTutorial.OnWatcherDisableSubPatch();
         }
 
@@ -83,6 +91,16 @@ namespace LancerRemix.Latcher
                 return !self.watcherDynamicWarpInput && self.warpExhausionTime <= 0 && self.input[0].spec && self.Consious && !self.Stunned && self.camoCharge < self.usableCamoLimit && self.cancelCamoCooldown <= 0 && !self.camoInputsNeedReset && animOkay && (self.rippleLevel < 5f || self.room.game.cameras[0].warpPointTimer == null);
             }
             return res;
+        }
+
+        private delegate bool orig_KarmaLadderScreenLatcherMode(KarmaLadderScreen self);
+
+        private static bool KarmaLadderScreenLatcherMode(orig_KarmaLadderScreenLatcherMode orig, KarmaLadderScreen self)
+        {
+            if (self.saveState != null && GetBasis(self.saveState.saveStateNumber) == WatcherName.Watcher
+                && self.saveState.deathPersistentSaveData.maximumRippleLevel >= 1f && !self.RippleLadderMode)
+                return true;
+            return orig(self);
         }
 
         #endregion Properties
