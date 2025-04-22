@@ -40,6 +40,10 @@ namespace LancerRemix.Latcher
                 typeof(KarmaLadderScreen).GetProperty(nameof(KarmaLadderScreen.WatcherMode), BindingFlags.Instance | BindingFlags.Public).GetGetMethod(),
                 typeof(ModifyLatcher).GetMethod(nameof(KarmaLadderScreenLatcherMode), BindingFlags.Static | BindingFlags.NonPublic)
             ));
+            hooks.Add(new Hook(
+                typeof(LocustSystem.Swarm).GetProperty(nameof(LocustSystem.Swarm.CamoFactor), BindingFlags.Instance | BindingFlags.NonPublic).GetGetMethod(true),
+                typeof(ModifyLatcher).GetMethod(nameof(LocustCamoFactor), BindingFlags.Static | BindingFlags.NonPublic)
+            ));
 
             On.Player.WatcherUpdate += LatcherUpdate;
 
@@ -59,7 +63,7 @@ namespace LancerRemix.Latcher
         }
 
         private static bool IsPlayerLatcher(Player player)
-            => ModManager.Watcher && GetBasis(player.SlugCatClass) == WatcherName.Watcher;
+            => ModManager.Watcher && IsPlayerLancer(player) && GetBasis(player.SlugCatClass) == WatcherName.Watcher;
 
         #region Properties
 
@@ -102,6 +106,16 @@ namespace LancerRemix.Latcher
                 && self.saveState.deathPersistentSaveData.maximumRippleLevel >= 1f && !self.RippleLadderMode)
                 return true;
             return orig(self);
+        }
+
+        private delegate float orig_LocustCamoFactor(LocustSystem.Swarm self);
+
+        private static float LocustCamoFactor(orig_LocustCamoFactor orig, LocustSystem.Swarm self)
+        {
+            var res = orig(self);
+            if (res > 0f && self.target is Player player && IsPlayerLatcher(player))
+                return 0f; // No camo for Latcher
+            return res;
         }
 
         #endregion Properties

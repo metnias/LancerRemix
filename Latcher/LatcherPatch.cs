@@ -50,8 +50,8 @@ namespace LancerRemix.Latcher
             => ModManager.Watcher && IsStoryLancer && game != null && game.IsStorySession
             && GetBasis(game.GetStorySession.saveStateNumber) == WatcherEnums.SlugcatStatsName.Watcher;
 
-        internal static bool IsStoryLatcher(Player player)
-            => ModManager.Watcher && IsStoryLancer && player != null
+        internal static bool IsPlayerLatcher(Player player)
+            => ModManager.Watcher && IsStoryLancer && player != null && IsPlayerLancer(player)
             && GetBasis(player.SlugCatClass) == WatcherEnums.SlugcatStatsName.Watcher;
 
         private static bool LatcherSentientRotMode(On.DaddyCorruption.orig_SentientRotMode orig, Room rm)
@@ -79,7 +79,7 @@ namespace LancerRemix.Latcher
 
         private static void LatcherAddCamoMeter(On.HUD.HUD.orig_InitSinglePlayerHud orig, HUD.HUD self, RoomCamera cam)
         {
-            if (IsStoryLatcher(self.owner as Player))
+            if (IsPlayerLatcher(self.owner as Player))
                 self.AddPart(new CamoMeter(self, self.fContainers[1]));
             orig(self, cam);
         }
@@ -87,7 +87,7 @@ namespace LancerRemix.Latcher
         private static void LatcherKarmaMeterUpdate(On.HUD.KarmaMeter.orig_Update orig, HUD.KarmaMeter self)
         {
             orig(self);
-            if (self.hud.owner is Player player && IsStoryLatcher(player))
+            if (self.hud.owner is Player player && IsPlayerLatcher(player))
             {
                 if (player.activateDynamicWarpTimer > 5)
                 {
