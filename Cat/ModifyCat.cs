@@ -1,5 +1,6 @@
 ﻿using CatSub.Cat;
 using LancerRemix.LancerMenu;
+using LancerRemix.Latcher;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using MonoMod.RuntimeDetour;
@@ -145,6 +146,11 @@ namespace LancerRemix.Cat
             {
                 catSubs.Add(self.playerState, new LunterSupplement(self));
                 catDecos.Add(self.playerState, new LunterDecoration(self));
+            }
+            else if (ModManager.Watcher && basis == WatcherEnums.SlugcatStatsName.Watcher)
+            {
+                catSubs.Add(self.playerState, new LatcherSupplement(self));
+                catDecos.Add(self.playerState, new LatcherDecoration(self));
             }
             else
             {

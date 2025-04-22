@@ -3,7 +3,6 @@ using MonoMod.Cil;
 using MoreSlugcats;
 using RWCustom;
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 using UnityEngine;
 using Watcher;

@@ -27,9 +27,7 @@ namespace LancerRemix.Cat
             //player.playerState.isPup = true;
             player.setPupStatus(true);
             isLonk = LancerEnums.GetBasis(player.SlugCatClass) == SlugcatStats.Name.Yellow;
-            isLatcher = ModManager.Watcher && LancerEnums.GetBasis(player.SlugCatClass) == WatcherEnums.SlugcatStatsName.Watcher;
-            if (isLatcher && self.room.game.session is StoryGameSession && self.rippleLevel > 0f)
-                (self.room.game.session as StoryGameSession).saveState.theGlow = true;
+
             removeStun = !isLonk;
             UpdateHasExhaustion();
             Debug.Log($"Added {GetType()} for {player.SlugCatClass}");
@@ -39,7 +37,6 @@ namespace LancerRemix.Cat
         {
         }
 
-        private readonly bool isLatcher = false;
         public readonly bool isLonk = false;
         protected bool hasExhaustion = false;
         public bool removeStun = true;
@@ -90,24 +87,6 @@ namespace LancerRemix.Cat
                 }
                 else
                     self.slowMovementStun = Math.Max(self.slowMovementStun, (int)Custom.LerpMap(self.aerobicLevel, 1f, 0.4f, 2f, 0f, 2f));
-            }
-
-            if (isLatcher)
-            {
-                if (self.sporeParticleTicks > 0)
-                {
-                    if (self.sporeParticleTicks % 4 == 0)
-                    {
-                        var bodyChunk = self.bodyChunks[UnityEngine.Random.Range(0, self.bodyChunks.Length)];
-                        Vector2 vel = bodyChunk.vel * 0.5f + Custom.RNV() * UnityEngine.Random.Range(0f, 3f);
-                        var sporeCloud = new SporeCloud(bodyChunk.pos, vel, new Color(0.02f, 0.1f, 0.08f), UnityEngine.Random.Range(0.65f, 0.8f), null, 0, null, self.abstractPhysicalObject.rippleLayer)
-                        {
-                            pos = bodyChunk.pos + UnityEngine.Random.insideUnitCircle * bodyChunk.rad,
-                            nonToxic = true
-                        };
-                        self.room.AddObject(sporeCloud);
-                    }
-                }
             }
         }
 

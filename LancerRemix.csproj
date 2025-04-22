@@ -81,8 +81,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Cat\LancerGenerator.cs" />
+    <Compile Include="Latcher\LatcherDecoration.cs" />
     <Compile Include="Latcher\LatcherMusicbox.cs" />
     <Compile Include="Latcher\LatcherPatch.cs" />
+    <Compile Include="Latcher\LatcherSupplement.cs" />
     <Compile Include="Latcher\LatcherTutorial.cs" />
     <Compile Include="Cat\LunterDecoration.cs" />
     <Compile Include="Cat\LunterSupplement.cs" />
