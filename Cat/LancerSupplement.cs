@@ -261,6 +261,7 @@ namespace LancerRemix.Cat
             {
                 if (speed > 40f && speed <= 60f && direction.y < 0)
                 {
+                    if (self.room != null && self.room.abstractRoom.name == "HI_W05") return; // Latcher death protection
                     self.room.PlaySound(SoundID.Slugcat_Terrain_Impact_Death, self.mainBodyChunk);
                     Debug.Log("Lancer Fall damage death");
                     self.Die();

@@ -538,7 +538,8 @@ namespace LancerRemix.LancerMenu
                 {
                     ReplaceIllust(page.slugcatImage, $"scenes{Path.DirectorySeparatorChar}slugcat - lancer",
                         "Lancer - Watcher - Flat", "Watcher Slugcat - 5", "Watcher Lancer - 5", new Vector2(577f, 100f));
-                    MoveGlow("red lancer - 1");
+                    MoveGlow("Watcher Lancer - 5");
+                    page.glowOffset = new Vector2(-10f, -70f);
                 }
                 else
                     ReplaceIllust(page.slugcatImage, $"scenes{Path.DirectorySeparatorChar}slugcat - lancer",

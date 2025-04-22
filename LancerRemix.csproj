@@ -250,6 +250,8 @@
     <AdditionalFiles Include="text\text_rus\51-RedLancer.txt" />
     <AdditionalFiles Include="text\text_rus\55-RedLancer.txt" />
     <AdditionalFiles Include="text\text_rus\strings.txt" />
+    <Content Include="text\text_eng\200-WatcherLancer.txt" />
+    <Content Include="text\text_kor\200-WatcherLancer.txt" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -118,6 +118,7 @@ namespace LancerRemix.Cat
                 sprites[1].y = Mathf.Lerp(mainBodyChunk.lastPos.y, mainBodyChunk.pos.y, timeStacker) - camPos.y;
                 sprites[1].color = new Color(player.camoProgress, 0f, 0f);
                 */
+                sLeaser.sprites[12].color = new Color(0f, 0f, 0f);
                 self.rippleTrail?.DrawUpdate(timeStacker, rCam, camPos);
 
                 /*

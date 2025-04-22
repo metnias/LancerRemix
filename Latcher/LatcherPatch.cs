@@ -33,6 +33,7 @@ namespace LancerRemix.Latcher
             On.StoryGameSession.ctor += LatcherStorySession;
             On.WinState.TrackerAllowedOnSlugcat += TrackerAllowedOnLatcher;
             On.World.SpawnGhost += LatcherSpawnSpinningTop;
+            On.Watcher.SpinningTop.SpinningTopConversation.AddEvents += LatcherSpinningTopDialog;
         }
 
         internal static void OnWatcherDisableSubPatch()
@@ -228,6 +229,32 @@ namespace LancerRemix.Latcher
                     }
                 }
             }
+            orig(self);
+        }
+
+        private static void LatcherSpinningTopDialog(On.Watcher.SpinningTop.SpinningTopConversation.orig_AddEvents orig, SpinningTop.SpinningTopConversation self)
+        {
+            if (self.ghost.room != null && IsStoryLatcher(self.ghost.room.game))
+            {
+                int eventFile = 200;
+                if (self.id == WatcherEnums.ConversationID.Ghost_ST_V1) eventFile = 200;
+                if (ModManager.Watcher && self.id == WatcherEnums.ConversationID.Ghost_ST_V2) eventFile = 201;
+                if (ModManager.Watcher && self.id == WatcherEnums.ConversationID.Ghost_ST_V3) eventFile = 202;
+                if (ModManager.Watcher && self.id == WatcherEnums.ConversationID.Ghost_ST_N1) eventFile = 203;
+                if (ModManager.Watcher && self.id == WatcherEnums.ConversationID.Ghost_ST_N2) eventFile = 204;
+                if (ModManager.Watcher && self.id == WatcherEnums.ConversationID.Ghost_ST_N3) eventFile = 205;
+                if (ModManager.Watcher && self.id == WatcherEnums.ConversationID.Ghost_ST_N4) eventFile = 206;
+                if (ModManager.Watcher && self.id == WatcherEnums.ConversationID.Ghost_ST_N5) eventFile = 211;
+                if (ModManager.Watcher && self.id == WatcherEnums.ConversationID.Ghost_ST_N6) eventFile = 212;
+                if (ModManager.Watcher && self.id == WatcherEnums.ConversationID.Ghost_ST_N7) eventFile = 213;
+                if (ModManager.Watcher && self.id == WatcherEnums.ConversationID.Ghost_ST_RIP1) eventFile = 207;
+                if (ModManager.Watcher && self.id == WatcherEnums.ConversationID.Ghost_ST_ROT1) eventFile = 208;
+                if (ModManager.Watcher && self.id == WatcherEnums.ConversationID.Ghost_ST_AU1) eventFile = 210;
+                if (ModManager.Watcher && self.id == WatcherEnums.ConversationID.Ghost_ST_AU2) eventFile = 209;
+                self.LoadEventsFromFile(eventFile, GetLancer(WatcherEnums.SlugcatStatsName.Watcher), false, 0);
+                return;
+            }
+
             orig(self);
         }
     }
