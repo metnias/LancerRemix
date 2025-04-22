@@ -46,11 +46,11 @@ namespace LancerRemix.Latcher
             On.World.SpawnGhost -= LatcherSpawnSpinningTop;
         }
 
-        private static bool IsStoryLatcher(RainWorldGame game)
+        internal static bool IsStoryLatcher(RainWorldGame game)
             => ModManager.Watcher && IsStoryLancer && game != null && game.IsStorySession
             && GetBasis(game.GetStorySession.saveStateNumber) == WatcherEnums.SlugcatStatsName.Watcher;
 
-        private static bool IsStoryLatcher(Player player)
+        internal static bool IsStoryLatcher(Player player)
             => ModManager.Watcher && IsStoryLancer && player != null
             && GetBasis(player.SlugCatClass) == WatcherEnums.SlugcatStatsName.Watcher;
 

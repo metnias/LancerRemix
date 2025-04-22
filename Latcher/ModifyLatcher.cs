@@ -19,6 +19,7 @@ namespace LancerRemix.Latcher
             hooks.Clear();
             LatcherPatch.SubPatch();
             LatcherTutorial.SubPatch();
+            LatcherMusicbox.SubPatch();
 
             if (!ModManager.Watcher) return;
             OnWatcherEnablePatch();

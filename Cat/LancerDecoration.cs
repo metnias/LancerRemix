@@ -30,7 +30,7 @@ namespace LancerRemix.Cat
 
         protected virtual void InitiateHorn(RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam)
         {
-            sprites = new FSprite[isLatcher ? 2 : 1];
+            sprites = new FSprite[1]; //isLatcher ? 2 : 1];
             var tris = new TriangleMesh.Triangle[] { new TriangleMesh.Triangle(0, 1, 2) };
             var triangleMesh = new TriangleMesh("Futile_White", tris, false, false);
             sprites[0] = triangleMesh;
@@ -39,9 +39,11 @@ namespace LancerRemix.Cat
             if (isLatcher)
             {
                 sLeaser.sprites[0].shader = Custom.rainWorld.Shaders["PlayerCamoMaskBeforePlayer"];
+                /*
                 sprites[1] = new FSprite("Futile_White", true);
                 sprites[1].scale = 7f;
                 sprites[1].shader = Custom.rainWorld.Shaders["PlayerCamoMask"];
+                */
                 for (int i = 1; i < 10; i++)
                     sLeaser.sprites[i].shader = Custom.rainWorld.Shaders["RippleBasicBothSides"];
                 sLeaser.sprites[11].shader = Custom.rainWorld.Shaders["RippleBasicBothSides"];
@@ -65,7 +67,7 @@ namespace LancerRemix.Cat
                     else
                         newContatiner.AddChild(sLeaser.sprites[i]);
                 }
-                (player.inVoidSea ? rCam.ReturnFContainer("Foreground") : newContatiner).AddChild(sprites[1]);
+                //(player.inVoidSea ? rCam.ReturnFContainer("Foreground") : newContatiner).AddChild(sprites[1]);
             }
         }
 
@@ -78,9 +80,9 @@ namespace LancerRemix.Cat
 
         public override void DrawSprites(On.PlayerGraphics.orig_DrawSprites orig, RoomCamera.SpriteLeaser sLeaser, RoomCamera rCam, float timeStacker, Vector2 camPos)
         {
-            if (isLatcher)
+            if (isLatcher && player != null)
             {
-                if (self.player.inVoidSea != self.lastInVoidSea)
+                if (player.inVoidSea != self.lastInVoidSea)
                     self.AddToContainer(sLeaser, rCam, null);
                 self.lastInVoidSea = player.inVoidSea;
             }
@@ -88,7 +90,7 @@ namespace LancerRemix.Cat
             base.DrawSprites(orig, sLeaser, rCam, timeStacker, camPos);
             DrawHorn(sLeaser, timeStacker, camPos);
 
-            if (isLatcher)
+            if (isLatcher && player != null)
             {
                 // Set EyeColor
                 var eyeColor = Color.Lerp(new Color(1f, 1f, 1f), rCam.currentPalette.blackColor, 0.3f);
@@ -104,18 +106,21 @@ namespace LancerRemix.Cat
                 eyeColor = Color.Lerp(eyeColor, Color.white, player.camoProgress);
                 sLeaser.sprites[9].color = eyeColor;
 
+                /*
                 if (sprites[1].container != sLeaser.sprites[9].container)
                     sLeaser.sprites[9].container.AddChild(sLeaser.sprites[1]);
                 if (rCam.warpPointTimer == null)
                     sprites[1].MoveBehindOtherNode(sLeaser.sprites[9]);
                 else
                     sprites[1].MoveInFrontOfOtherNode(sLeaser.sprites[9]);
-                BodyChunk mainBodyChunk = player.mainBodyChunk;
+                var mainBodyChunk = player.mainBodyChunk;
                 sprites[1].x = Mathf.Lerp(mainBodyChunk.lastPos.x, mainBodyChunk.pos.x, timeStacker) - camPos.x;
                 sprites[1].y = Mathf.Lerp(mainBodyChunk.lastPos.y, mainBodyChunk.pos.y, timeStacker) - camPos.y;
                 sprites[1].color = new Color(player.camoProgress, 0f, 0f);
+                */
                 self.rippleTrail?.DrawUpdate(timeStacker, rCam, camPos);
 
+                /*
                 for (int i = 0; i < self.mudSpriteCount; i++)
                 {
                     FSprite fsprite = sLeaser.sprites[self.firstMudSprite + i];
@@ -125,10 +130,9 @@ namespace LancerRemix.Cat
                         sprites[1].container.AddChildAtIndex(fsprite, sprites[1].container.GetChildIndex(sprites[1]) + 1);
                     }
                     else if (sprites[1].container.GetChildIndex(fsprite) != sprites[1].container.GetChildIndex(sprites[1]) + 1)
-                    {
                         fsprite.MoveInFrontOfOtherNode(sprites[1]);
-                    }
                 }
+                */
             }
         }
 
