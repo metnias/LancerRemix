@@ -31,6 +31,15 @@ namespace LancerRemix.Latcher
                     self.room.AddObject(sporeCloud);
                 }
             }
+
+            if (self.camoProgress > 0f)
+            {
+                float mushroomEffect = .1f;
+                if (self.rippleLevel >= 5f) mushroomEffect = 1f;
+                else if (self.rippleLevel >= 4f) mushroomEffect = .8f;
+                else if (self.rippleLevel >= 3f) mushroomEffect = .5f;
+                self.mushroomEffect = Mathf.Max(self.mushroomEffect, mushroomEffect * self.camoProgress);
+            }
         }
     }
 }

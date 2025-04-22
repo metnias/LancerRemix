@@ -387,5 +387,15 @@ namespace LancerRemix.Latcher
 
             orig(self);
         }
+
+        private static void LatcherCamoUpdate(On.Player.orig_CamoUpdate orig, Player self)
+        {
+            orig(self);
+            if (!IsPlayerLatcher(self)) return;
+
+            if (self.isCamo)
+                self.camoCharge = Mathf.Min(self.camoCharge + (LatcherMusicbox.playerSlowRatio - 1f), self.usableCamoLimit);
+            // Additional penalty with slowed down game
+        }
     }
 }
