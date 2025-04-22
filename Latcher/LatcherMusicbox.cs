@@ -475,23 +475,32 @@ namespace LancerRemix.Latcher
 
                 if (maxRipple <= 2.5f)
                 {
-                    playerTPS = Mathf.Lerp(40f, 15f, maxRipple * 2f);
-                    worldTPS = Mathf.Lerp(40f, 15f, maxRipple * 2f);
+                    playerTPS = Mathf.Lerp(40f, 25f, maxRipple * 2f);
+                    worldTPS = Mathf.Lerp(40f, 25f, maxRipple * 2f);
                 }
                 else if (maxRipple <= 3.5f)
                 {
-                    playerTPS = Mathf.Lerp(15f, 24f, (maxRipple - 2.5f) * 2f);
-                    worldTPS = Mathf.Lerp(15f, 12f, (maxRipple - 2.5f) * 2f);
+                    // canLevitate; x1.5
+                    playerTPS = Mathf.Lerp(25f, 27f, (maxRipple - 2.5f) * 2f);
+                    worldTPS = Mathf.Lerp(25f, 18f, (maxRipple - 2.5f) * 2f);
+                }
+                else if (maxRipple <= 4.0f)
+                {
+                    // x2.0
+                    playerTPS = Mathf.Lerp(27f, 30f, (maxRipple - 3.5f) * 2f);
+                    worldTPS = Mathf.Lerp(18f, 15f, (maxRipple - 3.5f) * 2f);
                 }
                 else if (maxRipple <= 4.5f)
                 {
-                    playerTPS = Mathf.Lerp(24f, 32f, (maxRipple - 3.5f) * 2f);
-                    worldTPS = Mathf.Lerp(12f, 8f, (maxRipple - 3.5f) * 2f);
+                    // x3.0
+                    playerTPS = Mathf.Lerp(30f, 33f, (maxRipple - 4.0f) * 2f);
+                    worldTPS = Mathf.Lerp(15f, 11f, (maxRipple - 4.0f) * 2f);
                 }
                 else
                 {
-                    playerTPS = Mathf.Lerp(32f, 40f, (maxRipple - 4.5f) * 2f);
-                    worldTPS = Mathf.Lerp(8f, 0f, (maxRipple - 4.5f) * 2f);
+                    // xinf
+                    playerTPS = Mathf.Lerp(33f, 40f, (maxRipple - 4.5f) * 2f);
+                    worldTPS = Mathf.Lerp(11f, 0f, (maxRipple - 4.5f) * 2f);
                 }
                 worldTPS = Mathf.Min(targetTPS, worldTPS);
                 playerTPS = Mathf.Min(targetTPS, playerTPS);
