@@ -502,6 +502,7 @@ namespace LancerRemix.Latcher
                     playerTPS = Mathf.Lerp(33f, 40f, (maxRipple - 4.5f) * 2f);
                     worldTPS = Mathf.Lerp(11f, 0f, (maxRipple - 4.5f) * 2f);
                 }
+
                 worldTPS = Mathf.Min(targetTPS, worldTPS);
                 playerTPS = Mathf.Min(targetTPS, playerTPS);
                 if (ModManager.MMF)
@@ -512,6 +513,20 @@ namespace LancerRemix.Latcher
                 }
                 worldSpeed = worldTPS / playerTPS;
                 playerSlowRatio = targetTPS / playerTPS;
+
+                if (game.devToolsActive)
+                {
+                    if (game.devToolsActive && Input.GetKey("a"))
+                    {
+                        self.framesPerSecond = 10;
+                        goto normalSpeed;
+                    }
+                    else if (Input.GetKey("s") && game.devToolsActive)
+                    {
+                        self.framesPerSecond = 400;
+                        goto normalSpeed;
+                    }
+                }
 
                 #endregion CheckRipple
 
