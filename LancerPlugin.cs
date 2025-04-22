@@ -4,6 +4,7 @@ using LancerRemix;
 using LancerRemix.Cat;
 using LancerRemix.Combat;
 using LancerRemix.LancerMenu;
+using LancerRemix.Latcher;
 using LancerRemix.Story;
 using Menu.Remix;
 using System;
