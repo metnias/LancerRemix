@@ -39,6 +39,9 @@ namespace LancerRemix.Latcher
                 else if (self.rippleLevel >= 4f) mushroomEffect = .8f;
                 else if (self.rippleLevel >= 3f) mushroomEffect = .5f;
                 self.mushroomEffect = Mathf.Max(self.mushroomEffect, mushroomEffect * self.camoProgress);
+
+                if (self.adrenalineEffect != null)
+                    self.adrenalineEffect.intensity = Mathf.Max(self.adrenalineEffect.intensity, (1f - mushroomEffect) * self.camoProgress);
             }
         }
     }

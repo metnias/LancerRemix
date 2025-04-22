@@ -2,6 +2,7 @@
 using System;
 using UnityEngine;
 using static LancerRemix.Latcher.LatcherPatch;
+using static LancerRemix.Cat.ModifyCat;
 using Random = UnityEngine.Random;
 
 namespace LancerRemix.Latcher
@@ -456,13 +457,13 @@ namespace LancerRemix.Latcher
                 if (players.Count < 1) goto normalSpeed;
                 for (int j = 0; j < players.Count; j++)
                 {
-                    if (players[j].realizedCreature is Player player && player.room != null
-                        && player.room.roomSettings.GetEffectAmount(RoomSettings.RoomEffect.Type.VoidMelt) > 0f)
+                    if (players[j].realizedCreature is Player player)
                     {
-                        targetTPS = Math.Min(targetTPS, Mathf.Lerp(targetTPS, 15f, player.room.roomSettings.GetEffectAmount(RoomSettings.RoomEffect.Type.VoidMelt) * Mathf.InverseLerp(-7000f, -2000f, player.mainBodyChunk.pos.y)));
+                        if (player.room != null && player.room.roomSettings.GetEffectAmount(RoomSettings.RoomEffect.Type.VoidMelt) > 0f)
+                            targetTPS = Math.Min(targetTPS, Mathf.Lerp(targetTPS, 15f, player.room.roomSettings.GetEffectAmount(RoomSettings.RoomEffect.Type.VoidMelt) * Mathf.InverseLerp(-7000f, -2000f, player.mainBodyChunk.pos.y)));
                         if (!player.isCamo && player.Adrenaline > 0f)
                             targetTPS = Math.Min(targetTPS, Mathf.Lerp(40f, 15f, player.Adrenaline));
-                        if (IsStoryLatcher(player))
+                        if (IsPlayerLancer(player))
                             maxRipple = Mathf.Max(player.camoProgress * player.rippleLevel, maxRipple);
                         if (player.redsIllness != null)
                             targetTPS *= player.redsIllness.TimeFactor;
@@ -470,7 +471,6 @@ namespace LancerRemix.Latcher
                 }
                 if (Mathf.Approximately(maxRipple, 0f)) goto normalSpeed;
 
-                if (ModManager.MMF) targetTPS /= MMF.cfgSlowTimeFactor.Value;
                 targetTPS = Math.Min(targetTPS, 40f - game.cameras[0].ghostMode * 10f);
 
                 if (maxRipple <= 2.5f)
@@ -495,15 +495,22 @@ namespace LancerRemix.Latcher
                 }
                 worldTPS = Mathf.Min(targetTPS, worldTPS);
                 playerTPS = Mathf.Min(targetTPS, playerTPS);
+                if (ModManager.MMF)
+                {
+                    worldTPS /= MMF.cfgSlowTimeFactor.Value;
+                    playerTPS /= MMF.cfgSlowTimeFactor.Value;
+                    targetTPS /= MMF.cfgSlowTimeFactor.Value;
+                }
                 worldSpeed = worldTPS / playerTPS;
                 playerSlowRatio = targetTPS / playerTPS;
 
-            #endregion CheckRipple
+                #endregion CheckRipple
 
-            normalSpeed:
                 self.framesPerSecond = Mathf.Max(1, Mathf.CeilToInt(playerTPS));
+                //Debug.Log($"Ripple{maxRipple:0.00} target{targetTPS:0.0} w{worldTPS:0.0}/p{playerTPS:0.0} (w{worldSpeed:0.00};p{playerSlowRatio:0.00})");
             }
 
+        normalSpeed:
             orig(self, dt);
         }
 
