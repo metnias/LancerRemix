@@ -9,14 +9,17 @@ using static LancerRemix.LancerEnums;
 using WatcherName = Watcher.WatcherEnums.SlugcatStatsName;
 using Random = UnityEngine.Random;
 
-namespace LancerRemix.Cat
+namespace LancerRemix.Latcher
 {
     internal static class ModifyLatcher
     {
         internal static void SubPatch()
         {
             hooks.Clear();
-            if (ModManager.Watcher) OnWatcherEnablePatch();
+            if (!ModManager.Watcher) return;
+            OnWatcherEnablePatch();
+
+            LatcherTutorial.SubPatch();
         }
 
         internal static void OnWatcherEnablePatch()
@@ -32,6 +35,8 @@ namespace LancerRemix.Cat
             ));
 
             On.Player.WatcherUpdate += LatcherUpdate;
+
+            LatcherTutorial.OnWatcherEnableSubPatch();
         }
 
         internal static void OnWatcherDisablePatch()
@@ -40,6 +45,8 @@ namespace LancerRemix.Cat
             hooks.Clear();
 
             On.Player.WatcherUpdate -= LatcherUpdate;
+
+            LatcherTutorial.OnWatcherDisableSubPatch();
         }
 
         private static bool IsPlayerLatcher(Player player)
@@ -124,7 +131,7 @@ namespace LancerRemix.Cat
                 }
                 if (self.rippleLevel >= 0.5f && (self.performingActivationTimer > 0 || self.RippleAbilityActivationButtonCondition))
                 {
-                    if (self.rippleRingDelay.isFinished && (double)self.camoProgress <= 0.2)
+                    if (self.rippleRingDelay.isFinished && self.camoProgress <= 0.2f)
                     {
                         self.SpawnRippleRing();
                         self.rippleRingDelay.Reset();
@@ -133,9 +140,9 @@ namespace LancerRemix.Cat
                     if (self.rippleLevel >= 4f)
                     {
                         float num3 = Mathf.InverseLerp(4f, 5f, self.rippleLevel);
-                        if (UnityEngine.Random.value > 0.98f - self.manyRingsProgress.normalized * (0.1f + num3 * 0.1f) && (double)self.camoProgress <= 0.2)
+                        if (Random.value > 0.98f - self.manyRingsProgress.normalized * (0.1f + num3 * 0.1f) && self.camoProgress <= 0.2f)
                         {
-                            self.room.AddObject(new RippleRing(self.mainBodyChunk.pos + Custom.RNV() * UnityEngine.Random.Range(1f, (200f + num3 * 200f) * self.manyRingsProgress.normalized), 80 + UnityEngine.Random.Range(0, 40), 0.75f + self.transitionScale01 * 0.5f, 0.5f + UnityEngine.Random.value * 0.5f));
+                            self.room.AddObject(new RippleRing(self.mainBodyChunk.pos + Custom.RNV() * Random.Range(1f, (200f + num3 * 200f) * self.manyRingsProgress.normalized), 80 + UnityEngine.Random.Range(0, 40), 0.75f + self.transitionScale01 * 0.5f, 0.5f + UnityEngine.Random.value * 0.5f));
                         }
                     }
                     if (self.startingCamoStateOnActivate == -1)
@@ -145,7 +152,7 @@ namespace LancerRemix.Cat
                     }
                     if (self.transitionRipple == null)
                     {
-                        self.rippleAnimationJitterTimer = UnityEngine.Random.Range(0, 100);
+                        self.rippleAnimationJitterTimer = Random.Range(0, 100);
                         self.rippleAnimationIntensityTarget = 0f;
                         self.transitionRipple = self.SpawnWatcherMechanicRipple();
                         self.transitionRipple.Data.scale = self.GetTransitionRippleTargets(self.rippleLevel).Item1;
@@ -286,11 +293,11 @@ namespace LancerRemix.Cat
                     }
                 }
                 SoundID soundID = null;
-                bool flag4 = false;
+                bool dynamicWarpInput = false;
                 if (self.activateCamoTimer == 0 && self.watcherDynamicWarpInput && self.dynamicWarpCooldown <= 0 && self.activateDynamicWarpTimer > 0)
                 {
                     soundID = (self.KarmaIsReinforced ? WatcherEnums.WatcherSoundID.Player_Generating_Warp_Point_LOOP : WatcherEnums.WatcherSoundID.Player_Generating_Bad_Warp_Point_LOOP);
-                    flag4 = true;
+                    dynamicWarpInput = true;
                 }
                 else if (self.rippleLevel >= 0.5f && self.activateCamoTimer > 0 && (self.performingActivationTimer > 0 || self.RippleAbilityActivationButtonCondition))
                 {
@@ -299,7 +306,7 @@ namespace LancerRemix.Cat
                         self.camoDirectionSoundID = (self.isCamo ? WatcherEnums.WatcherSoundID.Player_Deactivating_Camo_LOOP : WatcherEnums.WatcherSoundID.Player_Activating_Camo_LOOP);
                     }
                     soundID = self.camoDirectionSoundID;
-                    flag4 = false;
+                    dynamicWarpInput = false;
                 }
                 if (soundID != null && (self.watcherAbilitySoundLoop == null || soundID != self.watcherAbilitySoundID))
                 {
@@ -328,14 +335,14 @@ namespace LancerRemix.Cat
                     else
                     {
                         self.watcherAbilitySoundLoop.pitch = 1f;
-                        if (flag4 && (float)self.activateDynamicWarpTimer > 0f)
+                        if (dynamicWarpInput && (float)self.activateDynamicWarpTimer > 0f)
                         {
                             self.watcherAbilitySoundLoop.volume = Mathf.InverseLerp(0f, 20f, (float)self.activateDynamicWarpTimer) * ((self.KarmaIsReinforced && self.warpSpawningRipple != null) ? (0.5f + self.warpSpawningRipple.ringScale * 0.5f) : 1f);
                             StaticSoundLoop staticSoundLoop = self.watcherAbilitySoundLoop;
                             WarpSpawningRipple warpSpawningRipple = self.warpSpawningRipple;
                             staticSoundLoop.pitch = Custom.LerpMap((warpSpawningRipple != null) ? warpSpawningRipple.ringScale : 1f, 1f, 0f, 1f, self.KarmaIsReinforced ? 0.1f : 1.8f);
                         }
-                        else if (!flag4 && (float)self.activateCamoTimer > 0f)
+                        else if (!dynamicWarpInput && (float)self.activateCamoTimer > 0f)
                         {
                             int num4 = (self.camoDirectionSoundID == WatcherEnums.WatcherSoundID.Player_Deactivating_Camo_LOOP) ? self.exitOutOfCamoDuration : self.enterIntoCamoDuration;
                             if (self.camoDirectionSoundID == WatcherEnums.WatcherSoundID.Player_Deactivating_Camo_LOOP)

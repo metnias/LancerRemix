@@ -59,7 +59,7 @@ namespace LancerRemix.Cat
             On.PlayerGraphics.DefaultSlugcatColor += DefaultLancerColor;
 
             SwapSave.SubPatch();
-            ModifyLatcher.SubPatch();
+            Latcher.ModifyLatcher.SubPatch();
 
             if (ModManager.MSC) OnMSCEnablePatch();
         }

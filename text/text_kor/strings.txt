@@ -82,3 +82,6 @@ Or actually I'm sure he would, but he has so many of these~<LINE>it doesn't do h
 This much effort, just to help me... It means more than you could ever know.|날 돕기 위해서 이렇게나 노력해주다니... 정말로 내게 의미 깊어.
 All of this trouble just to save me... You are more generous than anyone I've known.|날 구하기 위해서 이렇게 고생하다니... 그 누구보다도 관대하구나.
 I am happy that I'm not alone.|내가 혼자가 아니라서 기쁘네.
+
+// Latcher
+Hold <SPECIAL> to slow down time|<SPECIAL>(을)를 길게 눌러 시간을 느리게 한다
