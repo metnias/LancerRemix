@@ -20,6 +20,7 @@ namespace LancerRemix.Latcher
             On.RainWorldGame.GrafUpdate += GrafUpdateHalt;
             On.RoomCamera.SpriteLeaser.Update += SpriteLeaserPatch;
             On.Room.ShouldBeDeferred += TimelineDeferredPatch;
+            On.RainCycle.Update += RainTimerPatch;
             On.Player.CanIPickThisUp += CanIPickUpPatch;
 
             On.LocustSystem.Swarm.IsTargetValid += NoLatcherLocustAttachOnRipple;
@@ -308,12 +309,16 @@ namespace LancerRemix.Latcher
                         }
                     }
 
-                    // Force Dialog update
+                    // Force HUD update
                     for (int i = 0; i < rwg.cameras.Length; i++)
                     {
                         if (rwg.cameras[i].hud == null) continue;
-                        foreach (var hudPart in rwg.cameras[i].hud.parts)
-                            if (hudPart is DialogBox) hudPart.Update();
+                        if (rwg.cameras[i].hud.owner.GetOwnerType() == HUD.HUD.OwnerType.Player)
+                            rwg.cameras[i].hud.Update();
+                        /*
+                        foreach (var part in rwg.cameras[i].hud.parts)
+                            if (part is DialogBox || part is Map) part.Update();
+                            */
                     }
 
                     // Force Shortcut update with Player
@@ -385,6 +390,12 @@ namespace LancerRemix.Latcher
             if (res) return res;
             if (IsLatcherRipple && !InLatcherTimeline(obj)) return true;
             return res;
+        }
+
+        private static void RainTimerPatch(On.RainCycle.orig_Update orig, RainCycle cycle)
+        {
+            if (IsLatcherRipple) return;
+            orig.Invoke(cycle);
         }
 
         private static bool CanIPickUpPatch(On.Player.orig_CanIPickThisUp orig, Player player, PhysicalObject obj)

@@ -413,7 +413,7 @@ namespace LancerRemix.Latcher
             if (self.isCamo)
                 self.camoCharge = Mathf.Min(self.camoCharge + (LatcherMusicbox.playerSlowRatio - 1f), self.usableCamoLimit);
             // Additional penalty with slowed down game
-            // Also use x2 cuz this is quite op in combat
+            // TODO: I should adjust the camoLimit itself later
 
             if (self.rippleData != null)
             {
@@ -425,7 +425,9 @@ namespace LancerRemix.Latcher
             }
             // No Ripple Layer
             self.ChangeRippleLayer(0);
-            //Shader.DisableKeyword("RIPPLE");
+            // TEMP; this *works* but has lots of visual glitches
+            if (self.isCamo && self.rippleLevel >= 5.0f) Shader.DisableKeyword("RIPPLE");
+            else Shader.EnableKeyword("RIPPLE");
         }
     }
 }
