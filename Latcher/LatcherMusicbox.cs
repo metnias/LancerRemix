@@ -184,7 +184,7 @@ namespace LancerRemix.Latcher
                                 continue;
                             }
 
-                            if (!InPlayerTimeline(ud)) { --updateIndex; continue; }
+                            if (!InLatcherTimeline(ud)) { --updateIndex; continue; }
 
                             if (!room.game.pauseUpdate || ud is IRunDuringDialog)
                             {
@@ -228,7 +228,7 @@ namespace LancerRemix.Latcher
                             {
                                 for (int r = q + 1; r < room.physicalObjects[p].Count; r++)
                                 {
-                                    if ((InPlayerTimeline(room.physicalObjects[p][q]) || InPlayerTimeline(room.physicalObjects[p][r])) &&
+                                    if ((InLatcherTimeline(room.physicalObjects[p][q]) || InLatcherTimeline(room.physicalObjects[p][r])) &&
                                         (room.physicalObjects[p][q].abstractPhysicalObject.rippleLayer == room.physicalObjects[p][r].abstractPhysicalObject.rippleLayer || room.physicalObjects[p][q].abstractPhysicalObject.rippleBothSides || room.physicalObjects[p][r].abstractPhysicalObject.rippleBothSides) && Mathf.Abs(room.physicalObjects[p][q].bodyChunks[0].pos.x - room.physicalObjects[p][r].bodyChunks[0].pos.x) < room.physicalObjects[p][q].collisionRange + room.physicalObjects[p][r].collisionRange && Mathf.Abs(room.physicalObjects[p][q].bodyChunks[0].pos.y - room.physicalObjects[p][r].bodyChunks[0].pos.y) < room.physicalObjects[p][q].collisionRange + room.physicalObjects[p][r].collisionRange)
                                     {
                                         bool collided = false;
@@ -267,25 +267,25 @@ namespace LancerRemix.Latcher
                                                         float dist = Vector2.Distance(room.physicalObjects[p][q].bodyChunks[t].pos, room.physicalObjects[p][r].bodyChunks[u].pos);
                                                         Vector2 dir = Custom.DirVec(room.physicalObjects[p][q].bodyChunks[t].pos, room.physicalObjects[p][r].bodyChunks[u].pos);
                                                         float massRatio = room.physicalObjects[p][r].bodyChunks[u].mass / (room.physicalObjects[p][q].bodyChunks[t].mass + room.physicalObjects[p][r].bodyChunks[u].mass);
-                                                        if (InPlayerTimeline(room.physicalObjects[p][q]))
+                                                        if (InLatcherTimeline(room.physicalObjects[p][q]))
                                                         {
                                                             room.physicalObjects[p][q].bodyChunks[t].pos -= (radSum - dist) * dir * massRatio;
                                                             room.physicalObjects[p][q].bodyChunks[t].vel -= (radSum - dist) * dir * massRatio;
                                                         }
-                                                        if (InPlayerTimeline(room.physicalObjects[p][r]))
+                                                        if (InLatcherTimeline(room.physicalObjects[p][r]))
                                                         {
                                                             room.physicalObjects[p][r].bodyChunks[u].pos += (radSum - dist) * dir * (1f - massRatio);
                                                             room.physicalObjects[p][r].bodyChunks[u].vel += (radSum - dist) * dir * (1f - massRatio);
                                                         }
                                                         if (room.physicalObjects[p][q].bodyChunks[t].pos.x == room.physicalObjects[p][r].bodyChunks[u].pos.x)
                                                         {
-                                                            if (InPlayerTimeline(room.physicalObjects[p][q])) room.physicalObjects[p][q].bodyChunks[t].vel += Custom.DegToVec(UnityEngine.Random.value * 360f) * 0.0001f;
-                                                            if (InPlayerTimeline(room.physicalObjects[p][r])) room.physicalObjects[p][r].bodyChunks[u].vel += Custom.DegToVec(UnityEngine.Random.value * 360f) * 0.0001f;
+                                                            if (InLatcherTimeline(room.physicalObjects[p][q])) room.physicalObjects[p][q].bodyChunks[t].vel += Custom.DegToVec(UnityEngine.Random.value * 360f) * 0.0001f;
+                                                            if (InLatcherTimeline(room.physicalObjects[p][r])) room.physicalObjects[p][r].bodyChunks[u].vel += Custom.DegToVec(UnityEngine.Random.value * 360f) * 0.0001f;
                                                         }
                                                         if (!collided)
                                                         {
-                                                            if (InPlayerTimeline(room.physicalObjects[p][q])) room.physicalObjects[p][q].Collide(room.physicalObjects[p][r], t, u);
-                                                            if (InPlayerTimeline(room.physicalObjects[p][r])) room.physicalObjects[p][r].Collide(room.physicalObjects[p][q], u, t);
+                                                            if (InLatcherTimeline(room.physicalObjects[p][q])) room.physicalObjects[p][q].Collide(room.physicalObjects[p][r], t, u);
+                                                            if (InLatcherTimeline(room.physicalObjects[p][r])) room.physicalObjects[p][r].Collide(room.physicalObjects[p][q], u, t);
                                                         }
                                                         collided = true;
                                                     }
@@ -300,26 +300,6 @@ namespace LancerRemix.Latcher
                     //Debug.Log($"{worldTPS:0}/{playerTPS:0}>{playerWorldRatio:0.00}) update{updateUDCount} graf{playerTimelineDrawables.Count}");
                 }
                 //Debug.Log($"{worldTPS:0}/{playerTPS:0}>{playerWorldRatio:0.00}) ts{self.myTimeStacker:0.00}/{playerTimeStacker:0.00} graf{playerTimelineDrawables.Count}");
-
-                bool InPlayerTimeline(UpdatableAndDeletable ud)
-                {
-                    if (ud is IRunDuringDialog) return true;
-                    //if (ud is Conversation.IOwnAConversation) return true;
-                    if (ud is Ghost) return true;
-                    if (ud is RippleRing) return true;
-                    if (ud is CosmeticRipple) return true;
-                    if (ud is PhysicalObject po)
-                    {
-                        if (po is VoidSpawn) return true;
-                        if (po is Player player) return IsPlayerLatcher(player);
-                        if (po is PlayerCarryableItem pci && pci.grabbedBy?.Count > 0 && pci.grabbedBy[0].grabber is Player grabber)
-                            return IsPlayerLatcher(grabber);
-                        if (po is Weapon w && w.mode == Weapon.Mode.Thrown && w.thrownBy is Player thrower)
-                            return IsPlayerLatcher(thrower);
-                        return false;
-                    }
-                    return false;
-                }
             }
             else
                 playerTimeStacker = self.myTimeStacker;
@@ -328,6 +308,26 @@ namespace LancerRemix.Latcher
                 haltGrafUpdate = false;
                 self.GrafUpdate(self.myTimeStacker);
             }
+        }
+
+        private static bool InLatcherTimeline(UpdatableAndDeletable ud)
+        {
+            if (ud is IRunDuringDialog) return true;
+            //if (ud is Conversation.IOwnAConversation) return true;
+            if (ud is Ghost) return true;
+            if (ud is RippleRing) return true;
+            if (ud is CosmeticRipple) return true;
+            if (ud is PhysicalObject po)
+            {
+                if (po is VoidSpawn) return true;
+                if (po is Player player) return IsPlayerLatcher(player);
+                if (po is PlayerCarryableItem pci && pci.grabbedBy?.Count > 0 && pci.grabbedBy[0].grabber is Player grabber)
+                    return IsPlayerLatcher(grabber);
+                if (po is Weapon w && w.mode == Weapon.Mode.Thrown && w.thrownBy is Player thrower)
+                    return IsPlayerLatcher(thrower);
+                return false;
+            }
+            return false;
         }
 
         private static void GrafUpdateHalt(On.RainWorldGame.orig_GrafUpdate orig, RainWorldGame self, float timeStacker)
@@ -352,7 +352,7 @@ namespace LancerRemix.Latcher
         {
             var res = orig(self, obj);
             if (res) return res;
-            if (worldTPS < 1f) return true;
+            if (worldTPS < 1f && !InLatcherTimeline(obj)) return true;
             return res;
         }
 
