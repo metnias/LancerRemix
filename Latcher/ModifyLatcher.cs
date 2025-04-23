@@ -423,6 +423,8 @@ namespace LancerRemix.Latcher
                 else
                     self.rippleData.trailPaletteAmount = Mathf.Lerp(lastTrailPaletteAmount, 0f, 0.003f);
             }
+            // No Ripple Layer
+            self.ChangeRippleLayer(0);
         }
     }
 }

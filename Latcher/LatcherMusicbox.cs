@@ -7,6 +7,7 @@ using Random = UnityEngine.Random;
 using System.Collections.Generic;
 using RWCustom;
 using Watcher;
+using HUD;
 
 namespace LancerRemix.Latcher
 {
@@ -35,6 +36,7 @@ namespace LancerRemix.Latcher
         private static float playerWorldRatio;
         private static float playerTimeStacker;
         private static HashSet<IDrawable> playerTimelineDrawables;
+        internal static bool IsLatcherRipple => worldTPS < 1f;
 
         private static void RoomUpdatePatch(On.Room.orig_Update orig, Room self)
         {
@@ -47,12 +49,12 @@ namespace LancerRemix.Latcher
             haltGrafUpdate = false;
             playerWorldRatio = playerSlowRatio = 1f;
             playerTPS = worldTPS = self.framesPerSecond;
+            float targetTPS = self.framesPerSecond;
             var ripplePlayers = new List<Player>();
-            if (self is RainWorldGame game && IsStoryLatcher(game) && !game.paused)
+            if (self is RainWorldGame game && IsStoryLatcher(game) && game.pauseMenu == null && game.processActive)
             {
                 #region CheckRipple
 
-                float targetTPS = 40f;
                 float maxRipple = 0f;
                 var players = game.session.Players;
                 if (players.Count < 1) goto normalSpeed;
@@ -145,7 +147,7 @@ namespace LancerRemix.Latcher
             playerTimelineDrawables.Clear();
             orig(self, dt);
 
-            if (playerWorldRatio > 1f && ripplePlayers.Count > 0)
+            if (playerWorldRatio > 1f)
             {
                 playerTimeStacker += dt * playerTPS;
                 //Debug.Log($"{worldTPS:0}/{playerTPS:0}>{playerWorldRatio:0.00}) ts{self.myTimeStacker:0.00}/{playerTimeStacker:0.00} didWorldTick{didWorldTick}");
@@ -344,6 +346,8 @@ namespace LancerRemix.Latcher
                 // Check whether replace timeStacker
                 if (self.drawableObject != null && playerTimelineDrawables.Contains(self.drawableObject))
                     timeStacker = playerTimeStacker;
+                else if (IsLatcherRipple)
+                    timeStacker = 0f; // remove jitter
             }
             orig(self, timeStacker, rCam, camPos);
         }
@@ -352,13 +356,13 @@ namespace LancerRemix.Latcher
         {
             var res = orig(self, obj);
             if (res) return res;
-            if (worldTPS < 1f && !InLatcherTimeline(obj)) return true;
+            if (IsLatcherRipple && !InLatcherTimeline(obj)) return true;
             return res;
         }
 
         private static bool CanIPickUpPatch(On.Player.orig_CanIPickThisUp orig, Player player, PhysicalObject obj)
         {
-            if (worldTPS < 1f && obj is Weapon && (obj.abstractPhysicalObject.rippleBothSides || player.abstractPhysicalObject.rippleLayer == obj.abstractPhysicalObject.rippleLayer))
+            if (IsLatcherRipple && obj is Weapon)
             {
                 if ((obj as Weapon).mode == Weapon.Mode.Thrown && !((obj as Weapon).thrownBy is Player))
                 {
@@ -374,7 +378,7 @@ namespace LancerRemix.Latcher
         {
             var res = orig(self);
             if (!res) return res;
-            if (self.target is Player player && IsPlayerLatcher(player) && player.maxRippleLevel >= 5.0f && player.isCamo)
+            if (self.target is Player player && IsPlayerLatcher(player) && IsLatcherRipple)
                 return false;
             return res;
         }

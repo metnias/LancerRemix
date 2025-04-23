@@ -4,6 +4,7 @@ using MoreSlugcats;
 using RWCustom;
 using System;
 using System.Globalization;
+using System.IO.Ports;
 using UnityEngine;
 using Watcher;
 using static LancerRemix.Cat.ModifyCat;
@@ -33,6 +34,8 @@ namespace LancerRemix.Latcher
             On.WinState.TrackerAllowedOnSlugcat += TrackerAllowedOnLatcher;
             On.World.SpawnGhost += LatcherSpawnSpinningTop;
             On.Watcher.SpinningTop.SpinningTopConversation.AddEvents += LatcherSpinningTopDialog;
+            On.Watcher.SpinningTop.OnScreen += LatcherSpinningTopOnScreen;
+            On.VirtualMicrophone.RippleSpaceUpdate += LatcherRippleSoundSpeedFix;
         }
 
         internal static void OnWatcherDisableSubPatch()
@@ -44,6 +47,8 @@ namespace LancerRemix.Latcher
             On.StoryGameSession.ctor -= LatcherStorySession;
             On.WinState.TrackerAllowedOnSlugcat -= TrackerAllowedOnLatcher;
             On.World.SpawnGhost -= LatcherSpawnSpinningTop;
+            On.Watcher.SpinningTop.OnScreen -= LatcherSpinningTopOnScreen;
+            On.VirtualMicrophone.RippleSpaceUpdate -= LatcherRippleSoundSpeedFix;
         }
 
         internal static bool IsStoryLatcher(RainWorldGame game)
@@ -257,6 +262,27 @@ namespace LancerRemix.Latcher
             }
 
             orig(self);
+        }
+
+        private static bool LatcherSpinningTopOnScreen(On.Watcher.SpinningTop.orig_OnScreen orig, SpinningTop self)
+        {
+            var res = orig(self);
+            if (res) return res;
+            if (self.SpecialData.rippleWarp && self.room.game.FirstAlivePlayer.realizedCreature is Player player
+                && IsPlayerLatcher(player) && self.room.VisibleInAnyCameraScreenBounds(self.pos) && LatcherMusicbox.IsLatcherRipple)
+            {
+                self.timeSinceLastTauntLaugh = 0; // also stop laughing
+                return true;
+            }
+
+            return res;
+        }
+
+        private static void LatcherRippleSoundSpeedFix(On.VirtualMicrophone.orig_RippleSpaceUpdate orig, VirtualMicrophone self,
+            float timeStacker, float timeSpeed, Vector2 currentListenerPos)
+        {
+            if (LatcherMusicbox.IsLatcherRipple) timeSpeed = (timeSpeed + 2f) / 3f;
+            orig(self, timeStacker, timeSpeed, currentListenerPos);
         }
     }
 }
