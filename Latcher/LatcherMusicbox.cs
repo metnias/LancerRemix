@@ -35,6 +35,7 @@ namespace LancerRemix.Latcher
         internal static float playerSlowRatio;
         private static float playerWorldRatio;
         private static float playerTimeStacker;
+        private static bool playerEvenUpdate = false;
         private static HashSet<IDrawable> playerTimelineDrawables;
         internal static bool IsLatcherRipple => worldTPS < 1f;
 
@@ -160,6 +161,7 @@ namespace LancerRemix.Latcher
                 var rippleRooms = new HashSet<Room>();
                 while (playerTimeStacker > 1f)
                 {
+                    playerEvenUpdate = !playerEvenUpdate;
                     if (!didWorldTick) PlayerUpdate();
                     didWorldTick = false;
                     playerTimeStacker -= 1f;
@@ -170,6 +172,7 @@ namespace LancerRemix.Latcher
 
                 void PlayerUpdate()
                 {
+                    var rwg = self as RainWorldGame;
                     foreach (var player in ripplePlayers)
                     {
                         if (player.room == null || player.room.game == null || !player.room.readyForAI) continue;
@@ -304,6 +307,24 @@ namespace LancerRemix.Latcher
                             }
                         }
                     }
+
+                    // Force Dialog update
+                    for (int i = 0; i < rwg.cameras.Length; i++)
+                    {
+                        if (rwg.cameras[i].hud == null) continue;
+                        foreach (var hudPart in rwg.cameras[i].hud.parts)
+                            if (hudPart is DialogBox) hudPart.Update();
+                    }
+
+                    // Force Shortcut update with Player
+                    if (playerEvenUpdate && rwg.shortcuts != null)
+                    {
+                        bool updateShortcut = false;
+                        foreach (var vessel in rwg.shortcuts.transportVessels)
+                        { if (vessel.creature is Player) { updateShortcut = true; break; } }
+                        if (updateShortcut) rwg.shortcuts.Update();
+                    }
+
                     //Debug.Log($"{worldTPS:0}/{playerTPS:0}>{playerWorldRatio:0.00}) update{updateUDCount} graf{playerTimelineDrawables.Count}");
                 }
                 //Debug.Log($"{worldTPS:0}/{playerTPS:0}>{playerWorldRatio:0.00}) ts{self.myTimeStacker:0.00}/{playerTimeStacker:0.00} graf{playerTimelineDrawables.Count}");
