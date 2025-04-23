@@ -4,6 +4,9 @@ using UnityEngine;
 using static LancerRemix.Latcher.LatcherPatch;
 using static LancerRemix.Cat.ModifyCat;
 using Random = UnityEngine.Random;
+using System.Collections.Generic;
+using RWCustom;
+using Watcher;
 
 namespace LancerRemix.Latcher
 {
@@ -12,441 +15,39 @@ namespace LancerRemix.Latcher
         internal static void SubPatch()
         {
             On.Room.Update += RoomUpdatePatch;
-            On.Room.ShouldBeDeferred += ShouldObjBeDefered;
-            On.AbstractRoom.Update += AbstractRoomPatch;
-            On.RoomCamera.SpriteLeaser.Update += SpriteLeaserPatch;
-            On.ShortcutHandler.Update += ShortcutHandlerPatch;
-            On.RainCycle.Update += RainTimerPatch;
-            On.BodyChunk.Update += BodyChunkPatch;
             On.MainLoopProcess.RawUpdate += GameRawUpdatePatch;
+            On.RainWorldGame.GrafUpdate += GrafUpdateHalt;
+            On.RoomCamera.SpriteLeaser.Update += SpriteLeaserPatch;
             On.Player.CanIPickThisUp += CanIPickUpPatch;
-            On.WaterNut.Swell += WaterNutSwellPatch;
-            On.VirtualMicrophone.DrawUpdate += MicrophoneDrawPatch;
+
             On.LocustSystem.Swarm.IsTargetValid += NoLatcherLocustAttachOnRipple;
 
-            worldSpeed = 1f; worldTPS = playerTPS = 40f; worldTickStacker = 0f;
+            worldTPS = playerTPS = 40f;
+            playerTimelineDrawables = new HashSet<IDrawable>();
         }
 
         private static float worldTPS;
         private static float playerTPS;
-        private static float worldSpeed;
-        private const float STOP_THRESHOLD = 0.05f;
-        private static bool doWorldTick;
-        private static float worldTickStacker = 0f;
+        private static bool didWorldTick;
+        private static bool haltGrafUpdate;
         internal static float playerSlowRatio;
+        private static float playerWorldRatio;
+        private static float playerTimeStacker;
+        private static HashSet<IDrawable> playerTimelineDrawables;
 
         private static void RoomUpdatePatch(On.Room.orig_Update orig, Room self)
         {
-            doWorldTick = true;
-            if (self.game == null || !IsStoryLatcher(self.game)
-                || Mathf.Approximately(worldSpeed, 1f))
-            {
-                worldTickStacker = 0f; goto normalSpeed;
-            }
-            doWorldTick = false;
-            if (worldSpeed >= STOP_THRESHOLD)
-            {
-                worldTickStacker += worldSpeed;
-                if (worldTickStacker > 1f)
-                {
-                    doWorldTick = true;
-                    worldTickStacker -= 1f;
-                }
-            }
-        /*
-        if (self.fullyLoaded && (!self.abstractRoom.gate && !self.abstractRoom.shelter))
-        {
-            if (self.snowSources.Count == 0) self.snow = false;
-            self.UpdateWindDirection();
-            if (self.waitToEnterAfterFullyLoaded > 0 && self.fullyLoaded) self.waitToEnterAfterFullyLoaded--;
-            self.lastBackgroundNoise = self.backgroundNoise;
-            self.backgroundNoise = Mathf.Max(0f, self.backgroundNoise - 0.05f * worldSpeed);
-            if (self.game.pauseUpdate)
-                self.backgroundNoise = Mathf.Lerp(self.backgroundNoise, 0f, 0.05f);
-            self.aidataprepro?.Update();
-            if (self.waterObject != null)
-            {
-                if (self.defaultWaterLevel == -2000 && self.waterObject.fWaterLevel < -400f && self.waterObject.fWaterLevel > -2000f)
-                    self.waterObject.fWaterLevel = -2000f;
-                self.waterObject.Update();
-            }
-            if (!Mathf.Approximately(worldSpeed, 0f))
-            {
-                self.socialEventRecognizer.Update();
-            }
-            self.UpdateSentientRotEffect();
-            self.darkenLightsFactor = self.roomSettings.GetEffectAmount(RoomSettings.RoomEffect.Type.DarkenLights);
-            if (self.DustStormIntensity > 0f)
-            {
-                float dustStormIntensity = self.DustStormIntensity;
-                Shader.SetGlobalFloat(RainWorld.ShadPropDustWaveProgress, dustStormIntensity);
-                dustStormIntensity = Mathf.InverseLerp(0.4f, 0.2f, dustStormIntensity);
-                self.roomSettings.Clouds = self.cloudsNdarken.x + dustStormIntensity * (1f - self.cloudsNdarken.x);
-                self.darkenLightsFactor = self.cloudsNdarken.y + dustStormIntensity * (1f - self.cloudsNdarken.y);
-            }
-            else
-            {
-                self.cloudsNdarken.x = self.roomSettings.Clouds;
-                self.cloudsNdarken.y = self.darkenLightsFactor;
-            }
-            if (doWorldTick) self.syncTicker++;
-
-            if (!self.game.pauseUpdate && self.BeingViewed && !self.abstractRoom.shelter && self.roomSettings.DangerType != RoomRain.DangerType.None && self.ceilingTiles.Length != 0 && Random.value < (self.gravity * worldSpeed) && (double)Random.value > Mathf.Pow((1f - Mathf.Max((1f - self.world.rainCycle.CycleStartUp) * Mathf.InverseLerp(0f, 0.5f, self.roomSettings.CeilingDrips), Mathf.Pow(self.roomSettings.CeilingDrips, 7f)) * 0.05f), self.ceilingTiles.Length))
-            {
-                self.AddObject(new WaterDrip(self.MiddleOfTile(self.ceilingTiles[Random.Range(0, self.ceilingTiles.Length)]) + new Vector2(Mathf.Lerp(-10f, 10f, Random.value), 9f), new Vector2(0f, 0f), false));
-            }
-            self.lastWaterGlitterCycle = self.waterGlitterCycle;
-            self.waterGlitterCycle -= 0.0166666675f * worldSpeed;
-            if (self.shortcutsBlinking != null && !self.game.pauseUpdate)
-            {
-                for (int l = 0; l < self.shortcutsBlinking.GetLength(0); l++)
-                {
-                    self.shortcutsBlinking[l, 0] = Mathf.Clamp(self.shortcutsBlinking[l, 0] - 1f / ((self.shortcutsBlinking[l, 1] > 0f) ? Mathf.Lerp(20f, (float)this.shortcuts[l].length, 0.3f) : 10f), 0f, 1f);
-                    if (self.shortcutsBlinking[l, 1] > 0f)
-                    {
-                        self.shortcutsBlinking[l, 1] += 1f / Mathf.Lerp(20f, (float)self.shortcuts[l].length, 0.3f);
-                        if (self.shortcutsBlinking[l, 1] > 1f)
-                            self.shortcutsBlinking[l, 1] = 0f;
-                        self.shortcutsBlinking[l, 2] = 0f;
-                    }
-                    if (self.shortcutsBlinking[l, 3] == 0f)
-                    {
-                        self.shortcutsBlinking[l, 2] = Mathf.Lerp(self.shortcutsBlinking[l, 2], 1f, 0.04f);
-                        if (Random.value < 0.01f * worldSpeed)
-                        {
-                            self.shortcutsBlinking[l, 3] = Random.value * 20f;
-                        }
-                    }
-                    else if (self.shortcutsBlinking[l, 3] < 0f)
-                    {
-                        self.shortcutsBlinking[l, 3] = Mathf.Min(self.shortcutsBlinking[l, 3] + 1f, 0f);
-                    }
-                    else
-                    {
-                        self.shortcutsBlinking[l, 3] = Mathf.Max(self.shortcutsBlinking[l, 3] - 1f, 0f);
-                        self.shortcutsBlinking[l, 2] = Mathf.Lerp(self.shortcutsBlinking[l, 2], Random.value, Mathf.Lerp(0f, 0.5f, UnityEngine.Random.value));
-                    }
-                }
-            }
-            self.fliesRoomAi?.Update(self.game.evenUpdate);
-            self.PERTILEVISALIZER?.Update(self);
-            if (!self.game.pauseUpdate && doWorldTick)
-                self.abstractRoom.UpdateCreaturesInDens(1);
-
-            int updateIndex = self.updateList.Count - 1;
-            while (updateIndex >= 0)
-            {
-                var ud = self.updateList[updateIndex];
-                if (ud.slatedForDeletetion || ud.room != self)
-                {
-                    self.CleanOutObjectNotInThisRoom(ud);
-                    --updateIndex;
-                    continue;
-                }
-
-                if (ud is Player player)
-                {
-                    // TODO: implement playerTPS
-                    player.Update(self.game.evenUpdate);
-                    if (player.dangerGraspTime > 0 && Random.value > worldSpeed) player.dangerGraspTime--;
-                    player.graphicsModule.Update();
-                    player.GraphicsModuleUpdated(true, self.game.evenUpdate);
-
-                    updateIndex--;
-                    continue;
-                }
-
-                bool defered = self.ShouldBeDeferred(ud) && (!doWorldTick && !(ud is Player));
-                if ((!self.game.pauseUpdate || ud is IRunDuringDialog) && !defered)
-                {
-                    ud.Update(self.game.evenUpdate);
-                }
-                if (ud.slatedForDeletetion || ud.room != self)
-                {
-                    self.CleanOutObjectNotInThisRoom(ud);
-                }
-                else if (ud is PhysicalObject po && !defered)
-                {
-                    if (po.graphicsModule != null)
-                    {
-                        po.graphicsModule.Update();
-                        po.GraphicsModuleUpdated(true, self.game.evenUpdate);
-                    }
-                    else
-                    {
-                        po.GraphicsModuleUpdated(false, self.game.evenUpdate);
-                    }
-                }
-
-                // Freeze
-                if (worldSpeed < STOP_THRESHOLD)
-                {
-                    if (ud is PhysicalObject)
-                    {
-                        if ((ud as PhysicalObject).grabbedBy.Count > 0) // && (updatableAndDeletable as PhysicalObject).grabbedBy[0].grabber is Player
-                            goto forceUpdate;
-                        else if (ud is VoidSpawn) // VoidSpawn ignore time shift
-                            goto forceUpdate;
-                    }
-                    updateIndex--;
-                    continue;
-
-                forceUpdate:
-                    ud.Update(self.game.evenUpdate);
-                    if (ud is PhysicalObject po)
-                    {
-                        if (po.graphicsModule != null)
-                        {
-                            po.graphicsModule.Update();
-                            po.GraphicsModuleUpdated(true, self.game.evenUpdate);
-                        }
-                        else
-                        {
-                            po.GraphicsModuleUpdated(false, self.game.evenUpdate);
-                        }
-                    }
-                    updateIndex--;
-                    continue;
-                }
-
-                // Slowed
-                ud.Update(self.game.evenUpdate);
-                if (ud is PhysicalObject p)
-                {
-                    if (p.graphicsModule != null)
-                    {
-                        p.graphicsModule.Update();
-                        p.GraphicsModuleUpdated(true, self.game.evenUpdate);
-                    }
-                    else
-                    {
-                        p.GraphicsModuleUpdated(false, self.game.evenUpdate);
-                    }
-                }
-                updateIndex--;
-            }
-
-            if (ModManager.DLCShared && this.roomSettings.GetEffect(DLCSharedEnums.RoomEffectType.RoomWrap) != null)
-            {
-                foreach (AbstractCreature abstractCreature2 in this.game.Players)
-                {
-                    if (abstractCreature2.realizedCreature != null && abstractCreature2.realizedCreature.room == this)
-                    {
-                        Player player = abstractCreature2.realizedCreature as Player;
-                        if (player.mainBodyChunk.pos.x < -228f)
-                        {
-                            player.SuperHardSetPosition(new Vector2(this.RoomRect.right + 212f, player.mainBodyChunk.pos.y));
-                        }
-                        if (player.mainBodyChunk.pos.x > this.RoomRect.right + 228f)
-                        {
-                            player.SuperHardSetPosition(new Vector2(-212f, player.mainBodyChunk.pos.y));
-                        }
-                        if (player.mainBodyChunk.pos.y > this.RoomRect.top + 48f)
-                        {
-                            player.SuperHardSetPosition(new Vector2(player.mainBodyChunk.pos.x, this.RoomRect.bottom - 72f));
-                        }
-                        if (player.mainBodyChunk.pos.y < this.RoomRect.bottom - 96f)
-                        {
-                            player.SuperHardSetPosition(new Vector2(player.mainBodyChunk.pos.x, this.RoomRect.top + 32f));
-                            for (int m = 0; m < player.bodyChunks.Length; m++)
-                            {
-                                player.bodyChunks[m].vel.y = Mathf.Clamp(player.bodyChunks[m].vel.y, -15f, 15f);
-                            }
-                        }
-                    }
-                }
-            }
-            this.updateIndex = int.MaxValue;
-            if (this.chunkGlue != null)
-            {
-                foreach (ChunkGlue chunkGlue in this.chunkGlue)
-                {
-                    chunkGlue.moveChunk.pos = chunkGlue.otherChunk.pos + chunkGlue.relativePos;
-                }
-            }
-            this.chunkGlue = null;
-            for (int n = 1; n < this.physicalObjects.Length; n++)
-            {
-                for (int num5 = 0; num5 < this.physicalObjects[n].Count; num5++)
-                {
-                    for (int num6 = num5 + 1; num6 < this.physicalObjects[n].Count; num6++)
-                    {
-                        if ((this.physicalObjects[n][num5].abstractPhysicalObject.rippleLayer == this.physicalObjects[n][num6].abstractPhysicalObject.rippleLayer || this.physicalObjects[n][num5].abstractPhysicalObject.rippleBothSides || this.physicalObjects[n][num6].abstractPhysicalObject.rippleBothSides) && Mathf.Abs(this.physicalObjects[n][num5].bodyChunks[0].pos.x - this.physicalObjects[n][num6].bodyChunks[0].pos.x) < this.physicalObjects[n][num5].collisionRange + this.physicalObjects[n][num6].collisionRange && Mathf.Abs(this.physicalObjects[n][num5].bodyChunks[0].pos.y - this.physicalObjects[n][num6].bodyChunks[0].pos.y) < this.physicalObjects[n][num5].collisionRange + this.physicalObjects[n][num6].collisionRange)
-                        {
-                            bool flag2 = false;
-                            bool flag3 = false;
-                            if (this.physicalObjects[n][num5] is Creature && (this.physicalObjects[n][num5] as Creature).Template.grasps > 0)
-                            {
-                                foreach (Creature.Grasp grasp in (this.physicalObjects[n][num5] as Creature).grasps)
-                                {
-                                    if (grasp != null && grasp.grabbed == this.physicalObjects[n][num6])
-                                    {
-                                        flag3 = true;
-                                        break;
-                                    }
-                                }
-                            }
-                            if (!flag3 && this.physicalObjects[n][num6] is Creature && (this.physicalObjects[n][num6] as Creature).Template.grasps > 0)
-                            {
-                                foreach (Creature.Grasp grasp2 in (this.physicalObjects[n][num6] as Creature).grasps)
-                                {
-                                    if (grasp2 != null && grasp2.grabbed == this.physicalObjects[n][num5])
-                                    {
-                                        flag3 = true;
-                                        break;
-                                    }
-                                }
-                            }
-                            if (!flag3)
-                            {
-                                for (int num8 = 0; num8 < this.physicalObjects[n][num5].bodyChunks.Length; num8++)
-                                {
-                                    for (int num9 = 0; num9 < this.physicalObjects[n][num6].bodyChunks.Length; num9++)
-                                    {
-                                        if (this.physicalObjects[n][num5].bodyChunks[num8].collideWithObjects && this.physicalObjects[n][num6].bodyChunks[num9].collideWithObjects && Custom.DistLess(this.physicalObjects[n][num5].bodyChunks[num8].pos, this.physicalObjects[n][num6].bodyChunks[num9].pos, this.physicalObjects[n][num5].bodyChunks[num8].rad + this.physicalObjects[n][num6].bodyChunks[num9].rad))
-                                        {
-                                            float num10 = this.physicalObjects[n][num5].bodyChunks[num8].rad + this.physicalObjects[n][num6].bodyChunks[num9].rad;
-                                            float num11 = Vector2.Distance(this.physicalObjects[n][num5].bodyChunks[num8].pos, this.physicalObjects[n][num6].bodyChunks[num9].pos);
-                                            Vector2 a = Custom.DirVec(this.physicalObjects[n][num5].bodyChunks[num8].pos, this.physicalObjects[n][num6].bodyChunks[num9].pos);
-                                            float num12 = this.physicalObjects[n][num6].bodyChunks[num9].mass / (this.physicalObjects[n][num5].bodyChunks[num8].mass + this.physicalObjects[n][num6].bodyChunks[num9].mass);
-                                            this.physicalObjects[n][num5].bodyChunks[num8].pos -= (num10 - num11) * a * num12;
-                                            this.physicalObjects[n][num5].bodyChunks[num8].vel -= (num10 - num11) * a * num12;
-                                            this.physicalObjects[n][num6].bodyChunks[num9].pos += (num10 - num11) * a * (1f - num12);
-                                            this.physicalObjects[n][num6].bodyChunks[num9].vel += (num10 - num11) * a * (1f - num12);
-                                            if (this.physicalObjects[n][num5].bodyChunks[num8].pos.x == this.physicalObjects[n][num6].bodyChunks[num9].pos.x)
-                                            {
-                                                this.physicalObjects[n][num5].bodyChunks[num8].vel += Custom.DegToVec(UnityEngine.Random.value * 360f) * 0.0001f;
-                                                this.physicalObjects[n][num6].bodyChunks[num9].vel += Custom.DegToVec(UnityEngine.Random.value * 360f) * 0.0001f;
-                                            }
-                                            if (!flag2)
-                                            {
-                                                this.physicalObjects[n][num5].Collide(this.physicalObjects[n][num6], num8, num9);
-                                                this.physicalObjects[n][num6].Collide(this.physicalObjects[n][num5], num9, num8);
-                                            }
-                                            flag2 = true;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            if (self.chunkGlue != null)
-            {
-                foreach (ChunkGlue chunkGlue in self.chunkGlue)
-                { chunkGlue.moveChunk.pos = chunkGlue.otherChunk.pos + chunkGlue.relativePos; }
-            }
-            self.chunkGlue = null;
-            for (int j = 1; j < self.physicalObjects.Length; j++)
-            {
-                for (int k = 0; k < self.physicalObjects[j].Count; k++)
-                {
-                    for (int l = k + 1; l < self.physicalObjects[j].Count; l++)
-                    {
-                        if (Mathf.Abs(self.physicalObjects[j][k].bodyChunks[0].pos.x - self.physicalObjects[j][l].bodyChunks[0].pos.x)
-                            < self.physicalObjects[j][k].collisionRange + self.physicalObjects[j][l].collisionRange
-                            && Mathf.Abs(self.physicalObjects[j][k].bodyChunks[0].pos.y - self.physicalObjects[j][l].bodyChunks[0].pos.y)
-                            < self.physicalObjects[j][k].collisionRange + self.physicalObjects[j][l].collisionRange)
-                        {
-                            bool collided = false;
-                            bool grabbed = false;
-                            if (self.physicalObjects[j][k] is Creature && (self.physicalObjects[j][k] as Creature).Template.grasps > 0)
-                            {
-                                foreach (Creature.Grasp grasp in (self.physicalObjects[j][k] as Creature).grasps)
-                                {
-                                    if (grasp != null && grasp.grabbed == self.physicalObjects[j][l])
-                                    {
-                                        grabbed = true;
-                                        break;
-                                    }
-                                }
-                            }
-                            if (!grabbed && self.physicalObjects[j][l] is Creature && (self.physicalObjects[j][l] as Creature).Template.grasps > 0)
-                            {
-                                foreach (Creature.Grasp grasp2 in (self.physicalObjects[j][l] as Creature).grasps)
-                                {
-                                    if (grasp2 != null && grasp2.grabbed == self.physicalObjects[j][k])
-                                    {
-                                        grabbed = true;
-                                        break;
-                                    }
-                                }
-                            }
-                            if (!grabbed)
-                            {
-                                for (int p = 0; p < self.physicalObjects[j][k].bodyChunks.Length; p++)
-                                {
-                                    for (int q = 0; q < self.physicalObjects[j][l].bodyChunks.Length; q++)
-                                    {
-                                        if (self.physicalObjects[j][k].bodyChunks[p].collideWithObjects && self.physicalObjects[j][l].bodyChunks[q].collideWithObjects
-                                            && Custom.DistLess(self.physicalObjects[j][k].bodyChunks[p].pos, self.physicalObjects[j][l].bodyChunks[q].pos,
-                                            self.physicalObjects[j][k].bodyChunks[p].rad + self.physicalObjects[j][l].bodyChunks[q].rad))
-                                        {
-                                            float radSum = self.physicalObjects[j][k].bodyChunks[p].rad + self.physicalObjects[j][l].bodyChunks[q].rad;
-                                            float dist = Vector2.Distance(self.physicalObjects[j][k].bodyChunks[p].pos, self.physicalObjects[j][l].bodyChunks[q].pos);
-                                            Vector2 dir = Custom.DirVec(self.physicalObjects[j][k].bodyChunks[p].pos, self.physicalObjects[j][l].bodyChunks[q].pos) * worldSpeed;
-                                            float massRatio = self.physicalObjects[j][l].bodyChunks[q].mass / (self.physicalObjects[j][k].bodyChunks[p].mass + self.physicalObjects[j][l].bodyChunks[q].mass);
-                                            self.physicalObjects[j][k].bodyChunks[p].pos -= (radSum - dist) * dir * massRatio;
-                                            self.physicalObjects[j][k].bodyChunks[p].vel -= (radSum - dist) * dir * massRatio;
-                                            self.physicalObjects[j][l].bodyChunks[q].pos += (radSum - dist) * dir * (1f - massRatio);
-                                            self.physicalObjects[j][l].bodyChunks[q].vel += (radSum - dist) * dir * (1f - massRatio);
-                                            if (self.physicalObjects[j][k].bodyChunks[p].pos.x == self.physicalObjects[j][l].bodyChunks[q].pos.x)
-                                            {
-                                                self.physicalObjects[j][k].bodyChunks[p].vel += Custom.DegToVec(Random.value * 360f) * 0.0001f;
-                                                self.physicalObjects[j][l].bodyChunks[q].vel += Custom.DegToVec(Random.value * 360f) * 0.0001f;
-                                            }
-                                            if (!collided)
-                                            {
-                                                self.physicalObjects[j][k].Collide(self.physicalObjects[j][l], p, q);
-                                                self.physicalObjects[j][l].Collide(self.physicalObjects[j][k], q, p);
-                                            }
-                                            collided = true;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            if (ModManager.Expedition && self.game.rainWorld.ExpeditionMode)
-                ExpeditionGame.ExSpawn(self);
-            if (ModManager.Watcher)
-            {
-                float effectAmount = self.roomSettings.GetEffectAmount(WatcherEnums.RoomEffectType.SentientRotInfection);
-                if (!self.rotPresenceInitialized && effectAmount > 0f && self.aimap != null)
-                    self.InitializeSentientRotPresenceInRoom(effectAmount);
-            }
-            return;
-        }
-        */
-        normalSpeed:
+            didWorldTick = true;
             orig(self);
-        }
-
-        private static bool ShouldObjBeDefered(On.Room.orig_ShouldBeDeferred orig, Room self, UpdatableAndDeletable obj)
-        {
-            var res = orig(self, obj);
-            if (res) return res;
-            if (obj is Player p && IsPlayerLatcher(p) && p.camoProgress > 0f) return false;
-            if (!doWorldTick)
-            {
-                if (!(obj is PhysicalObject po)) return res;
-                if (po.grabbedBy.Count > 0 && po.grabbedBy[0].grabber is Player) return false;
-                if (po is Weapon w && w.mode == Weapon.Mode.Thrown && w.thrownBy is Player) return false;
-                return true;
-            }
-            return res;
         }
 
         private static void GameRawUpdatePatch(On.MainLoopProcess.orig_RawUpdate orig, MainLoopProcess self, float dt)
         {
-            worldSpeed = playerSlowRatio = 1f;
+            haltGrafUpdate = false;
+            playerWorldRatio = playerSlowRatio = 1f;
             playerTPS = worldTPS = self.framesPerSecond;
-            if (self is RainWorldGame game && IsStoryLatcher(game))
+            var ripplePlayers = new List<Player>();
+            if (self is RainWorldGame game && IsStoryLatcher(game) && !game.paused)
             {
                 #region CheckRipple
 
@@ -463,7 +64,10 @@ namespace LancerRemix.Latcher
                         if (!player.isCamo && player.Adrenaline > 0f)
                             targetTPS = Math.Min(targetTPS, Mathf.Lerp(40f, 15f, player.Adrenaline));
                         if (IsPlayerLancer(player))
+                        {
                             maxRipple = Mathf.Max(player.camoProgress * player.rippleLevel, maxRipple);
+                            if (player.camoProgress > 0f) ripplePlayers.Add(player);
+                        }
                         if (player.redsIllness != null)
                             targetTPS *= player.redsIllness.TimeFactor;
                     }
@@ -510,7 +114,7 @@ namespace LancerRemix.Latcher
                     playerTPS /= MMF.cfgSlowTimeFactor.Value;
                     targetTPS /= MMF.cfgSlowTimeFactor.Value;
                 }
-                worldSpeed = worldTPS / playerTPS;
+                playerWorldRatio = playerTPS / worldTPS;
                 playerSlowRatio = targetTPS / playerTPS;
 
                 if (game.devToolsActive)
@@ -529,75 +133,225 @@ namespace LancerRemix.Latcher
 
                 #endregion CheckRipple
 
-                self.framesPerSecond = Mathf.Max(1, Mathf.CeilToInt(playerTPS));
+                haltGrafUpdate = playerWorldRatio > 1f;
+                self.framesPerSecond = Mathf.Max(1, Mathf.CeilToInt(worldTPS));
                 //Debug.Log($"Ripple{maxRipple:0.00} target{targetTPS:0.0} w{worldTPS:0.0}/p{playerTPS:0.0} (w{worldSpeed:0.00};p{playerSlowRatio:0.00})");
             }
 
         normalSpeed:
+            playerTimelineDrawables.Clear();
             orig(self, dt);
-        }
 
-        private static void AbstractRoomPatch(On.AbstractRoom.orig_Update orig, AbstractRoom room, int timePassed)
-        {
-            int newTime = Mathf.RoundToInt(timePassed * worldSpeed);
-            if (newTime == 0)
+            if (playerWorldRatio > 1f && ripplePlayers.Count > 0)
             {
-                if (Random.value < timePassed * worldSpeed)
-                    orig(room, 1);
+                playerTimeStacker += dt * playerTPS;
+                //Debug.Log($"{worldTPS:0}/{playerTPS:0}>{playerWorldRatio:0.00}) ts{self.myTimeStacker:0.00}/{playerTimeStacker:0.00} didWorldTick{didWorldTick}");
+                int updateCount = 0;
+                var rippleRooms = new HashSet<Room>();
+                while (playerTimeStacker > 1f)
+                {
+                    if (!didWorldTick) PlayerUpdate();
+                    didWorldTick = false;
+                    playerTimeStacker -= 1f;
+                    updateCount++;
+                    if (updateCount > 2) playerTimeStacker = 0f;
+                    if (playerTimeStacker > 1f) self.manager.rainWorld.RunRewiredUpdate();
+                }
+
+                void PlayerUpdate()
+                {
+                    foreach (var player in ripplePlayers)
+                    {
+                        if (player.room == null || player.room.game == null || !player.room.readyForAI) continue;
+                        if (!rippleRooms.Contains(player.room))
+                            rippleRooms.Add(player.room);
+                    }
+                    // Force player update
+                    int updateUDCount = 0;
+                    foreach (var room in rippleRooms)
+                    {
+                        // Update
+                        int updateIndex = room.updateList.Count - 1;
+                        while (updateIndex >= 0)
+                        {
+                            var ud = room.updateList[updateIndex];
+                            if (ud.slatedForDeletetion || ud.room != room)
+                            {
+                                room.CleanOutObjectNotInThisRoom(ud);
+                                --updateIndex;
+                                continue;
+                            }
+
+                            if (!InPlayerTimeline(ud)) { --updateIndex; continue; }
+                            ++updateUDCount;
+
+                            bool deferred = room.ShouldBeDeferred(ud);
+                            if ((!room.game.pauseUpdate || ud is IRunDuringDialog) && !deferred)
+                            {
+                                ud.Update(room.game.evenUpdate);
+                            }
+                            if (ud.slatedForDeletetion || ud.room != room)
+                            {
+                                room.CleanOutObjectNotInThisRoom(ud);
+                            }
+                            else if (ud is PhysicalObject po)
+                            {
+                                if (!deferred)
+                                {
+                                    if (po.graphicsModule != null)
+                                    {
+                                        playerTimelineDrawables.Add(po.graphicsModule);
+                                        po.graphicsModule.Update();
+                                        po.GraphicsModuleUpdated(true, room.game.evenUpdate);
+                                    }
+                                    else
+                                    {
+                                        if (ud is IDrawable id) playerTimelineDrawables.Add(id);
+                                        po.GraphicsModuleUpdated(false, room.game.evenUpdate);
+                                    }
+                                }
+                            }
+                            else if (ud is IDrawable id)
+                                playerTimelineDrawables.Add(id);
+
+                            --updateIndex;
+                        }
+
+                        if (room.chunkGlue != null)
+                        {
+                            foreach (var chunkGlue in room.chunkGlue)
+                                chunkGlue.moveChunk.pos = chunkGlue.otherChunk.pos + chunkGlue.relativePos;
+                        }
+                        room.chunkGlue = null;
+
+                        // Collision
+                        for (int p = 1; p < room.physicalObjects.Length; p++)
+                        {
+                            for (int q = 0; q < room.physicalObjects[p].Count; q++)
+                            {
+                                for (int r = q + 1; r < room.physicalObjects[p].Count; r++)
+                                {
+                                    if ((InPlayerTimeline(room.physicalObjects[p][q]) || InPlayerTimeline(room.physicalObjects[p][r])) &&
+                                        (room.physicalObjects[p][q].abstractPhysicalObject.rippleLayer == room.physicalObjects[p][r].abstractPhysicalObject.rippleLayer || room.physicalObjects[p][q].abstractPhysicalObject.rippleBothSides || room.physicalObjects[p][r].abstractPhysicalObject.rippleBothSides) && Mathf.Abs(room.physicalObjects[p][q].bodyChunks[0].pos.x - room.physicalObjects[p][r].bodyChunks[0].pos.x) < room.physicalObjects[p][q].collisionRange + room.physicalObjects[p][r].collisionRange && Mathf.Abs(room.physicalObjects[p][q].bodyChunks[0].pos.y - room.physicalObjects[p][r].bodyChunks[0].pos.y) < room.physicalObjects[p][q].collisionRange + room.physicalObjects[p][r].collisionRange)
+                                    {
+                                        bool collided = false;
+                                        bool grasped = false;
+                                        if (room.physicalObjects[p][q] is Creature pqCrit && pqCrit.Template.grasps > 0)
+                                        {
+                                            foreach (var g in pqCrit.grasps)
+                                            {
+                                                if (g != null && g.grabbed == room.physicalObjects[p][r])
+                                                {
+                                                    grasped = true;
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                        if (!grasped && room.physicalObjects[p][r] is Creature prCrit && prCrit.Template.grasps > 0)
+                                        {
+                                            foreach (var g in prCrit.grasps)
+                                            {
+                                                if (g != null && g.grabbed == room.physicalObjects[p][q])
+                                                {
+                                                    grasped = true;
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                        if (!grasped)
+                                        {
+                                            for (int t = 0; t < room.physicalObjects[p][q].bodyChunks.Length; t++)
+                                            {
+                                                for (int u = 0; u < room.physicalObjects[p][r].bodyChunks.Length; u++)
+                                                {
+                                                    if (room.physicalObjects[p][q].bodyChunks[t].collideWithObjects && room.physicalObjects[p][r].bodyChunks[u].collideWithObjects && Custom.DistLess(room.physicalObjects[p][q].bodyChunks[t].pos, room.physicalObjects[p][r].bodyChunks[u].pos, room.physicalObjects[p][q].bodyChunks[t].rad + room.physicalObjects[p][r].bodyChunks[u].rad))
+                                                    {
+                                                        float radSum = room.physicalObjects[p][q].bodyChunks[t].rad + room.physicalObjects[p][r].bodyChunks[u].rad;
+                                                        float dist = Vector2.Distance(room.physicalObjects[p][q].bodyChunks[t].pos, room.physicalObjects[p][r].bodyChunks[u].pos);
+                                                        Vector2 dir = Custom.DirVec(room.physicalObjects[p][q].bodyChunks[t].pos, room.physicalObjects[p][r].bodyChunks[u].pos);
+                                                        float massRatio = room.physicalObjects[p][r].bodyChunks[u].mass / (room.physicalObjects[p][q].bodyChunks[t].mass + room.physicalObjects[p][r].bodyChunks[u].mass);
+                                                        if (InPlayerTimeline(room.physicalObjects[p][q]))
+                                                        {
+                                                            room.physicalObjects[p][q].bodyChunks[t].pos -= (radSum - dist) * dir * massRatio;
+                                                            room.physicalObjects[p][q].bodyChunks[t].vel -= (radSum - dist) * dir * massRatio;
+                                                        }
+                                                        if (InPlayerTimeline(room.physicalObjects[p][r]))
+                                                        {
+                                                            room.physicalObjects[p][r].bodyChunks[u].pos += (radSum - dist) * dir * (1f - massRatio);
+                                                            room.physicalObjects[p][r].bodyChunks[u].vel += (radSum - dist) * dir * (1f - massRatio);
+                                                        }
+                                                        if (room.physicalObjects[p][q].bodyChunks[t].pos.x == room.physicalObjects[p][r].bodyChunks[u].pos.x)
+                                                        {
+                                                            if (InPlayerTimeline(room.physicalObjects[p][q])) room.physicalObjects[p][q].bodyChunks[t].vel += Custom.DegToVec(UnityEngine.Random.value * 360f) * 0.0001f;
+                                                            if (InPlayerTimeline(room.physicalObjects[p][r])) room.physicalObjects[p][r].bodyChunks[u].vel += Custom.DegToVec(UnityEngine.Random.value * 360f) * 0.0001f;
+                                                        }
+                                                        if (!collided)
+                                                        {
+                                                            if (InPlayerTimeline(room.physicalObjects[p][q])) room.physicalObjects[p][q].Collide(room.physicalObjects[p][r], t, u);
+                                                            if (InPlayerTimeline(room.physicalObjects[p][r])) room.physicalObjects[p][r].Collide(room.physicalObjects[p][q], u, t);
+                                                        }
+                                                        collided = true;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    //Debug.Log($"{worldTPS:0}/{playerTPS:0}>{playerWorldRatio:0.00}) update{updateUDCount} graf{playerTimelineDrawables.Count}");
+                }
+                //Debug.Log($"{worldTPS:0}/{playerTPS:0}>{playerWorldRatio:0.00}) ts{self.myTimeStacker:0.00}/{playerTimeStacker:0.00} graf{playerTimelineDrawables.Count}");
+
+                bool InPlayerTimeline(UpdatableAndDeletable ud)
+                {
+                    if (ud is Ghost) return true;
+                    if (ud is RippleRing) return true;
+                    if (ud is CosmeticRipple) return true;
+                    if (ud is PhysicalObject po)
+                    {
+                        if (po is VoidSpawn) return true;
+                        if (po is Player player) return IsPlayerLatcher(player) && player.camoProgress > 0f;
+                        if (po is PlayerCarryableItem pci && pci.grabbedBy?.Count > 0 && pci.grabbedBy[0].grabber is Player grabber)
+                            return IsPlayerLatcher(grabber) && grabber.camoProgress > 0f;
+                        if (po is Weapon w && w.mode == Weapon.Mode.Thrown && w.thrownBy is Player thrower)
+                            return IsPlayerLatcher(thrower) && thrower.camoProgress > 0f;
+                        return false;
+                    }
+                    return false;
+                }
             }
             else
-                orig(room, newTime);
-        }
-
-        private static void SpriteLeaserPatch(On.RoomCamera.SpriteLeaser.orig_Update orig, RoomCamera.SpriteLeaser leaser, float timeStacker, RoomCamera rCam, Vector2 camPos)
-        {
-            orig(leaser, timeStacker * worldSpeed, rCam, camPos);
-        }
-
-        private static void RainTimerPatch(On.RainCycle.orig_Update orig, RainCycle cycle)
-        {
-            if (worldSpeed < STOP_THRESHOLD) return;
-            else if (Mathf.Approximately(worldSpeed, 1f)) { orig.Invoke(cycle); return; }
-            else
+                playerTimeStacker = self.myTimeStacker;
+            if (haltGrafUpdate)
             {
-                if (doWorldTick) orig(cycle);
+                haltGrafUpdate = false;
+                self.GrafUpdate(self.myTimeStacker);
             }
         }
 
-        private static void ShortcutHandlerPatch(On.ShortcutHandler.orig_Update orig, ShortcutHandler handler)
+        private static void GrafUpdateHalt(On.RainWorldGame.orig_GrafUpdate orig, RainWorldGame self, float timeStacker)
         {
-            for (int i = handler.transportVessels.Count - 1; i >= 0; i--)
-            { if (handler.transportVessels[i].creature is Player) { orig(handler); return; } }
-            if (Mathf.Approximately(worldSpeed, 1f) || (worldSpeed >= STOP_THRESHOLD && doWorldTick))
-                orig(handler);
+            if (haltGrafUpdate) return;
+            orig(self, timeStacker);
         }
 
-        private static void BodyChunkPatch(On.BodyChunk.orig_Update orig, BodyChunk bodyChunk)
+        private static void SpriteLeaserPatch(On.RoomCamera.SpriteLeaser.orig_Update orig, RoomCamera.SpriteLeaser self,
+            float timeStacker, RoomCamera rCam, Vector2 camPos)
         {
-            if (Mathf.Approximately(worldSpeed, 1f))
+            if (playerWorldRatio > 1f && playerTimelineDrawables.Count > 0)
             {
-                orig(bodyChunk); return;
+                // Check whether replace timeStacker
+                if (self.drawableObject != null && playerTimelineDrawables.Contains(self.drawableObject))
+                    timeStacker = playerTimeStacker;
             }
-
-            bool isOrRelatedToPlayer = bodyChunk.owner is Player || (bodyChunk.owner.grabbedBy.Count > 0 && bodyChunk.owner.grabbedBy[0].grabber is Player)
-                || bodyChunk.setPos != null;
-            if (!isOrRelatedToPlayer && worldSpeed < STOP_THRESHOLD) return;
-            Vector2 origV = bodyChunk.vel;
-            if (float.IsNaN(origV.y)) origV.y = 0f;
-            if (float.IsNaN(origV.x)) origV.x = 0f;
-            orig(bodyChunk);
-            if (!isOrRelatedToPlayer && bodyChunk.owner.room != null)
-            {
-                bodyChunk.pos.x = Mathf.Lerp(bodyChunk.lastPos.x, bodyChunk.pos.x, worldSpeed);
-                bodyChunk.pos.y = Mathf.Lerp(bodyChunk.lastPos.y, bodyChunk.pos.y, worldSpeed);
-                bodyChunk.vel.x = Mathf.Lerp(origV.x, bodyChunk.vel.x, worldSpeed);
-                bodyChunk.vel.y = Mathf.Lerp(origV.y, bodyChunk.vel.y, worldSpeed);
-            }
+            orig(self, timeStacker, rCam, camPos);
         }
 
         private static bool CanIPickUpPatch(On.Player.orig_CanIPickThisUp orig, Player player, PhysicalObject obj)
         {
-            if (worldSpeed < STOP_THRESHOLD && obj is Weapon)
+            if (worldTPS <= 1f && obj is Weapon && (obj.abstractPhysicalObject.rippleBothSides || player.abstractPhysicalObject.rippleLayer == obj.abstractPhysicalObject.rippleLayer))
             {
                 if ((obj as Weapon).mode == Weapon.Mode.Thrown && !((obj as Weapon).thrownBy is Player))
                 {
@@ -607,20 +361,6 @@ namespace LancerRemix.Latcher
                 }
             }
             return orig(player, obj);
-        }
-
-        private static void WaterNutSwellPatch(On.WaterNut.orig_Swell orig, WaterNut nut)
-        {
-            //if (Mathf.Approximately(worldSpeed, 1f))
-            orig(nut);
-        }
-
-        private static void MicrophoneDrawPatch(On.VirtualMicrophone.orig_DrawUpdate orig, VirtualMicrophone mic, float timeStacker, float timeSpeed)
-        {
-            if (worldSpeed > STOP_THRESHOLD)
-                orig(mic, timeStacker, timeSpeed);
-            else
-                orig(mic, timeStacker, timeSpeed * Mathf.Max(worldSpeed, 0.2f));
         }
 
         private static bool NoLatcherLocustAttachOnRipple(On.LocustSystem.Swarm.orig_IsTargetValid orig, LocustSystem.Swarm self)
