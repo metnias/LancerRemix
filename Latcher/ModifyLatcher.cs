@@ -425,6 +425,7 @@ namespace LancerRemix.Latcher
             }
             // No Ripple Layer
             self.ChangeRippleLayer(0);
+            //Shader.DisableKeyword("RIPPLE");
         }
     }
 }

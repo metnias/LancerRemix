@@ -36,6 +36,7 @@ namespace LancerRemix.Latcher
             On.Watcher.SpinningTop.SpinningTopConversation.AddEvents += LatcherSpinningTopDialog;
             On.Watcher.SpinningTop.OnScreen += LatcherSpinningTopOnScreen;
             On.VirtualMicrophone.RippleSpaceUpdate += LatcherRippleSoundSpeedFix;
+            On.Watcher.RippleCameraData.SetGlobals += LatcherRippleSetGlobals;
         }
 
         internal static void OnWatcherDisableSubPatch()
@@ -49,6 +50,7 @@ namespace LancerRemix.Latcher
             On.World.SpawnGhost -= LatcherSpawnSpinningTop;
             On.Watcher.SpinningTop.OnScreen -= LatcherSpinningTopOnScreen;
             On.VirtualMicrophone.RippleSpaceUpdate -= LatcherRippleSoundSpeedFix;
+            On.Watcher.RippleCameraData.SetGlobals -= LatcherRippleSetGlobals;
         }
 
         internal static bool IsStoryLatcher(RainWorldGame game)
@@ -283,6 +285,15 @@ namespace LancerRemix.Latcher
         {
             if (LatcherMusicbox.IsLatcherRipple) timeSpeed = (timeSpeed + 2f) / 3f;
             orig(self, timeStacker, timeSpeed, currentListenerPos);
+        }
+
+        private static void LatcherRippleSetGlobals(On.Watcher.RippleCameraData.orig_SetGlobals orig, RippleCameraData self)
+        {
+            if (self.camera?.room != null && IsStoryLatcher(self.camera.room.game))
+            {
+                self.hasGameplayScreen = false;
+            }
+            orig(self);
         }
     }
 }

@@ -49,7 +49,7 @@ namespace LancerRemix.Latcher
             haltGrafUpdate = false;
             playerWorldRatio = playerSlowRatio = 1f;
             playerTPS = worldTPS = self.framesPerSecond;
-            float targetTPS = self.framesPerSecond;
+            float targetTPS = 40f;
             var ripplePlayers = new List<Player>();
             if (self is RainWorldGame game && IsStoryLatcher(game) && game.pauseMenu == null && game.processActive)
             {
@@ -64,13 +64,13 @@ namespace LancerRemix.Latcher
                     {
                         if (player.room != null && player.room.roomSettings.GetEffectAmount(RoomSettings.RoomEffect.Type.VoidMelt) > 0f)
                             targetTPS = Math.Min(targetTPS, Mathf.Lerp(targetTPS, 15f, player.room.roomSettings.GetEffectAmount(RoomSettings.RoomEffect.Type.VoidMelt) * Mathf.InverseLerp(-7000f, -2000f, player.mainBodyChunk.pos.y)));
-                        if (!player.isCamo && player.Adrenaline > 0f)
-                            targetTPS = Math.Min(targetTPS, Mathf.Lerp(40f, 15f, player.Adrenaline));
                         if (IsPlayerLatcher(player) && player.camoProgress > 0f)
                         {
-                            maxRipple = Mathf.Max(player.camoProgress * player.rippleLevel, maxRipple);
+                            maxRipple = Mathf.Max(Mathf.Clamp01(player.camoProgress) * player.rippleLevel, maxRipple);
                             ripplePlayers.Add(player);
                         }
+                        if (player.mushroomCounter > 0)
+                            targetTPS = Math.Min(targetTPS, Mathf.Lerp(40f, 15f, player.Adrenaline));
                         if (player.redsIllness != null)
                             targetTPS *= player.redsIllness.TimeFactor;
                     }
@@ -81,32 +81,37 @@ namespace LancerRemix.Latcher
 
                 if (maxRipple <= 2.5f)
                 {
-                    playerTPS = Mathf.Lerp(40f, 25f, maxRipple * 2f);
-                    worldTPS = Mathf.Lerp(40f, 25f, maxRipple * 2f);
+                    float t = Mathf.Clamp01(maxRipple * 2f);
+                    playerTPS = Mathf.Lerp(40f, 25f, t);
+                    worldTPS = Mathf.Lerp(40f, 25f, t);
                 }
                 else if (maxRipple <= 3.5f)
                 {
                     // canLevitate; x1.5
-                    playerTPS = Mathf.Lerp(25f, 27f, (maxRipple - 2.5f) * 2f);
-                    worldTPS = Mathf.Lerp(25f, 18f, (maxRipple - 2.5f) * 2f);
+                    float t = Mathf.Clamp01((maxRipple - 2.5f) * 2f);
+                    playerTPS = Mathf.Lerp(25f, 27f, t);
+                    worldTPS = Mathf.Lerp(25f, 18f, t);
                 }
                 else if (maxRipple <= 4.0f)
                 {
                     // x2.0
-                    playerTPS = Mathf.Lerp(27f, 30f, (maxRipple - 3.5f) * 2f);
-                    worldTPS = Mathf.Lerp(18f, 15f, (maxRipple - 3.5f) * 2f);
+                    float t = Mathf.Clamp01((maxRipple - 3.5f) * 2f);
+                    playerTPS = Mathf.Lerp(27f, 30f, t);
+                    worldTPS = Mathf.Lerp(18f, 15f, t);
                 }
                 else if (maxRipple <= 4.5f)
                 {
                     // x3.0
-                    playerTPS = Mathf.Lerp(30f, 33f, (maxRipple - 4.0f) * 2f);
-                    worldTPS = Mathf.Lerp(15f, 11f, (maxRipple - 4.0f) * 2f);
+                    float t = Mathf.Clamp01((maxRipple - 4.0f) * 2f);
+                    playerTPS = Mathf.Lerp(30f, 33f, t);
+                    worldTPS = Mathf.Lerp(15f, 11f, t);
                 }
                 else
                 {
                     // xinf
-                    playerTPS = Mathf.Lerp(33f, 40f, (maxRipple - 4.5f) * 2f);
-                    worldTPS = Mathf.Lerp(11f, 0f, (maxRipple - 4.5f) * 2f);
+                    float t = Mathf.Clamp01((maxRipple - 4.5f) * 2f);
+                    playerTPS = Mathf.Lerp(33f, 40f, t);
+                    worldTPS = Mathf.Lerp(11f, 0f, t);
                 }
 
                 worldTPS = Mathf.Min(targetTPS, worldTPS);
@@ -140,7 +145,7 @@ namespace LancerRemix.Latcher
                 haltGrafUpdate = playerWorldRatio > 1f;
                 self.framesPerSecond = Mathf.Max(8, Mathf.CeilToInt(worldTPS));
 
-                //Debug.Log($"Ripple{maxRipple:0.00} target{targetTPS:0.0} w{worldTPS:0.0}/p{playerTPS:0.0} (w{worldSpeed:0.00};p{playerSlowRatio:0.00})");
+                //Debug.Log($"Ripple{maxRipple:0.00} target{targetTPS:0.0} w{worldTPS:0.0}/p{playerTPS:0.0} (w{playerWorldRatio:0.00};p{playerSlowRatio:0.00})");
             }
 
         normalSpeed:
@@ -150,7 +155,7 @@ namespace LancerRemix.Latcher
             if (playerWorldRatio > 1f)
             {
                 playerTimeStacker += dt * playerTPS;
-                //Debug.Log($"{worldTPS:0}/{playerTPS:0}>{playerWorldRatio:0.00}) ts{self.myTimeStacker:0.00}/{playerTimeStacker:0.00} didWorldTick{didWorldTick}");
+                //Debug.Log($"{worldTPS:0}/{playerTPS:0}>{playerWorldRatio:0.00}) ts{self.myTimeStacker:0.00}/{playerTimeStacker:0.00} worldTicked{(didWorldTick ? "O" : "X")}");
                 int updateCount = 0;
                 var rippleRooms = new HashSet<Room>();
                 while (playerTimeStacker > 1f)
@@ -315,6 +320,7 @@ namespace LancerRemix.Latcher
         private static bool InLatcherTimeline(UpdatableAndDeletable ud)
         {
             if (ud is IRunDuringDialog) return true;
+            if (ud is ISpecialWarp) return true;
             //if (ud is Conversation.IOwnAConversation) return true;
             if (ud is Ghost) return true;
             if (ud is RippleRing) return true;
