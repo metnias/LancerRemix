@@ -89,31 +89,31 @@ namespace LancerRemix.Latcher
                 }
                 else if (maxRipple <= 3.5f)
                 {
-                    // canLevitate; x1.5
+                    // x2.0
                     float t = Mathf.Clamp01((maxRipple - 2.5f) * 2f);
-                    playerTPS = Mathf.Lerp(25f, 27f, t);
-                    worldTPS = Mathf.Lerp(25f, 18f, t);
+                    playerTPS = Mathf.Lerp(25f, 30f, t);
+                    worldTPS = Mathf.Lerp(25f, 15f, t);
                 }
                 else if (maxRipple <= 4.0f)
                 {
-                    // x2.0
+                    // x3.0
                     float t = Mathf.Clamp01((maxRipple - 3.5f) * 2f);
-                    playerTPS = Mathf.Lerp(27f, 30f, t);
-                    worldTPS = Mathf.Lerp(18f, 15f, t);
+                    playerTPS = Mathf.Lerp(30f, 33f, t);
+                    worldTPS = Mathf.Lerp(15f, 11f, t);
                 }
                 else if (maxRipple <= 4.5f)
                 {
-                    // x3.0
+                    // x4.0
                     float t = Mathf.Clamp01((maxRipple - 4.0f) * 2f);
-                    playerTPS = Mathf.Lerp(30f, 33f, t);
-                    worldTPS = Mathf.Lerp(15f, 11f, t);
+                    playerTPS = Mathf.Lerp(33f, 36f, t);
+                    worldTPS = Mathf.Lerp(11f, 9f, t);
                 }
                 else
                 {
                     // xinf
                     float t = Mathf.Clamp01((maxRipple - 4.5f) * 2f);
-                    playerTPS = Mathf.Lerp(33f, 40f, t);
-                    worldTPS = Mathf.Lerp(11f, 0f, t);
+                    playerTPS = Mathf.Lerp(36f, 40f, t);
+                    worldTPS = Mathf.Lerp(9f, 0f, t);
                 }
 
                 worldTPS = Mathf.Min(targetTPS, worldTPS);
@@ -355,7 +355,7 @@ namespace LancerRemix.Latcher
             {
                 if (po is VoidSpawn) return true;
                 if (po is Player player) return IsPlayerLatcher(player);
-                if (po is PlayerCarryableItem pci && pci.grabbedBy?.Count > 0 && pci.grabbedBy[0].grabber is Player grabber)
+                if (po.grabbedBy?.Count > 0 && po.grabbedBy[0].grabber is Player grabber)
                     return IsPlayerLatcher(grabber);
                 if (po is Weapon w && w.mode == Weapon.Mode.Thrown && w.thrownBy is Player thrower)
                     return IsPlayerLatcher(thrower);
@@ -400,13 +400,21 @@ namespace LancerRemix.Latcher
 
         private static bool CanIPickUpPatch(On.Player.orig_CanIPickThisUp orig, Player player, PhysicalObject obj)
         {
-            if (IsLatcherRipple && obj is Weapon)
+            if (playerWorldRatio > 1f)
             {
-                if ((obj as Weapon).mode == Weapon.Mode.Thrown && !((obj as Weapon).thrownBy is Player))
+                if (!didWorldTick && obj is PlayerCarryableItem pci)
                 {
-                    (obj as Weapon).mode = Weapon.Mode.Free;
-                    if (orig(player, obj)) return true;
-                    else { (obj as Weapon).mode = Weapon.Mode.Thrown; return false; }
+                    if (pci.forbiddenToPlayer > 0) --pci.forbiddenToPlayer; // manual reduce
+                    if (pci.blink > 0) --pci.blink;
+                }
+                if (IsLatcherRipple && obj is Weapon weapon)
+                {
+                    if (weapon.mode == Weapon.Mode.Thrown && !(weapon.thrownBy is Player))
+                    {
+                        weapon.mode = Weapon.Mode.Free;
+                        if (orig(player, obj)) return true;
+                        else { weapon.mode = Weapon.Mode.Thrown; return false; }
+                    }
                 }
             }
             return orig(player, obj);

@@ -426,8 +426,13 @@ namespace LancerRemix.Latcher
             // No Ripple Layer
             self.ChangeRippleLayer(0);
             // TEMP; this *works* but has lots of visual glitches
-            if (self.isCamo && self.rippleLevel >= 5.0f) Shader.DisableKeyword("RIPPLE");
-            else Shader.EnableKeyword("RIPPLE");
+            if (self.isCamo && self.rippleLevel >= 5.0f)
+                Shader.DisableKeyword("RIPPLE");
+            else
+                Shader.EnableKeyword("RIPPLE");
+
+            if (LatcherMusicbox.IsLatcherRipple)
+                foreach (var grabber in self.grabbedBy) grabber?.Release();
         }
     }
 }

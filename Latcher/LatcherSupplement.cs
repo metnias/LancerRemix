@@ -49,6 +49,19 @@ namespace LancerRemix.Latcher
             }
         }
 
+        public override void ThrowObject(On.Player.orig_ThrowObject orig, int grasp, bool eu)
+        {
+            if (self.grasps[grasp]?.grabbed != null && !(self.grasps[grasp].grabbed is Spear)
+                && LatcherMusicbox.IsLatcherRipple)
+            {
+                self.room.AddObject(new ShockWave(self.grasps[grasp].grabbed.bodyChunks[0].pos,
+                    self.grasps[grasp].grabbed.bodyChunks[0].rad, self.grasps[grasp].grabbed.bodyChunks[0].mass,
+                    16));
+            }
+
+            base.ThrowObject(orig, grasp, eu);
+        }
+
         protected override void LancerTerrainImpact(IntVector2 direction, float speed, bool firstContact)
         {
             if (speed > 10f)
