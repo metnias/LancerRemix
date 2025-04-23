@@ -291,7 +291,7 @@ namespace LancerRemix.Latcher
         {
             if (self.camera?.room != null && IsStoryLatcher(self.camera.room.game))
             {
-                self.hasGameplayScreen = false;
+                //self.hasGameplayScreen = false;
             }
             orig(self);
         }
