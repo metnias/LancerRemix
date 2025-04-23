@@ -18,6 +18,7 @@ namespace LancerRemix.Latcher
             On.MainLoopProcess.RawUpdate += GameRawUpdatePatch;
             On.RainWorldGame.GrafUpdate += GrafUpdateHalt;
             On.RoomCamera.SpriteLeaser.Update += SpriteLeaserPatch;
+            On.Room.ShouldBeDeferred += TimelineDeferredPatch;
             On.Player.CanIPickThisUp += CanIPickUpPatch;
 
             On.LocustSystem.Swarm.IsTargetValid += NoLatcherLocustAttachOnRipple;
@@ -63,10 +64,10 @@ namespace LancerRemix.Latcher
                             targetTPS = Math.Min(targetTPS, Mathf.Lerp(targetTPS, 15f, player.room.roomSettings.GetEffectAmount(RoomSettings.RoomEffect.Type.VoidMelt) * Mathf.InverseLerp(-7000f, -2000f, player.mainBodyChunk.pos.y)));
                         if (!player.isCamo && player.Adrenaline > 0f)
                             targetTPS = Math.Min(targetTPS, Mathf.Lerp(40f, 15f, player.Adrenaline));
-                        if (IsPlayerLancer(player))
+                        if (IsPlayerLatcher(player) && player.camoProgress > 0f)
                         {
                             maxRipple = Mathf.Max(player.camoProgress * player.rippleLevel, maxRipple);
-                            if (player.camoProgress > 0f) ripplePlayers.Add(player);
+                            ripplePlayers.Add(player);
                         }
                         if (player.redsIllness != null)
                             targetTPS *= player.redsIllness.TimeFactor;
@@ -110,11 +111,12 @@ namespace LancerRemix.Latcher
                 playerTPS = Mathf.Min(targetTPS, playerTPS);
                 if (ModManager.MMF)
                 {
-                    worldTPS /= MMF.cfgSlowTimeFactor.Value;
-                    playerTPS /= MMF.cfgSlowTimeFactor.Value;
-                    targetTPS /= MMF.cfgSlowTimeFactor.Value;
+                    float slowFactor = 1f / Mathf.Max(MMF.cfgSlowTimeFactor.Value, .01f);
+                    worldTPS *= slowFactor;
+                    playerTPS *= slowFactor;
+                    targetTPS *= slowFactor;
                 }
-                playerWorldRatio = playerTPS / worldTPS;
+                playerWorldRatio = playerTPS / Mathf.Max(worldTPS, 1f);
                 playerSlowRatio = targetTPS / playerTPS;
 
                 if (game.devToolsActive)
@@ -134,7 +136,8 @@ namespace LancerRemix.Latcher
                 #endregion CheckRipple
 
                 haltGrafUpdate = playerWorldRatio > 1f;
-                self.framesPerSecond = Mathf.Max(1, Mathf.CeilToInt(worldTPS));
+                self.framesPerSecond = Mathf.Max(8, Mathf.CeilToInt(worldTPS));
+
                 //Debug.Log($"Ripple{maxRipple:0.00} target{targetTPS:0.0} w{worldTPS:0.0}/p{playerTPS:0.0} (w{worldSpeed:0.00};p{playerSlowRatio:0.00})");
             }
 
@@ -167,7 +170,6 @@ namespace LancerRemix.Latcher
                             rippleRooms.Add(player.room);
                     }
                     // Force player update
-                    int updateUDCount = 0;
                     foreach (var room in rippleRooms)
                     {
                         // Update
@@ -183,10 +185,8 @@ namespace LancerRemix.Latcher
                             }
 
                             if (!InPlayerTimeline(ud)) { --updateIndex; continue; }
-                            ++updateUDCount;
 
-                            bool deferred = room.ShouldBeDeferred(ud);
-                            if ((!room.game.pauseUpdate || ud is IRunDuringDialog) && !deferred)
+                            if (!room.game.pauseUpdate || ud is IRunDuringDialog)
                             {
                                 ud.Update(room.game.evenUpdate);
                             }
@@ -196,19 +196,16 @@ namespace LancerRemix.Latcher
                             }
                             else if (ud is PhysicalObject po)
                             {
-                                if (!deferred)
+                                if (po.graphicsModule != null)
                                 {
-                                    if (po.graphicsModule != null)
-                                    {
-                                        playerTimelineDrawables.Add(po.graphicsModule);
-                                        po.graphicsModule.Update();
-                                        po.GraphicsModuleUpdated(true, room.game.evenUpdate);
-                                    }
-                                    else
-                                    {
-                                        if (ud is IDrawable id) playerTimelineDrawables.Add(id);
-                                        po.GraphicsModuleUpdated(false, room.game.evenUpdate);
-                                    }
+                                    playerTimelineDrawables.Add(po.graphicsModule);
+                                    po.graphicsModule.Update();
+                                    po.GraphicsModuleUpdated(true, room.game.evenUpdate);
+                                }
+                                else
+                                {
+                                    if (ud is IDrawable id) playerTimelineDrawables.Add(id);
+                                    po.GraphicsModuleUpdated(false, room.game.evenUpdate);
                                 }
                             }
                             else if (ud is IDrawable id)
@@ -306,17 +303,19 @@ namespace LancerRemix.Latcher
 
                 bool InPlayerTimeline(UpdatableAndDeletable ud)
                 {
+                    if (ud is IRunDuringDialog) return true;
+                    //if (ud is Conversation.IOwnAConversation) return true;
                     if (ud is Ghost) return true;
                     if (ud is RippleRing) return true;
                     if (ud is CosmeticRipple) return true;
                     if (ud is PhysicalObject po)
                     {
                         if (po is VoidSpawn) return true;
-                        if (po is Player player) return IsPlayerLatcher(player) && player.camoProgress > 0f;
+                        if (po is Player player) return IsPlayerLatcher(player);
                         if (po is PlayerCarryableItem pci && pci.grabbedBy?.Count > 0 && pci.grabbedBy[0].grabber is Player grabber)
-                            return IsPlayerLatcher(grabber) && grabber.camoProgress > 0f;
+                            return IsPlayerLatcher(grabber);
                         if (po is Weapon w && w.mode == Weapon.Mode.Thrown && w.thrownBy is Player thrower)
-                            return IsPlayerLatcher(thrower) && thrower.camoProgress > 0f;
+                            return IsPlayerLatcher(thrower);
                         return false;
                     }
                     return false;
@@ -349,9 +348,17 @@ namespace LancerRemix.Latcher
             orig(self, timeStacker, rCam, camPos);
         }
 
+        private static bool TimelineDeferredPatch(On.Room.orig_ShouldBeDeferred orig, Room self, UpdatableAndDeletable obj)
+        {
+            var res = orig(self, obj);
+            if (res) return res;
+            if (worldTPS < 1f) return true;
+            return res;
+        }
+
         private static bool CanIPickUpPatch(On.Player.orig_CanIPickThisUp orig, Player player, PhysicalObject obj)
         {
-            if (worldTPS <= 1f && obj is Weapon && (obj.abstractPhysicalObject.rippleBothSides || player.abstractPhysicalObject.rippleLayer == obj.abstractPhysicalObject.rippleLayer))
+            if (worldTPS < 1f && obj is Weapon && (obj.abstractPhysicalObject.rippleBothSides || player.abstractPhysicalObject.rippleLayer == obj.abstractPhysicalObject.rippleLayer))
             {
                 if ((obj as Weapon).mode == Weapon.Mode.Thrown && !((obj as Weapon).thrownBy is Player))
                 {
