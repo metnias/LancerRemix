@@ -18,6 +18,7 @@ namespace LancerRemix.Latcher
         public override void Update(On.Player.orig_Update orig, bool eu)
         {
             base.Update(orig, eu);
+            if (self.room == null) return;
 
             if (self.sporeParticleTicks > 0)
             {
@@ -34,7 +35,7 @@ namespace LancerRemix.Latcher
                 }
             }
 
-            if (self.camoProgress > 0f)
+            if (self.camoProgress > 0f && self.mushroomCounter == 0)
             {
                 float mushroomEffect = .1f;
                 if (self.rippleLevel >= 5f) mushroomEffect = 1f;

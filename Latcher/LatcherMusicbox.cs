@@ -22,6 +22,8 @@ namespace LancerRemix.Latcher
             On.Player.CanIPickThisUp += CanIPickUpPatch;
             On.WaterNut.Swell += WaterNutSwellPatch;
             On.VirtualMicrophone.DrawUpdate += MicrophoneDrawPatch;
+            On.LocustSystem.Swarm.IsTargetValid += NoLatcherLocustAttachOnRipple;
+
             worldSpeed = 1f; worldTPS = playerTPS = 40f; worldTickStacker = 0f;
         }
 
@@ -429,10 +431,7 @@ namespace LancerRemix.Latcher
         {
             var res = orig(self, obj);
             if (res) return res;
-            if (obj is Player p && p.camoProgress > 0f)
-            {
-                return false;
-            }
+            if (obj is Player p && IsPlayerLatcher(p) && p.camoProgress > 0f) return false;
             if (!doWorldTick)
             {
                 if (!(obj is PhysicalObject po)) return res;
@@ -622,6 +621,15 @@ namespace LancerRemix.Latcher
                 orig(mic, timeStacker, timeSpeed);
             else
                 orig(mic, timeStacker, timeSpeed * Mathf.Max(worldSpeed, 0.2f));
+        }
+
+        private static bool NoLatcherLocustAttachOnRipple(On.LocustSystem.Swarm.orig_IsTargetValid orig, LocustSystem.Swarm self)
+        {
+            var res = orig(self);
+            if (!res) return res;
+            if (self.target is Player player && IsPlayerLatcher(player) && player.maxRippleLevel >= 5.0f && player.isCamo)
+                return false;
+            return res;
         }
     }
 }

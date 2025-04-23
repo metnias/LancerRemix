@@ -46,6 +46,7 @@ namespace LancerRemix.Latcher
             ));
 
             On.Player.WatcherUpdate += LatcherUpdate;
+            On.Player.CamoUpdate += LatcherCamoUpdate;
 
             LatcherPatch.OnWatcherEnableSubPatch();
             LatcherTutorial.OnWatcherEnableSubPatch();
@@ -57,6 +58,7 @@ namespace LancerRemix.Latcher
             hooks.Clear();
 
             On.Player.WatcherUpdate -= LatcherUpdate;
+            On.Player.CamoUpdate -= LatcherCamoUpdate;
 
             LatcherPatch.OnWatcherDisableSubPatch();
             LatcherTutorial.OnWatcherDisableSubPatch();
@@ -404,12 +406,23 @@ namespace LancerRemix.Latcher
 
         private static void LatcherCamoUpdate(On.Player.orig_CamoUpdate orig, Player self)
         {
+            float lastTrailPaletteAmount = self.rippleData.trailPaletteAmount;
             orig(self);
             if (!IsPlayerLatcher(self)) return;
 
             if (self.isCamo)
                 self.camoCharge = Mathf.Min(self.camoCharge + (LatcherMusicbox.playerSlowRatio - 1f), self.usableCamoLimit);
             // Additional penalty with slowed down game
+            // Also use x2 cuz this is quite op in combat
+
+            if (self.rippleData != null)
+            {
+                // Reverse camo effect
+                if (self.isCamo)
+                    self.rippleData.trailPaletteAmount = Mathf.Lerp(lastTrailPaletteAmount, 1f, LatcherMusicbox.playerSlowRatio * 0.09f);
+                else
+                    self.rippleData.trailPaletteAmount = Mathf.Lerp(lastTrailPaletteAmount, 0f, 0.003f);
+            }
         }
     }
 }
