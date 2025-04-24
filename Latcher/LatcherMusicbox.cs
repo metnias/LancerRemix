@@ -36,7 +36,6 @@ namespace LancerRemix.Latcher
         internal static float playerSlowRatio;
         private static float playerWorldRatio;
         private static float playerTimeStacker;
-        private static bool playerEvenUpdate = false;
         private static HashSet<IDrawable> playerTimelineDrawables;
         internal static bool IsLatcherRipple => worldTPS < 1f;
 
@@ -53,13 +52,15 @@ namespace LancerRemix.Latcher
             playerTPS = worldTPS = self.framesPerSecond;
             float targetTPS = 40f;
             var ripplePlayers = new List<Player>();
+            bool doSync = false;
             if (self is RainWorldGame game && IsStoryLatcher(game) && game.pauseMenu == null && game.processActive)
             {
-                #region CheckRipple
-
                 float maxRipple = 0f;
                 var players = game.session.Players;
                 if (players.Count < 1) goto normalSpeed;
+
+                #region CheckRippleAndTargetTPS
+
                 for (int j = 0; j < players.Count; j++)
                 {
                     if (players[j].realizedCreature is Player player)
@@ -80,6 +81,10 @@ namespace LancerRemix.Latcher
                 if (Mathf.Approximately(maxRipple, 0f)) goto normalSpeed;
 
                 targetTPS = Math.Min(targetTPS, 40f - game.cameras[0].ghostMode * 10f);
+
+                #endregion CheckRippleAndTargetTPS
+
+                #region CalculateTPSForMaxRipple
 
                 if (maxRipple <= 2.5f)
                 {
@@ -116,6 +121,8 @@ namespace LancerRemix.Latcher
                     worldTPS = Mathf.Lerp(9f, 0f, t);
                 }
 
+                #endregion CalculateTPSForMaxRipple
+
                 worldTPS = Mathf.Min(targetTPS, worldTPS);
                 playerTPS = Mathf.Min(targetTPS, playerTPS);
                 if (ModManager.MMF)
@@ -125,8 +132,9 @@ namespace LancerRemix.Latcher
                     playerTPS *= slowFactor;
                     targetTPS *= slowFactor;
                 }
-                playerWorldRatio = playerTPS / Mathf.Max(worldTPS, 1f);
+                playerWorldRatio = playerTPS / Mathf.Max(worldTPS, 8f);
                 playerSlowRatio = targetTPS / playerTPS;
+                if (playerWorldRatio % 1f < .01f) doSync = true;
 
                 if (game.devToolsActive)
                 {
@@ -142,8 +150,6 @@ namespace LancerRemix.Latcher
                     }
                 }
 
-                #endregion CheckRipple
-
                 haltGrafUpdate = playerWorldRatio > 1f;
                 self.framesPerSecond = Mathf.Max(8, Mathf.CeilToInt(worldTPS));
 
@@ -152,9 +158,13 @@ namespace LancerRemix.Latcher
 
         normalSpeed:
             playerTimelineDrawables.Clear();
+            didWorldTick = false;
             orig(self, dt);
-
-            if (playerWorldRatio > 1f)
+            if (didWorldTick && doSync)
+            {
+                playerTimeStacker = self.myTimeStacker;
+            }
+            else if (playerWorldRatio > 1f)
             {
                 playerTimeStacker += dt * playerTPS;
                 //Debug.Log($"{worldTPS:0}/{playerTPS:0}>{playerWorldRatio:0.00}) ts{self.myTimeStacker:0.00}/{playerTimeStacker:0.00} worldTicked{(didWorldTick ? "O" : "X")}");
@@ -162,9 +172,7 @@ namespace LancerRemix.Latcher
                 var rippleRooms = new HashSet<Room>();
                 while (playerTimeStacker > 1f)
                 {
-                    playerEvenUpdate = !playerEvenUpdate;
-                    if (!didWorldTick) PlayerUpdate();
-                    didWorldTick = false;
+                    PlayerUpdate();
                     playerTimeStacker -= 1f;
                     updateCount++;
                     if (updateCount > 2) playerTimeStacker = 0f;
@@ -322,20 +330,29 @@ namespace LancerRemix.Latcher
                     }
 
                     // Force Shortcut update with Player
-                    if (playerEvenUpdate && rwg.shortcuts != null)
+                    if (rwg.shortcuts != null)
                     {
                         bool updateShortcut = false;
                         foreach (var vessel in rwg.shortcuts.transportVessels)
                         { if (vessel.creature is Player) { updateShortcut = true; break; } }
-                        if (updateShortcut) rwg.shortcuts.Update();
+                        if (updateShortcut)
+                        {
+                            ++rwg.updateShortCut;
+                            if (rwg.updateShortCut > 2)
+                            {
+                                rwg.updateShortCut = 0;
+                                rwg.shortcuts.Update();
+                            }
+                        }
+                        else if (IsLatcherRipple)
+                            rwg.updateShortCut = 0; // disallow shortcut update while ripple
                     }
 
                     //Debug.Log($"{worldTPS:0}/{playerTPS:0}>{playerWorldRatio:0.00}) update{updateUDCount} graf{playerTimelineDrawables.Count}");
                 }
                 //Debug.Log($"{worldTPS:0}/{playerTPS:0}>{playerWorldRatio:0.00}) ts{self.myTimeStacker:0.00}/{playerTimeStacker:0.00} graf{playerTimelineDrawables.Count}");
             }
-            else
-                playerTimeStacker = self.myTimeStacker;
+
             if (haltGrafUpdate)
             {
                 haltGrafUpdate = false;

@@ -423,6 +423,7 @@ namespace LancerRemix.Latcher
                 else
                     self.rippleData.trailPaletteAmount = Mathf.Lerp(lastTrailPaletteAmount, 0f, 0.003f);
             }
+            /*
             // No Ripple Layer
             self.ChangeRippleLayer(0);
             // TEMP; this *works* but has lots of visual glitches
@@ -430,6 +431,7 @@ namespace LancerRemix.Latcher
                 Shader.DisableKeyword("RIPPLE");
             else
                 Shader.EnableKeyword("RIPPLE");
+            */
 
             if (LatcherMusicbox.IsLatcherRipple)
                 foreach (var grabber in self.grabbedBy) grabber?.Release();
