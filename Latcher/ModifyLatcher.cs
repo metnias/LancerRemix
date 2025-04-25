@@ -129,10 +129,10 @@ namespace LancerRemix.Latcher
         private static float LatcherCamoLimit(orig_LatcherCamoLimit orig, Player self)
         {
             if (!IsPlayerLatcher(self)) return orig(self);
-            if (self.rippleLevel >= 5f) return 1600f;
-            if (self.rippleLevel >= 4f) return 1400f;
-            if (self.rippleLevel >= 2f) return 1200f;
-            return 800f;
+            if (self.rippleLevel >= 5f) return 2400f;
+            if (self.rippleLevel >= 4f) return 2100f;
+            if (self.rippleLevel >= 2f) return 1800f;
+            return 1200f;
         }
 
         #endregion Properties
