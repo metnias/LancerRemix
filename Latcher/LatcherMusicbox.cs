@@ -381,12 +381,26 @@ namespace LancerRemix.Latcher
 
         private static bool InLatcherTimeline(UpdatableAndDeletable ud)
         {
-            if (ud is IRunDuringDialog && !(ud is CosmeticSprite)) return true;
             if (ud is ISpecialWarp) return true;
-            //if (ud is Conversation.IOwnAConversation) return true;
-            if (ud is Ghost) return true;
-            if (ud is RippleRing) return true;
+            if (ud is IRunDuringDialog)
+            {
+                if (ud is CosmeticSprite cs)
+                {
+                    if (cs is CosmeticInsect) return false; // fast escape for commoners
+                    if (cs is Ghost) return true;
+                    if (cs is RippleRing) return true;
+                    if (cs is RippleDeathEffect) return true;
+                    if (cs is AdrenalineEffect) return true;
+                    if (cs is ShockWave shockWave) return shockWave.life * 2 < shockWave.lifeTime;
+
+                    return false;
+                }
+                return true;
+            }
             if (ud is CosmeticRipple) return true;
+            if (ud is Explosion explosion) return explosion.frame * 3 < explosion.lifeTime;
+            if (ud is KarmicShockwave kShockWave) return kShockWave.frame < 8;
+            //if (ud is Conversation.IOwnAConversation) return true;
             if (ud is PhysicalObject po)
             {
                 if (po.abstractPhysicalObject.rippleLayer == 1
