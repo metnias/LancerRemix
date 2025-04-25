@@ -182,12 +182,15 @@ namespace LancerRemix.Latcher
                 void PlayerUpdate()
                 {
                     var rwg = self as RainWorldGame;
+                    if (rwg.cameras?[0]?.room != null)
+                        rippleRooms.Add(rwg.cameras[0].room);
                     foreach (var player in ripplePlayers)
                     {
                         if (player.room == null || player.room.game == null || !player.room.readyForAI) continue;
                         if (!rippleRooms.Contains(player.room))
                             rippleRooms.Add(player.room);
                     }
+
                     // Force player update
                     foreach (var room in rippleRooms)
                     {
@@ -203,7 +206,25 @@ namespace LancerRemix.Latcher
                                 continue;
                             }
 
-                            if (!InLatcherTimeline(ud)) { --updateIndex; continue; }
+                            if (!InLatcherTimeline(ud))
+                            {
+                                if (ud is PhysicalObject po)
+                                {
+                                    if (po.graphicsModule != null)
+                                    {
+                                        po.graphicsModule.Update();
+                                        po.GraphicsModuleUpdated(true, room.game.evenUpdate);
+                                    }
+                                    else
+                                    {
+                                        if (ud is IDrawable id) latcherTimelineDrawables.Add(id);
+                                        po.GraphicsModuleUpdated(false, room.game.evenUpdate);
+                                    }
+                                }
+
+                                --updateIndex;
+                                continue;
+                            }
 
                             if (!room.game.pauseUpdate || ud is IRunDuringDialog)
                             {
@@ -227,8 +248,6 @@ namespace LancerRemix.Latcher
                                     po.GraphicsModuleUpdated(false, room.game.evenUpdate);
                                 }
                             }
-                            else if (ud is IDrawable id)
-                                latcherTimelineDrawables.Add(id);
 
                             --updateIndex;
                         }
@@ -362,7 +381,7 @@ namespace LancerRemix.Latcher
 
         private static bool InLatcherTimeline(UpdatableAndDeletable ud)
         {
-            if (ud is IRunDuringDialog) return true;
+            if (ud is IRunDuringDialog && !(ud is CosmeticSprite)) return true;
             if (ud is ISpecialWarp) return true;
             //if (ud is Conversation.IOwnAConversation) return true;
             if (ud is Ghost) return true;
@@ -370,7 +389,7 @@ namespace LancerRemix.Latcher
             if (ud is CosmeticRipple) return true;
             if (ud is PhysicalObject po)
             {
-                if (po.abstractPhysicalObject.rippleLayer == ud.room.game.ActiveRippleLayer
+                if (po.abstractPhysicalObject.rippleLayer == 1
                     || po.abstractPhysicalObject.rippleBothSides) return true;
                 //if (po is VoidSpawn) return true;
                 if (po is Player player) return IsPlayerLatcher(player);
