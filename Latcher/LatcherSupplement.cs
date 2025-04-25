@@ -90,7 +90,11 @@ namespace LancerRemix.Latcher
             {
                 if (speed > 50f && speed <= 60f && direction.y < 0)
                 {
-                    if (self.room != null && self.room.abstractRoom.name == "HI_W05") return; // Latcher death protection in intro
+                    if (self.room != null)
+                    {
+                        if (self.room.abstractRoom.name == "HI_W05") return; // Latcher death protection in intro
+                        if (self.room.abstractRoom.name.ToUpper().StartsWith("WRSA_")) return; // No fall death in Daemon
+                    }
                     self.room.PlaySound(SoundID.Slugcat_Terrain_Impact_Death, self.mainBodyChunk);
                     Debug.Log("Lancer Fall damage death");
                     self.Die();
