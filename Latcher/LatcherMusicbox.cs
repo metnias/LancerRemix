@@ -250,10 +250,11 @@ namespace LancerRemix.Latcher
                                 }
                                 else
                                 {
-                                    if (ud is IDrawable id) latcherTimelineDrawables.Add(id);
+                                    if (po is IDrawable id) latcherTimelineDrawables.Add(id);
                                     po.GraphicsModuleUpdated(false, room.game.evenUpdate);
                                 }
                             }
+                            else if (ud is IDrawable id) latcherTimelineDrawables.Add(id);
 
                             --updateIndex;
                         }
