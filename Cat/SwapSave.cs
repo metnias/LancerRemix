@@ -4,6 +4,7 @@ using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using MoreSlugcats;
 using System;
+using System.Runtime.CompilerServices;
 using static CatSub.Story.SaveManager;
 using static LancerRemix.LancerEnums;
 using Debug = UnityEngine.Debug;
@@ -26,6 +27,8 @@ namespace LancerRemix.Cat
             //IL.PlayerProgression.LoadMapTexture += LoadLancerMapTexture;
             //On.PlayerProgression.LoadGameState += LoadLancerStateInstead;
             IL.PlayerProgression.LoadGameState += LoadLancerState;
+
+            On.MoreSlugcats.SpeedRunTimer.GetCampaignTimeTracker += GetLancerCampaignTimeTracker;
 
             On.RoomSettings.ctor_Room_string_Region_bool_bool_Timeline_RainWorldGame += LancerRoomSettings;
             On.Region.GetRegionFullName += LancerRegionFullName;
@@ -384,6 +387,13 @@ namespace LancerRemix.Cat
         }
 
         #endregion SaveState
+
+        private static SpeedRunTimer.CampaignTimeTracker GetLancerCampaignTimeTracker(On.MoreSlugcats.SpeedRunTimer.orig_GetCampaignTimeTracker orig, SlugName slugcat)
+        {
+            if (slugcat == null) return orig(slugcat);
+            if (IsStoryLancer) slugcat = GetLancer(slugcat);
+            return orig(slugcat);
+        }
 
         #region Region
 
