@@ -182,8 +182,10 @@ namespace LancerRemix.Latcher
                 void PlayerUpdate()
                 {
                     var rwg = self as RainWorldGame;
-                    if (rwg.cameras?[0]?.room != null)
+                    if (rwg.cameras[0]?.room != null)
+                    {
                         rippleRooms.Add(rwg.cameras[0].room);
+                    }
                     foreach (var player in ripplePlayers)
                     {
                         if (player.room == null || player.room.game == null || !player.room.readyForAI) continue;
@@ -210,6 +212,8 @@ namespace LancerRemix.Latcher
                             {
                                 if (ud is PhysicalObject po)
                                 {
+                                    var backupRng = Random.state;
+                                    Random.InitState(0);
                                     if (po.graphicsModule != null)
                                     {
                                         po.graphicsModule.Update();
@@ -220,6 +224,7 @@ namespace LancerRemix.Latcher
                                         if (ud is IDrawable id) latcherTimelineDrawables.Add(id);
                                         po.GraphicsModuleUpdated(false, room.game.evenUpdate);
                                     }
+                                    Random.state = backupRng;
                                 }
 
                                 --updateIndex;
@@ -381,6 +386,7 @@ namespace LancerRemix.Latcher
 
         private static bool InLatcherTimeline(UpdatableAndDeletable ud)
         {
+            if (ud == null) return false;
             if (ud is ISpecialWarp) return true;
             if (ud is IRunDuringDialog)
             {
@@ -400,6 +406,7 @@ namespace LancerRemix.Latcher
             if (ud is CosmeticRipple) return true;
             if (ud is Explosion explosion) return explosion.frame * 3 < explosion.lifeTime;
             if (ud is KarmicShockwave kShockWave) return kShockWave.frame < 8;
+            if (ud is PoisonInjecter poisonInjecter) return InLatcherTimeline(poisonInjecter.crit);
             //if (ud is Conversation.IOwnAConversation) return true;
             if (ud is PhysicalObject po)
             {
@@ -427,15 +434,22 @@ namespace LancerRemix.Latcher
         private static void SpriteLeaserPatch(On.RoomCamera.SpriteLeaser.orig_Update orig, RoomCamera.SpriteLeaser self,
             float timeStacker, RoomCamera rCam, Vector2 camPos)
         {
+            bool fixTime = false;
+            var backupRng = Random.state;
             if (playerWorldRatio > 1f)
             {
                 // Check whether replace timeStacker
                 if (self.drawableObject != null && latcherTimelineDrawables.Contains(self.drawableObject))
                     timeStacker = playerTimeStacker;
                 else if (IsLatcherRipple)
+                {
                     timeStacker = 0f; // remove jitter
+                    fixTime = true;
+                    Random.InitState(0);
+                }
             }
             orig(self, timeStacker, rCam, camPos);
+            if (fixTime) Random.state = backupRng;
         }
 
         private static bool TimelineDeferredPatch(On.Room.orig_ShouldBeDeferred orig, Room self, UpdatableAndDeletable obj)

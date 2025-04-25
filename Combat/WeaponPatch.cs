@@ -289,9 +289,20 @@ namespace LancerRemix.Combat
                 (sLeaser.sprites[2] as TriangleMesh).MoveVertice(2, tie + normalized * d - perp * vel - camPos);
                 (sLeaser.sprites[2] as TriangleMesh).MoveVertice(3, tie + normalized * d + perp * vel - camPos);
             }
-            float aimRot = Custom.AimFromOneVectorToAnother(Vector2.zero, aimDir);
-            for (int i = (self is ExplosiveSpear || self.bugSpear) ? 1 : 0; i >= 0; i--)
+            float aimRot = Custom.VecToDeg(aimDir);
+            for (int i = (self is ExplosiveSpear || self.bugSpear || self.hasPoisonGraphicsActive) ? 1 : 0; i >= 0; i--)
                 sLeaser.sprites[i].rotation = aimRot;
+
+            if (self.hasPoisonGraphicsActive)
+            {
+                var firstChunkPos = Vector2.Lerp(self.firstChunk.lastPos, self.firstChunk.pos, timeStacker);
+                float pivotAtTip = Mathf.Lerp(self.lastPivotAtTip ? 7f : 26f, self.pivotAtTip ? 7f : 26f, timeStacker);
+                var tipPos = firstChunkPos + aimDir * pivotAtTip;
+                sLeaser.sprites[0].x = tipPos.x - camPos.x;
+                sLeaser.sprites[0].y = tipPos.y - camPos.y;
+                sLeaser.sprites[0].anchorY = 0f;
+                sLeaser.sprites[0].rotation = aimRot;
+            }
         }
 
         private static void ElecSpearDrawSprites(On.MoreSlugcats.ElectricSpear.orig_DrawSprites orig, ElectricSpear self,
