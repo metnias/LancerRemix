@@ -36,6 +36,7 @@ namespace LancerRemix.Latcher
             On.Watcher.SpinningTop.OnScreen += LatcherSpinningTopOnScreen;
             On.VirtualMicrophone.RippleSpaceUpdate += LatcherRippleSoundSpeedFix;
             On.RoomCamera.SpriteLeaser.ctor += ReplaceLatcherRippleShader;
+            On.GraphicsModule.UpdateRippleHybrid += LatcherUpdateRippleHybrid;
         }
 
         internal static void OnWatcherDisableSubPatch()
@@ -50,6 +51,7 @@ namespace LancerRemix.Latcher
             On.Watcher.SpinningTop.OnScreen -= LatcherSpinningTopOnScreen;
             On.VirtualMicrophone.RippleSpaceUpdate -= LatcherRippleSoundSpeedFix;
             On.RoomCamera.SpriteLeaser.ctor -= ReplaceLatcherRippleShader;
+            On.GraphicsModule.UpdateRippleHybrid -= LatcherUpdateRippleHybrid;
         }
 
         internal static bool IsStoryLatcher(RainWorldGame game)
@@ -308,6 +310,17 @@ namespace LancerRemix.Latcher
                         fsprite.shader = fshader;
                 }
             }
+        }
+
+        private static void LatcherUpdateRippleHybrid(On.GraphicsModule.orig_UpdateRippleHybrid orig,
+            GraphicsModule self, RoomCamera.SpriteLeaser sLeaser, Room room)
+        {
+            if (self.owner?.room != null && IsStoryLatcher(self.owner.room.game))
+            {
+                if (self.rippleHybrid != null) self.DeactivateRippleHybrid();
+                return;
+            }
+            orig(self, sLeaser, room);
         }
     }
 }
