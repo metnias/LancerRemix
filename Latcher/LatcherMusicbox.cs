@@ -58,6 +58,7 @@ namespace LancerRemix.Latcher
                 float maxRipple = 0f;
                 var players = game.session.Players;
                 if (players.Count < 1) goto normalSpeed;
+                if (game.cameras[0]?.warpPointTimer != null) goto normalSpeed; // Deactivate timeline while warping
 
                 #region CheckRippleAndTargetTPS
 
@@ -397,14 +398,14 @@ namespace LancerRemix.Latcher
                     if (cs is RippleRing) return true;
                     if (cs is RippleDeathEffect) return true;
                     if (cs is AdrenalineEffect) return true;
-                    if (cs is ShockWave shockWave) return shockWave.life * 2 < shockWave.lifeTime;
+                    if (cs is ShockWave shockWave) return shockWave.life < .2f;
 
                     return false;
                 }
                 return true;
             }
             if (ud is CosmeticRipple) return true;
-            if (ud is Explosion explosion) return explosion.frame * 3 < explosion.lifeTime;
+            if (ud is Explosion explosion) return explosion.frame < 8;
             if (ud is KarmicShockwave kShockWave) return kShockWave.frame < 8;
             if (ud is PoisonInjecter poisonInjecter) return InLatcherTimeline(poisonInjecter.crit);
             //if (ud is Conversation.IOwnAConversation) return true;
@@ -456,7 +457,7 @@ namespace LancerRemix.Latcher
         {
             var res = orig(self, obj);
             if (res) return res;
-            if (IsLatcherRipple && !InLatcherTimeline(obj)) return true;
+            if (IsLatcherRipple && !InLatcherTimeline(obj) && !(obj is SoundEmitter)) return true;
             return res;
         }
 

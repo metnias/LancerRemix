@@ -1,4 +1,5 @@
 ﻿using LancerRemix.Cat;
+using LancerRemix.Latcher;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using MoreSlugcats;
@@ -51,6 +52,14 @@ namespace LancerRemix.Combat
         private static void LancerViolencePatch(On.Creature.orig_Violence orig, Creature self,
             BodyChunk source, Vector2? directionAndMomentum, BodyChunk hitChunk, PhysicalObject.Appendage.Pos hitAppendage, Creature.DamageType type, float damage, float stunBonus)
         {
+            if (ModManager.Watcher && LatcherMusicbox.IsLatcherRipple && source?.owner.room != null)
+            {
+                //Debug.Log($"Latcher created Shockwave");
+                var intensity = Mathf.Max(directionAndMomentum.HasValue ? directionAndMomentum.Value.magnitude * 10f : 0f, damage * 40f, 10f);
+                source.owner.room.AddObject(new ShockWave(source.pos, intensity * .5f, intensity, Mathf.CeilToInt(intensity * .5f)));
+                source.owner.room.PlaySound(SoundID.Rock_Hit_Creature, source, false, 1f, .8f);
+            }
+
             if (source?.owner is Spear spear && spear.thrownBy is Player atkPlayer && IsPlayerLancer(atkPlayer))
             {
                 LancerModifyViolence(self, ref stunBonus, atkPlayer, spear);
