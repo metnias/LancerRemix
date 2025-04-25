@@ -42,7 +42,11 @@ namespace LancerRemix.Latcher
             ));
             hooks.Add(new Hook(
                 typeof(LocustSystem.Swarm).GetProperty(nameof(LocustSystem.Swarm.CamoFactor), BindingFlags.Instance | BindingFlags.NonPublic).GetGetMethod(true),
-                typeof(ModifyLatcher).GetMethod(nameof(LocustCamoFactor), BindingFlags.Static | BindingFlags.NonPublic)
+                typeof(ModifyLatcher).GetMethod(nameof(LatcherLocustCamoFactor), BindingFlags.Static | BindingFlags.NonPublic)
+            ));
+            hooks.Add(new Hook(
+                typeof(Player).GetProperty(nameof(Player.camoLimit), BindingFlags.Instance | BindingFlags.Public).GetGetMethod(),
+                typeof(ModifyLatcher).GetMethod(nameof(LatcherCamoLimit), BindingFlags.Static | BindingFlags.NonPublic)
             ));
 
             On.Player.WatcherUpdate += LatcherUpdate;
@@ -110,14 +114,25 @@ namespace LancerRemix.Latcher
             return orig(self);
         }
 
-        private delegate float orig_LocustCamoFactor(LocustSystem.Swarm self);
+        private delegate float orig_LatcherLocustCamoFactor(LocustSystem.Swarm self);
 
-        private static float LocustCamoFactor(orig_LocustCamoFactor orig, LocustSystem.Swarm self)
+        private static float LatcherLocustCamoFactor(orig_LatcherLocustCamoFactor orig, LocustSystem.Swarm self)
         {
             var res = orig(self);
             if (res > 0f && self.target is Player player && IsPlayerLatcher(player))
                 return 0f; // No camo for Latcher
             return res;
+        }
+
+        private delegate float orig_LatcherCamoLimit(Player self);
+
+        private static float LatcherCamoLimit(orig_LatcherCamoLimit orig, Player self)
+        {
+            if (!IsPlayerLatcher(self)) return orig(self);
+            if (self.rippleLevel >= 5f) return 1600f;
+            if (self.rippleLevel >= 4f) return 1400f;
+            if (self.rippleLevel >= 2f) return 1200f;
+            return 800f;
         }
 
         #endregion Properties
@@ -413,7 +428,6 @@ namespace LancerRemix.Latcher
             if (self.isCamo)
                 self.camoCharge = Mathf.Min(self.camoCharge + (LatcherMusicbox.playerSlowRatio - 1f), self.usableCamoLimit);
             // Additional penalty with slowed down game
-            // TODO: I should adjust the camoLimit itself later
 
             if (self.rippleData != null)
             {
