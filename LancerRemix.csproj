@@ -72,6 +72,10 @@
     <Reference Include="UnityEngine">
       <HintPath>..\References\RWDownpour\UnityEngine.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.AssetBundleModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\References\RWDownpour\UnityEngine.AssetBundleModule.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>..\References\RWDownpour\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
@@ -107,6 +111,7 @@
     <Compile Include="Story\TutorialModify.cs" />
     <Compile Include="Story\SLOracleModify.cs" />
     <Compile Include="Story\SSOracleModify.cs" />
+    <None Include="assetbundles\latcher" />
     <None Include="JsonBuilder.cs" />
     <Compile Include="LancerPlugin.cs" />
     <Compile Include="LancerEnums.cs" />
@@ -264,6 +269,7 @@ copy /Y "$(TargetPath)" "C:\Drive\Repo\References\RWDownpour\$(TargetName).dll"
 xcopy "$(ProjectDir)scenes\*.*" "D:\SteamLibrary\steamapps\common\Rain World\RainWorld_Data\StreamingAssets\mods\lancer\scenes" /Y /I /E
 xcopy "$(ProjectDir)slugbase\*.*" "D:\SteamLibrary\steamapps\common\Rain World\RainWorld_Data\StreamingAssets\mods\lancer\slugbase" /Y /I /E
 xcopy "$(ProjectDir)illustrations\*.*" "D:\SteamLibrary\steamapps\common\Rain World\RainWorld_Data\StreamingAssets\mods\lancer\illustrations" /Y /I /E
-xcopy "$(ProjectDir)text\*.*" "D:\SteamLibrary\steamapps\common\Rain World\RainWorld_Data\StreamingAssets\mods\lancer\text" /Y /I /E</PostBuildEvent>
+xcopy "$(ProjectDir)text\*.*" "D:\SteamLibrary\steamapps\common\Rain World\RainWorld_Data\StreamingAssets\mods\lancer\text" /Y /I /E
+xcopy "$(ProjectDir)assetbundles\*.*" "D:\SteamLibrary\steamapps\common\Rain World\RainWorld_Data\StreamingAssets\mods\lancer\assetbundles" /Y /I /E</PostBuildEvent>
   </PropertyGroup>
 </Project>

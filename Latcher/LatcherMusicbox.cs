@@ -26,7 +26,7 @@ namespace LancerRemix.Latcher
             On.LocustSystem.Swarm.IsTargetValid += NoLatcherLocustAttachOnRipple;
 
             worldTPS = playerTPS = 40f;
-            playerTimelineDrawables = new HashSet<IDrawable>();
+            latcherTimelineDrawables = new HashSet<IDrawable>();
         }
 
         private static float worldTPS;
@@ -36,7 +36,7 @@ namespace LancerRemix.Latcher
         internal static float playerSlowRatio;
         private static float playerWorldRatio;
         private static float playerTimeStacker;
-        private static HashSet<IDrawable> playerTimelineDrawables;
+        private static HashSet<IDrawable> latcherTimelineDrawables;
         internal static bool IsLatcherRipple => worldTPS < 1f;
 
         private static void RoomUpdatePatch(On.Room.orig_Update orig, Room self)
@@ -157,7 +157,7 @@ namespace LancerRemix.Latcher
             }
 
         normalSpeed:
-            playerTimelineDrawables.Clear();
+            latcherTimelineDrawables.Clear();
             didWorldTick = false;
             orig(self, dt);
             if (didWorldTick && doSync)
@@ -217,18 +217,18 @@ namespace LancerRemix.Latcher
                             {
                                 if (po.graphicsModule != null)
                                 {
-                                    playerTimelineDrawables.Add(po.graphicsModule);
+                                    latcherTimelineDrawables.Add(po.graphicsModule);
                                     po.graphicsModule.Update();
                                     po.GraphicsModuleUpdated(true, room.game.evenUpdate);
                                 }
                                 else
                                 {
-                                    if (ud is IDrawable id) playerTimelineDrawables.Add(id);
+                                    if (ud is IDrawable id) latcherTimelineDrawables.Add(id);
                                     po.GraphicsModuleUpdated(false, room.game.evenUpdate);
                                 }
                             }
                             else if (ud is IDrawable id)
-                                playerTimelineDrawables.Add(id);
+                                latcherTimelineDrawables.Add(id);
 
                             --updateIndex;
                         }
@@ -370,12 +370,16 @@ namespace LancerRemix.Latcher
             if (ud is CosmeticRipple) return true;
             if (ud is PhysicalObject po)
             {
-                if (po is VoidSpawn) return true;
+                if (po.abstractPhysicalObject.rippleLayer == ud.room.game.ActiveRippleLayer
+                    || po.abstractPhysicalObject.rippleBothSides) return true;
+                //if (po is VoidSpawn) return true;
                 if (po is Player player) return IsPlayerLatcher(player);
                 if (po.grabbedBy?.Count > 0 && po.grabbedBy[0].grabber is Player grabber)
                     return IsPlayerLatcher(grabber);
                 if (po is Weapon w && w.mode == Weapon.Mode.Thrown && w.thrownBy is Player thrower)
                     return IsPlayerLatcher(thrower);
+                if (po is PlayerCarryableItem pci && pci.forbiddenToPlayer > 0)
+                    return true;
                 return false;
             }
             return false;
@@ -390,10 +394,10 @@ namespace LancerRemix.Latcher
         private static void SpriteLeaserPatch(On.RoomCamera.SpriteLeaser.orig_Update orig, RoomCamera.SpriteLeaser self,
             float timeStacker, RoomCamera rCam, Vector2 camPos)
         {
-            if (playerWorldRatio > 1f && playerTimelineDrawables.Count > 0)
+            if (playerWorldRatio > 1f)
             {
                 // Check whether replace timeStacker
-                if (self.drawableObject != null && playerTimelineDrawables.Contains(self.drawableObject))
+                if (self.drawableObject != null && latcherTimelineDrawables.Contains(self.drawableObject))
                     timeStacker = playerTimeStacker;
                 else if (IsLatcherRipple)
                     timeStacker = 0f; // remove jitter

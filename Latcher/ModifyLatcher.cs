@@ -423,9 +423,10 @@ namespace LancerRemix.Latcher
                 else
                     self.rippleData.trailPaletteAmount = Mathf.Lerp(lastTrailPaletteAmount, 0f, 0.003f);
             }
-            /*
             // No Ripple Layer
-            self.ChangeRippleLayer(0);
+            bool isLatcherRipple = LatcherMusicbox.IsLatcherRipple;
+            self.abstractPhysicalObject.rippleBothSides = isLatcherRipple;
+            /*
             // TEMP; this *works* but has lots of visual glitches
             if (self.isCamo && self.rippleLevel >= 5.0f)
                 Shader.DisableKeyword("RIPPLE");
@@ -433,7 +434,7 @@ namespace LancerRemix.Latcher
                 Shader.EnableKeyword("RIPPLE");
             */
 
-            if (LatcherMusicbox.IsLatcherRipple)
+            if (isLatcherRipple)
                 foreach (var grabber in self.grabbedBy) grabber?.Release();
         }
     }

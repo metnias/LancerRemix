@@ -4,7 +4,6 @@ using MoreSlugcats;
 using RWCustom;
 using System;
 using System.Globalization;
-using System.IO.Ports;
 using UnityEngine;
 using Watcher;
 using static LancerRemix.Cat.ModifyCat;
@@ -36,7 +35,7 @@ namespace LancerRemix.Latcher
             On.Watcher.SpinningTop.SpinningTopConversation.AddEvents += LatcherSpinningTopDialog;
             On.Watcher.SpinningTop.OnScreen += LatcherSpinningTopOnScreen;
             On.VirtualMicrophone.RippleSpaceUpdate += LatcherRippleSoundSpeedFix;
-            On.Watcher.RippleCameraData.SetGlobals += LatcherRippleSetGlobals;
+            On.RoomCamera.SpriteLeaser.ctor += ReplaceLatcherRippleShader;
         }
 
         internal static void OnWatcherDisableSubPatch()
@@ -50,7 +49,7 @@ namespace LancerRemix.Latcher
             On.World.SpawnGhost -= LatcherSpawnSpinningTop;
             On.Watcher.SpinningTop.OnScreen -= LatcherSpinningTopOnScreen;
             On.VirtualMicrophone.RippleSpaceUpdate -= LatcherRippleSoundSpeedFix;
-            On.Watcher.RippleCameraData.SetGlobals -= LatcherRippleSetGlobals;
+            On.RoomCamera.SpriteLeaser.ctor -= ReplaceLatcherRippleShader;
         }
 
         internal static bool IsStoryLatcher(RainWorldGame game)
@@ -287,13 +286,28 @@ namespace LancerRemix.Latcher
             orig(self, timeStacker, timeSpeed, currentListenerPos);
         }
 
-        private static void LatcherRippleSetGlobals(On.Watcher.RippleCameraData.orig_SetGlobals orig, RippleCameraData self)
+        private static void ReplaceLatcherRippleShader(On.RoomCamera.SpriteLeaser.orig_ctor orig,
+            RoomCamera.SpriteLeaser self, IDrawable obj, RoomCamera rCam)
         {
-            if (self.camera?.room != null && IsStoryLatcher(self.camera.room.game))
+            orig(self, obj, rCam);
+
+            if (rCam.rippleData != null
+                && rCam.room?.game != null && IsStoryLatcher(rCam.room.game))
             {
-                //self.hasGameplayScreen = false;
+                ReplaceRippleShader(self.sprites);
             }
-            orig(self);
+
+            void ReplaceRippleShader(FSprite[] sprites)
+            {
+                if (sprites == null || sprites.Length == 0) return;
+                var fshader = Custom.rainWorld.Shaders["LatcherRippleGolden"]; // "Basic"
+                int index = Custom.rainWorld.Shaders["RippleBasic"].index;
+                foreach (FSprite fsprite in sprites)
+                {
+                    if (fsprite != null && fsprite.shader.index == index)
+                        fsprite.shader = fshader;
+                }
+            }
         }
     }
 }

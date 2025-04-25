@@ -61,6 +61,15 @@ namespace LancerRemix
             OI = MachineConnector.GetRegisteredOI("topicular.lancer");
             if (OI is InternalOI_Auto) (OI as InternalOI_Auto).automated = false;
 
+            try
+            {
+                LogSource.LogInfo(AssetManager.ResolveFilePath($"assetbundles/latcher"));
+                var bundle = AssetBundle.LoadFromFile(AssetManager.ResolveFilePath($"assetbundles/latcher"));
+                var shader = bundle.LoadAsset<Shader>("RippleGoldenBasic");
+                rw.Shaders.Add("LatcherRippleGolden", FShader.CreateShader("LatcherRippleGolden", shader));
+            }
+            catch (Exception e) { LogSource.LogError(e); }
+
             LancerEnums.RegisterExtEnum();
             HornColorPick.Initalize();
 
