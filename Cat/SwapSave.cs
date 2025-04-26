@@ -72,7 +72,13 @@ namespace LancerRemix.Cat
 
         private static void WipeSaveLancer(On.PlayerProgression.orig_WipeSaveState orig, PlayerProgression self, SlugName saveStateNumber)
         {
-            if (IsStoryLancer) saveStateNumber = GetLancer(saveStateNumber);
+            if (IsStoryLancer)
+            {
+                var basis = GetBasis(saveStateNumber);
+                saveStateNumber = GetLancer(saveStateNumber);
+                if (ModManager.Watcher && basis == Watcher.WatcherEnums.SlugcatStatsName.Watcher)
+                    SetMiscValue(self.miscProgressionData, Latcher.ModifyLatcher.LATCHER_CAMPAIGNSEED, 0);
+            }
 
             /*
             Debug.Log($"WipeSaveStateTest: {saveStateNumber.value}");

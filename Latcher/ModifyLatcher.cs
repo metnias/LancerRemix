@@ -9,6 +9,7 @@ using static LancerRemix.LancerEnums;
 using WatcherName = Watcher.WatcherEnums.SlugcatStatsName;
 using Random = UnityEngine.Random;
 using Menu;
+using CatSub.Story;
 
 namespace LancerRemix.Latcher
 {
@@ -48,6 +49,19 @@ namespace LancerRemix.Latcher
                 typeof(Player).GetProperty(nameof(Player.camoLimit), BindingFlags.Instance | BindingFlags.Public).GetGetMethod(),
                 typeof(ModifyLatcher).GetMethod(nameof(LatcherCamoLimit), BindingFlags.Static | BindingFlags.NonPublic)
             ));
+
+            #region MISCPROG
+
+            hooks.Add(new Hook(
+                typeof(PlayerProgression.MiscProgressionData).GetProperty(nameof(PlayerProgression.MiscProgressionData.watcherCampaignSeed), BindingFlags.Instance | BindingFlags.Public).GetGetMethod(),
+                typeof(ModifyLatcher).GetMethod(nameof(LatcherCampaignSeedGet), BindingFlags.Static | BindingFlags.NonPublic)
+            ));
+            hooks.Add(new Hook(
+                typeof(PlayerProgression.MiscProgressionData).GetProperty(nameof(PlayerProgression.MiscProgressionData.watcherCampaignSeed), BindingFlags.Instance | BindingFlags.Public).GetSetMethod(),
+                typeof(ModifyLatcher).GetMethod(nameof(LatcherCampaignSeedSet), BindingFlags.Static | BindingFlags.NonPublic)
+            ));
+
+            #endregion MISCPROG
 
             On.Player.WatcherUpdate += LatcherUpdate;
             On.Player.CamoUpdate += LatcherCamoUpdate;
@@ -134,6 +148,41 @@ namespace LancerRemix.Latcher
             if (self.rippleLevel >= 2f) return 1800f;
             return 1200f;
         }
+
+        #region MISCPROG
+
+        internal const string LATCHER_CAMPAIGNSEED = "LATCHERCAMPAIGNSEED";
+
+        private delegate int orig_LatcherCampaignSeedGet(PlayerProgression.MiscProgressionData self);
+
+        private static int LatcherCampaignSeedGet(orig_LatcherCampaignSeedGet orig, PlayerProgression.MiscProgressionData self)
+        {
+            if (!IsStoryLancer) return orig(self);
+            if (Watcher.Watcher.cfgForcedCampaignSeed.Value <= 0)
+            {
+                try
+                {
+                    return SaveManager.GetMiscValue<int>(self, LATCHER_CAMPAIGNSEED);
+                }
+                catch
+                {
+                    SaveManager.SetMiscValue(self, LATCHER_CAMPAIGNSEED, 0);
+                    return 0;
+                }
+            }
+            return Watcher.Watcher.cfgForcedCampaignSeed.Value;
+        }
+
+        private delegate void orig_LatcherCampaignSeedSet(PlayerProgression.MiscProgressionData self, int value);
+
+        private static void LatcherCampaignSeedSet(orig_LatcherCampaignSeedSet orig, PlayerProgression.MiscProgressionData self, int value)
+        {
+            if (!IsStoryLancer) { orig(self, value); return; }
+            if (Watcher.Watcher.cfgForcedCampaignSeed.Value <= 0)
+                SaveManager.SetMiscValue(self, LATCHER_CAMPAIGNSEED, value);
+        }
+
+        #endregion MISCPROG
 
         #endregion Properties
 
