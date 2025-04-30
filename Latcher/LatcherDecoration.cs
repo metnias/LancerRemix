@@ -1,4 +1,6 @@
-﻿using LancerRemix.Cat;
+﻿#if LATCHER
+
+using LancerRemix.Cat;
 using RWCustom;
 using UnityEngine;
 
@@ -106,3 +108,5 @@ namespace LancerRemix.Latcher
         }
     }
 }
+
+#endif

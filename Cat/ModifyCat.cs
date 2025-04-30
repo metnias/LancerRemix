@@ -60,7 +60,9 @@ namespace LancerRemix.Cat
             On.PlayerGraphics.DefaultSlugcatColor += DefaultLancerColor;
 
             SwapSave.SubPatch();
+#if LATCHER
             Latcher.ModifyLatcher.SubPatch();
+#endif
 
             if (ModManager.MSC) OnMSCEnablePatch();
         }
@@ -147,11 +149,13 @@ namespace LancerRemix.Cat
                 catSubs.Add(self.playerState, new LunterSupplement(self));
                 catDecos.Add(self.playerState, new LunterDecoration(self));
             }
+#if LATCHER
             else if (ModManager.Watcher && basis == WatcherEnums.SlugcatStatsName.Watcher)
             {
                 catSubs.Add(self.playerState, new LatcherSupplement(self));
                 catDecos.Add(self.playerState, new LatcherDecoration(self));
             }
+#endif
             else
             {
                 catSubs.Add(self.playerState, new LancerSupplement(self));

@@ -1,4 +1,6 @@
-﻿using Mono.Cecil.Cil;
+﻿#if LATCHER
+
+using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using MoreSlugcats;
 using RWCustom;
@@ -324,3 +326,5 @@ namespace LancerRemix.Latcher
         }
     }
 }
+
+#endif

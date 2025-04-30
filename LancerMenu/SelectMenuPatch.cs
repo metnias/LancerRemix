@@ -708,7 +708,12 @@ namespace LancerRemix.LancerMenu
                     }
                     else if (ModManager.Watcher && basisNumber == WatcherEnums.SlugcatStatsName.Watcher)
                     {
+#if LATCHER
                         info = menu.Translate("Clear the game as Survivor or Monk to unlock.");
+#else
+                        diff = "???";
+                        info = menu.Translate("To be released...");
+#endif
                     }
                 }
                 info = Custom.ReplaceLineDelimeters(info);

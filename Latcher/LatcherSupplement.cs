@@ -1,4 +1,6 @@
-﻿using LancerRemix.Cat;
+﻿#if LATCHER
+
+using LancerRemix.Cat;
 using RWCustom;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -108,3 +110,5 @@ namespace LancerRemix.Latcher
         }
     }
 }
+
+#endif

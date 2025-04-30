@@ -34,6 +34,9 @@ namespace LancerRemix
             {
                 i = GetBasis(i);
                 if (SlugcatStats.IsSlugcatFromMSC(i)) return LancerPlugin.MSCLANCERS && HasCustomLancer(i.value, out var _);
+#if !LATCHER
+                if (ModManager.Watcher && i == WatcherEnums.SlugcatStatsName.Watcher) return false;
+#endif
             }
             return orig(i, rainWorld);
         }

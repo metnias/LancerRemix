@@ -1,13 +1,13 @@
-﻿using MoreSlugcats;
-using System;
-using UnityEngine;
-using static LancerRemix.Latcher.LatcherPatch;
-using static LancerRemix.Cat.ModifyCat;
-using Random = UnityEngine.Random;
-using System.Collections.Generic;
+﻿#if LATCHER
+
+using MoreSlugcats;
 using RWCustom;
+using System;
+using System.Collections.Generic;
+using UnityEngine;
 using Watcher;
-using HUD;
+using static LancerRemix.Latcher.LatcherPatch;
+using Random = UnityEngine.Random;
 
 namespace LancerRemix.Latcher
 {
@@ -500,3 +500,5 @@ namespace LancerRemix.Latcher
         }
     }
 }
+
+#endif

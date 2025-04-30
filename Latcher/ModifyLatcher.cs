@@ -1,4 +1,6 @@
-﻿using MonoMod.RuntimeDetour;
+﻿#if LATCHER
+
+using MonoMod.RuntimeDetour;
 using RWCustom;
 using System.Collections.Generic;
 using System.Reflection;
@@ -17,7 +19,6 @@ namespace LancerRemix.Latcher
     {
         internal static void SubPatch()
         {
-            hooks.Clear();
             LatcherPatch.SubPatch();
             LatcherTutorial.SubPatch();
             LatcherMusicbox.SubPatch();
@@ -495,3 +496,5 @@ namespace LancerRemix.Latcher
         }
     }
 }
+
+#endif

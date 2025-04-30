@@ -36,7 +36,7 @@ namespace LancerRemix
     {
         public const string PLUGIN_ID = "com.rainworldgame.topicular.lancer.plugin";
         public const string PLUGIN_NAME = "Lancer";
-        public const string PLUGIN_VERSION = "1.3.0.0";
+        public const string PLUGIN_VERSION = "1.2.1.0";
 
         private static bool init = false;
         internal static ManualLogSource LogSource { get; private set; }
@@ -169,7 +169,9 @@ namespace LancerRemix
             if (!lastWatcherEnabled && ModManager.Watcher)
             {
                 LogSource.LogInfo("Lancer detected Watcher newly enabled.");
+#if LATCHER
                 ModifyLatcher.OnWatcherEnablePatch();
+#endif
                 lastWatcherEnabled = ModManager.Watcher;
             }
         }
@@ -204,7 +206,9 @@ namespace LancerRemix
             if (lastWatcherEnabled && !ModManager.Watcher)
             {
                 LogSource.LogInfo("Lancer detected Watcher newly disabled.");
+#if LATCHER
                 ModifyLatcher.OnWatcherDisablePatch();
+#endif
                 lastWatcherEnabled = ModManager.Watcher;
             }
         }
