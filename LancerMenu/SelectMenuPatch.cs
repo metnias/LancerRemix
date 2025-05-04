@@ -656,7 +656,7 @@ namespace LancerRemix.LancerMenu
                     B.AppendLine($"layerImage [{layerImageOrig}] is not in these ({i}/{scene.depthIllustrations.Count}):");
                     for (i = 0; i < scene.depthIllustrations.Count; ++i)
                         B.AppendLine($"{i}: [{scene.depthIllustrations[i].fileName}] == [{layerImageOrig}] ? {string.Equals(scene.depthIllustrations[i].fileName, layerImageOrig, StringComparison.InvariantCultureIgnoreCase)}");
-                    throw new ArgumentOutOfRangeException(B.ToString());
+                    throw new ArgumentOutOfRangeException(layerImageOrig, B.ToString());
                 }
                 float depth = scene.depthIllustrations[i].depth;
                 scene.depthIllustrations[i].RemoveSprites();
@@ -667,7 +667,7 @@ namespace LancerRemix.LancerMenu
                 if (i < scene.depthIllustrations.Count - 1)
                     scene.depthIllustrations[i].sprite.MoveBehindOtherNode(scene.depthIllustrations[i + 1].sprite);
                 scene.subObjects.Add(scene.depthIllustrations[i]);
-                Debug.Log($"Replace Illust {i}: [{layerImage}] <- [{layerImageOrig}]");
+                Debug.Log($"Replaced Illust {i}: [{layerImage}] <- [{layerImageOrig}]");
             }
         }
 
