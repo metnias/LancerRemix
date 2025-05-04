@@ -52,7 +52,7 @@ namespace LancerRemix.Latcher
             playerTPS = worldTPS = self.framesPerSecond;
             float targetTPS = 40f;
             var ripplePlayers = new List<Player>();
-            bool doSync = false;
+            bool doSync = true;
             if (self is RainWorldGame game && IsStoryLatcher(game) && game.pauseMenu == null && game.processActive)
             {
                 float maxRipple = 0f;
@@ -133,9 +133,10 @@ namespace LancerRemix.Latcher
                     playerTPS *= slowFactor;
                     targetTPS *= slowFactor;
                 }
-                playerWorldRatio = playerTPS / Mathf.Max(worldTPS, 8f);
+                worldTPS = Mathf.Max(playerTPS / 5f, worldTPS);
+                playerWorldRatio = playerTPS / worldTPS;
                 playerSlowRatio = targetTPS / playerTPS;
-                if (playerWorldRatio % 1f < .01f) doSync = true;
+                doSync = playerWorldRatio % 1f < .01f;
 
                 if (game.devToolsActive)
                 {
@@ -152,7 +153,7 @@ namespace LancerRemix.Latcher
                 }
 
                 haltGrafUpdate = playerWorldRatio > 1f;
-                self.framesPerSecond = Mathf.Max(8, Mathf.CeilToInt(worldTPS));
+                self.framesPerSecond = Mathf.CeilToInt(worldTPS);
 
                 //Debug.Log($"Ripple{maxRipple:0.00} target{targetTPS:0.0} w{worldTPS:0.0}/p{playerTPS:0.0} (w{playerWorldRatio:0.00};p{playerSlowRatio:0.00})");
             }
