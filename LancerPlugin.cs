@@ -4,7 +4,6 @@ using LancerRemix;
 using LancerRemix.Cat;
 using LancerRemix.Combat;
 using LancerRemix.LancerMenu;
-using LancerRemix.Latcher;
 using LancerRemix.Story;
 using Menu.Remix;
 using System;
@@ -12,6 +11,10 @@ using System.Reflection;
 using System.Security;
 using System.Security.Permissions;
 using UnityEngine;
+
+#if LATCHER
+using LancerRemix.Latcher;
+#endif
 
 #region Assembly attributes
 
@@ -36,7 +39,7 @@ namespace LancerRemix
     {
         public const string PLUGIN_ID = "com.rainworldgame.topicular.lancer.plugin";
         public const string PLUGIN_NAME = "Lancer";
-        public const string PLUGIN_VERSION = "1.3.0.0";
+        public const string PLUGIN_VERSION = "1.2.2.1";
 
         private static bool init = false;
         internal static ManualLogSource LogSource { get; private set; }
@@ -61,6 +64,7 @@ namespace LancerRemix
             OI = MachineConnector.GetRegisteredOI("topicular.lancer");
             if (OI is InternalOI_Auto) (OI as InternalOI_Auto).automated = false;
 
+#if LATCHER
             try
             {
                 LogSource.LogInfo(AssetManager.ResolveFilePath($"assetbundles/latcher"));
@@ -69,6 +73,7 @@ namespace LancerRemix
                 rw.Shaders.Add("LatcherRippleGolden", FShader.CreateShader("LatcherRippleGolden", shader));
             }
             catch (Exception e) { LogSource.LogError(e); }
+#endif
 
             LancerEnums.RegisterExtEnum();
             HornColorPick.Initalize();
@@ -234,8 +239,10 @@ namespace LancerRemix
             KingTuskParryCheck = 1 << 9,
             LanceFarStickPrevent = 1 << 10,
 
+#if LATCHER
             LatcherControlMapPatch = 1 << 11,
             LatcherAddRoomSpecificScriptPatch = 1 << 12,
+#endif
         }
 
         internal static void ILhookTry(ILhooks flag)

@@ -78,10 +78,14 @@ namespace LancerRemix.Story
         private static void HunterMeetLancerTrigger(On.DaddyLongLegs.orig_Update orig, DaddyLongLegs self, bool eu)
         {
             orig(self, eu);
-            if (self.room == null || !self.HDmode || !self.room.game.IsStorySession || !IsStoryLancer) return;
+            if (!self.HDmode || self.room?.game == null || !self.room.game.IsStorySession || !IsStoryLancer) return;
             var basis = GetBasis(self.room.game.StoryCharacter);
             if (basis != SlugName.Red) return;
-            if (GetProgValue<int>(self.room.game.GetStorySession.saveState.miscWorldSaveData, HUNTERMEET) > 0) return; // already triggered
+            try
+            {
+                if (GetProgValue<int>(self.room.game.GetStorySession.saveState.miscWorldSaveData, HUNTERMEET) > 0) return; // already triggered
+            }
+            catch { SetProgValue<int>(self.room.game.GetStorySession.saveState.miscWorldSaveData, HUNTERMEET, 0); return; }
             if (!(self.room.game.FirstAlivePlayer?.realizedCreature is Player player)) return;
             if (self.room.VisualContact(self.mainBodyChunk.pos, player.mainBodyChunk.pos))
             {
@@ -93,7 +97,7 @@ namespace LancerRemix.Story
         private static bool HunterRecognizeLancer(On.DaddyLongLegs.orig_CheckDaddyConsumption orig, DaddyLongLegs self, PhysicalObject otherObject)
         {
             var result = orig(self, otherObject);
-            if (self.room == null || !self.HDmode) return result;
+            if (!self.HDmode || self.room?.game == null) return result;
             if (otherObject is DaddyLongLegs ddl && ddl.HDmode) return false; // don't eat each other
             if (!self.room.game.IsStorySession || !IsStoryLancer) return result;
             var basis = GetBasis(self.room.game.StoryCharacter);
