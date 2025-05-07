@@ -13,7 +13,9 @@ using System.Security.Permissions;
 using UnityEngine;
 
 #if LATCHER
+
 using LancerRemix.Latcher;
+
 #endif
 
 #region Assembly attributes
@@ -39,7 +41,7 @@ namespace LancerRemix
     {
         public const string PLUGIN_ID = "com.rainworldgame.topicular.lancer.plugin";
         public const string PLUGIN_NAME = "Lancer";
-        public const string PLUGIN_VERSION = "1.2.2.1";
+        public const string PLUGIN_VERSION = "1.3.0.0";
 
         private static bool init = false;
         internal static ManualLogSource LogSource { get; private set; }
