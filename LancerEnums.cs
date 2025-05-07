@@ -102,8 +102,6 @@ namespace LancerRemix
             }
             slugNameVersion = ExtEnumBase.GetExtEnumType(typeof(SlugName)).version;
             LancerPlugin.CheckedAnyModChanged();
-
-            LancerGenerator.updatedTimeline = false;
         }
 
         internal static void ClearLancers()

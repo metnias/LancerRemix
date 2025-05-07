@@ -303,32 +303,11 @@ namespace LancerRemix
             return l < c && c < r;
         }
 
-        internal static bool updatedTimeline = false;
-
         private static LinkedList<SlugTime> AppendLancerTimelineOrder(On.SlugcatStats.orig_SlugcatTimelineOrder orig)
         {
             var timeline = orig();
             // Only do for vanilla as others will be dealt with SlugBase
-            if (updatedTimeline) return timeline;
-            updatedTimeline = true;
 
-            // clear lancers
-            for (LinkedListNode<SlugTime> node = timeline.First; node != null; node = node.Next)
-            {
-                var slugName = new SlugName(node.Value.value);
-                if (LancerTimes.ContainsKey(slugName))
-                {
-                    var basis = GetBasis(slugName);
-                    if (basis == SlugName.White || basis == SlugName.Red || basis == SlugName.Yellow
-                        || (ModManager.Watcher && basis == WatcherEnums.SlugcatStatsName.Watcher))
-                    {
-                        node = node.Previous;
-                        timeline.Remove(node.Next);
-                    }
-                }
-            }
-
-            // readd lancers
             for (LinkedListNode<SlugTime> node = timeline.First; node != null; node = node.Next)
             {
                 if (node.Value == SlugTime.White)
