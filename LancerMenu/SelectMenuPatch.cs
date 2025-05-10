@@ -534,16 +534,25 @@ namespace LancerRemix.LancerMenu
             }
             else if (ModManager.Watcher && basis == WatcherEnums.SlugcatStatsName.Watcher)
             {
-                if ((page.menu as SlugcatSelectMenu).SlugcatUnlocked(page.slugcatNumber))
+                if (page.slugcatImage.sceneID == WatcherEnums.MenuSceneID.Slugcat_Watcher)
                 {
-                    ReplaceIllust(page.slugcatImage, $"scenes{Path.DirectorySeparatorChar}slugcat - lancer",
-                        "Lancer - Watcher - Flat", "Watcher Slugcat - 5", "Watcher Lancer - 5", new Vector2(577f, 100f));
-                    MoveGlow("Watcher Lancer - 5");
-                    page.glowOffset = new Vector2(-10f, -70f);
+                    if ((page.menu as SlugcatSelectMenu).SlugcatUnlocked(page.slugcatNumber))
+                    {
+                        ReplaceIllust(page.slugcatImage, $"scenes{Path.DirectorySeparatorChar}slugcat - lancer",
+                            "Lancer - Watcher - Flat", "Watcher Slugcat - 5", "Watcher Lancer - 5", new Vector2(577f, 100f));
+                        MoveGlow("Watcher Lancer - 5");
+                        page.glowOffset = new Vector2(-10f, -70f);
+                    }
+                    else
+                        ReplaceIllust(page.slugcatImage, $"scenes{Path.DirectorySeparatorChar}slugcat - lancer",
+                        "Lancer - Watcher Dark - Flat", "Watcher Slugcat - 5 - Dark", "Watcher Lancer - 5 - Dark", new Vector2(577f, 100f), MenuDepthIllustration.MenuShader.Basic);
                 }
-                else
-                    ReplaceIllust(page.slugcatImage, $"scenes{Path.DirectorySeparatorChar}slugcat - lancer",
-                    "Lancer - Watcher Dark - Flat", "Watcher Slugcat - 5 - Dark", "Watcher Lancer - 5 - Dark", new Vector2(577f, 100f), MenuDepthIllustration.MenuShader.Basic);
+                else if (page.slugcatImage.sceneID == WatcherEnums.MenuSceneID.End_Watcher_A)
+                {
+                }
+                else if (page.slugcatImage.sceneID == WatcherEnums.MenuSceneID.End_Watcher_B)
+                {
+                }
             }
 
             void UpdateEffectColor()
@@ -589,7 +598,26 @@ namespace LancerRemix.LancerMenu
                     }
                     else if (ModManager.Watcher && basis == WatcherEnums.SlugcatStatsName.Watcher)
                     {
-                        // TODO: fill this
+                        // TODO: replace this with Latcher
+                        res = WatcherEnums.MenuSceneID.Slugcat_Watcher;
+                        /*
+                        if (Custom.rainWorld.progression.miscProgressionData.watcherEndingID == 1)
+                        {
+                            res = WatcherEnums.MenuSceneID.End_Watcher_A;
+                        }
+                        else if (Custom.rainWorld.progression.miscProgressionData.watcherEndingID == 2)
+                        {
+                            res = WatcherEnums.MenuSceneID.End_Watcher_B;
+                        }
+                        else
+                        {
+                            res = WatcherEnums.MenuSceneID.Slugcat_Watcher;
+                        }
+                        */
+                        page.sceneOffset = new Vector2(-10f, 100f);
+                        page.slugcatDepth = 3.10000014f;
+                        page.markOffset = new Vector2(-15f, -2f);
+                        page.glowOffset = new Vector2(-30f, -50f);
                     }
                     else if (SlugBaseCharacter.Registry.TryGet(basis, out var slugbase))
                     {
