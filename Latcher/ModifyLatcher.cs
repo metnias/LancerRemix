@@ -7,8 +7,10 @@ using MonoMod.RuntimeDetour;
 using RWCustom;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using UnityEngine;
 using Watcher;
 using static LancerRemix.Cat.ModifyCat;
@@ -71,6 +73,7 @@ namespace LancerRemix.Latcher
             On.Player.CamoUpdate += LatcherCamoUpdate;
 
             On.Menu.MenuScene.BuildRippleSleepScene += BuildLatcherRippleSleepScene;
+            On.Menu.MenuScene.BuildWatcherSleepScreen += BuildLatcherSleepScreen;
 
             LatcherPatch.OnWatcherEnableSubPatch();
             LatcherTutorial.OnWatcherEnableSubPatch();
@@ -85,6 +88,7 @@ namespace LancerRemix.Latcher
             On.Player.CamoUpdate -= LatcherCamoUpdate;
 
             On.Menu.MenuScene.BuildRippleSleepScene -= BuildLatcherRippleSleepScene;
+            On.Menu.MenuScene.BuildWatcherSleepScreen -= BuildLatcherSleepScreen;
 
             LatcherPatch.OnWatcherDisableSubPatch();
             LatcherTutorial.OnWatcherDisableSubPatch();
@@ -535,6 +539,7 @@ namespace LancerRemix.Latcher
         {
             string sceneFolder = $"Scenes{Path.DirectorySeparatorChar}ripple screen - latcher";
             orig(self, playerDied);
+            if (!IsStoryLancer) return;
             if (self.flatMode)
             {
                 ReplaceFlatIllust(self, sceneFolder, "ripple - flat - latcher", "ripple - flat - watcher");
@@ -543,6 +548,75 @@ namespace LancerRemix.Latcher
             }
             ReplaceIllust(self, sceneFolder, null, "ripple - 1", "ripple latcher - 1", new Vector2(434f, 156f), MenuDepthIllustration.MenuShader.Basic);
             ReplaceIllust(self, sceneFolder, null, "ripple - 1b", "ripple latcher - 1b", new Vector2(435f, 155f), MenuDepthIllustration.MenuShader.Basic);
+        }
+
+        private static void BuildLatcherSleepScreen(On.Menu.MenuScene.orig_BuildWatcherSleepScreen orig,
+            MenuScene self)
+        {
+            string sceneFolder = $"Scenes{Path.DirectorySeparatorChar}sleep screen - latcher";
+            orig(self);
+            if (!IsStoryLancer) return;
+
+            #region GetIndex
+
+            float rippleLevel = 0f;
+            if (self.menu.manager.rainWorld.progression.IsThereASavedGame(GetLancer(WatcherName.Watcher)))
+            {
+                if (self.menu.manager.rainWorld.progression.currentSaveState != null && self.menu.manager.rainWorld.progression.currentSaveState.saveStateNumber == GetLancer(WatcherName.Watcher))
+                {
+                    rippleLevel = self.menu.manager.rainWorld.progression.currentSaveState.deathPersistentSaveData.rippleLevel;
+                }
+                else if (self.menu.manager.rainWorld.progression.HasSaveData)
+                {
+                    string[] progLinesFromMemory = self.menu.manager.rainWorld.progression.GetProgLinesFromMemory();
+                    if (progLinesFromMemory.Length != 0)
+                    {
+                        for (int i = 0; i < progLinesFromMemory.Length; i++)
+                        {
+                            string[] array = Regex.Split(progLinesFromMemory[i], "<progDivB>");
+                            if (array.Length == 2 && array[0] == "SAVE STATE" && BackwardsCompatibilityRemix.ParseSaveNumber(array[1]) == GetLancer(WatcherName.Watcher))
+                            {
+                                var miner = new List<SaveStateMiner.Target>
+                                {
+                                    new SaveStateMiner.Target(">RIPPLELEVEL", "<dpB>", "<dpA>", 20)
+                                };
+                                var mineResult = SaveStateMiner.Mine(self.menu.manager.rainWorld, array[1], miner);
+                                for (int j = 0; j < mineResult.Count; j++)
+                                {
+                                    string name = mineResult[j].name;
+                                    if (name != null && name == ">RIPPLELEVEL")
+                                    {
+                                        try
+                                        {
+                                            rippleLevel = float.Parse(mineResult[j].data, NumberStyles.Any, CultureInfo.InvariantCulture);
+                                        }
+                                        catch
+                                        {
+                                            Custom.LogWarning(new string[]
+                                            {
+                                                "failed to assign ripple level. Data:",
+                                                mineResult[j].data
+                                            });
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            string postfix = "C";
+            if (rippleLevel < 0.25f) postfix = "A";
+            else if (rippleLevel < 0.5f) postfix = "B";
+
+            #endregion GetIndex
+
+            postfix = postfix.ToLower();
+            ReplaceIllust(self, sceneFolder,
+                $"sleep screen - latcher - flat - {postfix}",
+                $"sleep - 2{postfix} - watcher",
+                $"sleep - 2{postfix} - latcher",
+                new Vector2(800f, 81f), MenuDepthIllustration.MenuShader.Basic);
         }
 
         #endregion MenuScenes

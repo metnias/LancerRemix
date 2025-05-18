@@ -18,7 +18,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;LATCHER</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -203,6 +203,12 @@
     <Content Include="scenes\ripple screen - latcher\ripple latcher - 1b.png" />
     <Content Include="scenes\ripple screen - latcher\ripple - flat - latcher - b.png" />
     <Content Include="scenes\ripple screen - latcher\ripple - flat - latcher.png" />
+    <Content Include="scenes\sleep screen - latcher\sleep - 2a - latcher.png" />
+    <Content Include="scenes\sleep screen - latcher\sleep - 2b - latcher.png" />
+    <Content Include="scenes\sleep screen - latcher\sleep - 2c - latcher.png" />
+    <Content Include="scenes\sleep screen - latcher\sleep screen - latcher - flat - a.png" />
+    <Content Include="scenes\sleep screen - latcher\sleep screen - latcher - flat - b.png" />
+    <Content Include="scenes\sleep screen - latcher\sleep screen - latcher - flat - c.png" />
     <Content Include="slugbase\scenes\outro lhunter 1 - swim\camera.txt" />
     <Content Include="slugbase\scenes\outro lhunter 1 - swim\outro Lhunter 1 - swim - 5.png" />
     <Content Include="slugbase\scenes\outro lhunter 1 - swim\outro Lhunter 1 - swim - 1.png" />
