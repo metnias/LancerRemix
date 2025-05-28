@@ -199,6 +199,7 @@
     <AdditionalFiles Include="scenes\Outro L_3\2 - facecloseup - Lsurv.png" />
     <AdditionalFiles Include="scenes\Outro L_3\outro 3 - face - Lmonk - flat.png" />
     <AdditionalFiles Include="scenes\Outro L_3\outro 3 - face - Lsurv - flat.png" />
+    <Content Include="illustrations\title_card_lancer.png" />
     <Content Include="scenes\ripple screen - latcher\ripple latcher - 1.png" />
     <Content Include="scenes\ripple screen - latcher\ripple latcher - 1b.png" />
     <Content Include="scenes\ripple screen - latcher\ripple - flat - latcher - b.png" />

@@ -240,10 +240,11 @@ namespace LancerRemix
             BigNeedleWormParryCheck = 1 << 8,
             KingTuskParryCheck = 1 << 9,
             LanceFarStickPrevent = 1 << 10,
+            LancerIntroRoll = 1 << 11,
 
 #if LATCHER
-            LatcherControlMapPatch = 1 << 11,
-            LatcherAddRoomSpecificScriptPatch = 1 << 12,
+            LatcherControlMapPatch = 1 << 12,
+            LatcherAddRoomSpecificScriptPatch = 1 << 13,
 #endif
         }
 

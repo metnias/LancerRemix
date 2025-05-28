@@ -1,4 +1,5 @@
-﻿using LancerRemix.Cat;
+﻿using CatSub.Story;
+using LancerRemix.Cat;
 using LancerRemix.Story;
 using Menu;
 using Mono.Cecil.Cil;
@@ -21,6 +22,7 @@ namespace LancerRemix.LancerMenu
             On.Menu.MenuScene.ctor += LancerSceneSwap;
             IL.Menu.FastTravelScreen.ctor += LancerTravelScreen;
             On.Menu.StoryGameStatisticsScreen.AddBkgIllustration += LancerStatsBkgScene;
+            IL.Menu.IntroRoll.ctor += LancerIntroRoll;
 
             SelectMenuPatch.SubPatch();
             MultiplayerPatch.SubPatch();
@@ -227,6 +229,53 @@ namespace LancerRemix.LancerMenu
 
             LancerPlugin.ILhookOkay(LancerPlugin.ILhooks.LancerTravelScreen);
 
+            void DebugLogCursor() =>
+                LancerPlugin.LogSource.LogInfo($"{cursor.Prev.OpCode.Name} > Cursor < {cursor.Next.OpCode.Name}");
+        }
+
+        private static void LancerIntroRoll(ILContext il)
+        {
+            LancerPlugin.ILhookTry(LancerPlugin.ILhooks.LancerIntroRoll);
+
+            var cursor = new ILCursor(il);
+            ILLabel introRollCAdded = null;
+
+            if (!cursor.TryGotoNext(
+                MoveType.AfterLabel,
+                x => x.MatchLdsfld<ModManager>(nameof(ModManager.Watcher)),
+                x => x.MatchBrfalse(out _))
+                || !cursor.Clone().TryGotoNext(x => x.MatchBr(out introRollCAdded)))
+                return;
+
+            DebugLogCursor();
+            cursor.Emit(OpCodes.Ldarg_0);
+            cursor.EmitDelegate<Func<IntroRoll, bool>>(self =>
+            {
+                SlugName curSlugcat = self.manager.rainWorld.progression.miscProgressionData.currentlySelectedSinglePlayerSlugcat;
+                bool lastPlayedLancer = IsLancer(curSlugcat);
+                lastPlayedLancer |= TryGetCurrSlugcatLancer(self.manager);
+                if (!lastPlayedLancer) return false;
+                var basis = GetBasis(curSlugcat);
+                if (basis == SlugName.White || basis == SlugName.Yellow || basis == SlugName.Red)
+                {
+                    self.illustrations[2] = new MenuIllustration(self, self.pages[0], "", "title_card_lancer", new Vector2(0f, 0f), true, false);
+                    return true;
+                }
+
+                return false;
+            });
+            cursor.Emit(OpCodes.Brtrue, introRollCAdded);
+
+            LancerPlugin.ILhookOkay(LancerPlugin.ILhooks.LancerIntroRoll);
+
+            bool TryGetCurrSlugcatLancer(ProcessManager manager)
+            {
+                try
+                { return SaveManager.GetMiscValue<bool>(manager.rainWorld.progression.miscProgressionData, SwapSave.CURRSLUGCATLANCER); }
+                catch // first install
+                { SaveManager.SetMiscValue(manager.rainWorld.progression.miscProgressionData, SwapSave.CURRSLUGCATLANCER, true); }
+                return true;
+            }
             void DebugLogCursor() =>
                 LancerPlugin.LogSource.LogInfo($"{cursor.Prev.OpCode.Name} > Cursor < {cursor.Next.OpCode.Name}");
         }
