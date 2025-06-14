@@ -692,9 +692,16 @@ namespace LancerRemix.LancerMenu
                 // LancerPlugin.LogSource.LogMessage($"({i}/{scene.depthIllustrations.Count}) replaced to {layerImage}");
                 scene.depthIllustrations[i] =
                     new MenuDepthIllustration(scene.page.menu, scene, sceneFolder, layerImage, layerPos, depth, shader ?? MenuDepthIllustration.MenuShader.Basic);
-                if (i < scene.depthIllustrations.Count - 1)
-                    scene.depthIllustrations[i].sprite.MoveBehindOtherNode(scene.depthIllustrations[i + 1].sprite);
                 scene.subObjects.Add(scene.depthIllustrations[i]);
+                if (i < scene.depthIllustrations.Count - 1)
+                {
+                    for (int t = i + 1; t < scene.depthIllustrations.Count; ++t)
+                    {
+                        if (scene.depthIllustrations[t].sprite == null || !scene.depthIllustrations[t].spriteAdded) continue;
+                        scene.depthIllustrations[i].sprite.MoveBehindOtherNode(scene.depthIllustrations[t].sprite);
+                        break;
+                    }
+                }
                 Debug.Log($"Replaced Illust {i}: [{layerImage}] <- [{layerImageOrig}]");
             }
         }
