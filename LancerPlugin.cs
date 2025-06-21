@@ -245,6 +245,7 @@ namespace LancerRemix
 #if LATCHER
             LatcherControlMapPatch = 1 << 12,
             LatcherAddRoomSpecificScriptPatch = 1 << 13,
+            DrillCrabNoAttackOnRipple = 1 << 14,
 #endif
         }
 

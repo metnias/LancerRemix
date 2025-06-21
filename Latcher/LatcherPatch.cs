@@ -39,6 +39,7 @@ namespace LancerRemix.Latcher
             On.VirtualMicrophone.RippleSpaceUpdate += LatcherRippleSoundSpeedFix;
             On.RoomCamera.SpriteLeaser.ctor += ReplaceLatcherRippleShader;
             On.GraphicsModule.UpdateRippleHybrid += LatcherUpdateRippleHybrid;
+            IL.Watcher.DrillCrab.Collide += DrillCrabNoAttackOnRipple;
         }
 
         internal static void OnWatcherDisableSubPatch()
@@ -323,6 +324,28 @@ namespace LancerRemix.Latcher
                 return;
             }
             orig(self, sLeaser, room);
+        }
+
+        private static void DrillCrabNoAttackOnRipple(ILContext il)
+        {
+            var cursor = new ILCursor(il);
+            LancerPlugin.ILhookTry(LancerPlugin.ILhooks.DrillCrabNoAttackOnRipple);
+
+            if (!cursor.TryGotoNext(MoveType.After,
+                i => i.MatchCall(nameof(PhysicalObject), nameof(PhysicalObject.Collide)))) return;
+
+            var resumeLabel = cursor.DefineLabel();
+            DebugLogCursor();
+            cursor.EmitDelegate<Func<bool>>(() => LatcherMusicbox.IsLatcherRipple);
+            cursor.Emit(OpCodes.Brfalse_S, resumeLabel);
+            cursor.Emit(OpCodes.Ret);
+            cursor.MarkLabel(resumeLabel);
+            //DebugLogCursor();
+
+            LancerPlugin.ILhookOkay(LancerPlugin.ILhooks.DrillCrabNoAttackOnRipple);
+
+            void DebugLogCursor() =>
+                LancerPlugin.LogSource.LogInfo($"{cursor.Prev.OpCode.Name} > Cursor < {cursor.Next.OpCode.Name}");
         }
     }
 }
