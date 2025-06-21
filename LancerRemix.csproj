@@ -200,6 +200,7 @@
     <AdditionalFiles Include="scenes\Outro L_3\outro 3 - face - Lmonk - flat.png" />
     <AdditionalFiles Include="scenes\Outro L_3\outro 3 - face - Lsurv - flat.png" />
     <Content Include="illustrations\title_card_lancer.png" />
+    <Content Include="illustrations\title_card_latcher.png" />
     <Content Include="scenes\outro princel 5\outro prince 5 slugcat overseeing - 1b_L.png" />
     <Content Include="scenes\outro princel 5\outro prince 5 slugcat overseeing - 1c_L.png" />
     <Content Include="scenes\outro princel 5\outro prince 5 slugcat overseeing - 1_L.png" />

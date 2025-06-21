@@ -261,6 +261,11 @@ namespace LancerRemix.LancerMenu
                     self.illustrations[2] = new MenuIllustration(self, self.pages[0], "", "title_card_lancer", new Vector2(0f, 0f), true, false);
                     return true;
                 }
+                if (basis == Watcher.WatcherEnums.SlugcatStatsName.Watcher)
+                {
+                    self.illustrations[2] = new MenuIllustration(self, self.pages[0], "", "title_card_latcher", new Vector2(0f, 0f), true, false);
+                    return true;
+                }
 
                 return false;
             });
