@@ -549,9 +549,13 @@ namespace LancerRemix.LancerMenu
                 }
                 else if (page.slugcatImage.sceneID == WatcherEnums.MenuSceneID.End_Watcher_A)
                 {
+                    MoveGlow("slugcat end a - latcher - 8");
+                    page.glowOffset = new Vector2(10f, -70f);
                 }
                 else if (page.slugcatImage.sceneID == WatcherEnums.MenuSceneID.End_Watcher_B)
                 {
+                    MoveGlow("slugcat end b - latcher - 9");
+                    page.glowOffset = new Vector2(-10f, -70f);
                 }
             }
 
@@ -598,22 +602,15 @@ namespace LancerRemix.LancerMenu
                     }
                     else if (ModManager.Watcher && basis == WatcherEnums.SlugcatStatsName.Watcher)
                     {
-                        // TODO: replace this with Latcher
-                        res = WatcherEnums.MenuSceneID.Slugcat_Watcher;
-                        /*
-                        if (Custom.rainWorld.progression.miscProgressionData.watcherEndingID == 1)
-                        {
+                        int latcherEndingID = 0;
+                        try { latcherEndingID = SaveManager.GetMiscValue<int>(Custom.rainWorld.progression.miscProgressionData, Latcher.ModifyLatcher.LATCHER_ENDINGID); }
+                        catch { }
+                        if (latcherEndingID == 1)
                             res = WatcherEnums.MenuSceneID.End_Watcher_A;
-                        }
-                        else if (Custom.rainWorld.progression.miscProgressionData.watcherEndingID == 2)
-                        {
+                        else if (latcherEndingID == 2)
                             res = WatcherEnums.MenuSceneID.End_Watcher_B;
-                        }
                         else
-                        {
                             res = WatcherEnums.MenuSceneID.Slugcat_Watcher;
-                        }
-                        */
                         page.sceneOffset = new Vector2(-10f, 100f);
                         page.slugcatDepth = 3.10000014f;
                         page.markOffset = new Vector2(-15f, -2f);
@@ -672,38 +669,37 @@ namespace LancerRemix.LancerMenu
                 scene.AddIllustration(new MenuIllustration(scene.page.menu, scene, sceneFolder, flatImage, new Vector2(683f, 384f), false, true));
                 scene.flatIllustrations[scene.flatIllustrations.Count - 1].sprite.MoveBehindOtherNode(old.sprite);
                 old.RemoveSprites();
+                return;
             }
-            else
+
+            int i = 0;
+            for (; i < scene.depthIllustrations.Count; ++i)
+                if (string.Equals(scene.depthIllustrations[i].fileName, layerImageOrig, StringComparison.InvariantCultureIgnoreCase)) break;
+            if (i >= scene.depthIllustrations.Count)
             {
-                int i = 0;
-                for (; i < scene.depthIllustrations.Count; ++i)
-                    if (string.Equals(scene.depthIllustrations[i].fileName, layerImageOrig, StringComparison.InvariantCultureIgnoreCase)) break;
-                if (i >= scene.depthIllustrations.Count)
-                {
-                    var B = new System.Text.StringBuilder();
-                    B.AppendLine($"layerImage [{layerImageOrig}] is not in these ({i}/{scene.depthIllustrations.Count}):");
-                    for (i = 0; i < scene.depthIllustrations.Count; ++i)
-                        B.AppendLine($"{i}: [{scene.depthIllustrations[i].fileName}] == [{layerImageOrig}] ? {string.Equals(scene.depthIllustrations[i].fileName, layerImageOrig, StringComparison.InvariantCultureIgnoreCase)}");
-                    throw new ArgumentOutOfRangeException(layerImageOrig, B.ToString());
-                }
-                float depth = scene.depthIllustrations[i].depth;
-                scene.depthIllustrations[i].RemoveSprites();
-                scene.depthIllustrations[i] = null;
-                // LancerPlugin.LogSource.LogMessage($"({i}/{scene.depthIllustrations.Count}) replaced to {layerImage}");
-                scene.depthIllustrations[i] =
-                    new MenuDepthIllustration(scene.page.menu, scene, sceneFolder, layerImage, layerPos, depth, shader ?? MenuDepthIllustration.MenuShader.Basic);
-                scene.subObjects.Add(scene.depthIllustrations[i]);
-                if (i < scene.depthIllustrations.Count - 1)
-                {
-                    for (int t = i + 1; t < scene.depthIllustrations.Count; ++t)
-                    {
-                        if (scene.depthIllustrations[t].sprite == null || !scene.depthIllustrations[t].spriteAdded) continue;
-                        scene.depthIllustrations[i].sprite.MoveBehindOtherNode(scene.depthIllustrations[t].sprite);
-                        break;
-                    }
-                }
-                Debug.Log($"Replaced Illust {i}: [{layerImage}] <- [{layerImageOrig}]");
+                var B = new System.Text.StringBuilder();
+                B.AppendLine($"layerImage [{layerImageOrig}] is not in these ({i}/{scene.depthIllustrations.Count}):");
+                for (i = 0; i < scene.depthIllustrations.Count; ++i)
+                    B.AppendLine($"{i}: [{scene.depthIllustrations[i].fileName}] == [{layerImageOrig}] ? {string.Equals(scene.depthIllustrations[i].fileName, layerImageOrig, StringComparison.InvariantCultureIgnoreCase)}");
+                throw new ArgumentOutOfRangeException(layerImageOrig, B.ToString());
             }
+            float depth = scene.depthIllustrations[i].depth;
+            scene.depthIllustrations[i].RemoveSprites();
+            scene.depthIllustrations[i] = null;
+            // LancerPlugin.LogSource.LogMessage($"({i}/{scene.depthIllustrations.Count}) replaced to {layerImage}");
+            scene.depthIllustrations[i] =
+                new MenuDepthIllustration(scene.page.menu, scene, sceneFolder, layerImage, layerPos, depth, shader ?? MenuDepthIllustration.MenuShader.Basic);
+            scene.subObjects.Add(scene.depthIllustrations[i]);
+            if (i < scene.depthIllustrations.Count - 1)
+            {
+                for (int t = i + 1; t < scene.depthIllustrations.Count; ++t)
+                {
+                    if (scene.depthIllustrations[t].sprite == null || !scene.depthIllustrations[t].spriteAdded) continue;
+                    scene.depthIllustrations[i].sprite.MoveBehindOtherNode(scene.depthIllustrations[t].sprite);
+                    break;
+                }
+            }
+            Debug.Log($"Replaced Illust {i}: [{layerImage}] <- [{layerImageOrig}]");
         }
 
         internal class LancerPageNewGame : SlugcatPageNewGame

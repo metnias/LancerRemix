@@ -66,6 +66,14 @@ namespace LancerRemix.Latcher
                 typeof(PlayerProgression.MiscProgressionData).GetProperty(nameof(PlayerProgression.MiscProgressionData.watcherCampaignSeed), BindingFlags.Instance | BindingFlags.Public).GetSetMethod(),
                 typeof(ModifyLatcher).GetMethod(nameof(LatcherCampaignSeedSet), BindingFlags.Static | BindingFlags.NonPublic)
             ));
+            hooks.Add(new Hook(
+                typeof(PlayerProgression.MiscProgressionData).GetProperty(nameof(PlayerProgression.MiscProgressionData.watcherEndingID), BindingFlags.Instance | BindingFlags.Public).GetGetMethod(),
+                typeof(ModifyLatcher).GetMethod(nameof(LatcherEndingIDGet), BindingFlags.Static | BindingFlags.NonPublic)
+            ));
+            hooks.Add(new Hook(
+                typeof(PlayerProgression.MiscProgressionData).GetProperty(nameof(PlayerProgression.MiscProgressionData.watcherEndingID), BindingFlags.Instance | BindingFlags.Public).GetSetMethod(),
+                typeof(ModifyLatcher).GetMethod(nameof(LatcherEndingIDSet), BindingFlags.Static | BindingFlags.NonPublic)
+            ));
 
             #endregion MISCPROG
 
@@ -74,6 +82,11 @@ namespace LancerRemix.Latcher
 
             On.Menu.MenuScene.BuildRippleSleepScene += BuildLatcherRippleSleepScene;
             On.Menu.MenuScene.BuildWatcherSleepScreen += BuildLatcherSleepScreen;
+            On.Menu.MenuScene.BuildVoidBathScene += BuildLatcherVoidBathScene;
+            On.Menu.MenuScene.BuildSpinningTopEndingScene += BuildLatcherSpinningTopEndingScene;
+            On.Menu.MenuScene.BuildPrinceEndingScene += BuildLatcherPrinceEndingScene;
+            On.Menu.MenuScene.BuildEndWatcherSceneA += BuildEndLatcherSceneA;
+            On.Menu.MenuScene.BuildEndWatcherSceneB += BuildEndLatcherSceneB;
 
             LatcherPatch.OnWatcherEnableSubPatch();
             LatcherTutorial.OnWatcherEnableSubPatch();
@@ -164,12 +177,19 @@ namespace LancerRemix.Latcher
         #region MISCPROG
 
         internal const string LATCHER_CAMPAIGNSEED = "LATCHERCAMPAIGNSEED";
+        internal const string LATCHER_ENDINGID = "LATCHERENDINGID";
+
+        private static bool NotInGame => Custom.rainWorld.processManager.currentMainLoop == null
+            || (Custom.rainWorld.processManager.currentMainLoop.ID == ProcessManager.ProcessID.MainMenu ||
+            Custom.rainWorld.processManager.currentMainLoop.ID == ProcessManager.ProcessID.SlugcatSelect ||
+            Custom.rainWorld.processManager.currentMainLoop.ID == ProcessManager.ProcessID.OptionsMenu ||
+            Custom.rainWorld.processManager.currentMainLoop.ID == ProcessManager.ProcessID.MultiplayerMenu);
 
         private delegate int orig_LatcherCampaignSeedGet(PlayerProgression.MiscProgressionData self);
 
         private static int LatcherCampaignSeedGet(orig_LatcherCampaignSeedGet orig, PlayerProgression.MiscProgressionData self)
         {
-            if (!IsStoryLancer) return orig(self);
+            if (NotInGame || !IsStoryLancer) return orig(self);
             if (Watcher.Watcher.cfgForcedCampaignSeed.Value <= 0)
             {
                 try
@@ -189,9 +209,33 @@ namespace LancerRemix.Latcher
 
         private static void LatcherCampaignSeedSet(orig_LatcherCampaignSeedSet orig, PlayerProgression.MiscProgressionData self, int value)
         {
-            if (!IsStoryLancer) { orig(self, value); return; }
+            if (NotInGame || !IsStoryLancer) { orig(self, value); return; }
             if (Watcher.Watcher.cfgForcedCampaignSeed.Value <= 0)
                 SaveManager.SetMiscValue(self, LATCHER_CAMPAIGNSEED, value);
+        }
+
+        private delegate int orig_LatcherEndingIDGet(PlayerProgression.MiscProgressionData self);
+
+        private static int LatcherEndingIDGet(orig_LatcherEndingIDGet orig, PlayerProgression.MiscProgressionData self)
+        {
+            if (NotInGame || !IsStoryLancer) return orig(self);
+            try
+            {
+                return SaveManager.GetMiscValue<int>(self, LATCHER_ENDINGID);
+            }
+            catch
+            {
+                SaveManager.SetMiscValue(self, LATCHER_ENDINGID, 0);
+                return 0;
+            }
+        }
+
+        private delegate void orig_LatcherEndingIDSet(PlayerProgression.MiscProgressionData self, int value);
+
+        private static void LatcherEndingIDSet(orig_LatcherEndingIDSet orig, PlayerProgression.MiscProgressionData self, int value)
+        {
+            if (NotInGame || !IsStoryLancer) { orig(self, value); return; }
+            SaveManager.SetMiscValue(self, LATCHER_ENDINGID, value);
         }
 
         #endregion MISCPROG
@@ -509,6 +553,40 @@ namespace LancerRemix.Latcher
         private static void ReplaceIllust(MenuScene scene, string sceneFolder, string flatImage, string layerImageOrig, string layerImage, Vector2 layerPos, MenuDepthIllustration.MenuShader shader = null)
             => SelectMenuPatch.ReplaceIllust(scene, sceneFolder, flatImage, layerImageOrig, layerImage, layerPos, shader ?? MenuDepthIllustration.MenuShader.Normal);
 
+        private static void ReplaceCrossfade(MenuScene scene, string sceneFolder, string layerImageOrig, string layerImage, Vector2 layerPos, MenuDepthIllustration.MenuShader shader = null)
+        {
+            if (scene.flatMode) return;
+
+            foreach (var pair in scene.crossFades)
+            {
+                var list = pair.Value;
+                for (int i = 0; i < list.Count; ++i)
+                {
+                    if (!string.Equals(list[i].fileName, layerImageOrig)) continue;
+
+                    float depth = list[i].depth;
+                    list[i].RemoveSprites();
+                    list[i] = null;
+
+                    list[i] =
+                        new MenuDepthIllustration(scene.page.menu, scene, sceneFolder, layerImage, layerPos, depth, shader ?? MenuDepthIllustration.MenuShader.Basic);
+                    int n = pair.Key;
+                    if (n < scene.depthIllustrations.Count - 1)
+                    {
+                        for (int t = n + 1; t < scene.depthIllustrations.Count; ++t)
+                        {
+                            if (scene.depthIllustrations[t].sprite == null || !scene.depthIllustrations[t].spriteAdded) continue;
+                            list[i].sprite.MoveBehindOtherNode(scene.depthIllustrations[t].sprite);
+                            break;
+                        }
+                    }
+                    list[i].setAlpha = 0f;
+                    Debug.Log($"Replaced Crossfade {n}-{i}: [{layerImage}] <- [{layerImageOrig}]");
+                    return;
+                }
+            }
+        }
+
         private static void ReplaceFlatIllust(MenuScene scene, string sceneFolder, string flatImage, string flatImageOrig)
         {
             int i = 0;
@@ -531,6 +609,8 @@ namespace LancerRemix.Latcher
             if (i < scene.flatIllustrations.Count - 1)
                 scene.flatIllustrations[i].sprite.MoveBehindOtherNode(scene.flatIllustrations[i + 1].sprite);
             scene.subObjects.Add(scene.flatIllustrations[i]);
+            if (scene.useFlatCrossfades)
+                scene.flatIllustrations[i].alpha = i > 0 ? 0 : 1;
             Debug.Log($"Replaced Illust {i}: [{flatImage}] <- [{flatImageOrig}]");
         }
 
@@ -553,9 +633,9 @@ namespace LancerRemix.Latcher
         private static void BuildLatcherSleepScreen(On.Menu.MenuScene.orig_BuildWatcherSleepScreen orig,
             MenuScene self)
         {
-            string sceneFolder = $"Scenes{Path.DirectorySeparatorChar}sleep screen - latcher";
             orig(self);
             if (!IsStoryLancer) return;
+            string sceneFolder = $"Scenes{Path.DirectorySeparatorChar}sleep screen - latcher";
 
             #region GetIndex
 
@@ -617,6 +697,135 @@ namespace LancerRemix.Latcher
                 $"sleep - 2{postfix} - watcher",
                 $"sleep - 2{postfix} - latcher",
                 new Vector2(800f, 81f), MenuDepthIllustration.MenuShader.Basic);
+        }
+
+        private static void BuildLatcherVoidBathScene(On.Menu.MenuScene.orig_BuildVoidBathScene orig,
+            MenuScene self, int index)
+        {
+            orig(self, index);
+            if (!IsStoryLancer) return;
+            string sceneFolder = $"Scenes{Path.DirectorySeparatorChar}outro void bathl {index}";
+
+            switch (index)
+            {
+                case 1:
+                    ReplaceIllust(self, sceneFolder, "outro void bath 1 - flat_L",
+                        "outro void bath 1 slugcat - 1", "outro void bath 1 slugcat - 1_L",
+                        new Vector2(501f, -93f), MenuDepthIllustration.MenuShader.Normal);
+                    break;
+
+                case 2:
+                    ReplaceIllust(self, sceneFolder, null,
+                        "outro void bath 2 slugcat watching - 1", "outro void bath 2 slugcat watching - 1_L",
+                        new Vector2(488f, -36f), MenuDepthIllustration.MenuShader.Normal);
+                    if (!self.flatMode) break;
+                    ReplaceFlatIllust(self, sceneFolder, "outro void bath 2 - flat_L", "outro void bath 2 - flat");
+                    ReplaceFlatIllust(self, sceneFolder, "outro void bath 2 - flat - b_L", "outro void bath 2 - flat - b");
+                    break;
+
+                case 3:
+                    ReplaceIllust(self, sceneFolder, null,
+                        "outro void bath 3 watcher watching - 2", "outro void bath 3 watcher watching - 2_L",
+                        new Vector2(360f, 118f), MenuDepthIllustration.MenuShader.Normal);
+                    if (!self.flatMode) break;
+                    ReplaceFlatIllust(self, sceneFolder, "outro void bath 3 - flat_L", "outro void bath 3 - flat");
+                    ReplaceFlatIllust(self, sceneFolder, "outro void bath 3 - flat - b_L", "outro void bath 3 - flat - b");
+                    break;
+            }
+        }
+
+        private static void BuildLatcherSpinningTopEndingScene(On.Menu.MenuScene.orig_BuildSpinningTopEndingScene orig,
+            MenuScene self, int index)
+        {
+            orig(self, index);
+            if (!IsStoryLancer) return;
+            string sceneFolder = $"Scenes{Path.DirectorySeparatorChar}outro spinning topl {index}";
+
+            switch (index)
+            {
+                case 1:
+                    ReplaceIllust(self, sceneFolder, "outro spinning top 1 - flat_L",
+                        "outro spinning top 1 watcher toypicking - 1", "outro spinning top 1 watcher toypicking - 1_L",
+                        new Vector2(13f, -81f), MenuDepthIllustration.MenuShader.Normal);
+                    break;
+
+                case 2:
+                    ReplaceIllust(self, sceneFolder, "outro spinning top 2 - flat_L",
+                        "outro spinning top 2 watcher playing - 3", "outro spinning top 2 watcher playing - 3_L",
+                        new Vector2(25f, 4f), MenuDepthIllustration.MenuShader.Normal);
+                    break;
+
+                case 3:
+                    ReplaceIllust(self, sceneFolder, "outro spinning top 3 - flat_L",
+                        "outro spinning top 3 watcher alone - 3", "outro spinning top 3 watcher alone - 3_L",
+                        new Vector2(126f, -1f), MenuDepthIllustration.MenuShader.LightEdges);
+                    break;
+            }
+        }
+
+        private static void BuildLatcherPrinceEndingScene(On.Menu.MenuScene.orig_BuildPrinceEndingScene orig,
+            MenuScene self, int index)
+        {
+            orig(self, index);
+            if (!IsStoryLancer) return;
+            string sceneFolder = $"Scenes{Path.DirectorySeparatorChar}outro princel {index}";
+
+            switch (index)
+            {
+                case 5:
+                    ReplaceIllust(self, sceneFolder, null,
+                        "outro prince 5 slugcat overseeing - 1", "outro prince 5 slugcat overseeing - 1_L",
+                        new Vector2(321f, -73f), MenuDepthIllustration.MenuShader.Normal);
+                    if (self.flatMode)
+                    {
+                        ReplaceFlatIllust(self, sceneFolder, "outro prince 6 - flat_L", "outro prince 6 - flat");
+                        ReplaceFlatIllust(self, sceneFolder, "outro prince 6-1 - flat_L", "outro prince 6-1 - flat");
+                        ReplaceFlatIllust(self, sceneFolder, "outro prince 6-2 - flat_L", "outro prince 6-2 - flat");
+                    }
+                    else
+                    {
+                        ReplaceIllust(self, sceneFolder, null,
+                            "outro prince 5 slugcat overseeing - 1", "outro prince 5 slugcat overseeing - 1_L",
+                            new Vector2(321f, -73f), MenuDepthIllustration.MenuShader.Basic);
+                        ReplaceCrossfade(self, sceneFolder,
+                            "outro prince 5 slugcat overseeing - 1b", "outro prince 5 slugcat overseeing - 1b_L",
+                            new Vector2(321f, -73f), MenuDepthIllustration.MenuShader.Basic);
+                        ReplaceCrossfade(self, sceneFolder,
+                            "outro prince 5 slugcat overseeing - 1c", "outro prince 5 slugcat overseeing - 1c_L",
+                            new Vector2(321f, -73f), MenuDepthIllustration.MenuShader.Basic);
+                    }
+                    break;
+
+                case 6:
+                    ReplaceIllust(self, sceneFolder, "outro prince 6 - flat_L",
+                        "outro prince 6 watcher watching - 2", "outro prince 6 watcher watching - 2_L",
+                        new Vector2(81f, -56f), MenuDepthIllustration.MenuShader.Normal);
+                    break;
+            }
+        }
+
+        private static void BuildEndLatcherSceneA(On.Menu.MenuScene.orig_BuildEndWatcherSceneA orig,
+            MenuScene self)
+        {
+            orig(self);
+            if (!IsStoryLancer) return;
+            string sceneFolder = $"Scenes{Path.DirectorySeparatorChar}slugcat end_a - latcher";
+
+            ReplaceIllust(self, sceneFolder, "slugcat end a - latcher - flat",
+                "slugcat end a - watcher - 8", "slugcat end a - latcher - 8",
+                new Vector2(549f, 177f), MenuDepthIllustration.MenuShader.Basic);
+        }
+
+        private static void BuildEndLatcherSceneB(On.Menu.MenuScene.orig_BuildEndWatcherSceneB orig,
+            MenuScene self)
+        {
+            orig(self);
+            if (!IsStoryLancer) return;
+            string sceneFolder = $"Scenes{Path.DirectorySeparatorChar}slugcat end_a - latcher";
+
+            ReplaceIllust(self, sceneFolder, "slugcat end b - latcher - flat",
+                "slugcat end b - watcher - 9", "slugcat end b - latcher - 9",
+                new Vector2(599f, 246f), MenuDepthIllustration.MenuShader.Basic);
         }
 
         #endregion MenuScenes

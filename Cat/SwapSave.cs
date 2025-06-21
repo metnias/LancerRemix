@@ -78,7 +78,10 @@ namespace LancerRemix.Cat
                 saveStateNumber = GetLancer(saveStateNumber);
 #if LATCHER
                 if (ModManager.Watcher && basis == Watcher.WatcherEnums.SlugcatStatsName.Watcher)
+                {
                     SetMiscValue(self.miscProgressionData, Latcher.ModifyLatcher.LATCHER_CAMPAIGNSEED, 0);
+                    SetMiscValue(self.miscProgressionData, Latcher.ModifyLatcher.LATCHER_ENDINGID, 0);
+                }
 #endif
             }
 
