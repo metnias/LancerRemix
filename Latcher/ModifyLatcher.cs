@@ -59,6 +59,15 @@ namespace LancerRemix.Latcher
             #region MISCPROG
 
             hooks.Add(new Hook(
+                typeof(PlayerProgression.MiscProgressionData).GetProperty(nameof(PlayerProgression.MiscProgressionData.beaten_Watcher), BindingFlags.Instance | BindingFlags.Public).GetGetMethod(),
+                typeof(ModifyLatcher).GetMethod(nameof(LatcherBeatenGet), BindingFlags.Static | BindingFlags.NonPublic)
+            ));
+            hooks.Add(new Hook(
+                typeof(PlayerProgression.MiscProgressionData).GetProperty(nameof(PlayerProgression.MiscProgressionData.beaten_Watcher), BindingFlags.Instance | BindingFlags.Public).GetSetMethod(),
+                typeof(ModifyLatcher).GetMethod(nameof(LatcherBeatenSet), BindingFlags.Static | BindingFlags.NonPublic)
+            ));
+
+            hooks.Add(new Hook(
                 typeof(PlayerProgression.MiscProgressionData).GetProperty(nameof(PlayerProgression.MiscProgressionData.watcherCampaignSeed), BindingFlags.Instance | BindingFlags.Public).GetGetMethod(),
                 typeof(ModifyLatcher).GetMethod(nameof(LatcherCampaignSeedGet), BindingFlags.Static | BindingFlags.NonPublic)
             ));
@@ -66,6 +75,25 @@ namespace LancerRemix.Latcher
                 typeof(PlayerProgression.MiscProgressionData).GetProperty(nameof(PlayerProgression.MiscProgressionData.watcherCampaignSeed), BindingFlags.Instance | BindingFlags.Public).GetSetMethod(),
                 typeof(ModifyLatcher).GetMethod(nameof(LatcherCampaignSeedSet), BindingFlags.Static | BindingFlags.NonPublic)
             ));
+
+            hooks.Add(new Hook(
+                typeof(PlayerProgression.MiscProgressionData).GetProperty(nameof(PlayerProgression.MiscProgressionData.beaten_Watcher_SpinningTop), BindingFlags.Instance | BindingFlags.Public).GetGetMethod(),
+                typeof(ModifyLatcher).GetMethod(nameof(LatcherBeatenSTGet), BindingFlags.Static | BindingFlags.NonPublic)
+            ));
+            hooks.Add(new Hook(
+                typeof(PlayerProgression.MiscProgressionData).GetProperty(nameof(PlayerProgression.MiscProgressionData.beaten_Watcher_SpinningTop), BindingFlags.Instance | BindingFlags.Public).GetSetMethod(),
+                typeof(ModifyLatcher).GetMethod(nameof(LatcherBeatenSTSet), BindingFlags.Static | BindingFlags.NonPublic)
+            ));
+
+            hooks.Add(new Hook(
+                typeof(PlayerProgression.MiscProgressionData).GetProperty(nameof(PlayerProgression.MiscProgressionData.beaten_Watcher_SentientRot), BindingFlags.Instance | BindingFlags.Public).GetGetMethod(),
+                typeof(ModifyLatcher).GetMethod(nameof(LatcherBeatenRPGet), BindingFlags.Static | BindingFlags.NonPublic)
+            ));
+            hooks.Add(new Hook(
+                typeof(PlayerProgression.MiscProgressionData).GetProperty(nameof(PlayerProgression.MiscProgressionData.beaten_Watcher_SentientRot), BindingFlags.Instance | BindingFlags.Public).GetSetMethod(),
+                typeof(ModifyLatcher).GetMethod(nameof(LatcherBeatenRPSet), BindingFlags.Static | BindingFlags.NonPublic)
+            ));
+
             hooks.Add(new Hook(
                 typeof(PlayerProgression.MiscProgressionData).GetProperty(nameof(PlayerProgression.MiscProgressionData.watcherEndingID), BindingFlags.Instance | BindingFlags.Public).GetGetMethod(),
                 typeof(ModifyLatcher).GetMethod(nameof(LatcherEndingIDGet), BindingFlags.Static | BindingFlags.NonPublic)
@@ -176,7 +204,10 @@ namespace LancerRemix.Latcher
 
         #region MISCPROG
 
+        internal const string LATCHER_BEATEN = "LATCHERBEATEN";
         internal const string LATCHER_CAMPAIGNSEED = "LATCHERCAMPAIGNSEED";
+        internal const string LATCHER_BEATEN_ST = "LATCHERBEATENST";
+        internal const string LATCHER_BEATEN_RP = "LATCHERBEATENRP";
         internal const string LATCHER_ENDINGID = "LATCHERENDINGID";
 
         private static bool NotInGame => Custom.rainWorld.processManager.currentMainLoop == null
@@ -185,9 +216,35 @@ namespace LancerRemix.Latcher
             Custom.rainWorld.processManager.currentMainLoop.ID == ProcessManager.ProcessID.OptionsMenu ||
             Custom.rainWorld.processManager.currentMainLoop.ID == ProcessManager.ProcessID.MultiplayerMenu);
 
-        private delegate int orig_LatcherCampaignSeedGet(PlayerProgression.MiscProgressionData self);
+        private delegate int orig_MiscIntGet(PlayerProgression.MiscProgressionData self);
 
-        private static int LatcherCampaignSeedGet(orig_LatcherCampaignSeedGet orig, PlayerProgression.MiscProgressionData self)
+        private delegate void orig_MiscIntSet(PlayerProgression.MiscProgressionData self, int value);
+
+        private delegate bool orig_MiscBoolGet(PlayerProgression.MiscProgressionData self);
+
+        private delegate void orig_MiscBoolSet(PlayerProgression.MiscProgressionData self, bool value);
+
+        private static bool LatcherBeatenGet(orig_MiscBoolGet orig, PlayerProgression.MiscProgressionData self)
+        {
+            if (NotInGame || !IsStoryLancer) return orig(self);
+            try
+            {
+                return SaveManager.GetMiscValue<bool>(self, LATCHER_BEATEN);
+            }
+            catch
+            {
+                SaveManager.SetMiscValue(self, LATCHER_BEATEN, false);
+                return false;
+            }
+        }
+
+        private static void LatcherBeatenSet(orig_MiscBoolSet orig, PlayerProgression.MiscProgressionData self, bool value)
+        {
+            if (NotInGame || !IsStoryLancer) { orig(self, value); return; }
+            SaveManager.SetMiscValue(self, LATCHER_BEATEN, value);
+        }
+
+        private static int LatcherCampaignSeedGet(orig_MiscIntGet orig, PlayerProgression.MiscProgressionData self)
         {
             if (NotInGame || !IsStoryLancer) return orig(self);
             if (Watcher.Watcher.cfgForcedCampaignSeed.Value <= 0)
@@ -205,18 +262,54 @@ namespace LancerRemix.Latcher
             return Watcher.Watcher.cfgForcedCampaignSeed.Value;
         }
 
-        private delegate void orig_LatcherCampaignSeedSet(PlayerProgression.MiscProgressionData self, int value);
-
-        private static void LatcherCampaignSeedSet(orig_LatcherCampaignSeedSet orig, PlayerProgression.MiscProgressionData self, int value)
+        private static void LatcherCampaignSeedSet(orig_MiscIntSet orig, PlayerProgression.MiscProgressionData self, int value)
         {
             if (NotInGame || !IsStoryLancer) { orig(self, value); return; }
             if (Watcher.Watcher.cfgForcedCampaignSeed.Value <= 0)
                 SaveManager.SetMiscValue(self, LATCHER_CAMPAIGNSEED, value);
         }
 
-        private delegate int orig_LatcherEndingIDGet(PlayerProgression.MiscProgressionData self);
+        private static bool LatcherBeatenSTGet(orig_MiscBoolGet orig, PlayerProgression.MiscProgressionData self)
+        {
+            if (NotInGame || !IsStoryLancer) return orig(self);
+            try
+            {
+                return SaveManager.GetMiscValue<bool>(self, LATCHER_BEATEN_ST);
+            }
+            catch
+            {
+                SaveManager.SetMiscValue(self, LATCHER_BEATEN_ST, false);
+                return false;
+            }
+        }
 
-        private static int LatcherEndingIDGet(orig_LatcherEndingIDGet orig, PlayerProgression.MiscProgressionData self)
+        private static void LatcherBeatenSTSet(orig_MiscBoolSet orig, PlayerProgression.MiscProgressionData self, bool value)
+        {
+            if (NotInGame || !IsStoryLancer) { orig(self, value); return; }
+            SaveManager.SetMiscValue(self, LATCHER_BEATEN_ST, value);
+        }
+
+        private static bool LatcherBeatenRPGet(orig_MiscBoolGet orig, PlayerProgression.MiscProgressionData self)
+        {
+            if (NotInGame || !IsStoryLancer) return orig(self);
+            try
+            {
+                return SaveManager.GetMiscValue<bool>(self, LATCHER_BEATEN_RP);
+            }
+            catch
+            {
+                SaveManager.SetMiscValue(self, LATCHER_BEATEN_RP, false);
+                return false;
+            }
+        }
+
+        private static void LatcherBeatenRPSet(orig_MiscBoolSet orig, PlayerProgression.MiscProgressionData self, bool value)
+        {
+            if (NotInGame || !IsStoryLancer) { orig(self, value); return; }
+            SaveManager.SetMiscValue(self, LATCHER_BEATEN_RP, value);
+        }
+
+        private static int LatcherEndingIDGet(orig_MiscIntGet orig, PlayerProgression.MiscProgressionData self)
         {
             if (NotInGame || !IsStoryLancer) return orig(self);
             try
@@ -230,9 +323,7 @@ namespace LancerRemix.Latcher
             }
         }
 
-        private delegate void orig_LatcherEndingIDSet(PlayerProgression.MiscProgressionData self, int value);
-
-        private static void LatcherEndingIDSet(orig_LatcherEndingIDSet orig, PlayerProgression.MiscProgressionData self, int value)
+        private static void LatcherEndingIDSet(orig_MiscIntSet orig, PlayerProgression.MiscProgressionData self, int value)
         {
             if (NotInGame || !IsStoryLancer) { orig(self, value); return; }
             SaveManager.SetMiscValue(self, LATCHER_ENDINGID, value);

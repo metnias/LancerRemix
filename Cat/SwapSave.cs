@@ -79,7 +79,10 @@ namespace LancerRemix.Cat
 #if LATCHER
                 if (ModManager.Watcher && basis == Watcher.WatcherEnums.SlugcatStatsName.Watcher)
                 {
+                    SetMiscValue(self.miscProgressionData, Latcher.ModifyLatcher.LATCHER_BEATEN, false);
                     SetMiscValue(self.miscProgressionData, Latcher.ModifyLatcher.LATCHER_CAMPAIGNSEED, 0);
+                    SetMiscValue(self.miscProgressionData, Latcher.ModifyLatcher.LATCHER_BEATEN_ST, false);
+                    SetMiscValue(self.miscProgressionData, Latcher.ModifyLatcher.LATCHER_BEATEN_RP, false);
                     SetMiscValue(self.miscProgressionData, Latcher.ModifyLatcher.LATCHER_ENDINGID, 0);
                 }
 #endif
