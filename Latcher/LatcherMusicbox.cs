@@ -37,7 +37,7 @@ namespace LancerRemix.Latcher
         private static float playerWorldRatio;
         private static float playerTimeStacker;
         private static HashSet<IDrawable> latcherTimelineDrawables;
-        internal static bool IsLatcherRipple => worldTPS < 1f;
+        internal static bool IsLatcherRipple { get; private set; } = false;
 
         private static void RoomUpdatePatch(On.Room.orig_Update orig, Room self)
         {
@@ -47,6 +47,7 @@ namespace LancerRemix.Latcher
 
         private static void GameRawUpdatePatch(On.MainLoopProcess.orig_RawUpdate orig, MainLoopProcess self, float dt)
         {
+            IsLatcherRipple = false;
             haltGrafUpdate = false;
             playerWorldRatio = playerSlowRatio = 1f;
             playerTPS = worldTPS = self.framesPerSecond;
@@ -133,6 +134,7 @@ namespace LancerRemix.Latcher
                     playerTPS *= slowFactor;
                     targetTPS *= slowFactor;
                 }
+                if (Mathf.Approximately(0f, worldTPS)) IsLatcherRipple = true;
                 worldTPS = Mathf.Max(playerTPS / 5f, worldTPS);
                 playerWorldRatio = playerTPS / worldTPS;
                 playerSlowRatio = targetTPS / playerTPS;
