@@ -113,8 +113,6 @@ namespace LancerRemix.Latcher
             On.Menu.MenuScene.BuildVoidBathScene += BuildLatcherVoidBathScene;
             On.Menu.MenuScene.BuildSpinningTopEndingScene += BuildLatcherSpinningTopEndingScene;
             On.Menu.MenuScene.BuildPrinceEndingScene += BuildLatcherPrinceEndingScene;
-            On.Menu.MenuScene.BuildEndWatcherSceneA += BuildEndLatcherSceneA;
-            On.Menu.MenuScene.BuildEndWatcherSceneB += BuildEndLatcherSceneB;
 
             LatcherPatch.OnWatcherEnableSubPatch();
             LatcherTutorial.OnWatcherEnableSubPatch();
@@ -864,14 +862,11 @@ namespace LancerRemix.Latcher
             switch (index)
             {
                 case 5:
-                    ReplaceIllust(self, sceneFolder, null,
-                        "outro prince 5 slugcat overseeing - 1", "outro prince 5 slugcat overseeing - 1_L",
-                        new Vector2(321f, -73f), MenuDepthIllustration.MenuShader.Normal);
                     if (self.flatMode)
                     {
-                        ReplaceFlatIllust(self, sceneFolder, "outro prince 6 - flat_L", "outro prince 6 - flat");
-                        ReplaceFlatIllust(self, sceneFolder, "outro prince 6-1 - flat_L", "outro prince 6-1 - flat");
-                        ReplaceFlatIllust(self, sceneFolder, "outro prince 6-2 - flat_L", "outro prince 6-2 - flat");
+                        ReplaceFlatIllust(self, sceneFolder, "outro prince 5 - flat_L", "outro prince 5 - flat");
+                        ReplaceFlatIllust(self, sceneFolder, "outro prince 5-1 - flat_L", "outro prince 5-1 - flat");
+                        ReplaceFlatIllust(self, sceneFolder, "outro prince 5-2 - flat_L", "outro prince 5-2 - flat");
                     }
                     else
                     {
@@ -893,30 +888,6 @@ namespace LancerRemix.Latcher
                         new Vector2(81f, -56f), MenuDepthIllustration.MenuShader.Normal);
                     break;
             }
-        }
-
-        private static void BuildEndLatcherSceneA(On.Menu.MenuScene.orig_BuildEndWatcherSceneA orig,
-            MenuScene self)
-        {
-            orig(self);
-            if (!IsStoryLancer) return;
-            string sceneFolder = $"Scenes{Path.DirectorySeparatorChar}slugcat end_a - latcher";
-
-            ReplaceIllust(self, sceneFolder, "slugcat end a - latcher - flat",
-                "slugcat end a - watcher - 8", "slugcat end a - latcher - 8",
-                new Vector2(549f, 177f), MenuDepthIllustration.MenuShader.Basic);
-        }
-
-        private static void BuildEndLatcherSceneB(On.Menu.MenuScene.orig_BuildEndWatcherSceneB orig,
-            MenuScene self)
-        {
-            orig(self);
-            if (!IsStoryLancer) return;
-            string sceneFolder = $"Scenes{Path.DirectorySeparatorChar}slugcat end_a - latcher";
-
-            ReplaceIllust(self, sceneFolder, "slugcat end b - latcher - flat",
-                "slugcat end b - watcher - 9", "slugcat end b - latcher - 9",
-                new Vector2(599f, 246f), MenuDepthIllustration.MenuShader.Basic);
         }
 
         #endregion MenuScenes

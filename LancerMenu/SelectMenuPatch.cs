@@ -549,13 +549,23 @@ namespace LancerRemix.LancerMenu
                 }
                 else if (page.slugcatImage.sceneID == WatcherEnums.MenuSceneID.End_Watcher_A)
                 {
+                    string sceneFolder = $"Scenes{Path.DirectorySeparatorChar}slugcat end_a - latcher";
+                    ReplaceIllust(page.slugcatImage, sceneFolder, "slugcat end a - latcher - flat",
+                        "slugcat end a - watcher - 8", "slugcat end a - latcher - 8",
+                        new Vector2(549f, 177f), MenuDepthIllustration.MenuShader.Basic);
+
                     MoveGlow("slugcat end a - latcher - 8");
                     page.glowOffset = new Vector2(10f, -70f);
                 }
                 else if (page.slugcatImage.sceneID == WatcherEnums.MenuSceneID.End_Watcher_B)
                 {
+                    string sceneFolder = $"Scenes{Path.DirectorySeparatorChar}slugcat end_b - latcher";
+                    ReplaceIllust(page.slugcatImage, sceneFolder, "slugcat end b - latcher - flat",
+                        "slugcat end b - watcher - 9", "slugcat end b - latcher - 9",
+                        new Vector2(599f, 246f), MenuDepthIllustration.MenuShader.Basic);
+
                     MoveGlow("slugcat end b - latcher - 9");
-                    page.glowOffset = new Vector2(-10f, -70f);
+                    page.glowOffset = new Vector2(-30f, -70f);
                 }
             }
 
@@ -572,9 +582,11 @@ namespace LancerRemix.LancerMenu
             {
                 var sceneID = GetLancerBasisScene();
                 if (page.slugcatImage.sceneID == sceneID) return;
+                Debug.Log($"Reload Lancer SlugcatSelect scene: [{sceneID}] <- [{page.slugcatImage.sceneID}]");
                 page.RemoveSubObject(page.slugcatImage);
                 page.slugcatImage.RemoveSprites(); page.slugcatImage.RemoveSubObject(page.slugcatImage); page.slugcatImage = null;
                 page.slugcatImage = new InteractiveMenuScene(page.menu, page, sceneID);
+                page.subObjects.Add(page.slugcatImage);
 
                 SceneID GetLancerBasisScene()
                 {
