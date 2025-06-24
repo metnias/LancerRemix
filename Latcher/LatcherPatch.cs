@@ -299,6 +299,7 @@ namespace LancerRemix.Latcher
             if (rCam.rippleData != null
                 && rCam.room?.game != null && IsStoryLatcher(rCam.room.game))
             {
+                if (obj is SunBlocker) return;
                 ReplaceRippleShader(self.sprites);
             }
 
