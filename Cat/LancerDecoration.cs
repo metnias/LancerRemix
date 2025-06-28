@@ -109,6 +109,8 @@ namespace LancerRemix.Cat
         public static Color DefaultHornColor(SlugName basis)
         {
             basis = GetBasis(basis);
+            if (ModManager.Watcher && basis == WatcherEnums.SlugcatStatsName.Watcher)
+                return new Color(0.1f, 0.5f, 0.3f);
             if (defaultHornColors.TryGetValue(basis, out var res)) return res;
 
             var c = PlayerGraphics.DefaultSlugcatColor(basis);
@@ -127,7 +129,6 @@ namespace LancerRemix.Cat
                 { SlugName.Yellow, new Color(0.5f, 0.1f, 0.0f) },
                 { SlugName.Red, new Color(0.0f, 0.1f, 0.5f) },
                 { SlugName.Night, new Color(0.1f, 0.5f, 0.3f) },
-                { WatcherEnums.SlugcatStatsName.Watcher, new Color(0.1f, 0.5f, 0.3f) }
             };
 
         public static IntVector2 HornStat(SlugName basis)

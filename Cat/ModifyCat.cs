@@ -65,7 +65,6 @@ namespace LancerRemix.Cat
 #endif
 
             if (ModManager.MSC) OnMSCEnablePatch();
-            if (ModManager.Watcher) OnWatcherEnablePatch();
         }
 
         internal static void OnMSCEnablePatch()
@@ -73,16 +72,6 @@ namespace LancerRemix.Cat
         }
 
         internal static void OnMSCDisablePatch()
-        {
-        }
-
-        internal static void OnWatcherEnablePatch()
-        {
-            defaultLancerBodyColors.Remove(WatcherEnums.SlugcatStatsName.Watcher);
-            defaultLancerBodyColors.Add(WatcherEnums.SlugcatStatsName.Watcher, new Color(0.8f, 0.1f, 0.3f));
-        }
-
-        internal static void OnWatcherDisablePatch()
         {
         }
 
@@ -463,6 +452,9 @@ namespace LancerRemix.Cat
             if (IsLancer(i) && !IsPlayerCustomLancer(i))
             {
                 var basis = GetBasis(i);
+                if (ModManager.Watcher && basis == WatcherEnums.SlugcatStatsName.Watcher)
+                    return new Color(0.8f, 0.1f, 0.3f);
+
                 if (defaultLancerBodyColors.TryGetValue(basis, out var res)) return res;
                 return orig(basis);
             }

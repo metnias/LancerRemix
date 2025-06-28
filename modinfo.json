@@ -5,7 +5,7 @@
   "hide_version": false,
   "authors": "Lead Dev: topicular<LINE>Cat Pics: Merang<LINE>Writings: Empathy Module<LINE>Russian: MaxBogomol",
   "description": "Adds Lancer variant for campaigns, which use melee combat.",
-  "target_game_version": "v1.10.5",
+  "target_game_version": "v1.10.6",
   "requirements": [ "slime-cubed.slugbase", "topicular.catsupplement" ],
   "requirements_names": [ "SlugBase", "CatSupplement" ],
   "tags": [ "Campaigns", "Game Mechanics", "Custom Slugcat" ],

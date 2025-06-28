@@ -156,11 +156,12 @@ namespace LancerRemix
                 LancerTimes.Remove(lancer);
                 lancerTime?.Unregister();
             }
+            lancerModifiers.Remove(GetBasis(lancer));
+            if (IsCustomLancer(lancer.value)) return;
+
             if (SlugBaseCharacter.Registry.TryGet(lancer, out var _))
                 SlugBaseCharacter.Registry.Remove(lancer);
-            lancerModifiers.Remove(GetBasis(lancer));
 
-            if (IsCustomLancer(lancer.value)) return;
             lancer?.Unregister();
         }
 

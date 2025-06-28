@@ -91,6 +91,7 @@ namespace LancerRemix
                 if (LancerGenerator.HasCustomLancer(name, out var customName))
                 {
                     lancer = new SlugName(customName, false);
+                    LancerPlugin.LogSource.LogMessage($"{slug}({slug.Index}) has Custom Lancer: {lancer.value}({lancer.Index})");
                     if (lancer.Index < 0) continue;
                 }
                 else if (!LancerGenerator.CreateLancer(slug, out lancer)) continue;

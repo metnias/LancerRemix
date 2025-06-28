@@ -128,6 +128,9 @@ namespace LancerRemix.Latcher
 
             On.Menu.MenuScene.BuildRippleSleepScene -= BuildLatcherRippleSleepScene;
             On.Menu.MenuScene.BuildWatcherSleepScreen -= BuildLatcherSleepScreen;
+            On.Menu.MenuScene.BuildVoidBathScene -= BuildLatcherVoidBathScene;
+            On.Menu.MenuScene.BuildSpinningTopEndingScene -= BuildLatcherSpinningTopEndingScene;
+            On.Menu.MenuScene.BuildPrinceEndingScene -= BuildLatcherPrinceEndingScene;
 
             LatcherPatch.OnWatcherDisableSubPatch();
             LatcherTutorial.OnWatcherDisableSubPatch();
