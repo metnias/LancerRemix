@@ -14,8 +14,12 @@ namespace LancerRemix.LancerMenu
 {
     internal static class HornColorPick
     {
+        private static bool init = false;
+
         internal static void Initalize()
         {
+            if (init) return;
+            init = true;
             for (int i = 0; i < hornColors.Length; ++i)
             {
                 Color c;

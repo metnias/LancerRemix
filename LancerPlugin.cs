@@ -41,7 +41,7 @@ namespace LancerRemix
     {
         public const string PLUGIN_ID = "com.rainworldgame.topicular.lancer.plugin";
         public const string PLUGIN_NAME = "Lancer";
-        public const string PLUGIN_VERSION = "1.3.1.3";
+        public const string PLUGIN_VERSION = "1.3.1.4";
 
         private static bool init = false;
         internal static ManualLogSource LogSource { get; private set; }
@@ -78,7 +78,6 @@ namespace LancerRemix
 #endif
 
             LancerEnums.RegisterExtEnum();
-            HornColorPick.Initalize();
 
             ModifyCat.Patch();
             MenuModifier.Patch();
@@ -129,6 +128,7 @@ namespace LancerRemix
                 try
                 {
                     LancerEnums.RegisterLancers();
+                    HornColorPick.Initalize();
                 }
                 catch (Exception e) { Debug.LogException(e); }
             }
