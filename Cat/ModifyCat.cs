@@ -65,6 +65,7 @@ namespace LancerRemix.Cat
 #endif
 
             if (ModManager.MSC) OnMSCEnablePatch();
+            if (ModManager.Watcher) OnWatcherEnablePatch();
         }
 
         internal static void OnMSCEnablePatch()
@@ -72,6 +73,16 @@ namespace LancerRemix.Cat
         }
 
         internal static void OnMSCDisablePatch()
+        {
+        }
+
+        internal static void OnWatcherEnablePatch()
+        {
+            defaultLancerBodyColors.Remove(WatcherEnums.SlugcatStatsName.Watcher);
+            defaultLancerBodyColors.Add(WatcherEnums.SlugcatStatsName.Watcher, new Color(0.8f, 0.1f, 0.3f));
+        }
+
+        internal static void OnWatcherDisablePatch()
         {
         }
 
@@ -464,8 +475,7 @@ namespace LancerRemix.Cat
                 { SlugName.White, new Color(0.8f, 1.0f, 0.5f) },
                 { SlugName.Yellow, new Color(1.0f, 0.9f, 0.4f) },
                 { SlugName.Red, new Color(0.3f, 0.5f, 1.0f) },
-                { SlugName.Night, new Color(0.8f, 0.1f, 0.3f) },
-                { WatcherEnums.SlugcatStatsName.Watcher, new Color(0.8f, 0.1f, 0.3f) }
+                { SlugName.Night, new Color(0.8f, 0.1f, 0.3f) }
             };
 
         #endregion PlayerGraphics
