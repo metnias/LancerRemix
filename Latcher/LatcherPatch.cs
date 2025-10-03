@@ -91,7 +91,7 @@ namespace LancerRemix.Latcher
         private static void LatcherAddCamoMeter(On.HUD.HUD.orig_InitSinglePlayerHud orig, HUD.HUD self, RoomCamera cam)
         {
             if (IsPlayerLatcher(self.owner as Player))
-                self.AddPart(new CamoMeter(self, self.fContainers[1]));
+                self.AddPart(new CamoMeter(self, null, self.fContainers[1]));
             orig(self, cam);
         }
 

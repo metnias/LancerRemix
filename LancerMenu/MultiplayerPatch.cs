@@ -203,7 +203,7 @@ namespace LancerRemix.LancerMenu
             if (message == "PLAY!" || message == "RESUME")
             {
                 UpdateIsPlayerLancer(false);
-                if (!ModManager.MSC || self.currentGameType == MoreSlugcatsEnums.GameTypeID.Challenge)
+                if (!ModManager.DLCShared || self.currentGameType == DLCSharedEnums.GameTypeID.Challenge)
                     for (int i = 0; i < 4; ++i) SetLancerPlayers(i, false);
                 else
                 {
