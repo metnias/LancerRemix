@@ -312,11 +312,11 @@ namespace LancerRemix.Cat
             orig(self, actuallyViewed, eu);
         }
 
-        private static void LancerSetMalnourished(On.Player.orig_SetMalnourished orig, Player self, bool m)
+        private static void LancerSetMalnourished(On.Player.orig_SetMalnourished orig, Player self, bool m, bool malnourishedByCreature = false)
         {
             if (IsPlayerLancer(self))
-            { GetSub<LancerSupplement>(self)?.SetMalnourished(orig, m); return; }
-            orig(self, m);
+            { GetSub<LancerSupplement>(self)?.SetMalnourished(orig, m, malnourishedByCreature); return; }
+            orig(self, m, malnourishedByCreature);
         }
 
         private static void LancerTerrainImpact(On.Player.orig_TerrainImpact orig, Player self, int chunk, IntVector2 direction, float speed, bool firstContact)

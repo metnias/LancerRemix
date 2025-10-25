@@ -251,9 +251,9 @@ namespace LancerRemix.Cat
             }
         }
 
-        public virtual void SetMalnourished(On.Player.orig_SetMalnourished orig, bool m)
+        public virtual void SetMalnourished(On.Player.orig_SetMalnourished orig, bool m, bool malnourishedByCreature)
         {
-            orig(self, m);
+            orig(self, m, malnourishedByCreature);
             UpdateHasExhaustion();
         }
 
